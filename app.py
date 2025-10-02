@@ -44,6 +44,12 @@ def create_app(config_name=None):
     from auth.routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
     
+    from payments.routes import payments_bp
+    app.register_blueprint(payments_bp, url_prefix='/payments')
+    
+    from payments.webhooks import webhooks_bp
+    app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
+    
     # Add Jinja2 filter for JSON formatting
     import json
     @app.template_filter('tojsonpretty')

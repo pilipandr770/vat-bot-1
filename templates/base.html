@@ -41,8 +41,11 @@
                             <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
                                 <i class="bi bi-person"></i> Profil
                             </a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{{ url_for('payments.pricing') }}">
                                 <i class="bi bi-credit-card"></i> Abonnement
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('payments.customer_portal') }}">
+                                <i class="bi bi-gear"></i> Zahlungen verwalten
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
@@ -57,7 +60,7 @@
                         <a class="nav-link" href="{{ url_for('landing') }}#features">Funktionen</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('landing') }}#pricing">Preise</a>
+                        <a class="nav-link" href="{{ url_for('payments.pricing') }}">Preise</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('auth.login') }}">Anmelden</a>

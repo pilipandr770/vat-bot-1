@@ -139,7 +139,27 @@
                         <div class="col-md-6 mb-3">
                             <strong>Aktueller Plan:</strong>
                             <p class="mb-0">
-                                <span class="badge bg-primary">{{ current_user.subscription_plan|upper }}</span>
+                                {% if current_user.subscription_plan == 'free' %}
+                                    <span class="badge bg-secondary">KOSTENLOS</span>
+                                {% elif current_user.subscription_plan == 'pro' %}
+                                    <span class="badge bg-primary">PRO</span>
+                                {% elif current_user.subscription_plan == 'enterprise' %}
+                                    <span class="badge bg-success">ENTERPRISE</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>API-Nutzung:</strong>
+                            <p class="mb-0">
+                                {% if current_user.active_subscription %}
+                                    {{ current_user.active_subscription.api_calls_used }} / 
+                                    {% if current_user.active_subscription.api_calls_limit == 999999 %}
+                                        Unbegrenzt
+                                    {% else %}
+                                        {{ current_user.active_subscription.api_calls_limit }}
+                                    {% endif %}
+                                    <small class="text-muted">diesen Monat</small>
+                                {% endif %}
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -149,6 +169,20 @@
                                     {{ current_user.last_login.strftime('%d.%m.%Y %H:%M') }}
                                 {% else %}
                                     Erster Login
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Abonnement:</strong>
+                            <p class="mb-0">
+                                {% if current_user.subscription_plan == 'free' %}
+                                    <a href="{{ url_for('payments.pricing') }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-arrow-up-circle"></i> Upgrade
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('payments.customer_portal') }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-gear"></i> Verwalten
+                                    </a>
                                 {% endif %}
                             </p>
                         </div>

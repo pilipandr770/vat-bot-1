@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Preise - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Wählen Sie Ihren Plan</h1>
+        <p class="lead text-muted">Transparente Preise. Keine versteckten Gebühren. Jederzeit kündbar.</p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="row g-4 justify-content-center">
+        {% for plan in plans %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 {% if plan.featured %}border-primary shadow-lg{% else %}shadow-sm{% endif %}">
+                {% if plan.featured %}
+                <div class="card-header bg-primary text-white text-center py-2">
+                    <strong>⭐ Am beliebtesten</strong>
+                </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <!-- Plan Name -->
+                    <h3 class="card-title text-center mb-3">{{ plan.display_name }}</h3>
+                    
+                    <!-- Price -->
+                    <div class="text-center mb-4">
+                        {% if plan.price == 0 %}
+                        <h2 class="display-4 fw-bold">Kostenlos</h2>
+                        <p class="text-muted">{{ plan.period }}</p>
+                        {% else %}
+                        <h2 class="display-4 fw-bold">€{{ plan.price }}</h2>
+                        <p class="text-muted">{{ plan.period }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- API Calls -->
+                    <div class="text-center mb-4">
+                        <span class="badge bg-secondary fs-6 px-3 py-2">
+                            {% if plan.api_calls == 'Unbegrenzt' %}
+                            {{ plan.api_calls }} Prüfungen
+                            {% else %}
+                            {{ plan.api_calls }} Prüfungen/Monat
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Features List -->
+                    <ul class="list-unstyled mb-4 flex-grow-1">
+                        {% for feature in plan.features %}
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <!-- CTA Button -->
+                    <div class="text-center mt-auto">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.subscription_plan == plan.name %}
+                            <button class="btn btn-outline-secondary w-100" disabled>
+                                Aktueller Plan
+                            </button>
+                            {% else %}
+                                {% if plan.cta_params %}
+                                <a href="{{ url_for(plan.cta_url, **plan.cta_params) }}" 
+                                   class="btn {% if plan.featured %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                    {{ plan.cta }}
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for(plan.cta_url) }}" 
+                                   class="btn {% if plan.featured %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                    {{ plan.cta }}
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('auth.register') }}" 
+                               class="btn {% if plan.featured %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                {{ plan.cta }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-5 pt-5 border-top">
+        <h2 class="text-center mb-4">Häufig gestellte Fragen</h2>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="pricingFAQ">
+                    <!-- Question 1 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                Kann ich jederzeit kündigen?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Ja, Sie können Ihr Abonnement jederzeit ohne Kündigungsfrist beenden. 
+                                Es gibt keine langfristigen Verpflichtungen.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Was passiert, wenn ich mein Limit überschreite?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Beim kostenlosen Plan werden keine weiteren Prüfungen möglich sein, bis der nächste Monat beginnt.
+                                Bei bezahlten Plänen können Sie jederzeit upgraden, um mehr Prüfungen durchzuführen.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Welche Zahlungsmethoden akzeptieren Sie?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Wir akzeptieren alle gängigen Kreditkarten (Visa, Mastercard, American Express) 
+                                sowie SEPA-Lastschrift über unseren sicheren Zahlungsanbieter Stripe.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                Kann ich zwischen Plänen wechseln?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Ja, Sie können jederzeit upgraden oder downgraden. 
+                                Bei einem Upgrade erhalten Sie sofort Zugriff auf die zusätzlichen Features. 
+                                Bei einem Downgrade werden die Änderungen am Ende des aktuellen Abrechnungszeitraums wirksam.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                Gibt es eine Geld-zurück-Garantie?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Ja, wir bieten eine 14-tägige Geld-zurück-Garantie für alle bezahlten Pläne. 
+                                Wenn Sie nicht zufrieden sind, erstatten wir Ihnen den vollen Betrag zurück.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                Benötigen Sie eine individuelle Lösung?
+                            </button>
+                        </h2>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Für Unternehmen mit speziellen Anforderungen bieten wir maßgeschneiderte Enterprise-Lösungen an. 
+                                Kontaktieren Sie uns unter <a href="mailto:enterprise@vat-verification.de">enterprise@vat-verification.de</a> 
+                                für ein individuelles Angebot.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trust Badges -->
+    <div class="mt-5 pt-4 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p class="text-muted mb-3">Vertraut von über 500 Unternehmen in Europa</p>
+                <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
+                    <span class="badge bg-light text-dark p-3">
+                        <i class="bi bi-shield-check me-2"></i>SSL verschlüsselt
+                    </span>
+                    <span class="badge bg-light text-dark p-3">
+                        <i class="bi bi-check-circle me-2"></i>GDPR konform
+                    </span>
+                    <span class="badge bg-light text-dark p-3">
+                        <i class="bi bi-credit-card me-2"></i>Stripe-gesichert
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="mt-5 pt-5 text-center">
+        <h3 class="mb-3">Noch Fragen?</h3>
+        <p class="text-muted mb-4">Unser Support-Team hilft Ihnen gerne weiter.</p>
+        <a href="mailto:support@vat-verification.de" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-envelope me-2"></i>Kontaktieren Sie uns
+        </a>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card.border-primary {
+        position: relative;
+    }
+    
+    .card.border-primary::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #0d6efd, #6610f2);
+        border-radius: 0.375rem;
+        z-index: -1;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
