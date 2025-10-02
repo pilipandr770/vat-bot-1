@@ -1,0 +1,156 @@
+/* Landing Page Styles */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Hero Section */
+.hero-section {
+    padding: 120px 0 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+}
+
+.hero-section h1 {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.hero-section .lead {
+    animation: fadeInUp 1s ease-out;
+}
+
+.hero-section .btn {
+    animation: fadeInUp 1.2s ease-out;
+}
+
+/* Feature Icons */
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Pricing Cards */
+.card.border-primary {
+    position: relative;
+    top: -20px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.btn-primary {
+    animation: pulse 2s infinite;
+}
+
+.btn-primary:hover {
+    animation: none;
+    transform: scale(1.05);
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Navbar Transparency */
+.navbar {
+    transition: background-color 0.3s ease;
+}
+
+.navbar.scrolled {
+    background-color: rgba(33, 37, 41, 0.95) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 80px 0 40px;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .card.border-primary {
+        top: 0;
+    }
+}
+
+/* Footer Links */
+footer a {
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+footer a:hover {
+    opacity: 0.7;
+}
+
+/* Badge Styles */
+.badge {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+}
+
+/* Accordion Customization */
+.accordion-button:not(.collapsed) {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.accordion-button:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Icon Hover Effects */
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .feature-icon {
+    transform: rotate(360deg);
+}

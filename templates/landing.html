@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAT Verifizierung - Geschäftspartner Compliance Prüfung | SaaS Platform</title>
+    <meta name="description" content="Automatische USt-IdNr. Verifizierung, Sanktionsprüfung und Geschäftspartner Compliance. VIES, Handelsregister und EU/OFAC Sanktionslisten Integration.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/landing.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shield-check"></i> VAT Verifizierung
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#features">Funktionen</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pricing">Preise</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Anmelden</a></li>
+                    <li class="nav-item"><a class="btn btn-primary ms-2" href="{{ url_for('register') }}">Kostenlos Starten</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        Automatische <span class="text-primary">Geschäftspartner</span> Verifizierung
+                    </h1>
+                    <p class="lead mb-4">
+                        Prüfen Sie USt-IdNr., Sanktionslisten und Handelsregistereinträge Ihrer Geschäftspartner in Sekunden. 
+                        Compliance-konform und DSGVO-sicher.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-rocket"></i> Jetzt kostenlos starten
+                        </a>
+                        <a href="#demo" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-play-circle"></i> Demo ansehen
+                        </a>
+                    </div>
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <i class="bi bi-check-circle text-success"></i> Keine Kreditkarte erforderlich 
+                            <i class="bi bi-check-circle text-success ms-3"></i> 5 kostenlose Prüfungen
+                        </small>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{{ url_for('static', filename='images/hero-illustration.svg') }}" 
+                         alt="VAT Verification Dashboard" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Alle Prüfungen an einem Ort</h2>
+                <p class="lead text-muted">Umfassende Geschäftspartner Due Diligence in Echtzeit</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-primary text-white rounded-circle mb-3">
+                                <i class="bi bi-patch-check fs-1"></i>
+                            </div>
+                            <h3 class="h5">VIES USt-IdNr. Prüfung</h3>
+                            <p class="text-muted">
+                                Echtzeit-Validierung von EU-Umsatzsteuer-Identifikationsnummern direkt 
+                                über die offizielle VIES-Datenbank.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-danger text-white rounded-circle mb-3">
+                                <i class="bi bi-shield-exclamation fs-1"></i>
+                            </div>
+                            <h3 class="h5">Sanktionslisten</h3>
+                            <p class="text-muted">
+                                Automatischer Abgleich mit EU, OFAC und UK Sanktionslisten. 
+                                Schützen Sie Ihr Unternehmen vor Compliance-Risiken.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-success text-white rounded-circle mb-3">
+                                <i class="bi bi-building fs-1"></i>
+                            </div>
+                            <h3 class="h5">Handelsregister</h3>
+                            <p class="text-muted">
+                                Überprüfung von Firmendaten im deutschen Handelsregister und 
+                                Insolvenzbekanntmachungen.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-info text-white rounded-circle mb-3">
+                                <i class="bi bi-clock-history fs-1"></i>
+                            </div>
+                            <h3 class="h5">Verlauf & Berichte</h3>
+                            <p class="text-muted">
+                                Vollständige Historie aller Prüfungen mit exportierbaren 
+                                Compliance-Berichten im PDF-Format.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-warning text-white rounded-circle mb-3">
+                                <i class="bi bi-bell fs-1"></i>
+                            </div>
+                            <h3 class="h5">Monitoring & Alerts</h3>
+                            <p class="text-muted">
+                                Automatische Benachrichtigungen bei Statusänderungen Ihrer 
+                                Geschäftspartner per E-Mail oder Telegram.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-secondary text-white rounded-circle mb-3">
+                                <i class="bi bi-code-square fs-1"></i>
+                            </div>
+                            <h3 class="h5">REST API</h3>
+                            <p class="text-muted">
+                                Integrieren Sie die Prüfungen nahtlos in Ihre bestehenden 
+                                Systeme über unsere RESTful API.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Transparente Preise</h2>
+                <p class="lead text-muted">Wählen Sie den Plan, der zu Ihrem Unternehmen passt</p>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                <!-- Free Plan -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h3 class="h4 mb-3">Kostenlos</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                0€<small class="text-muted fs-6">/Monat</small>
+                            </div>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 5 Prüfungen pro Monat</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> VIES Validierung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Basis Sanktionsprüfung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> E-Mail Support</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> API Zugang</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> Handelsregister</li>
+                            </ul>
+                            <a href="{{ url_for('register') }}" class="btn btn-outline-primary w-100">
+                                Kostenlos starten
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pro Plan -->
+                <div class="col-lg-4">
+                    <div class="card border-primary border-3 shadow-lg">
+                        <div class="card-header bg-primary text-white text-center py-3">
+                            <span class="badge bg-white text-primary">Beliebt</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <h3 class="h4 mb-3">Professional</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                49€<small class="text-muted fs-6">/Monat</small>
+                            </div>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 200 Prüfungen pro Monat</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Validierungsdienste</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Handelsregister Prüfung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Erweiterte Sanktionslisten</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> API Zugang</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verlauf & Berichte</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Prioritäts-Support</li>
+                            </ul>
+                            <a href="{{ url_for('register') }}" class="btn btn-primary w-100">
+                                Jetzt starten
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enterprise Plan -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h3 class="h4 mb-3">Enterprise</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                199€<small class="text-muted fs-6">/Monat</small>
+                            </div>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Unbegrenzte Prüfungen</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Professional Features</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> White-Label Lösung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Custom API Integration</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Dedizierter Account Manager</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 24/7 Premium Support</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> SLA Garantie</li>
+                            </ul>
+                            <a href="mailto:sales@vatverification.com" class="btn btn-outline-primary w-100">
+                                Kontakt aufnehmen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Häufig gestellte Fragen</h2>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Wie funktioniert die USt-IdNr. Prüfung?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Wir nutzen die offizielle VIES-Datenbank der Europäischen Kommission für Echtzeit-Validierung 
+                                    von EU-Umsatzsteuer-Identifikationsnummern. Die Prüfung erfolgt automatisch und liefert 
+                                    sofortige Ergebnisse über die Gültigkeit der USt-IdNr.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Welche Sanktionslisten werden geprüft?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Wir prüfen EU-Sanktionslisten, OFAC (USA) und UK Sanctions List. Die Listen werden täglich 
+                                    aktualisiert und enthalten Personen, Organisationen und Länder mit Handelsbeschränkungen.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Ist meine Daten DSGVO-konform gespeichert?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Ja, alle Daten werden verschlüsselt in EU-Rechenzentren gespeichert und entsprechen den 
+                                    DSGVO-Anforderungen. Sie haben jederzeit Zugriff auf Ihre Daten und können diese löschen.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Kann ich mein Abonnement jederzeit kündigen?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Ja, Sie können Ihr Abonnement jederzeit mit einem Klick kündigen. Es gibt keine 
+                                    Mindestvertragslaufzeit und keine versteckten Kosten.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    Gibt es eine API für Entwickler?
+                                </button>
+                            </h2>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Ja, ab dem Professional-Plan haben Sie Zugriff auf unsere RESTful API. Vollständige 
+                                    Dokumentation mit Code-Beispielen ist im Dashboard verfügbar.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container text-center">
+            <h2 class="display-5 fw-bold mb-4">Bereit loszulegen?</h2>
+            <p class="lead mb-4">Starten Sie jetzt mit 5 kostenlosen Prüfungen</p>
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                <i class="bi bi-rocket"></i> Kostenlos registrieren
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2025 VAT Verifizierung. Alle Rechte vorbehalten.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white me-3">AGB</a>
+                    <a href="#" class="text-white me-3">Datenschutz</a>
+                    <a href="#" class="text-white">Impressum</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
