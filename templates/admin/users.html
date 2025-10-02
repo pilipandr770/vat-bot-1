@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Benutzerverwaltung - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3">
+                <i class="bi bi-people-fill"></i> Benutzerverwaltung
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+                    <li class="breadcrumb-item active">Benutzer</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.users') }}" class="row g-3">
+                <!-- Search -->
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Suche</label>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="E-Mail, Name, Firma..." 
+                           value="{{ search_query }}">
+                </div>
+                
+                <!-- Plan Filter -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Plan</label>
+                    <select name="plan" class="form-select">
+                        <option value="all" {% if plan_filter == 'all' %}selected{% endif %}>Alle Pläne</option>
+                        <option value="free" {% if plan_filter == 'free' %}selected{% endif %}>Kostenlos</option>
+                        <option value="pro" {% if plan_filter == 'pro' %}selected{% endif %}>Professional</option>
+                        <option value="enterprise" {% if plan_filter == 'enterprise' %}selected{% endif %}>Enterprise</option>
+                    </select>
+                </div>
+                
+                <!-- Status Filter -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Alle Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Aktiv</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inaktiv</option>
+                    </select>
+                </div>
+                
+                <!-- Actions -->
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">&nbsp;</label>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Filtern
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Benutzer ({{ pagination.total }} Ergebnisse)</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Benutzer</th>
+                            <th>Firma</th>
+                            <th>Plan</th>
+                            <th>API-Nutzung</th>
+                            <th>Registriert</th>
+                            <th>Status</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr id="user-row-{{ user.id }}">
+                            <td><small class="text-muted">#{{ user.id }}</small></td>
+                            <td>
+                                <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                                {% if user.is_admin %}
+                                    <span class="badge bg-danger ms-1">ADMIN</span>
+                                {% endif %}
+                                <br>
+                                <small class="text-muted">{{ user.email }}</small>
+                                {% if not user.is_email_confirmed %}
+                                    <span class="badge bg-warning ms-1">Email unbestätigt</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ user.company_name or 'N/A' }}</small>
+                            </td>
+                            <td>
+                                {% if user.subscription_plan == 'free' %}
+                                    <span class="badge bg-secondary">FREE</span>
+                                {% elif user.subscription_plan == 'pro' %}
+                                    <span class="badge bg-primary">PRO</span>
+                                {% elif user.subscription_plan == 'enterprise' %}
+                                    <span class="badge bg-success">ENTERPRISE</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.active_subscription %}
+                                    <small>
+                                        {{ user.active_subscription.api_calls_used }} / 
+                                        {% if user.active_subscription.api_calls_limit == 999999 %}
+                                            ∞
+                                        {% else %}
+                                            {{ user.active_subscription.api_calls_limit }}
+                                        {% endif %}
+                                    </small>
+                                {% else %}
+                                    <small class="text-muted">N/A</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ user.created_at.strftime('%d.%m.%Y') }}</small>
+                            </td>
+                            <td>
+                                <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}" 
+                                      id="status-badge-{{ user.id }}">
+                                    {{ 'Aktiv' if user.is_active else 'Inaktiv' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" 
+                                       class="btn btn-outline-primary" 
+                                       title="Details anzeigen">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-outline-warning" 
+                                            onclick="toggleUserStatus({{ user.id }})"
+                                            title="{{ 'Deaktivieren' if user.is_active else 'Aktivieren' }}">
+                                        <i class="bi bi-power"></i>
+                                    </button>
+                                    {% if not user.is_admin or user.id != current_user.id %}
+                                    <button type="button" 
+                                            class="btn btn-outline-danger" 
+                                            onclick="toggleAdminStatus({{ user.id }})"
+                                            title="Admin-Rechte {{ 'entziehen' if user.is_admin else 'erteilen' }}">
+                                        <i class="bi bi-shield-lock"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <div class="card-footer bg-white">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.users', page=pagination.prev_num, search=search_query, plan=plan_filter, status=status_filter) }}">
+                            Zurück
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Zurück</span>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == pagination.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.users', page=page_num, search=search_query, plan=plan_filter, status=status_filter) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.users', page=pagination.next_num, search=search_query, plan=plan_filter, status=status_filter) }}">
+                            Weiter
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Weiter</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function toggleUserStatus(userId) {
+        if (!confirm('Möchten Sie den Benutzerstatus wirklich ändern?')) {
+            return;
+        }
+        
+        fetch(`/admin/users/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update badge
+                const badge = document.getElementById(`status-badge-${userId}`);
+                if (data.is_active) {
+                    badge.className = 'badge bg-success';
+                    badge.textContent = 'Aktiv';
+                } else {
+                    badge.className = 'badge bg-danger';
+                    badge.textContent = 'Inaktiv';
+                }
+                
+                // Show success message
+                alert(data.message);
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Fehler beim Ändern des Benutzerstatus.');
+        });
+    }
+    
+    function toggleAdminStatus(userId) {
+        if (!confirm('Möchten Sie die Admin-Rechte wirklich ändern?')) {
+            return;
+        }
+        
+        fetch(`/admin/users/${userId}/toggle-admin`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Fehler beim Ändern der Admin-Rechte.');
+        });
+    }
+</script>
+{% endblock %}

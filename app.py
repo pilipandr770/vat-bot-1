@@ -50,6 +50,9 @@ def create_app(config_name=None):
     from payments.webhooks import webhooks_bp
     app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
     
+    from admin.routes import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    
     # Add Jinja2 filter for JSON formatting
     import json
     @app.template_filter('tojsonpretty')

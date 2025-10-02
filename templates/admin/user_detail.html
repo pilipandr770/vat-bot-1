@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.email }} - Benutzerdetails{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.users') }}">Benutzer</a></li>
+            <li class="breadcrumb-item active">{{ user.email }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- User Profile Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <!-- Avatar -->
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+                             style="width: 100px; height: 100px; font-size: 2.5rem;">
+                            {{ user.first_name[0]|upper }}{{ user.last_name[0]|upper }}
+                        </div>
+                    </div>
+                    
+                    <!-- Name and Role -->
+                    <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+                    <p class="text-muted mb-3">{{ user.email }}</p>
+                    
+                    {% if user.is_admin %}
+                        <span class="badge bg-danger mb-3">ADMINISTRATOR</span>
+                    {% endif %}
+                    
+                    <!-- Status Badge -->
+                    {% if user.is_active %}
+                        <span class="badge bg-success mb-3">Aktiv</span>
+                    {% else %}
+                        <span class="badge bg-danger mb-3">Inaktiv</span>
+                    {% endif %}
+                    
+                    {% if not user.is_email_confirmed %}
+                        <span class="badge bg-warning mb-3">Email unbestätigt</span>
+                    {% endif %}
+                </div>
+                
+                <!-- User Info -->
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <strong><i class="bi bi-building"></i> Firma:</strong><br>
+                        <small>{{ user.company_name or 'Nicht angegeben' }}</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong><i class="bi bi-telephone"></i> Telefon:</strong><br>
+                        <small>{{ user.phone or 'Nicht angegeben' }}</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong><i class="bi bi-geo-alt"></i> Land:</strong><br>
+                        <small>{{ user.country or 'Nicht angegeben' }}</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong><i class="bi bi-calendar-plus"></i> Registriert:</strong><br>
+                        <small>{{ user.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                    </div>
+                    <div class="list-group-item">
+                        <strong><i class="bi bi-clock-history"></i> Letzter Login:</strong><br>
+                        <small>
+                            {% if user.last_login %}
+                                {{ user.last_login.strftime('%d.%m.%Y %H:%M') }}
+                            {% else %}
+                                Nie
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-8">
+            <!-- Statistics Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <h6 class="text-muted">Abonnement</h6>
+                            <h3>
+                                {% if subscription.plan == 'free' %}
+                                    <span class="badge bg-secondary">KOSTENLOS</span>
+                                {% elif subscription.plan == 'pro' %}
+                                    <span class="badge bg-primary">PROFESSIONAL</span>
+                                {% elif subscription.plan == 'enterprise' %}
+                                    <span class="badge bg-success">ENTERPRISE</span>
+                                {% endif %}
+                            </h3>
+                            <small class="text-muted">
+                                Status: {{ subscription.status|upper if subscription else 'N/A' }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h6 class="text-muted">Gesamtausgaben</h6>
+                            <h3 class="text-success">€{{ "{:,.2f}".format(total_spent) }}</h3>
+                            <small class="text-muted">{{ payments|length }} Zahlungen</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Usage -->
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-activity"></i> API-Nutzung</h5>
+                </div>
+                <div class="card-body">
+                    {% if subscription %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Diesen Monat:</span>
+                            <strong>
+                                {{ subscription.api_calls_used }} / 
+                                {% if subscription.api_calls_limit == 999999 %}
+                                    Unbegrenzt
+                                {% else %}
+                                    {{ subscription.api_calls_limit }}
+                                {% endif %}
+                            </strong>
+                        </div>
+                        {% if subscription.api_calls_limit != 999999 %}
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar {% if subscription.api_calls_used >= subscription.api_calls_limit %}bg-danger{% elif subscription.api_calls_used >= subscription.api_calls_limit * 0.8 %}bg-warning{% else %}bg-success{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ (subscription.api_calls_used / subscription.api_calls_limit * 100) if subscription.api_calls_limit > 0 else 0 }}%">
+                                {{ "{:.0f}".format((subscription.api_calls_used / subscription.api_calls_limit * 100) if subscription.api_calls_limit > 0 else 0) }}%
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="row text-center">
+                        <div class="col">
+                            <h4>{{ total_verifications }}</h4>
+                            <small class="text-muted">Gesamt Prüfungen</small>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Keine Abonnementdaten verfügbar.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Payments -->
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Zahlungsverlauf</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if payments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Datum</th>
+                                    <th>Betrag</th>
+                                    <th>Status</th>
+                                    <th>Stripe ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>{{ payment.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td><strong>€{{ "{:.2f}".format(payment.amount) }}</strong></td>
+                                    <td>
+                                        {% if payment.status == 'succeeded' %}
+                                            <span class="badge bg-success">Erfolgreich</span>
+                                        {% elif payment.status == 'failed' %}
+                                            <span class="badge bg-danger">Fehlgeschlagen</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ payment.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted font-monospace">{{ payment.stripe_payment_intent_id }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="card-body">
+                        <p class="text-muted mb-0">Noch keine Zahlungen.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Verifications -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-shield-check"></i> Letzte Prüfungen</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if verifications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Datum</th>
+                                    <th>Firma</th>
+                                    <th>VAT</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for check in verifications %}
+                                <tr>
+                                    <td><small>{{ check.check_date.strftime('%d.%m.%Y %H:%M') }}</small></td>
+                                    <td>
+                                        {% if check.counterparty %}
+                                            <strong>{{ check.counterparty.company_name }}</strong>
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if check.counterparty %}
+                                            <small class="font-monospace">{{ check.counterparty.vat_number }}</small>
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if check.overall_status == 'valid' %}
+                                            <span class="badge bg-success">Gültig</span>
+                                        {% elif check.overall_status == 'warning' %}
+                                            <span class="badge bg-warning">Warnung</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Fehler</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="card-body">
+                        <p class="text-muted mb-0">Noch keine Prüfungen durchgeführt.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
