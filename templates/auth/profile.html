@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Mein Profil - VAT Verifizierung{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="avatar bg-primary text-white rounded-circle mx-auto mb-2" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            {{ current_user.first_name[0]}}{{ current_user.last_name[0] }}
+                        </div>
+                        <h5 class="mb-0">{{ current_user.first_name }} {{ current_user.last_name }}</h5>
+                        <p class="text-muted small">{{ current_user.email }}</p>
+                    </div>
+                    <hr>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="{{ url_for('auth.profile') }}">
+                            <i class="bi bi-person"></i> Profil
+                        </a>
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="{{ url_for('verification_history') }}">
+                            <i class="bi bi-clock-history"></i> Verlauf
+                        </a>
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-credit-card"></i> Abonnement
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-person-gear"></i> Profil bearbeiten</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('auth.profile') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Company Name -->
+                        <div class="mb-3">
+                            {{ form.company_name.label(class="form-label fw-bold") }}
+                            {{ form.company_name(class="form-control " + ("is-invalid" if form.company_name.errors else "")) }}
+                            {% if form.company_name.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.company_name.errors[0] }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- First Name and Last Name -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.first_name.label(class="form-label fw-bold") }}
+                                {{ form.first_name(class="form-control " + ("is-invalid" if form.first_name.errors else "")) }}
+                                {% if form.first_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.first_name.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_name.label(class="form-label fw-bold") }}
+                                {{ form.last_name(class="form-control " + ("is-invalid" if form.last_name.errors else "")) }}
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.last_name.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Phone and Country -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.phone.label(class="form-label fw-bold") }}
+                                {{ form.phone(class="form-control " + ("is-invalid" if form.phone.errors else "")) }}
+                                {% if form.phone.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.phone.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.country.label(class="form-label fw-bold") }}
+                                {{ form.country(class="form-select " + ("is-invalid" if form.country.errors else "")) }}
+                                {% if form.country.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.country.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Änderungen speichern
+                            </button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                Abbrechen
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Account Info -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Kontoinformationen</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>E-Mail-Adresse:</strong>
+                            <p class="mb-0">{{ current_user.email }}</p>
+                            {% if current_user.is_email_confirmed %}
+                                <span class="badge bg-success">Bestätigt</span>
+                            {% else %}
+                                <span class="badge bg-warning">Nicht bestätigt</span>
+                                <a href="{{ url_for('auth.resend_confirmation') }}" class="small">E-Mail erneut senden</a>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Mitglied seit:</strong>
+                            <p class="mb-0">{{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Aktueller Plan:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-primary">{{ current_user.subscription_plan|upper }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Letzter Login:</strong>
+                            <p class="mb-0">
+                                {% if current_user.last_login %}
+                                    {{ current_user.last_login.strftime('%d.%m.%Y %H:%M') }}
+                                {% else %}
+                                    Erster Login
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

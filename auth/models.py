@@ -31,6 +31,10 @@ class User(UserMixin, db.Model):
     is_email_confirmed = db.Column(db.Boolean, default=False)
     email_confirmation_token = db.Column(db.String(100), unique=True)
     
+    # Password reset
+    password_reset_token = db.Column(db.String(100), unique=True)
+    password_reset_expires = db.Column(db.DateTime)
+    
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     last_login = db.Column(db.DateTime)

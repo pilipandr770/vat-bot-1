@@ -5,8 +5,31 @@ from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from typing import Dict, List
 import logging
+from flask import current_app
+from flask_mail import Message
 
 logger = logging.getLogger(__name__)
+
+# Helper function for Flask-Mail
+def send_email(subject, recipient, text_body, html_body=None):
+    """Send email using Flask-Mail."""
+    try:
+        from app import mail
+        
+        msg = Message(
+            subject=subject,
+            recipients=[recipient],
+            body=text_body,
+            html=html_body,
+            sender=current_app.config['MAIL_DEFAULT_SENDER']
+        )
+        
+        mail.send(msg)
+        logger.info(f'Email sent to {recipient}: {subject}')
+        return True
+    except Exception as e:
+        logger.error(f'Error sending email: {str(e)}')
+        return False
 
 class NotificationService:
     """Service for sending notifications via Email and Telegram."""

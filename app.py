@@ -1,14 +1,21 @@
 import os
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from flask_migrate import Migrate
+from flask_login import LoginManager, login_required, current_user
+from flask_mail import Mail
 from config import config
 from crm.models import db, Company, Counterparty, VerificationCheck, CheckResult
+from auth.models import User
 from services.vies import VIESService
 from services.handelsregister import HandelsregisterService
 from services.sanctions import SanctionsService
 from crm.save_results import ResultsSaver
 import asyncio
 from datetime import datetime
+
+# Initialize Flask extensions
+login_manager = LoginManager()
+mail = Mail()
 
 def create_app(config_name=None):
     """Application factory pattern."""
@@ -21,6 +28,21 @@ def create_app(config_name=None):
     # Initialize extensions
     db.init_app(app)
     migrate = Migrate(app, db)
+    login_manager.init_app(app)
+    mail.init_app(app)
+    
+    # Configure Flask-Login
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Bitte melden Sie sich an, um auf diese Seite zuzugreifen.'
+    login_manager.login_message_category = 'warning'
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+    
+    # Register blueprints
+    from auth.routes import auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     
     # Add Jinja2 filter for JSON formatting
     import json
@@ -35,9 +57,32 @@ def create_app(config_name=None):
     results_saver = ResultsSaver(db)
     
     @app.route('/')
-    def index():
-        """Main verification interface."""
-        return render_template('index.html')
+    def landing():
+        """Landing page for non-authenticated users."""
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        return render_template('landing.html')
+    
+    @app.route('/dashboard')
+    @login_required
+    def dashboard():
+        """Main verification interface for authenticated users."""
+        subscription = current_user.active_subscription
+        
+        # Get user statistics
+        total_checks = current_user.verifications.count()
+        monthly_checks = current_user.get_monthly_verification_count()
+        
+        # Get recent verifications
+        recent_checks = current_user.verifications.order_by(
+            VerificationCheck.created_at.desc()
+        ).limit(5).all()
+        
+        return render_template('index.html',
+                             subscription=subscription,
+                             total_checks=total_checks,
+                             monthly_checks=monthly_checks,
+                             recent_checks=recent_checks)
     
     @app.route('/test')
     def test_form():
@@ -45,10 +90,18 @@ def create_app(config_name=None):
         return render_template('test_form.html')
     
     @app.route('/verify', methods=['POST'])
+    @login_required
     def verify_counterparty():
-        """Process verification request."""
+        """Process verification request - requires authentication."""
         import logging
         logger = logging.getLogger(__name__)
+        
+        # Check if user can perform verification (quota check)
+        if not current_user.can_perform_verification():
+            return jsonify({
+                'success': False,
+                'error': 'Sie haben Ihr monatliches Prüfungslimit erreicht. Bitte upgraden Sie Ihren Plan.'
+            }), 403
         
         try:
             # Log request details
@@ -118,6 +171,7 @@ def create_app(config_name=None):
             verification_check = VerificationCheck(
                 company_id=company.id,
                 counterparty_id=counterparty.id,
+                user_id=current_user.id,
                 overall_status='pending'
             )
             db.session.add(verification_check)
@@ -125,6 +179,9 @@ def create_app(config_name=None):
             
             # Run verification services
             verification_results = run_verification_services(counterparty_data)
+            
+            # Increment user API usage
+            current_user.increment_api_usage()
             
             # Save results and calculate overall status
             overall_status, confidence = results_saver.save_verification_results(

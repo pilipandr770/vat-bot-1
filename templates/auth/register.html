@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Registrierung - VAT Verifizierung{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="bi bi-person-plus"></i> Kostenloses Konto erstellen</h3>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">
+                        Starten Sie mit 5 kostenlosen Prüfungen pro Monat. Keine Kreditkarte erforderlich.
+                    </p>
+                    
+                    <form method="POST" action="{{ url_for('auth.register') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Email -->
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control " + ("is-invalid" if form.email.errors else "")) }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.email.errors[0] }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Company Name -->
+                        <div class="mb-3">
+                            {{ form.company_name.label(class="form-label") }}
+                            {{ form.company_name(class="form-control " + ("is-invalid" if form.company_name.errors else "")) }}
+                            {% if form.company_name.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.company_name.errors[0] }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- First Name and Last Name -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.first_name.label(class="form-label") }}
+                                {{ form.first_name(class="form-control " + ("is-invalid" if form.first_name.errors else "")) }}
+                                {% if form.first_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.first_name.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_name.label(class="form-label") }}
+                                {{ form.last_name(class="form-control " + ("is-invalid" if form.last_name.errors else "")) }}
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.last_name.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Phone and Country -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.phone.label(class="form-label") }}
+                                {{ form.phone(class="form-control " + ("is-invalid" if form.phone.errors else ""), placeholder="+49 123 456789") }}
+                                {% if form.phone.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.phone.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.country.label(class="form-label") }}
+                                {{ form.country(class="form-select " + ("is-invalid" if form.country.errors else "")) }}
+                                {% if form.country.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.country.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control " + ("is-invalid" if form.password.errors else "")) }}
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password.errors[0] }}
+                                </div>
+                            {% else %}
+                                <div class="form-text">Mindestens 8 Zeichen</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Password Confirm -->
+                        <div class="mb-3">
+                            {{ form.password_confirm.label(class="form-label") }}
+                            {{ form.password_confirm(class="form-control " + ("is-invalid" if form.password_confirm.errors else "")) }}
+                            {% if form.password_confirm.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password_confirm.errors[0] }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Terms Acceptance -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.accept_terms(class="form-check-input " + ("is-invalid" if form.accept_terms.errors else "")) }}
+                                {{ form.accept_terms.label(class="form-check-label") }}
+                                {% if form.accept_terms.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.accept_terms.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="bi bi-rocket"></i> Kostenloses Konto erstellen
+                        </button>
+                    </form>
+                    
+                    <!-- Login Link -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            Haben Sie bereits ein Konto? 
+                            <a href="{{ url_for('auth.login') }}">Jetzt anmelden</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Preview -->
+            <div class="card mt-3 bg-light border-0">
+                <div class="card-body">
+                    <h6 class="mb-3">Was Sie erhalten:</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 5 kostenlose Prüfungen pro Monat</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> VIES USt-IdNr. Validierung</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Sanktionslisten-Prüfung</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verlauf & Berichte</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

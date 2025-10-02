@@ -15,6 +15,15 @@ class Config:
     OPENCORPORATES_API_KEY = os.environ.get('OPENCORPORATES_API_KEY')
     SANCTIONS_API_KEY = os.environ.get('SANCTIONS_API_KEY')
     
+    # Flask-Mail Configuration
+    MAIL_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
+    MAIL_PORT = int(os.environ.get('SMTP_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'True') == 'True'
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'False') == 'True'
+    MAIL_USERNAME = os.environ.get('SMTP_USERNAME')
+    MAIL_PASSWORD = os.environ.get('SMTP_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@vatverification.com')
+    
     # Notification Settings
     TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
@@ -22,6 +31,11 @@ class Config:
     SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
     SMTP_USERNAME = os.environ.get('SMTP_USERNAME')
     SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
+    
+    # Stripe Configuration
+    STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
+    STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+    STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
     
     # Redis and Celery
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0'
