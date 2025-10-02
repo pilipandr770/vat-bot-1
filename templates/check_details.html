@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Деталі перевірки #{{ check.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-clipboard-data"></i> Деталі перевірки #{{ check.id }}</h2>
+        <p class="text-muted mb-0">
+            Перевірено {{ check.check_date.strftime('%d.%m.%Y о %H:%M') }}
+        </p>
+    </div>
+    <div>
+        <a href="{{ url_for('verification_history') }}" class="btn btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left"></i> Назад до історії
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Нова перевірка
+        </a>
+    </div>
+</div>
+
+<!-- Overall Status Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Загальний результат</h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            {% if check.overall_status == 'valid' %}
+                                <i class="bi bi-check-circle-fill text-success display-4"></i>
+                                <h4 class="text-success mt-2">Валідно</h4>
+                            {% elif check.overall_status == 'warning' %}
+                                <i class="bi bi-exclamation-triangle-fill text-warning display-4"></i>
+                                <h4 class="text-warning mt-2">Попередження</h4>
+                            {% elif check.overall_status == 'error' %}
+                                <i class="bi bi-x-circle-fill text-danger display-4"></i>
+                                <h4 class="text-danger mt-2">Проблема</h4>
+                            {% else %}
+                                <i class="bi bi-clock-fill text-secondary display-4"></i>
+                                <h4 class="text-secondary mt-2">Очікування</h4>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Рівень довіри:</h6>
+                                {% if check.confidence_score %}
+                                {% set confidence_percent = (check.confidence_score * 100)|round|int %}
+                                <div class="progress mb-2" style="height: 20px;">
+                                    <div class="progress-bar 
+                                        {% if check.confidence_score >= 0.8 %}bg-success
+                                        {% elif check.confidence_score >= 0.6 %}bg-warning
+                                        {% else %}bg-danger{% endif %}"
+                                        role="progressbar"
+                                        aria-valuenow="{{ confidence_percent }}"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                        style="width: {{ confidence_percent }}%">
+                                        {{ confidence_percent }}%
+                                    </div>
+                                </div>
+                                {% else %}
+                                    <p class="text-muted">Не визначено</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Моніторинг:</h6>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" 
+                                           {% if check.is_monitoring_active %}checked{% endif %}
+                                           disabled>
+                                    <label class="form-check-label">
+                                        {% if check.is_monitoring_active %}Активний{% else %}Вимкнений{% endif %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Company Information -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-building"></i> Інформація про заявника</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Назва:</dt>
+                    <dd class="col-sm-8">{{ check.company.company_name }}</dd>
+                    
+                    <dt class="col-sm-4">VAT номер:</dt>
+                    <dd class="col-sm-8"><code>{{ check.company.vat_number }}</code></dd>
+                    
+                    <dt class="col-sm-4">Адреса:</dt>
+                    <dd class="col-sm-8">{{ check.company.legal_address }}</dd>
+                    
+                    {% if check.company.email %}
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">{{ check.company.email }}</dd>
+                    {% endif %}
+                    
+                    {% if check.company.phone %}
+                    <dt class="col-sm-4">Телефон:</dt>
+                    <dd class="col-sm-8">{{ check.company.phone }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-person-badge"></i> Інформація про контрагента</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Назва:</dt>
+                    <dd class="col-sm-8">{{ check.counterparty.company_name }}</dd>
+                    
+                    <dt class="col-sm-4">Країна:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-secondary">{{ check.counterparty.country }}</span>
+                    </dd>
+                    
+                    {% if check.counterparty.vat_number %}
+                    <dt class="col-sm-4">VAT номер:</dt>
+                    <dd class="col-sm-8"><code>{{ check.counterparty.vat_number }}</code></dd>
+                    {% endif %}
+                    
+                    {% if check.counterparty.address %}
+                    <dt class="col-sm-4">Адреса:</dt>
+                    <dd class="col-sm-8">{{ check.counterparty.address }}</dd>
+                    {% endif %}
+                    
+                    {% if check.counterparty.email %}
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">{{ check.counterparty.email }}</dd>
+                    {% endif %}
+                    
+                    {% if check.counterparty.domain %}
+                    <dt class="col-sm-4">Домен:</dt>
+                    <dd class="col-sm-8">{{ check.counterparty.domain }}</dd>
+                    {% endif %}
+                    
+                    {% if check.counterparty.contact_person %}
+                    <dt class="col-sm-4">Контакт:</dt>
+                    <dd class="col-sm-8">{{ check.counterparty.contact_person }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Service Results -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-list-check"></i> Результати перевірки сервісів</h5>
+    </div>
+    <div class="card-body">
+        {% if check.check_results %}
+            <div class="accordion" id="servicesAccordion">
+                {% for result in check.check_results %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#service{{ loop.index }}">
+                            <div class="d-flex align-items-center w-100">
+                                <i class="bi {% if result.service_name == 'vies' %}bi-patch-check
+                                          {% elif result.service_name == 'handelsregister' %}bi-building
+                                          {% elif result.service_name == 'sanctions' %}bi-shield-exclamation
+                                          {% else %}bi-gear{% endif %} me-3"></i>
+                                <div class="flex-grow-1">
+                                    <strong>
+                                        {% if result.service_name == 'vies' %}VIES VAT Перевірка
+                                        {% elif result.service_name == 'handelsregister' %}Handelsregister
+                                        {% elif result.service_name == 'sanctions' %}Санкційні списки
+                                        {% else %}{{ result.service_name.title() }}{% endif %}
+                                    </strong>
+                                </div>
+                                <span class="badge me-3 
+                                    {% if result.status == 'valid' %}bg-success
+                                    {% elif result.status == 'warning' %}bg-warning text-dark
+                                    {% elif result.status == 'error' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {% if result.status == 'valid' %}✅ Валідно
+                                    {% elif result.status == 'warning' %}⚠️ Попередження
+                                    {% elif result.status == 'error' %}❌ Проблема
+                                    {% else %}⏳ Очікування{% endif %}
+                                </span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="service{{ loop.index }}" 
+                         class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
+                         data-bs-parent="#servicesAccordion">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    {% if result.data %}
+                                        <h6>Дані відповіді:</h6>
+                                        <pre class="bg-light p-3 rounded small">{{ result.data | tojsonpretty }}</pre>
+                                    {% endif %}
+                                    
+                                    {% if result.error_message %}
+                                        <div class="alert alert-warning">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            <strong>Помилка:</strong> {{ result.error_message }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>Метадані:</h6>
+                                    <dl class="small">
+                                        <dt>Довіра:</dt>
+                                        <dd>{{ (result.confidence_score * 100)|round|int }}%</dd>
+                                        
+                                        {% if result.response_time_ms %}
+                                        <dt>Час відповіді:</dt>
+                                        <dd>{{ result.response_time_ms }} мс</dd>
+                                        {% endif %}
+                                        
+                                        <dt>Перевірено:</dt>
+                                        <dd>{{ result.created_at.strftime('%d.%m.%Y %H:%M') }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-inbox display-4"></i>
+                <p class="mt-2">Результати перевірки відсутні</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Alerts Section -->
+{% if check.alerts %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h5><i class="bi bi-bell"></i> Сповіщення та алерти</h5>
+    </div>
+    <div class="card-body">
+        {% for alert in check.alerts %}
+        <div class="alert 
+            {% if alert.severity == 'critical' %}alert-danger
+            {% elif alert.severity == 'high' %}alert-warning
+            {% elif alert.severity == 'medium' %}alert-info
+            {% else %}alert-secondary{% endif %}" role="alert">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="alert-heading">
+                        {% if alert.severity == 'critical' %}🚨
+                        {% elif alert.severity == 'high' %}⚠️
+                        {% elif alert.severity == 'medium' %}ℹ️
+                        {% else %}📝{% endif %}
+                        {{ alert.alert_type.replace('_', ' ').title() }}
+                    </h6>
+                    <p class="mb-1">{{ alert.message }}</p>
+                    <small class="text-muted">
+                        {{ alert.created_at.strftime('%d.%m.%Y %H:%M') }}
+                        {% if alert.is_sent %} • Відправлено {% if alert.sent_at %}{{ alert.sent_at.strftime('%H:%M') }}{% endif %}{% endif %}
+                    </small>
+                </div>
+                <span class="badge 
+                    {% if alert.severity == 'critical' %}bg-danger
+                    {% elif alert.severity == 'high' %}bg-warning text-dark
+                    {% elif alert.severity == 'medium' %}bg-info
+                    {% else %}bg-secondary{% endif %}">
+                    {{ alert.severity.title() }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add any page-specific JavaScript here
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(function(tooltip) {
+        new bootstrap.Tooltip(tooltip);
+    });
+});
+</script>
+{% endblock %}

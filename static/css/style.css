@@ -1,0 +1,164 @@
+/* Custom styles for Counterparty Verification System */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* Status indicators */
+.status-valid {
+    color: #198754;
+}
+
+.status-warning {
+    color: #fd7e14;
+}
+
+.status-error {
+    color: #dc3545;
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.required-field {
+    color: #dc3545;
+}
+
+/* Loading states */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Results panel */
+.results-panel {
+    min-height: 400px;
+}
+
+.service-result {
+    border-left: 4px solid #dee2e6;
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+.service-result.valid {
+    border-left-color: #198754;
+}
+
+.service-result.warning {
+    border-left-color: #fd7e14;
+}
+
+.service-result.error {
+    border-left-color: #dc3545;
+}
+
+/* Confidence score */
+.confidence-bar {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #dc3545 0%, #fd7e14 50%, #198754 100%);
+    transition: width 0.5s ease;
+}
+
+/* Accordion customizations */
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(0,0,0,0.125);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #e7f1ff;
+    color: #0c63e4;
+}
+
+/* History table */
+.table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,0.075);
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .col-lg-4 {
+        margin-bottom: 1rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Utility classes */
+.text-muted-light {
+    color: #6c757d !important;
+    opacity: 0.7;
+}
+
+.border-start-success {
+    border-left: 4px solid #198754 !important;
+}
+
+.border-start-warning {
+    border-left: 4px solid #fd7e14 !important;
+}
+
+.border-start-danger {
+    border-left: 4px solid #dc3545 !important;
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}

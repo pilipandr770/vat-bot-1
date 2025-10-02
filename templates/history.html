@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Історія перевірок{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clock-history"></i> Історія перевірок контрагентів</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Нова перевірка
+    </a>
+</div>
+
+{% if checks.items %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Контрагент</th>
+                        <th>Країна</th>
+                        <th>VAT номер</th>
+                        <th>Статус</th>
+                        <th>Довіра</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for check in checks.items %}
+                    <tr>
+                        <td>
+                            <small class="text-muted">
+                                {{ check.check_date.strftime('%d.%m.%Y %H:%M') }}
+                            </small>
+                        </td>
+                        <td>
+                            <strong>{{ check.counterparty.company_name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ check.company.company_name }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ check.counterparty.country }}</span>
+                        </td>
+                        <td>
+                            {% if check.counterparty.vat_number %}
+                                <code>{{ check.counterparty.vat_number }}</code>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if check.overall_status == 'valid' %}
+                                <span class="badge bg-success">✅ Валідно</span>
+                            {% elif check.overall_status == 'warning' %}
+                                <span class="badge bg-warning text-dark">⚠️ Попередження</span>
+                            {% elif check.overall_status == 'error' %}
+                                <span class="badge bg-danger">❌ Проблема</span>
+                            {% else %}
+                                <span class="badge bg-secondary">⏳ Очікування</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if check.confidence_score %}
+                                {% set confidence_percent = (check.confidence_score * 100)|round|int %}
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                        <div class="progress-bar 
+                                            {% if check.confidence_score >= 0.8 %}bg-success
+                                            {% elif check.confidence_score >= 0.6 %}bg-warning
+                                            {% else %}bg-danger{% endif %}"
+                                            role="progressbar"
+                                            aria-valuenow="{{ confidence_percent }}"
+                                            style="width: {{ confidence_percent }}%">
+                                        </div>
+                                    </div>
+                                    <small>{{ confidence_percent }}%</small>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('check_details', check_id=check.id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> Деталі
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if checks.pages > 1 %}
+<nav aria-label="Pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if checks.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('verification_history', page=checks.prev_num) }}">
+                    <i class="bi bi-chevron-left"></i> Попередня
+                </a>
+            </li>
+        {% endif %}
+        
+        {% for page_num in checks.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                {% if page_num != checks.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('verification_history', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                {% endif %}
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if checks.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('verification_history', page=checks.next_num) }}">
+                    Наступна <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-inbox display-1 text-muted"></i>
+    <h4 class="mt-3 text-muted">Історія перевірок порожня</h4>
+    <p class="text-muted">Ви ще не проводили жодної перевірки контрагентів.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Провести першу перевірку
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
