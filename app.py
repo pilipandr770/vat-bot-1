@@ -339,7 +339,9 @@ def create_app(config_name=None):
     
     return app
 
+# Create app instance for WSGI servers (Gunicorn, etc.)
+app = create_app()
+
 # For development server
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True)
