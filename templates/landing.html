@@ -24,8 +24,8 @@
                     <li class="nav-item"><a class="nav-link" href="#features">Funktionen</a></li>
                     <li class="nav-item"><a class="nav-link" href="#pricing">Preise</a></li>
                     <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Anmelden</a></li>
-                    <li class="nav-item"><a class="btn btn-primary ms-2" href="{{ url_for('register') }}">Kostenlos Starten</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Anmelden</a></li>
+                    <li class="nav-item"><a class="btn btn-primary ms-2" href="{{ url_for('auth.register') }}">Kostenlos Starten</a></li>
                 </ul>
             </div>
         </div>
@@ -44,7 +44,7 @@
                         Compliance-konform und DSGVO-sicher.
                     </p>
                     <div class="d-flex gap-3">
-                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
                             <i class="bi bi-rocket"></i> Jetzt kostenlos starten
                         </a>
                         <a href="#demo" class="btn btn-outline-secondary btn-lg">
@@ -193,7 +193,7 @@
                                 <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> API Zugang</li>
                                 <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> Handelsregister</li>
                             </ul>
-                            <a href="{{ url_for('register') }}" class="btn btn-outline-primary w-100">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100">
                                 Kostenlos starten
                             </a>
                         </div>
@@ -220,7 +220,7 @@
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verlauf & Berichte</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Prioritäts-Support</li>
                             </ul>
-                            <a href="{{ url_for('register') }}" class="btn btn-primary w-100">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100">
                                 Jetzt starten
                             </a>
                         </div>
@@ -345,7 +345,7 @@
         <div class="container text-center">
             <h2 class="display-5 fw-bold mb-4">Bereit loszulegen?</h2>
             <p class="lead mb-4">Starten Sie jetzt mit 5 kostenlosen Prüfungen</p>
-            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
                 <i class="bi bi-rocket"></i> Kostenlos registrieren
             </a>
         </div>
@@ -370,3 +370,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
