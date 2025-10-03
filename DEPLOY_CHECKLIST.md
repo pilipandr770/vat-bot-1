@@ -70,10 +70,15 @@ MAIL_USE_TLS=True
 
 ## 🔄 Після першого деплою (5 хвилин)
 
-1. **Відкрити Shell в Render:**
+1. **Відкрити Shell в Render та ініціалізувати базу даних:**
    ```bash
-   export FLASK_APP=app.py
-   flask db upgrade
+   # Очистити схему (якщо були невдалі спроби)
+   psql $DATABASE_URL -c "DROP SCHEMA vat_verification CASCADE; CREATE SCHEMA vat_verification; GRANT ALL PRIVILEGES ON SCHEMA vat_verification TO ittoken_db_user; GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA vat_verification TO ittoken_db_user; GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA vat_verification TO ittoken_db_user;"
+   
+   # Створити всі таблиці
+   python init_db.py
+   
+   # Створити admin користувача
    python create_admin.py
    ```
 
