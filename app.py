@@ -84,7 +84,7 @@ def create_app(config_name=None):
         
         # Get recent verifications
         recent_checks = current_user.verifications.order_by(
-            VerificationCheck.created_at.desc()
+            VerificationCheck.check_date.desc()
         ).limit(5).all()
         
         return render_template('index.html',
