@@ -3,9 +3,11 @@
 ## 📋 Перед деплоєм
 
 - [x] Всі зміни закомічені в GitHub
-- [x] requirements.txt містить gunicorn
+- [x] requirements.txt містить gunicorn та SQLAlchemy 2.0.35
 - [x] config.py налаштований для PostgreSQL
 - [x] render.yaml створений
+- [x] .python-version створений (Python 3.10.14)
+- [x] app.py експортує app для Gunicorn
 - [x] Procfile створений
 - [x] DEPLOY.md з інструкціями готовий
 
