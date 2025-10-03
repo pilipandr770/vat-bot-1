@@ -2,27 +2,23 @@ services:
   # Web Service
   - type: web
     name: vat-verification-platform
-    env: python
+    runtime: python
     region: frankfurt
     plan: free
     branch: main
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        fromDatabase:
-          name: vat-verification-db
-          property: connectionString
+        sync: false
       - key: DB_SCHEMA
         value: vat_verification
-      - key: PYTHON_VERSION
-        value: 3.10.0
       # Stripe Keys (set manually in Render dashboard)
       - key: STRIPE_PUBLIC_KEY
         sync: false
