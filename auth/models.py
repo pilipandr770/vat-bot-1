@@ -100,9 +100,11 @@ class User(UserMixin, db.Model):
     
     def get_monthly_verification_count(self):
         """Get verification count for current month."""
+        from crm.models import VerificationCheck
         start_of_month = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        return self.verifications.filter(
-            db.func.date(db.column('created_at')) >= start_of_month
+        return VerificationCheck.query.filter(
+            VerificationCheck.user_id == self.id,
+            VerificationCheck.check_date >= start_of_month
         ).count()
     
     def increment_api_usage(self):
