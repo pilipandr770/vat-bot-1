@@ -356,12 +356,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <p>&copy; 2025 VAT Verifizierung. Alle Rechte vorbehalten.</p>
+                    <p>&copy; 2025 VAT Verifizierung. Alle Rechte vorbehalten. | USt-IdNr: DE456902445</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-white me-3">AGB</a>
-                    <a href="#" class="text-white me-3">Datenschutz</a>
-                    <a href="#" class="text-white">Impressum</a>
+                    <a href="{{ url_for('legal.agb') }}" class="text-white me-3">AGB</a>
+                    <a href="{{ url_for('legal.datenschutz') }}" class="text-white me-3">Datenschutz</a>
+                    <a href="{{ url_for('legal.impressum') }}" class="text-white">Impressum</a>
                 </div>
             </div>
         </div>
