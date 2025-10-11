@@ -9,6 +9,7 @@ class Company(db.Model):
     __tablename__ = 'companies'
     
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
     vat_number = db.Column(db.String(20), nullable=False, index=True)
     company_name = db.Column(db.String(255), nullable=False)
     legal_address = db.Column(db.Text, nullable=False)
@@ -27,6 +28,7 @@ class Counterparty(db.Model):
     __tablename__ = 'counterparties'
     
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
     vat_number = db.Column(db.String(20), nullable=True, index=True)
     company_name = db.Column(db.String(255), nullable=False, index=True)
     address = db.Column(db.Text, nullable=True)
@@ -47,6 +49,7 @@ class VerificationCheck(db.Model):
     __tablename__ = 'verification_checks'
     
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
     counterparty_id = db.Column(db.Integer, db.ForeignKey('counterparties.id'), nullable=False)
     check_date = db.Column(db.DateTime, default=datetime.utcnow, index=True)

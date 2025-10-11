@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Konto gelöscht - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center">
+                <i class="bi bi-check-circle text-success" style="font-size: 5rem;"></i>
+                <h1 class="mt-4">Ihr Konto wurde erfolgreich gelöscht</h1>
+                <p class="lead text-muted mt-3">
+                    Alle Ihre persönlichen Daten wurden gemäß DSGVO Art. 17 (Recht auf Löschung) 
+                    unwiderruflich aus unserem System entfernt.
+                </p>
+            </div>
+
+            <div class="card mt-5">
+                <div class="card-body">
+                    <h3 class="h5 mb-3">Was wurde gelöscht?</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i> 
+                            Ihr Benutzerkonto und Anmeldedaten
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i> 
+                            Alle persönlichen Informationen (Name, E-Mail, Telefon, Adresse)
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i> 
+                            Alle Firmendaten und Kontakte
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i> 
+                            Alle Verifizierungsdaten und Prüfungsergebnisse
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i> 
+                            Ihr Abonnement wurde gekündigt
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-info-circle-fill text-info"></i> 
+                            Zahlungsdaten wurden anonymisiert (gesetzliche Aufbewahrungspflicht 10 Jahre)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <h4 class="alert-heading">
+                    <i class="bi bi-info-circle-fill"></i> Hinweis zur Aufbewahrungspflicht
+                </h4>
+                <p class="mb-0">
+                    Gemäß § 147 AO (Abgabenordnung) müssen Zahlungsdaten für steuerliche Zwecke 10 Jahre 
+                    aufbewahrt werden. Diese Daten wurden jedoch anonymisiert und können nicht mehr Ihrer 
+                    Person zugeordnet werden.
+                </p>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h3 class="h5 mb-3">Vielen Dank für die Nutzung unseres Dienstes</h3>
+                    <p class="text-muted">
+                        Wir bedauern, dass Sie sich entschieden haben, unser Service zu verlassen. 
+                        Falls Sie Feedback für uns haben oder Fragen haben, kontaktieren Sie uns gerne.
+                    </p>
+                    <div class="mt-4">
+                        <a href="mailto:andrii.it.info@gmail.com" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-envelope"></i> Feedback senden
+                        </a>
+                        <a href="{{ url_for('landing') }}" class="btn btn-primary">
+                            <i class="bi bi-house"></i> Zur Startseite
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4 border-success">
+                <div class="card-body text-center">
+                    <h3 class="h5 mb-3 text-success">Möchten Sie uns eine zweite Chance geben?</h3>
+                    <p class="text-muted">
+                        Sie können jederzeit ein neues Konto erstellen und unseren Service erneut nutzen.
+                    </p>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-success">
+                        <i class="bi bi-person-plus"></i> Neues Konto erstellen
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <p class="text-muted">
+                    <small>
+                        Die Löschung erfolgte gemäß Art. 17 DSGVO (Recht auf Löschung) am {{ current_date }}
+                    </small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

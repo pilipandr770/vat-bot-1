@@ -53,11 +53,19 @@ def create_app(config_name=None):
     from admin.routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
     
+    from legal.routes import legal_bp
+    app.register_blueprint(legal_bp, url_prefix='/legal')
+    
     # Add Jinja2 filter for JSON formatting
     import json
     @app.template_filter('tojsonpretty')
     def to_json_pretty(value):
         return json.dumps(value, indent=2, ensure_ascii=False)
+    
+    # Add context processor for current date
+    @app.context_processor
+    def inject_current_date():
+        return {'current_date': datetime.now()}
     
     # Initialize services
     vies_service = VIESService()

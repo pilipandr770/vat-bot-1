@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}AGB - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="mb-4">Allgemeine Geschäftsbedingungen (AGB)</h1>
+            <p class="lead">Für die Nutzung des VAT Verification Systems</p>
+
+            <!-- 1. Geltungsbereich -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 1 Geltungsbereich</h2>
+                    <p>
+                        (1) Diese Allgemeinen Geschäftsbedingungen (nachfolgend "AGB") gelten für alle 
+                        Verträge über die Nutzung des VAT Verification Systems zwischen AndriiIT (nachfolgend 
+                        "Anbieter") und dem Nutzer (nachfolgend "Kunde").
+                    </p>
+                    <p>
+                        (2) Der Anbieter erbringt alle Leistungen ausschließlich auf der Grundlage dieser AGB. 
+                        Abweichende Bedingungen des Kunden werden nicht anerkannt, es sei denn, der Anbieter 
+                        stimmt ihrer Geltung ausdrücklich schriftlich zu.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. Vertragsgegenstand -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 2 Vertragsgegenstand und Leistungsumfang</h2>
+                    <p>
+                        (1) Der Anbieter stellt dem Kunden eine webbasierte Plattform zur Verifizierung von 
+                        Umsatzsteuer-Identifikationsnummern (USt-IdNr.) und zur Überprüfung von Geschäftspartnern 
+                        zur Verfügung.
+                    </p>
+                    <p>
+                        (2) Die Leistungen umfassen:
+                    </p>
+                    <ul>
+                        <li>Abfrage von USt-IdNr. über das VIES-System der EU</li>
+                        <li>Abfrage von Firmendaten aus öffentlichen Registern</li>
+                        <li>Prüfung gegen Sanktionslisten (EU, OFAC, UK)</li>
+                        <li>Prüfung auf Insolvenzverfahren</li>
+                        <li>Speicherung und Verwaltung der Verifizierungsergebnisse</li>
+                    </ul>
+                    <p>
+                        (3) Der genaue Leistungsumfang richtet sich nach dem gewählten Abonnement-Plan (Free, 
+                        Starter, Professional, Enterprise).
+                    </p>
+                    <p>
+                        (4) Der Anbieter ist berechtigt, Subunternehmer zur Leistungserbringung einzusetzen.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3. Vertragsschluss -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 3 Vertragsschluss und Registrierung</h2>
+                    <p>
+                        (1) Der Vertrag kommt durch die Registrierung des Kunden auf der Plattform zustande. 
+                        Mit der Registrierung gibt der Kunde ein verbindliches Angebot zum Abschluss eines 
+                        Nutzungsvertrags ab.
+                    </p>
+                    <p>
+                        (2) Der Anbieter kann das Angebot durch eine Bestätigungs-E-Mail oder durch Freischaltung 
+                        des Zugangs annehmen.
+                    </p>
+                    <p>
+                        (3) Der Kunde ist verpflichtet, bei der Registrierung vollständige und wahrheitsgemäße 
+                        Angaben zu machen und diese aktuell zu halten.
+                    </p>
+                    <p>
+                        (4) Ein Anspruch auf Abschluss eines Vertrags besteht nicht. Der Anbieter behält sich 
+                        das Recht vor, Registrierungen ohne Angabe von Gründen abzulehnen.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. Preise und Zahlung -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 4 Preise und Zahlungsbedingungen</h2>
+                    <p>
+                        (1) Die Preise für die Nutzung der Plattform ergeben sich aus der aktuellen Preisliste 
+                        auf der Website. Alle Preise verstehen sich als Nettopreise zuzüglich der gesetzlichen 
+                        Mehrwertsteuer.
+                    </p>
+                    <p>
+                        (2) <strong>Abonnement-Pläne:</strong>
+                    </p>
+                    <ul>
+                        <li><strong>Free:</strong> 0 €/Monat - 5 Verifizierungen</li>
+                        <li><strong>Starter:</strong> 29 €/Monat - 50 Verifizierungen</li>
+                        <li><strong>Professional:</strong> 79 €/Monat - 200 Verifizierungen</li>
+                        <li><strong>Enterprise:</strong> 199 €/Monat - Unbegrenzte Verifizierungen</li>
+                    </ul>
+                    <p>
+                        (3) Die Abrechnung erfolgt monatlich im Voraus. Die Zahlung erfolgt per Kreditkarte 
+                        oder anderen auf der Plattform angebotenen Zahlungsmethoden über den Zahlungsdienstleister 
+                        Stripe.
+                    </p>
+                    <p>
+                        (4) Bei Zahlungsverzug ist der Anbieter berechtigt, den Zugang zur Plattform zu sperren.
+                    </p>
+                    <p>
+                        (5) Der Anbieter behält sich das Recht vor, die Preise mit einer Ankündigungsfrist von 
+                        30 Tagen zu ändern. Bestehende Abonnements bleiben bis zum Ende der Laufzeit vom 
+                        bisherigen Preis erfasst.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 5. Laufzeit und Kündigung -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 5 Vertragslaufzeit und Kündigung</h2>
+                    <p>
+                        (1) Der Vertrag wird auf unbestimmte Zeit geschlossen.
+                    </p>
+                    <p>
+                        (2) Der Kunde kann den Vertrag jederzeit mit sofortiger Wirkung kündigen. Die Kündigung 
+                        kann über die Plattform oder per E-Mail erfolgen.
+                    </p>
+                    <p>
+                        (3) Bereits gezahlte Gebühren werden nicht erstattet. Bei Kündigung während eines 
+                        laufenden Abrechnungszeitraums steht dem Kunden die Nutzung bis zum Ende des 
+                        Abrechnungszeitraums zu.
+                    </p>
+                    <p>
+                        (4) Der Anbieter kann den Vertrag mit einer Frist von 30 Tagen kündigen.
+                    </p>
+                    <p>
+                        (5) Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt. 
+                        Ein wichtiger Grund liegt insbesondere vor bei:
+                    </p>
+                    <ul>
+                        <li>Zahlungsverzug von mehr als 14 Tagen</li>
+                        <li>Verstoß gegen diese AGB</li>
+                        <li>Missbräuchlicher Nutzung der Plattform</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 6. Nutzungsrechte -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 6 Nutzungsrechte und Pflichten des Kunden</h2>
+                    <p>
+                        (1) Der Kunde erhält ein nicht ausschließliches, nicht übertragbares Recht zur Nutzung 
+                        der Plattform für die Dauer des Vertrags.
+                    </p>
+                    <p>
+                        (2) Der Kunde verpflichtet sich:
+                    </p>
+                    <ul>
+                        <li>Die Plattform nur für eigene geschäftliche Zwecke zu nutzen</li>
+                        <li>Die Zugangsdaten vertraulich zu behandeln</li>
+                        <li>Die Plattform nicht missbräuchlich zu nutzen</li>
+                        <li>Keine automatisierten Abfragen (außer über bereitgestellte API) durchzuführen</li>
+                        <li>Die gesetzlichen Datenschutzbestimmungen einzuhalten</li>
+                    </ul>
+                    <p>
+                        (3) Der Kunde ist verantwortlich für alle Aktivitäten, die unter seinem Account 
+                        durchgeführt werden.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 7. Verfügbarkeit -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 7 Verfügbarkeit</h2>
+                    <p>
+                        (1) Der Anbieter bemüht sich um eine hohe Verfügbarkeit der Plattform, übernimmt jedoch 
+                        keine Garantie für eine ununterbrochene Verfügbarkeit.
+                    </p>
+                    <p>
+                        (2) Der Anbieter ist berechtigt, die Plattform für Wartungsarbeiten vorübergehend 
+                        außer Betrieb zu nehmen. Geplante Wartungsarbeiten werden nach Möglichkeit im Voraus 
+                        angekündigt.
+                    </p>
+                    <p>
+                        (3) Der Anbieter haftet nicht für Ausfälle, die auf höhere Gewalt, Streiks, 
+                        Aussperrungen oder technische Probleme außerhalb seines Einflussbereichs zurückzuführen 
+                        sind.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 8. Gewährleistung -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 8 Gewährleistung</h2>
+                    <p>
+                        (1) Der Anbieter gewährleistet, dass die Plattform die vertraglich vereinbarte 
+                        Beschaffenheit aufweist und frei von Rechts- und Sachmängeln ist.
+                    </p>
+                    <p>
+                        (2) Der Anbieter übernimmt keine Gewähr für:
+                    </p>
+                    <ul>
+                        <li>Die Richtigkeit, Vollständigkeit und Aktualität der von Drittanbietern 
+                            (VIES, Handelsregister, etc.) bereitgestellten Daten</li>
+                        <li>Die Verfügbarkeit von Drittdiensten</li>
+                        <li>Die Eignung der Plattform für bestimmte Zwecke des Kunden</li>
+                    </ul>
+                    <p>
+                        (3) Der Kunde ist verpflichtet, Mängel unverzüglich nach Feststellung anzuzeigen.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 9. Haftung -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 9 Haftung</h2>
+                    <p>
+                        (1) Der Anbieter haftet unbeschränkt:
+                    </p>
+                    <ul>
+                        <li>Bei Vorsatz und grober Fahrlässigkeit</li>
+                        <li>Bei Verletzung von Leben, Körper oder Gesundheit</li>
+                        <li>Nach dem Produkthaftungsgesetz</li>
+                        <li>Im Rahmen einer Garantie</li>
+                    </ul>
+                    <p>
+                        (2) Bei leicht fahrlässiger Verletzung wesentlicher Vertragspflichten haftet der 
+                        Anbieter beschränkt auf den vertragstypischen, vorhersehbaren Schaden.
+                    </p>
+                    <p>
+                        (3) Im Übrigen ist die Haftung ausgeschlossen.
+                    </p>
+                    <p>
+                        (4) Die vorstehenden Haftungsbeschränkungen gelten auch für die persönliche Haftung 
+                        der Mitarbeiter, Vertreter und Erfüllungsgehilfen des Anbieters.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 10. Datenschutz -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 10 Datenschutz</h2>
+                    <p>
+                        (1) Der Anbieter verarbeitet personenbezogene Daten des Kunden im Einklang mit der 
+                        <a href="{{ url_for('legal.datenschutz') }}">Datenschutzerklärung</a> und den 
+                        gesetzlichen Bestimmungen (DSGVO, BDSG).
+                    </p>
+                    <p>
+                        (2) Der Kunde ist für die Einhaltung der Datenschutzbestimmungen bei der Nutzung der 
+                        Plattform selbst verantwortlich.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 11. Änderungen der AGB -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 11 Änderungen der AGB</h2>
+                    <p>
+                        (1) Der Anbieter behält sich das Recht vor, diese AGB zu ändern. Änderungen werden 
+                        dem Kunden mindestens 30 Tage vor ihrem Inkrafttreten per E-Mail mitgeteilt.
+                    </p>
+                    <p>
+                        (2) Widerspricht der Kunde den geänderten AGB nicht innerhalb von 30 Tagen nach 
+                        Zugang der Mitteilung, gelten die geänderten AGB als angenommen. Der Anbieter wird 
+                        den Kunden in der Mitteilung auf diese Folge hinweisen.
+                    </p>
+                    <p>
+                        (3) Im Fall des Widerspruchs ist der Anbieter berechtigt, das Vertragsverhältnis 
+                        zum Zeitpunkt des Inkrafttretens der geänderten AGB zu kündigen.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 12. Schlussbestimmungen -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">§ 12 Schlussbestimmungen</h2>
+                    <p>
+                        (1) Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des 
+                        UN-Kaufrechts.
+                    </p>
+                    <p>
+                        (2) Ist der Kunde Kaufmann, juristische Person des öffentlichen Rechts oder 
+                        öffentlich-rechtliches Sondervermögen, ist ausschließlicher Gerichtsstand für alle 
+                        Streitigkeiten aus diesem Vertrag Frankfurt am Main.
+                    </p>
+                    <p>
+                        (3) Sollten einzelne Bestimmungen dieser AGB unwirksam sein oder werden, bleibt 
+                        die Wirksamkeit der übrigen Bestimmungen hiervon unberührt.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <p class="text-muted">
+                    <small>Stand: {{ current_date }}</small>
+                </p>
+                <div class="mt-3">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Jetzt registrieren
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Konto löschen - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-4">
+                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                <h1 class="mt-3">Konto und Daten löschen</h1>
+                <p class="lead text-muted">GDPR Recht auf Löschung (Art. 17 DSGVO)</p>
+            </div>
+
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Warnung: Diese Aktion kann nicht rückgängig gemacht werden!
+                </h4>
+                <hr>
+                <p class="mb-0">
+                    Wenn Sie Ihr Konto löschen, werden <strong>alle Ihre Daten unwiderruflich gelöscht</strong>:
+                </p>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Was wird gelöscht?</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check2-circle text-danger"></i>
+                            <strong>Persönliche Daten:</strong> Name, E-Mail, Telefon, Adresse
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check2-circle text-danger"></i>
+                            <strong>Firmendaten:</strong> Alle gespeicherten Unternehmensinformationen
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check2-circle text-danger"></i>
+                            <strong>Verifizierungen:</strong> Alle durchgeführten VAT-Prüfungen und Ergebnisse
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check2-circle text-danger"></i>
+                            <strong>Abonnement:</strong> Ihr aktuelles Abonnement wird gekündigt
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check2-circle text-warning"></i>
+                            <strong>Zahlungsdaten:</strong> Anonymisiert (10 Jahre Aufbewahrungspflicht gemäß § 147 AO)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Ihre Rechte nach DSGVO
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Gemäß Artikel 17 der Datenschutz-Grundverordnung (DSGVO) haben Sie das Recht auf 
+                        Löschung Ihrer personenbezogenen Daten.
+                    </p>
+                    <p class="mb-0">
+                        <strong>Hinweis:</strong> Zahlungsdaten müssen aus steuerrechtlichen Gründen 
+                        (§ 147 AO - Abgabenordnung) für 10 Jahre aufbewahrt werden, werden jedoch anonymisiert 
+                        und können nicht mehr Ihrer Person zugeordnet werden.
+                    </p>
+                </div>
+            </div>
+
+            {% if current_user.is_authenticated %}
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Konto löschen bestätigen</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('legal.delete_account') }}" id="deleteForm">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <strong>Aktuelles Konto:</strong>
+                            </label>
+                            <p class="text-muted">{{ current_user.email }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-key-fill"></i> Passwort zur Bestätigung eingeben:
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="password" 
+                                name="password" 
+                                required
+                                placeholder="Ihr aktuelles Passwort">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirm_text" class="form-label">
+                                Geben Sie <code>LÖSCHEN</code> ein, um zu bestätigen:
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="confirm_text" 
+                                name="confirm_text" 
+                                required
+                                pattern="LÖSCHEN"
+                                placeholder="LÖSCHEN">
+                            <small class="form-text text-muted">
+                                Bitte geben Sie das Wort genau so ein: LÖSCHEN
+                            </small>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                id="confirmUnderstand" 
+                                required>
+                            <label class="form-check-label" for="confirmUnderstand">
+                                Ich verstehe, dass diese Aktion nicht rückgängig gemacht werden kann und 
+                                alle meine Daten unwiderruflich gelöscht werden.
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg" id="deleteButton" disabled>
+                                <i class="bi bi-trash-fill"></i> Konto und Daten endgültig löschen
+                            </button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Abbrechen und zurück zum Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <h5 class="alert-heading">Sie sind nicht angemeldet</h5>
+                <p>Um Ihr Konto zu löschen, müssen Sie sich zunächst anmelden.</p>
+                <hr>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> Jetzt anmelden
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h5>Alternative: Daten exportieren statt löschen</h5>
+                    <p class="text-muted">
+                        Möchten Sie Ihre Daten lieber exportieren? Nutzen Sie Ihr Recht auf Datenübertragbarkeit.
+                    </p>
+                    <a href="{{ url_for('legal.gdpr_request') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Daten exportieren
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enable delete button only when all conditions are met
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('deleteForm');
+    if (!form) return;
+
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_text');
+    const checkbox = document.getElementById('confirmUnderstand');
+    const deleteButton = document.getElementById('deleteButton');
+
+    function checkForm() {
+        const passwordFilled = passwordInput && passwordInput.value.length > 0;
+        const confirmCorrect = confirmInput && confirmInput.value === 'LÖSCHEN';
+        const checkboxChecked = checkbox && checkbox.checked;
+
+        if (passwordFilled && confirmCorrect && checkboxChecked) {
+            deleteButton.disabled = false;
+        } else {
+            deleteButton.disabled = true;
+        }
+    }
+
+    if (passwordInput) passwordInput.addEventListener('input', checkForm);
+    if (confirmInput) confirmInput.addEventListener('input', checkForm);
+    if (checkbox) checkbox.addEventListener('change', checkForm);
+
+    // Add confirmation dialog
+    form.addEventListener('submit', function(e) {
+        if (!confirm('Sind Sie ABSOLUT SICHER? Diese Aktion kann nicht rückgängig gemacht werden!')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

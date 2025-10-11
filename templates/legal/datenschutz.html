@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Datenschutzerklärung - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="mb-4">Datenschutzerklärung</h1>
+            <p class="lead">Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst.</p>
+            
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle"></i>
+                <strong>DSGVO-konform:</strong> Diese Datenschutzerklärung entspricht den Anforderungen 
+                der EU-Datenschutz-Grundverordnung (DSGVO) und dem Bundesdatenschutzgesetz (BDSG).
+            </div>
+
+            <!-- 1. Verantwortlicher -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">1. Verantwortlicher für die Datenverarbeitung</h2>
+                    <p>Verantwortlich im Sinne der DSGVO:</p>
+                    <p>
+                        <strong>AndriiIT</strong><br>
+                        Andrii Pylypchuk<br>
+                        Bergmannweg 16<br>
+                        65934 Frankfurt am Main<br>
+                        Deutschland
+                    </p>
+                    <p>
+                        <i class="bi bi-envelope"></i> E-Mail: 
+                        <a href="mailto:andrii.it.info@gmail.com">andrii.it.info@gmail.com</a><br>
+                        <i class="bi bi-telephone"></i> Telefon: 
+                        <a href="tel:+4916095030120">+49 160 95030120</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. Erhebung und Speicherung personenbezogener Daten -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">2. Erhebung und Speicherung personenbezogener Daten</h2>
+                    
+                    <h3 class="h5 mt-4">2.1 Bei Besuch unserer Website</h3>
+                    <p>Beim Aufrufen unserer Website werden durch den auf Ihrem Endgerät zum Einsatz kommenden Browser automatisch Informationen an den Server unserer Website gesendet. Diese Informationen werden temporär in einem sog. Logfile gespeichert:</p>
+                    <ul>
+                        <li>IP-Adresse des anfragenden Rechners</li>
+                        <li>Datum und Uhrzeit des Zugriffs</li>
+                        <li>Name und URL der abgerufenen Datei</li>
+                        <li>Website, von der aus der Zugriff erfolgt (Referrer-URL)</li>
+                        <li>Verwendeter Browser und ggf. das Betriebssystem Ihres Rechners</li>
+                    </ul>
+                    <p class="text-muted small">
+                        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der technischen Bereitstellung und Optimierung der Website)
+                    </p>
+
+                    <h3 class="h5 mt-4">2.2 Bei Registrierung eines Benutzerkontos</h3>
+                    <p>Wenn Sie sich bei uns registrieren, erheben wir folgende personenbezogene Daten:</p>
+                    <ul>
+                        <li>E-Mail-Adresse (Pflichtangabe)</li>
+                        <li>Passwort (verschlüsselt gespeichert)</li>
+                        <li>Vorname und Nachname</li>
+                        <li>Firmenname</li>
+                        <li>Telefonnummer (optional)</li>
+                        <li>Land</li>
+                    </ul>
+                    <p class="text-muted small">
+                        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)<br>
+                        <strong>Speicherdauer:</strong> Bis zur Löschung Ihres Kontos
+                    </p>
+
+                    <h3 class="h5 mt-4">2.3 Bei Nutzung des VAT-Verifizierungsdienstes</h3>
+                    <p>Bei der Nutzung unseres Verifizierungsdienstes verarbeiten wir:</p>
+                    <ul>
+                        <li>Firmendaten der zu überprüfenden Unternehmen (Name, Adresse, USt-IdNr.)</li>
+                        <li>Verifizierungsergebnisse</li>
+                        <li>Datum und Uhrzeit der Verifizierung</li>
+                    </ul>
+                    <p class="text-muted small">
+                        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)<br>
+                        <strong>Speicherdauer:</strong> Bis zur Löschung Ihres Kontos oder gemäß gesetzlicher Aufbewahrungsfristen
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3. Weitergabe von Daten -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">3. Weitergabe von Daten</h2>
+                    <p>Eine Übermittlung Ihrer persönlichen Daten an Dritte zu anderen als den im Folgenden aufgeführten Zwecken findet nicht statt.</p>
+                    
+                    <h3 class="h5 mt-4">3.1 Zahlungsabwicklung (Stripe)</h3>
+                    <p>
+                        Für die Zahlungsabwicklung nutzen wir den Zahlungsdienstleister Stripe. Dabei werden 
+                        Zahlungsinformationen an Stripe übermittelt.
+                    </p>
+                    <p>
+                        <strong>Stripe, Inc.</strong><br>
+                        510 Townsend Street<br>
+                        San Francisco, CA 94103<br>
+                        USA
+                    </p>
+                    <p class="text-muted small">
+                        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)<br>
+                        Datenschutzerklärung: <a href="https://stripe.com/de/privacy" target="_blank">https://stripe.com/de/privacy</a>
+                    </p>
+
+                    <h3 class="h5 mt-4">3.2 Externe API-Dienste</h3>
+                    <p>Für die VAT-Verifizierung nutzen wir folgende externe Dienste:</p>
+                    <ul>
+                        <li><strong>VIES (EU-Kommission):</strong> VAT-Nummer-Verifizierung</li>
+                        <li><strong>Handelsregister:</strong> Firmendaten-Abfrage</li>
+                        <li><strong>Sanktionslisten (EU/OFAC/UK):</strong> Compliance-Prüfung</li>
+                    </ul>
+                    <p class="text-muted small">
+                        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. Cookies -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">4. Cookies</h2>
+                    <p>
+                        Unsere Website verwendet Cookies. Cookies sind kleine Textdateien, die auf Ihrem Endgerät 
+                        gespeichert werden. Wir verwenden ausschließlich technisch notwendige Cookies:
+                    </p>
+                    <ul>
+                        <li><strong>Session-Cookie:</strong> Erforderlich für die Anmeldung und Nutzung des Dienstes</li>
+                        <li><strong>CSRF-Token:</strong> Sicherheitsmaßnahme gegen Cross-Site-Request-Forgery-Angriffe</li>
+                    </ul>
+                    <p class="text-muted small">
+                        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (technisch notwendig)<br>
+                        <strong>Speicherdauer:</strong> Session-Ende bzw. bis zum Ausloggen
+                    </p>
+                </div>
+            </div>
+
+            <!-- 5. Ihre Rechte -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">5. Ihre Rechte nach der DSGVO</h2>
+                    <p>Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:</p>
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Recht auf Auskunft (Art. 15 DSGVO):</strong> Sie können Auskunft über Ihre von uns verarbeiteten personenbezogenen Daten verlangen.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Recht auf Berichtigung (Art. 16 DSGVO):</strong> Sie können die Berichtigung unrichtiger Daten verlangen.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Recht auf Löschung (Art. 17 DSGVO):</strong> Sie können die Löschung Ihrer Daten verlangen, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+                            <br>
+                            <a href="{{ url_for('legal.delete_account') }}" class="btn btn-sm btn-outline-danger mt-2">
+                                <i class="bi bi-trash"></i> Konto und Daten jetzt löschen
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO):</strong> Sie können die Einschränkung der Verarbeitung Ihrer Daten verlangen.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Recht auf Datenübertragbarkeit (Art. 20 DSGVO):</strong> Sie können verlangen, dass wir Ihnen Ihre Daten in einem strukturierten, gängigen Format zur Verfügung stellen.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Widerspruchsrecht (Art. 21 DSGVO):</strong> Sie können der Verarbeitung Ihrer Daten aus Gründen, die sich aus Ihrer besonderen Situation ergeben, widersprechen.
+                        </li>
+                    </ul>
+
+                    <div class="alert alert-primary mt-3">
+                        <strong>So nehmen Sie Ihre Rechte wahr:</strong><br>
+                        Senden Sie eine E-Mail an: 
+                        <a href="mailto:andrii.it.info@gmail.com">andrii.it.info@gmail.com</a>
+                        <br>
+                        Oder nutzen Sie unser <a href="{{ url_for('legal.gdpr_request') }}">DSGVO-Anfrageformular</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Beschwerderecht -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">6. Beschwerderecht bei einer Aufsichtsbehörde</h2>
+                    <p>
+                        Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde über die Verarbeitung 
+                        Ihrer personenbezogenen Daten durch uns zu beschweren.
+                    </p>
+                    <p>
+                        <strong>Zuständige Aufsichtsbehörde in Deutschland:</strong><br>
+                        Der Hessische Beauftragte für Datenschutz und Informationsfreiheit<br>
+                        Postfach 3163<br>
+                        65021 Wiesbaden<br>
+                        Telefon: 0611 1408 - 0<br>
+                        E-Mail: <a href="mailto:poststelle@datenschutz.hessen.de">poststelle@datenschutz.hessen.de</a><br>
+                        Website: <a href="https://datenschutz.hessen.de" target="_blank">https://datenschutz.hessen.de</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 7. Datensicherheit -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">7. Datensicherheit</h2>
+                    <p>Wir verwenden folgende Sicherheitsmaßnahmen zum Schutz Ihrer Daten:</p>
+                    <ul>
+                        <li><strong>SSL/TLS-Verschlüsselung:</strong> Alle Datenübertragungen erfolgen verschlüsselt</li>
+                        <li><strong>Passwort-Hashing:</strong> Passwörter werden mit bcrypt verschlüsselt gespeichert</li>
+                        <li><strong>Zugriffskontrolle:</strong> Nur autorisierte Personen haben Zugriff auf personenbezogene Daten</li>
+                        <li><strong>Regelmäßige Backups:</strong> Ihre Daten werden regelmäßig gesichert</li>
+                        <li><strong>Firewall und Monitoring:</strong> Schutz vor unbefugtem Zugriff</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 8. Aufbewahrungsfristen -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">8. Aufbewahrungsfristen</h2>
+                    <p>
+                        Wir speichern personenbezogene Daten nur so lange, wie es für die jeweiligen Zwecke 
+                        erforderlich ist oder gesetzliche Aufbewahrungsfristen bestehen:
+                    </p>
+                    <ul>
+                        <li><strong>Benutzerkontodaten:</strong> Bis zur Löschung des Kontos</li>
+                        <li><strong>Verifizierungsdaten:</strong> Bis zur Löschung des Kontos</li>
+                        <li><strong>Zahlungsdaten:</strong> 10 Jahre (gemäß § 147 AO - Abgabenordnung)</li>
+                        <li><strong>Log-Dateien:</strong> Maximal 30 Tage</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 9. Änderungen -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">9. Änderungen der Datenschutzerklärung</h2>
+                    <p>
+                        Wir behalten uns vor, diese Datenschutzerklärung anzupassen, damit sie stets den aktuellen 
+                        rechtlichen Anforderungen entspricht oder um Änderungen unserer Leistungen in der 
+                        Datenschutzerklärung umzusetzen. Für Ihren erneuten Besuch gilt dann die neue 
+                        Datenschutzerklärung.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <p class="text-muted">
+                    <small>Stand: {{ current_date }}</small>
+                </p>
+                <div class="mt-3">
+                    <a href="{{ url_for('legal.gdpr_request') }}" class="btn btn-primary">
+                        <i class="bi bi-shield-check"></i> DSGVO-Anfrage stellen
+                    </a>
+                    <a href="{{ url_for('legal.delete_account') }}" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> Daten löschen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
