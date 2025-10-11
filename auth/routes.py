@@ -37,7 +37,9 @@ def register():
                 country=form.country.data
             )
             user.set_password(form.password.data)
-            user.generate_confirmation_token()
+            # TEST MODE: Email confirmation disabled - automatically confirm email
+            user.is_email_confirmed = True
+            # user.generate_confirmation_token()  # Disabled for testing
             
             db.session.add(user)
             db.session.commit()
@@ -53,10 +55,10 @@ def register():
             db.session.add(free_subscription)
             db.session.commit()
             
-            # Send confirmation email
-            send_confirmation_email(user)
+            # TEST MODE: Email confirmation disabled
+            # send_confirmation_email(user)  # Disabled for testing
             
-            flash('Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen.', 'success')
+            flash('Registrierung erfolgreich! Sie können sich jetzt anmelden.', 'success')
             return redirect(url_for('auth.login'))
             
         except Exception as e:
@@ -86,10 +88,11 @@ def login():
             flash('Ihr Konto wurde deaktiviert. Bitte kontaktieren Sie den Support.', 'error')
             return redirect(url_for('auth.login'))
         
-        if not user.is_email_confirmed:
-            flash('Bitte bestätigen Sie Ihre E-Mail-Adresse. Bestätigungs-E-Mail wurde erneut gesendet.', 'warning')
-            send_confirmation_email(user)
-            return redirect(url_for('auth.login'))
+        # TEST MODE: Email confirmation check disabled
+        # if not user.is_email_confirmed:
+        #     flash('Bitte bestätigen Sie Ihre E-Mail-Adresse. Bestätigungs-E-Mail wurde erneut gesendet.', 'warning')
+        #     send_confirmation_email(user)
+        #     return redirect(url_for('auth.login'))
         
         # Login successful
         login_user(user, remember=form.remember_me.data)
