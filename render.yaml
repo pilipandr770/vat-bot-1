@@ -50,7 +50,7 @@ services:
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_AGENT_WORKFLOW_ID
-        value: wf_68f3ed065d5881909c95b20ad801090b07e400bf50570e4d
+        value: asst_vi3FV2KYJYJXrvSJGEa4ThE2
 
 # Note: You need to manually create the schema in your existing PostgreSQL database
 # Connect to your database and run: CREATE SCHEMA IF NOT EXISTS vat_verification;

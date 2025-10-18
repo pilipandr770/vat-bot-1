@@ -13,8 +13,8 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 # Assistants API v2 header (для всіх запитів)
 V2_HEADERS = {"OpenAI-Beta": "assistants=v2"}
 
-# Agent Builder workflow ID
-AGENT_WORKFLOW_ID = os.getenv("OPENAI_AGENT_WORKFLOW_ID", "wf_68f3ed065d5881909c95b20ad801090b07e400bf50570e4d")
+# Agent Builder workflow ID (або Assistant ID)
+AGENT_WORKFLOW_ID = os.getenv("OPENAI_AGENT_WORKFLOW_ID", "asst_vi3FV2KYJYJXrvSJGEa4ThE2")
 
 
 @chatbot_bp.route("/chat", methods=["GET"])
