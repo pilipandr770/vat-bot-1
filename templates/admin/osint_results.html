@@ -1,0 +1,96 @@
+<!-- FILE: templates/admin/osint_results.html -->
+{% extends "base.html" %}
+
+{% block title %}OSINT Results #{{ scan.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="bi bi-file-earmark-text"></i> Результати OSINT-скану #{{ scan.id }}
+            </h2>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Інформація про скан</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>URL:</strong> {{ scan.url or "-" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Домен:</strong> {{ scan.domain or "-" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Email:</strong> {{ scan.email or "-" }}</p>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-clock"></i> Створено: {{ scan.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Детальні результати</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 15%;">Сервіс</th>
+                                    <th style="width: 10%;">Статус</th>
+                                    <th style="width: 25%;">Примітки</th>
+                                    <th style="width: 50%;">Дані</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for f in scan.findings %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ f.service }}</strong>
+                                        <br><small class="text-muted">{{ f.created_at.strftime('%H:%M:%S') }}</small>
+                                    </td>
+                                    <td>
+                                        {% if f.status == 'ok' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> OK
+                                            </span>
+                                        {% elif f.status == 'warn' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-exclamation-triangle"></i> WARN
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> ERROR
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="word-wrap: break-word;">
+                                        {{ f.notes or '-' }}
+                                    </td>
+                                    <td>
+                                        <details>
+                                            <summary class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-eye"></i> Показати дані
+                                            </summary>
+                                            <pre class="mt-2 p-2 bg-light" style="white-space: pre-wrap; max-height: 300px; overflow-y: auto;">{{ f.data | tojsonpretty }}</pre>
+                                        </details>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ url_for('osint.scan') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Назад до сканера
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

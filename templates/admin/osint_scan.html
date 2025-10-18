@@ -1,0 +1,85 @@
+<!-- FILE: templates/admin/osint_scan.html -->
+{% extends "base.html" %}
+
+{% block title %}OSINT Scanner{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">
+                <i class="bi bi-shield-check"></i> OSINT Scanner
+            </h2>
+            <p class="text-muted">Пасивний збір інформації про домен, сайт або email контрагента.</p>
+
+            <form method="post" class="card p-4 shadow-sm">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">URL (опційно)</label>
+                    <input class="form-control" type="url" name="url" placeholder="https://example.com" />
+                    <small class="form-text text-muted">Повний URL сайту для аналізу headers та соцмереж.</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Домен <span class="text-danger">*</span></label>
+                    <input class="form-control" type="text" name="domain" placeholder="example.com" required />
+                    <small class="form-text text-muted">Основний домен компанії для WHOIS, DNS, SSL перевірок.</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">E-mail (опційно)</label>
+                    <input class="form-control" type="email" name="email" placeholder="info@example.com" />
+                    <small class="form-text text-muted">Email для базової валідації формату.</small>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" type="submit">
+                        <i class="bi bi-search"></i> Запустити сканування
+                    </button>
+                </div>
+            </form>
+
+            <div id="result" class="mt-4"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Сканування...';
+  
+  try {
+    const fd = new FormData(e.target);
+    const res = await fetch("", { method: "POST", body: fd });
+    const data = await res.json();
+    
+    let html = '<div class="card shadow-sm"><div class="card-body">';
+    html += '<h5 class="card-title text-success"><i class="bi bi-check-circle"></i> Сканування завершено</h5>';
+    html += '<div class="alert alert-info mt-3">';
+    html += '<strong>Результати:</strong>';
+    html += '<ul class="mb-0 mt-2">';
+    
+    data.results.forEach(r => {
+      const icon = r.status === 'ok' ? 'check-circle text-success' : 
+                   r.status === 'warn' ? 'exclamation-triangle text-warning' : 
+                   'x-circle text-danger';
+      html += `<li><i class="bi bi-${icon}"></i> <strong>${r.service}:</strong> ${r.status} ${r.notes ? '(' + r.notes + ')' : ''}</li>`;
+    });
+    
+    html += '</ul></div>';
+    html += `<a class="btn btn-primary mt-3" href="/osint/scan/${data.scan_id}">`;
+    html += '<i class="bi bi-eye"></i> Переглянути повні результати</a>';
+    html += '</div></div>';
+    
+    document.getElementById('result').innerHTML = html;
+  } catch (error) {
+    document.getElementById('result').innerHTML = 
+      '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Помилка сканування: ' + error + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
+});
+</script>
+{% endblock %}

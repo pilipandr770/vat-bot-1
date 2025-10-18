@@ -56,6 +56,9 @@ def create_app(config_name=None):
     from legal.routes import legal_bp
     app.register_blueprint(legal_bp, url_prefix='/legal')
     
+    from services.osint_routes import osint_bp
+    app.register_blueprint(osint_bp, url_prefix='/osint')
+    
     # Add Jinja2 filter for JSON formatting
     import json
     @app.template_filter('tojsonpretty')
