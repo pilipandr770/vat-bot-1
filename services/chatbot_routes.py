@@ -3,7 +3,6 @@ from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user
 import httpx
 import os
-import asyncio
 from datetime import datetime
 
 chatbot_bp = Blueprint("chatbot", __name__, template_folder="../templates")
@@ -21,7 +20,7 @@ def chat_page():
 
 @chatbot_bp.route("/api/chat/message", methods=["POST"])
 @login_required
-async def send_message():
+def send_message():
     """API endpoint для відправки повідомлень до AI асистента"""
     try:
         data = request.get_json()
@@ -38,9 +37,9 @@ async def send_message():
             "is_admin": current_user.is_admin
         }
         
-        # Виклик Agent Builder workflow
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.post(
+        # Виклик Agent Builder workflow (синхронний)
+        with httpx.Client(timeout=60.0) as client:
+            response = client.post(
                 AGENT_API_URL,
                 json={
                     "input_as_text": user_message,
