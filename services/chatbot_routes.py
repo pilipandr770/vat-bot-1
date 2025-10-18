@@ -29,6 +29,13 @@ def send_message():
         if not user_message:
             return jsonify({"error": "Message is required"}), 400
         
+        # Перевірка наявності API ключа
+        if not AGENT_API_KEY:
+            return jsonify({
+                "error": "API key not configured",
+                "details": "OPENAI_AGENT_API_KEY environment variable is not set"
+            }), 500
+        
         # Контекст користувача для персоналізації
         user_context = {
             "user_email": current_user.email,
@@ -38,6 +45,9 @@ def send_message():
         }
         
         # Виклик Agent Builder workflow (синхронний)
+        print(f"[CHATBOT] Calling Agent API: {AGENT_API_URL}")
+        print(f"[CHATBOT] User message: {user_message}")
+        
         with httpx.Client(timeout=60.0) as client:
             response = client.post(
                 AGENT_API_URL,
@@ -51,10 +61,14 @@ def send_message():
                 }
             )
             
+            print(f"[CHATBOT] Response status: {response.status_code}")
+            print(f"[CHATBOT] Response body: {response.text[:500]}")
+            
             if response.status_code != 200:
                 return jsonify({
                     "error": "Agent API error",
-                    "details": response.text
+                    "status_code": response.status_code,
+                    "details": response.text[:500]
                 }), 500
             
             agent_response = response.json()
@@ -66,8 +80,15 @@ def send_message():
             })
     
     except httpx.TimeoutException:
+        print("[CHATBOT] Timeout exception")
         return jsonify({"error": "Agent timeout. Please try again."}), 504
+    except httpx.HTTPError as e:
+        print(f"[CHATBOT] HTTP error: {str(e)}")
+        return jsonify({"error": f"HTTP error: {str(e)}"}), 500
     except Exception as e:
+        print(f"[CHATBOT] Unexpected error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
