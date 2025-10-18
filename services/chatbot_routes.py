@@ -7,8 +7,11 @@ from openai import OpenAI
 
 chatbot_bp = Blueprint("chatbot", __name__, template_folder="../templates")
 
-# OpenAI client з API key
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+# OpenAI client з API key та Assistants API v2
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY", ""),
+    default_headers={"OpenAI-Beta": "assistants=v2"}
+)
 
 # Agent Builder workflow ID
 AGENT_WORKFLOW_ID = os.getenv("OPENAI_AGENT_WORKFLOW_ID", "wf_68f3ed065d5881909c95b20ad801090b07e400bf50570e4d")
