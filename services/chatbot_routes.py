@@ -16,7 +16,7 @@ AGENT_API_KEY = os.getenv("OPENAI_AGENT_API_KEY", "")
 @chatbot_bp.route("/chat", methods=["GET"])
 def chat_page():
     """Сторінка з чат-інтерфейсом"""
-    return render_template("chatbot/chat.html")
+    return render_template("chatbot/chat.html", now=datetime.now())
 
 
 @chatbot_bp.route("/api/chat/message", methods=["POST"])
