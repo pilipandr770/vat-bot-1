@@ -1,15 +1,17 @@
 # FILE: services/chatbot_routes.py
 from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user
-import httpx
 import os
 from datetime import datetime
+from openai import OpenAI
 
 chatbot_bp = Blueprint("chatbot", __name__, template_folder="../templates")
 
-# OpenAI Agent Builder API endpoint
-AGENT_API_URL = os.getenv("OPENAI_AGENT_API_URL", "https://api.openai.com/v1/agents/run")
-AGENT_API_KEY = os.getenv("OPENAI_AGENT_API_KEY", "")
+# OpenAI client з API key
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+
+# Agent Builder workflow ID
+AGENT_WORKFLOW_ID = os.getenv("OPENAI_AGENT_WORKFLOW_ID", "wf_68f3ed065d5881909c95b20ad801090b07e400bf50570e4d")
 
 
 @chatbot_bp.route("/chat", methods=["GET"])
@@ -21,7 +23,7 @@ def chat_page():
 @chatbot_bp.route("/api/chat/message", methods=["POST"])
 @login_required
 def send_message():
-    """API endpoint для відправки повідомлень до AI асистента"""
+    """API endpoint для відправки повідомлень до AI асистента через Agents SDK"""
     try:
         data = request.get_json()
         user_message = data.get("message", "").strip()
@@ -30,61 +32,86 @@ def send_message():
             return jsonify({"error": "Message is required"}), 400
         
         # Перевірка наявності API ключа
-        if not AGENT_API_KEY:
+        if not client.api_key:
             return jsonify({
                 "error": "API key not configured",
-                "details": "OPENAI_AGENT_API_KEY environment variable is not set"
+                "details": "OPENAI_API_KEY environment variable is not set"
             }), 500
         
         # Контекст користувача для персоналізації
-        user_context = {
-            "user_email": current_user.email,
-            "user_name": f"{current_user.first_name} {current_user.last_name}",
-            "subscription_plan": getattr(current_user.subscription, 'plan', 'free') if hasattr(current_user, 'subscription') else 'free',
-            "is_admin": current_user.is_admin
-        }
+        user_context = f"""
+Benutzerkontext:
+- E-Mail: {current_user.email}
+- Name: {current_user.first_name} {current_user.last_name}
+- Abonnement: {getattr(current_user.subscription, 'plan', 'free') if hasattr(current_user, 'subscription') else 'free'}
+- Administrator: {'Ja' if current_user.is_admin else 'Nein'}
+"""
         
-        # Виклик Agent Builder workflow (синхронний)
-        print(f"[CHATBOT] Calling Agent API: {AGENT_API_URL}")
+        # Повне повідомлення з контекстом
+        full_message = f"{user_context}\n\nBenutzeranfrage: {user_message}"
+        
+        print(f"[CHATBOT] Using Agents SDK with workflow: {AGENT_WORKFLOW_ID}")
         print(f"[CHATBOT] User message: {user_message}")
         
-        with httpx.Client(timeout=60.0) as client:
-            response = client.post(
-                AGENT_API_URL,
-                json={
-                    "input_as_text": user_message,
-                    "context": user_context
-                },
-                headers={
-                    "Authorization": f"Bearer {AGENT_API_KEY}",
-                    "Content-Type": "application/json"
-                }
+        # Створюємо thread для розмови
+        thread = client.beta.threads.create()
+        print(f"[CHATBOT] Created thread: {thread.id}")
+        
+        # Додаємо повідомлення користувача
+        client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=full_message
+        )
+        
+        # Запускаємо агента з вашим workflow
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=AGENT_WORKFLOW_ID  # Ваш workflow ID як assistant
+        )
+        print(f"[CHATBOT] Started run: {run.id}")
+        
+        # Чекаємо завершення (polling)
+        import time
+        max_wait = 60  # seconds
+        elapsed = 0
+        while run.status in ['queued', 'in_progress', 'requires_action'] and elapsed < max_wait:
+            time.sleep(2)
+            elapsed += 2
+            run = client.beta.threads.runs.retrieve(
+                thread_id=thread.id,
+                run_id=run.id
             )
-            
-            print(f"[CHATBOT] Response status: {response.status_code}")
-            print(f"[CHATBOT] Response body: {response.text[:500]}")
-            
-            if response.status_code != 200:
-                return jsonify({
-                    "error": "Agent API error",
-                    "status_code": response.status_code,
-                    "details": response.text[:500]
-                }), 500
-            
-            agent_response = response.json()
-            
+            print(f"[CHATBOT] Run status: {run.status} (elapsed: {elapsed}s)")
+        
+        if run.status != 'completed':
+            error_details = getattr(run, 'last_error', None)
+            print(f"[CHATBOT] Run failed with status: {run.status}, error: {error_details}")
             return jsonify({
-                "response": agent_response.get("output_text", "Вибачте, не вдалося отримати відповідь."),
-                "timestamp": datetime.utcnow().isoformat(),
-                "user_context": user_context
-            })
+                "error": f"Agent run failed with status: {run.status}",
+                "details": str(error_details) if error_details else "Unknown error"
+            }), 500
+        
+        # Отримуємо відповідь від агента
+        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        assistant_messages = [msg for msg in messages.data if msg.role == 'assistant']
+        
+        if not assistant_messages:
+            print("[CHATBOT] No assistant messages found")
+            return jsonify({"error": "No response from assistant"}), 500
+        
+        # Беремо останнє повідомлення асистента
+        latest_message = assistant_messages[0]
+        response_text = latest_message.content[0].text.value
+        
+        print(f"[CHATBOT] Success! Response length: {len(response_text)} chars")
+        
+        return jsonify({
+            "response": response_text,
+            "timestamp": datetime.utcnow().isoformat(),
+            "thread_id": thread.id
+        })
     
-    except httpx.TimeoutException:
-        print("[CHATBOT] Timeout exception")
-        return jsonify({"error": "Agent timeout. Please try again."}), 504
-    except httpx.HTTPError as e:
-        print(f"[CHATBOT] HTTP error: {str(e)}")
-        return jsonify({"error": f"HTTP error: {str(e)}"}), 500
     except Exception as e:
         print(f"[CHATBOT] Unexpected error: {str(e)}")
         import traceback

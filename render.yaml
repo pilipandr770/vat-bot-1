@@ -46,11 +46,11 @@ services:
         sync: false
       - key: SANCTIONS_API_KEY
         sync: false
-      # OpenAI Agent Builder (set manually)
-      - key: OPENAI_AGENT_API_KEY
+      # OpenAI Agents SDK (set manually)
+      - key: OPENAI_API_KEY
         sync: false
-      - key: OPENAI_AGENT_API_URL
-        value: https://api.openai.com/v1/agents/run
+      - key: OPENAI_AGENT_WORKFLOW_ID
+        value: wf_68f3ed065d5881909c95b20ad801090b07e400bf50570e4d
 
 # Note: You need to manually create the schema in your existing PostgreSQL database
 # Connect to your database and run: CREATE SCHEMA IF NOT EXISTS vat_verification;
