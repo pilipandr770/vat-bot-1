@@ -59,6 +59,9 @@ def create_app(config_name=None):
     from services.osint_routes import osint_bp
     app.register_blueprint(osint_bp, url_prefix='/osint')
     
+    from services.chatbot_routes import chatbot_bp
+    app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
+    
     # Add Jinja2 filter for JSON formatting
     import json
     @app.template_filter('tojsonpretty')

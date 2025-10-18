@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assistent - VAT Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-robot"></i> AI Assistent - VAT Bot Helper
+                    </h5>
+                    <small>Stelle mir Fragen über die Plattform, Funktionen oder deine Prüfungen</small>
+                </div>
+                
+                <div class="card-body p-0">
+                    <!-- Chat Messages Container -->
+                    <div id="chatMessages" class="p-3" style="height: 500px; overflow-y: auto; background-color: #f8f9fa;">
+                        <!-- Welcome Message -->
+                        <div class="message bot-message mb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="avatar bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                    <i class="bi bi-robot"></i>
+                                </div>
+                                <div class="message-content bg-white p-3 rounded shadow-sm" style="max-width: 80%;">
+                                    <p class="mb-0">Hallo! Ich bin der VAT Bot Assistent. Wie kann ich dir helfen?</p>
+                                    <small class="text-muted">{{ now.strftime('%H:%M') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Suggestions -->
+                        <div class="suggestions mb-3">
+                            <p class="text-muted small mb-2">Häufige Fragen:</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-primary suggestion-btn" data-question="Wie starte ich eine Prüfung?">
+                                    <i class="bi bi-search"></i> Wie starte ich eine Prüfung?
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary suggestion-btn" data-question="Was macht der OSINT-Scanner?">
+                                    <i class="bi bi-shield-check"></i> Was macht der OSINT-Scanner?
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary suggestion-btn" data-question="Wie ändere ich mein Abo?">
+                                    <i class="bi bi-credit-card"></i> Wie ändere ich mein Abo?
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary suggestion-btn" data-question="Was bedeutet der Status in den Ergebnissen?">
+                                    <i class="bi bi-info-circle"></i> Status-Bedeutung?
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Input -->
+                    <div class="card-footer bg-white border-top">
+                        <form id="chatForm" class="d-flex gap-2">
+                            <input 
+                                type="text" 
+                                id="chatInput" 
+                                class="form-control" 
+                                placeholder="Schreibe deine Frage hier..."
+                                autocomplete="off"
+                                required
+                            />
+                            <button type="submit" class="btn btn-primary" id="sendBtn">
+                                <i class="bi bi-send"></i> Senden
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Helpful Tips -->
+            <div class="alert alert-info mt-3">
+                <i class="bi bi-lightbulb"></i> 
+                <strong>Tipp:</strong> Der Assistent kennt alle Funktionen der Plattform und kann dir bei Navigation, Prüfungen, OSINT-Scans und Abo-Verwaltung helfen.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+#chatMessages {
+    scroll-behavior: smooth;
+}
+
+.message {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bot-message .avatar {
+    font-size: 1.2rem;
+}
+
+.user-message .message-content {
+    background-color: #0d6efd !important;
+    color: white;
+}
+
+.typing-indicator {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    animation: bounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+.suggestion-btn {
+    font-size: 0.875rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    // Auto-scroll to bottom
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Add user message
+    function addUserMessage(text) {
+        const timestamp = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        const messageHTML = `
+            <div class="message user-message mb-3">
+                <div class="d-flex align-items-start justify-content-end">
+                    <div class="message-content p-3 rounded shadow-sm" style="max-width: 80%;">
+                        <p class="mb-0">${text}</p>
+                        <small class="text-white-50">${timestamp}</small>
+                    </div>
+                    <div class="avatar bg-secondary text-white rounded-circle ms-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatMessages.insertAdjacentHTML('beforeend', messageHTML);
+        scrollToBottom();
+    }
+    
+    // Add bot message
+    function addBotMessage(text) {
+        const timestamp = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        const messageHTML = `
+            <div class="message bot-message mb-3">
+                <div class="d-flex align-items-start">
+                    <div class="avatar bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div class="message-content bg-white p-3 rounded shadow-sm" style="max-width: 80%;">
+                        <p class="mb-0">${text}</p>
+                        <small class="text-muted">${timestamp}</small>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatMessages.insertAdjacentHTML('beforeend', messageHTML);
+        scrollToBottom();
+    }
+    
+    // Add typing indicator
+    function addTypingIndicator() {
+        const typingHTML = `
+            <div class="message bot-message mb-3" id="typingIndicator">
+                <div class="d-flex align-items-start">
+                    <div class="avatar bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div class="message-content bg-white p-3 rounded shadow-sm">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatMessages.insertAdjacentHTML('beforeend', typingHTML);
+        scrollToBottom();
+    }
+    
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    }
+    
+    // Send message to API
+    async function sendMessage(text) {
+        addUserMessage(text);
+        chatInput.value = '';
+        sendBtn.disabled = true;
+        addTypingIndicator();
+        
+        try {
+            const response = await fetch('/chatbot/api/chat/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: text })
+            });
+            
+            const data = await response.json();
+            
+            removeTypingIndicator();
+            
+            if (response.ok) {
+                addBotMessage(data.response);
+            } else {
+                addBotMessage(`❌ Fehler: ${data.error || 'Unbekannter Fehler'}`);
+            }
+        } catch (error) {
+            removeTypingIndicator();
+            addBotMessage('❌ Verbindungsfehler. Bitte versuche es erneut.');
+            console.error('Chat error:', error);
+        } finally {
+            sendBtn.disabled = false;
+            chatInput.focus();
+        }
+    }
+    
+    // Form submit handler
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (message) {
+            sendMessage(message);
+        }
+    });
+    
+    // Suggestion buttons
+    document.querySelectorAll('.suggestion-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const question = this.dataset.question;
+            sendMessage(question);
+        });
+    });
+    
+    // Focus input on load
+    chatInput.focus();
+});
+</script>
+{% endblock %}
