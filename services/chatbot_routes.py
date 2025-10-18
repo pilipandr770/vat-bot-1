@@ -7,11 +7,11 @@ from openai import OpenAI
 
 chatbot_bp = Blueprint("chatbot", __name__, template_folder="../templates")
 
-# OpenAI client з API key та Assistants API v2
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY", ""),
-    default_headers={"OpenAI-Beta": "assistants=v2"}
-)
+# OpenAI client з API key
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+
+# Assistants API v2 header (для всіх запитів)
+V2_HEADERS = {"OpenAI-Beta": "assistants=v2"}
 
 # Agent Builder workflow ID
 AGENT_WORKFLOW_ID = os.getenv("OPENAI_AGENT_WORKFLOW_ID", "wf_68f3ed065d5881909c95b20ad801090b07e400bf50570e4d")
@@ -56,21 +56,23 @@ Benutzerkontext:
         print(f"[CHATBOT] Using Agents SDK with workflow: {AGENT_WORKFLOW_ID}")
         print(f"[CHATBOT] User message: {user_message}")
         
-        # Створюємо thread для розмови
-        thread = client.beta.threads.create()
+        # Створюємо thread для розмови (з v2 header)
+        thread = client.beta.threads.create(extra_headers=V2_HEADERS)
         print(f"[CHATBOT] Created thread: {thread.id}")
         
         # Додаємо повідомлення користувача
         client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
-            content=full_message
+            content=full_message,
+            extra_headers=V2_HEADERS
         )
         
         # Запускаємо агента з вашим workflow
         run = client.beta.threads.runs.create(
             thread_id=thread.id,
-            assistant_id=AGENT_WORKFLOW_ID  # Ваш workflow ID як assistant
+            assistant_id=AGENT_WORKFLOW_ID,
+            extra_headers=V2_HEADERS
         )
         print(f"[CHATBOT] Started run: {run.id}")
         
@@ -83,7 +85,8 @@ Benutzerkontext:
             elapsed += 2
             run = client.beta.threads.runs.retrieve(
                 thread_id=thread.id,
-                run_id=run.id
+                run_id=run.id,
+                extra_headers=V2_HEADERS
             )
             print(f"[CHATBOT] Run status: {run.status} (elapsed: {elapsed}s)")
         
@@ -96,7 +99,10 @@ Benutzerkontext:
             }), 500
         
         # Отримуємо відповідь від агента
-        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        messages = client.beta.threads.messages.list(
+            thread_id=thread.id,
+            extra_headers=V2_HEADERS
+        )
         assistant_messages = [msg for msg in messages.data if msg.role == 'assistant']
         
         if not assistant_messages:
