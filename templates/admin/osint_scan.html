@@ -52,7 +52,19 @@ document.querySelector('form').addEventListener('submit', async (e) => {
   try {
     const fd = new FormData(e.target);
     const res = await fetch("", { method: "POST", body: fd });
+    
+    // Перевірка чи отримали JSON
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Сервер повернув некоректну відповідь. Спробуйте пізніше.");
+    }
+    
     const data = await res.json();
+    
+    // Перевірка на помилку від сервера
+    if (!res.ok || data.error) {
+      throw new Error(data.error || `HTTP ${res.status}: ${res.statusText}`);
+    }
     
     let html = '<div class="card shadow-sm"><div class="card-body">';
     html += '<h5 class="card-title text-success"><i class="bi bi-check-circle"></i> Сканування завершено</h5>';
@@ -74,8 +86,13 @@ document.querySelector('form').addEventListener('submit', async (e) => {
     
     document.getElementById('result').innerHTML = html;
   } catch (error) {
+    console.error('OSINT scan error:', error);
     document.getElementById('result').innerHTML = 
-      '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Помилка сканування: ' + error + '</div>';
+      `<div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i> 
+        <strong>Помилка сканування:</strong> ${error.message}
+        <br><small>Якщо помилка повторюється, зверніться до підтримки.</small>
+      </div>`;
   } finally {
     btn.disabled = false;
     btn.innerHTML = originalText;
