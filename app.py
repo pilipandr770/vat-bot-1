@@ -128,9 +128,26 @@ def create_app(config_name=None):
         
         # Check if user can perform verification (quota check)
         if not current_user.can_perform_verification():
+            # Get current usage info for better error message
+            sub = current_user.active_subscription
+            if not sub:
+                # Free plan
+                current_usage = current_user.get_monthly_verification_count()
+                limit = 5
+                plan_name = "Free"
+            else:
+                # Paid plan
+                current_usage = sub.api_calls_used
+                limit = sub.api_calls_limit if sub.api_calls_limit != -1 else "unlimited"
+                plan_name = sub.plan
+            
             return jsonify({
                 'success': False,
-                'error': 'Sie haben Ihr monatliches Prüfungslimit erreicht. Bitte upgraden Sie Ihren Plan.'
+                'error': f'Sie haben Ihr Prüfungslimit erreicht ({current_usage}/{limit}). Bitte upgraden Sie Ihren Plan.',
+                'current_plan': plan_name,
+                'current_usage': current_usage,
+                'limit': limit,
+                'upgrade_required': True
             }), 403
         
         try:

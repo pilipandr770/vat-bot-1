@@ -126,7 +126,12 @@ class CounterpartyVerification {
                 this.displayResults(response);
                 this.saveToLocalHistory(formData, response);
             } else {
-                this.displayError(response.error || 'Невідома помилка');
+                // Handle quota exceeded error specially
+                if (response.upgrade_required) {
+                    this.displayQuotaExceededError(response);
+                } else {
+                    this.displayError(response.error || 'Невідома помилка');
+                }
             }
         } catch (error) {
             console.error('Verification error:', error);
@@ -407,9 +412,45 @@ class CounterpartyVerification {
         };
         return icons[service] || 'bi-gear';
     }
-}
 
-// Initialize application when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    new CounterpartyVerification();
-});
+    displayQuotaExceededError(response) {
+        const resultsPanel = document.getElementById('resultsPanel');
+        if (!resultsPanel) return;
+
+        const planName = response.current_plan || 'Free';
+        const currentUsage = response.current_usage || 0;
+        const limit = response.limit || 5;
+
+        let html = `
+            <div class="alert alert-warning" role="alert">
+                <h5 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Prüfungslimit erreicht
+                </h5>
+                <p>Sie haben Ihr monatliches Prüfungslimit für den ${planName}-Plan erreicht.</p>
+                <div class="mb-3">
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" 
+                             style="width: 100%" 
+                             aria-valuenow="${currentUsage}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="${limit}">
+                            ${currentUsage} / ${limit === 'unlimited' ? '∞' : limit}
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-3">Upgraden Sie Ihren Plan, um weitere Prüfungen durchzuführen:</p>
+                <div class="d-flex gap-2">
+                    <a href="/payments" class="btn btn-primary">
+                        <i class="bi bi-credit-card"></i> Plan upgraden
+                    </a>
+                    <a href="/dashboard" class="btn btn-outline-secondary">
+                        <i class="bi bi-house"></i> Zum Dashboard
+                    </a>
+                </div>
+            </div>
+        `;
+
+        resultsPanel.innerHTML = html;
+        resultsPanel.classList.add('fade-in');
+    }
+}
