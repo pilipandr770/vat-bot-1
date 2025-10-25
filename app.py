@@ -113,11 +113,18 @@ def create_app(config_name=None):
         return render_template('test_form.html')
     
     @app.route('/verify', methods=['POST'])
-    @login_required
     def verify_counterparty():
         """Process verification request - requires authentication."""
         import logging
         logger = logging.getLogger(__name__)
+        
+        # Check authentication manually for AJAX requests
+        if not current_user.is_authenticated:
+            return jsonify({
+                'success': False,
+                'error': 'Bitte melden Sie sich an, um diese Funktion zu nutzen.',
+                'redirect': url_for('auth.login')
+            }), 401
         
         # Check if user can perform verification (quota check)
         if not current_user.can_perform_verification():

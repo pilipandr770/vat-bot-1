@@ -161,6 +161,15 @@ class CounterpartyVerification {
             body: formData
         });
 
+        if (response.status === 401) {
+            // User not authenticated, redirect to login
+            const data = await response.json();
+            if (data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
+        }
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
