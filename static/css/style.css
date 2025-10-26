@@ -19,7 +19,7 @@ body {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
-    color: #2d3748;
+    color: #00ff00;
     min-height: 100vh;
 }
 
@@ -170,8 +170,20 @@ body {
 }
 
 .form-control::placeholder {
-    color: rgba(45, 55, 72, 0.6);
+    color: #00ff00;
     font-weight: 400;
+}
+
+/* Form labels */
+.form-label {
+    color: #00ff00;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+label {
+    color: #00ff00;
+    font-weight: 600;
 }
 
 /* Modern badges */
@@ -365,7 +377,7 @@ h6 { font-size: 1.125rem; }
 
 p {
     line-height: 1.7;
-    color: rgba(45, 55, 72, 0.8);
+    color: #00ff00;
 }
 
 /* Utility classes */
