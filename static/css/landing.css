@@ -250,7 +250,7 @@ body {
 }
 
 .navbar.scrolled .navbar-nav .nav-link {
-    color: #2d3748 !important;
+    color: #00ff00 !important;
 }
 
 .navbar.scrolled .navbar-nav .nav-link::after {

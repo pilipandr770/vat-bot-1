@@ -535,8 +535,19 @@ p {
 
 /* Utility classes */
 .text-muted-light {
-    color: #6c757d !important;
-    opacity: 0.7;
+    color: #00ff00 !important;
+    opacity: 0.8;
+}
+
+.text-muted {
+    color: #00ff00 !important;
+    opacity: 0.8;
+}
+
+.form-text {
+    color: #00ff00 !important;
+    opacity: 0.8;
+    font-size: 0.875rem;
 }
 
 .border-start-success {
