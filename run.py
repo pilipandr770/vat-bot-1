@@ -9,7 +9,7 @@ def check_database():
     db_path = 'counterparty_verification.db'
     if not os.path.exists(db_path):
         print("⚠️  Database not found. Initializing...")
-        from app import create_app
+        from application import create_app
         from crm.models import db
         
         app = create_app()
