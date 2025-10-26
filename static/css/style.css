@@ -507,7 +507,7 @@ p {
 
 .accordion-button:not(.collapsed) {
     background-color: #e7f1ff;
-    color: #0c63e4;
+    color: #00ff00;
 }
 
 /* History table */
