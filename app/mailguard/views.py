@@ -16,7 +16,7 @@ def dashboard():
     accounts = MailAccount.query.filter_by(user_id=current_user.id, is_active=True).all()
     
     # Получаем активные правила
-    rules = MailRule.query.filter_by(is_active=True).order_by(MailRule.priority.desc()).all()
+    rules = MailRule.query.filter_by(is_enabled=True).order_by(MailRule.priority.desc()).all()
 
     # Получаем черновики ожидающие подтверждения
     pending_drafts = MailDraft.query.join(MailMessage).join(MailAccount)\
