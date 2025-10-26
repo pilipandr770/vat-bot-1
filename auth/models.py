@@ -87,6 +87,10 @@ class User(UserMixin, db.Model):
     
     def can_perform_verification(self):
         """Check if user can perform verification based on quota."""
+        # Admin users have unlimited access
+        if self.is_admin:
+            return True
+            
         sub = self.active_subscription
         if not sub:
             # Free plan - check monthly limit

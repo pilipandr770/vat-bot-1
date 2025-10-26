@@ -1,231 +1,215 @@
-# Counterparty Verification System - Development Guide
+# Counterparty Verification System - AI Development Guide
 
 ## Project Overview
-Flask веб-додаток для автоматизованої перевірки контрагентів через інтеграцію з офіційними реєстрами та API. Система приймає дані компанії та контрагента, перевіряє їх через різні джерела (VIES, Handelsregister, санкційні списки) і надає комплексну оцінку надійності.
+Flask SaaS platform for automated EU business partner verification. Validates VAT numbers, checks sanctions lists, performs OSINT scans, and provides subscription-based access control.
 
-## Architecture & Core Structure
+## Architecture & Core Patterns
 
-### Directory Structure
+### Application Structure
 ```
-project_root/
-├── app.py                    # Flask application entry point
-├── config.py                 # API keys, configuration management  
-├── .env                      # Environment variables (API keys, DB configs)
-├── requirements.txt          # Python dependencies
-├── static/                   # CSS/JS assets for 3-column UI
-├── templates/                # Jinja2 templates for web interface
-├── services/                 # API integration modules
-│   ├── vies.py              # EU VAT validation service
-│   ├── handelsregister.py   # German business register
-│   ├── sanctions.py         # EU/OFAC/UK sanctions lists
-│   ├── insolvency.py        # Insolvenzbekanntmachungen.de
-│   └── opencorporates.py    # Global business registry
-├── crm/                     # Database and CRM integration
-│   ├── models.py            # SQLAlchemy models (companies, checks, results)
-│   ├── save_results.py      # Result persistence logic
-│   └── monitor.py           # Daily monitoring and change detection
-└── notifications/           # Alert system (Email/Telegram)
+├── app.py                 # Main Flask app with blueprint registration
+├── config.py             # Environment-based configuration classes
+├── crm/models.py         # SQLAlchemy models (Company, Counterparty, VerificationCheck)
+├── auth/models.py        # User authentication & subscription models
+├── services/             # External API integrations
+│   ├── vies.py          # EU VAT validation (SOAP API)
+│   ├── handelsregister.py # German business register
+│   ├── sanctions.py     # EU/OFAC/UK sanctions lists
+│   └── osint/           # Open Source Intelligence scanner
+└── templates/            # 3-column UI layout (company|counterparty|results)
 ```
 
-### Key Components
-- **Web Interface**: 3-column layout (company data, counterparty data, verification results)
-- **API Services**: Individual modules for each data source with unified response format
-- **Database Layer**: Companies, verification checks, results history, alerts
-- **Monitoring System**: Daily re-checks with change notifications
-- **CRM Integration**: Results storage and historical tracking
+### Key Design Patterns
 
-## Data Sources & API Integrations
-
-### Primary Verification Sources
-- **VIES** (`services/vies.py`): EU VAT number validation
-- **Handelsregister** (`services/handelsregister.py`): German company registration data
-- **Sanctions Lists** (`services/sanctions.py`): EU/OFAC/UK consolidated checks
-- **Insolvency** (`services/insolvency.py`): German bankruptcy announcements
-- **OpenCorporates** (`services/opencorporates.py`): Global business registry
-
-### API Integration Patterns
+#### 1. Service Integration Pattern (`services/*.py`)
 ```python
-# Standard service response format
-{
-    "status": "valid|warning|error",
-    "source": "vies|handelsregister|sanctions",
-    "data": {...},
-    "last_checked": "2025-10-02T10:30:00Z",
-    "confidence": 0.95
-}
+class VIESService:
+    def validate_vat(self, country_code: str, vat_number: str) -> Dict:
+        # Standardized response format
+        return {
+            "status": "valid|warning|error",
+            "source": "vies",
+            "data": {...},
+            "last_checked": "2025-10-02T10:30:00Z",
+            "confidence": 0.95
+        }
 ```
 
-### Error Handling Strategy
-- Implement retry logic with exponential backoff for API failures
-- Cache successful responses to reduce API call frequency
-- Graceful degradation when services are unavailable
-- Log all API requests/responses for debugging and compliance
-
-## Database Schema
-
-### Core Models (`crm/models.py`)
+#### 2. Blueprint Route Organization
 ```python
-class Company(db.Model):
-    # Requester company data (left column)
-    vat_number, legal_address, company_name, email, phone
+# auth/routes.py - Authentication endpoints
+auth_bp = Blueprint('auth', __name__)
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login(): ...
 
-class Counterparty(db.Model):
-    # Target verification company (middle column)  
-    vat_number, company_name, address, email, domain, country
-
-class VerificationCheck(db.Model):
-    # Individual verification session
-    company_id, counterparty_id, check_date, overall_status
-
-class CheckResult(db.Model):
-    # Results from each service
-    check_id, service_name, status, data_json, confidence_score
+# Main routes in app.py with @login_required
+@app.route('/verify', methods=['POST'])
+def verify_counterparty(): ...
 ```
 
-## Development Workflows
-
-### Flask Application Structure
-- Use Flask blueprints for organizing routes (main, api, admin)
-- Implement form validation using WTForms for data input
-- Use SQLAlchemy with PostgreSQL for production, SQLite for development
-- Configure Flask-Migrate for database schema management
-
-### Service Integration Development
+#### 3. OSINT Adapter Pattern (`services/osint/`)
 ```python
-# Template for new service integration
-async def check_service(company_data):
-    try:
-        response = await api_call(company_data)
-        return format_standard_response(response)
-    except APIException as e:
-        return error_response(e)
+class OsintScanner:
+    def run_all(self) -> List[Dict]:
+        adapters = [WhoisAdapter, DnsAdapter, SslLabsAdapter, ...]
+        results = []
+        for adapter in adapters:
+            result = adapter(target).run()
+            results.append(result)
+        return results
 ```
 
-### Testing Strategy
-- Unit tests for each service module with mocked API responses
-- Integration tests for database operations and Flask routes
-- End-to-end tests for complete verification workflows
-- Mock external APIs in test environment to avoid rate limits
+## Critical Developer Workflows
 
-## Configuration Management
-
-### Environment Variables (`.env`)
-```
-FLASK_ENV=development|production
-DATABASE_URL=postgresql://user:pass@host/db
-SECRET_KEY=flask_secret_key
-
-# API Keys
-VIES_API_KEY=
-HANDELSREGISTER_API_KEY=
-OPENCORPORATES_API_KEY=
-SANCTIONS_API_KEY=
-
-# Notifications
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-SMTP_SERVER=
-SMTP_USERNAME=
-SMTP_PASSWORD=
-```
-
-### Configuration Patterns
-- Store sensitive API keys in environment variables only
-- Use different config classes for development/staging/production
-- Implement API rate limiting configuration per service
-- Configure monitoring intervals and notification thresholds
-
-## User Interface Guidelines
-
-### 3-Column Layout Structure
-1. **Left Column**: Company data input (requester information)
-2. **Middle Column**: Counterparty data input (verification target)
-3. **Right Column**: Verification results with status indicators
-
-### Status Indicators
-- ✅ **Valid**: All checks passed successfully
-- ⚠️ **Warning**: Minor issues or incomplete data
-- ❌ **Problem**: Critical issues or sanctions found
-
-### Form Validation Rules
-- VAT numbers: validate format per country before API calls
-- Email addresses: validate format and check domain existence
-- Company names: normalize and trim whitespace
-- Addresses: validate required fields per jurisdiction
-
-## Monitoring & Notifications
-
-### Daily Monitoring (`crm/monitor.py`)
-```python
-# Re-check all active counterparties daily
-# Compare results with previous checks
-# Trigger notifications for status changes
-# Update confidence scores based on data freshness
-```
-
-### Notification Triggers
-- New sanctions list matches
-- Insolvency proceedings started
-- VAT number validity changes
-- Significant confidence score drops
-
-## Performance Optimization
-
-### Caching Strategy
-- Redis cache for API responses (TTL: 24 hours for most services)
-- Database query optimization with proper indexing
-- Async API calls for parallel service checks
-- Background job processing with Celery for monitoring
-
-### API Rate Limiting
-- Implement backoff strategies for each service
-- Queue API requests to avoid hitting rate limits
-- Cache negative results to prevent repeated failed calls
-- Monitor API usage and costs per service
-
-## Security & Compliance
-
-### Data Protection
-- Encrypt sensitive company data at rest
-- Implement audit logging for all verification activities
-- Secure API key storage and rotation procedures
-- GDPR compliance for storing counterparty data
-
-### Access Control
-- Role-based access for different user types
-- API authentication for programmatic access
-- Session management with proper timeouts
-- Input sanitization to prevent injection attacks
-
-## Development Commands
-
-### Local Development Setup
+### Environment Setup (Required First)
 ```bash
+# 1. Clone and setup virtual environment
+git clone <repo>
+python -m venv venv
+venv\Scripts\activate  # Windows
+
+# 2. Install dependencies
 pip install -r requirements.txt
-flask db init                 # Initialize database
-flask db migrate             # Create migration
-flask db upgrade            # Apply migrations
-flask run --debug          # Start development server
+
+# 3. Environment configuration (.env)
+FLASK_ENV=development
+DATABASE_URL=sqlite:///counterparty_verification.db
+SECRET_KEY=your-secret-key
+# API keys for external services...
+
+# 4. Database initialization
+flask db init
+flask db migrate -m "Initial setup"
+flask db upgrade
+
+# 5. Start development server
+flask run --debug
 ```
 
-### Testing Commands
+### Database Schema Management
+- **Models**: `crm/models.py` (Company, Counterparty, VerificationCheck, CheckResult)
+- **Migrations**: Use `flask db migrate/upgrade` for schema changes
+- **Multi-tenant**: PostgreSQL schemas for production isolation
+- **Relationships**: User → VerificationCheck → CheckResult (cascading deletes)
+
+### Subscription & Quota System
+```python
+# User model methods (auth/models.py)
+def can_perform_verification(self):
+    sub = self.active_subscription
+    if not sub:
+        return self.get_monthly_verification_count() < 5  # Free tier: 5/month
+    return sub.api_calls_used < sub.api_calls_limit
+
+# Quota exceeded response (app.py)
+return jsonify({
+    'success': False,
+    'error': f'Sie haben Ihr Prüfungslimit erreicht ({usage}/{limit}).',
+    'upgrade_required': True
+}), 403
+```
+
+## Project-Specific Conventions
+
+### UI/UX Patterns
+- **3-Column Layout**: Company data | Counterparty data | Results panel
+- **German Interface**: All user-facing text in German (`Bitte melden Sie sich an...`)
+- **Status Indicators**: ✅ Valid, ⚠️ Warning, ❌ Error
+- **Form Validation**: Client-side + server-side with German error messages
+
+### API Integration Standards
+- **Response Format**: Consistent `{"status": "valid|warning|error", "data": {...}, "confidence": 0.95}`
+- **Error Handling**: Try/catch with logging, graceful degradation
+- **Rate Limiting**: Built-in delays and backoff strategies
+- **Caching**: Redis for API responses (TTL: 24h)
+
+### Authentication Flow
+```python
+# Manual auth check for AJAX endpoints (not @login_required)
+if not current_user.is_authenticated:
+    return jsonify({'error': 'Auth required', 'redirect': '/auth/login'}), 401
+
+# Quota check before processing
+if not current_user.can_perform_verification():
+    return jsonify({'error': 'Quota exceeded', 'upgrade_required': True}), 403
+```
+
+## Development Commands & Scripts
+
+### Database Operations
 ```bash
-pytest tests/              # Run unit tests
-pytest tests/integration/ # Run integration tests
-flask test-apis           # Test all external API connections
+flask db migrate -m "Add new field"  # Create migration
+flask db upgrade                     # Apply migrations
+flask db downgrade                   # Rollback
+```
+
+### Testing & Debugging
+```bash
+# Run with debug mode
+flask run --debug
+
+# Check API connectivity
+python -c "from services.vies import VIESService; print(VIESService().validate_vat('DE', '123456789'))"
+
+# Database shell
+flask shell
+>>> from crm.models import db, User
+>>> User.query.all()
 ```
 
 ### Production Deployment
 ```bash
-gunicorn app:app          # Production WSGI server
-celery -A app.celery worker # Background task processing
-celery beat               # Scheduled monitoring tasks
+# Environment variables required
+FLASK_ENV=production
+DATABASE_URL=postgresql://...
+SECRET_KEY=...
+STRIPE_SECRET_KEY=...
+# API keys for all services...
+
+# Gunicorn for production
+gunicorn app:app --bind 0.0.0.0:10000
 ```
 
-## API Integration Checklist
-- [ ] Implement standard response format for all services
-- [ ] Add comprehensive error handling and logging  
-- [ ] Configure appropriate caching and rate limiting
-- [ ] Add monitoring for API health and response times
-- [ ] Document API costs and usage limits
-- [ ] Implement fallback strategies for service outages
+## Common Development Tasks
+
+### Adding New Verification Service
+1. Create `services/new_service.py` with standardized response format
+2. Add to `crm/save_results.py` processing logic
+3. Update frontend JavaScript in `static/js/app.js`
+4. Add to database models if needed
+
+### Adding New Subscription Plan
+1. Update Stripe dashboard with new price
+2. Add plan logic in `payments/routes.py`
+3. Update quota checks in `auth/models.py`
+4. Update UI pricing display
+
+### Debugging API Issues
+```python
+# Check service logs
+import logging
+logger = logging.getLogger(__name__)
+logger.info(f"API Response: {response.json()}")
+
+# Test service isolation
+from services.vies import VIESService
+service = VIESService()
+result = service.validate_vat('DE', '123456789')
+print(f"Status: {result['status']}")
+```
+
+## File Organization Guidelines
+
+- **Routes**: Blueprint in separate files (`auth/routes.py`, `payments/routes.py`)
+- **Models**: Domain separation (`crm/models.py` for business logic, `auth/models.py` for users)
+- **Services**: One class per external API (`services/vies.py`, `services/sanctions.py`)
+- **Templates**: Organized by feature (`templates/auth/`, `templates/payments/`)
+- **Static Assets**: `static/css/`, `static/js/`, `static/images/`
+
+## Security & Compliance Notes
+
+- **GDPR Compliance**: User data encryption, audit logging
+- **API Key Management**: Environment variables only, never in code
+- **Session Security**: Flask-Login with proper timeouts
+- **Input Validation**: Both client and server-side validation
+- **Rate Limiting**: Built into service classes to prevent API abuse
