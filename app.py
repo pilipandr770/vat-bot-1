@@ -62,6 +62,9 @@ def create_app(config_name=None):
     from services.chatbot_routes import chatbot_bp
     app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
     
+    from file_scanner.routes import file_scanner
+    app.register_blueprint(file_scanner, url_prefix='/file-scanner')
+    
     # Add Jinja2 filter for JSON formatting
     import json
     @app.template_filter('tojsonpretty')

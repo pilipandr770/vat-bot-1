@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block title %}Datei-Scanner - Sicherheitsprüfung{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="bi bi-shield-check"></i> Datei-Scanner</h4>
+                    <small class="text-white-50">Sichere Überprüfung von Dateien auf Viren und Bedrohungen</small>
+                </div>
+                <div class="card-body">
+                    <!-- Drag & Drop Zone -->
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div id="dropZone" class="drop-zone">
+                                <div class="drop-zone-content">
+                                    <i class="bi bi-cloud-upload display-4 text-primary mb-3"></i>
+                                    <h5>Ziehen Sie Dateien hierher</h5>
+                                    <p class="text-muted mb-3">oder klicken Sie, um Dateien auszuwählen</p>
+                                    <input type="file" id="fileInput" multiple style="display: none;">
+                                    <button type="button" class="btn btn-primary btn-lg" onclick="document.getElementById('fileInput').click()">
+                                        <i class="bi bi-folder2-open"></i> Dateien auswählen
+                                    </button>
+                                    <div class="mt-3">
+                                        <small class="text-muted">
+                                            Unterstützte Formate: EXE, DLL, PDF, DOC, XLS, ZIP, RAR, TXT, HTML, XML, JSON<br>
+                                            Maximale Größe: 50MB pro Datei
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6><i class="bi bi-info-circle"></i> Wie funktioniert es?</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Lokale Analyse auf verdächtige Muster</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Cloud-Scan via VirusTotal</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Automatische Risikobewertung</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Sichere Isolierung gefährlicher Dateien</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Sofortige Empfehlungen</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="resultsSection" class="mt-4" style="display: none;">
+                        <h5><i class="bi bi-clipboard-check"></i> Scan-Ergebnisse</h5>
+                        <div id="resultsContainer"></div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div id="progressSection" class="mt-4" style="display: none;">
+                        <h6>Scanne Datei...</h6>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for detailed results -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detaillierte Scan-Ergebnisse</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be filled by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.drop-zone {
+    border: 3px dashed #007bff;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 255, 255, 0.1) 100%);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: #0056b3;
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 255, 255, 0.2) 100%);
+    transform: scale(1.02);
+}
+
+.drop-zone.dragover {
+    border-color: #00ff00;
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 255, 255, 0.2) 100%);
+}
+
+.result-card {
+    margin-bottom: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.result-card.safe {
+    border-left: 4px solid #28a745;
+}
+
+.result-card.warning {
+    border-left: 4px solid #ffc107;
+}
+
+.result-card.danger {
+    border-left: 4px solid #dc3545;
+}
+
+.risk-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+}
+
+.file-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-right: 15px;
+}
+
+.file-icon.exe { background: linear-gradient(45deg, #ff6b6b, #ee5a52); color: white; }
+.file-icon.pdf { background: linear-gradient(45deg, #dc3545, #c82333); color: white; }
+.file-icon.doc { background: linear-gradient(45deg, #007bff, #0056b3); color: white; }
+.file-icon.zip { background: linear-gradient(45deg, #ffc107, #e0a800); color: black; }
+.file-icon.txt { background: linear-gradient(45deg, #6c757d, #545b62); color: white; }
+.file-icon.default { background: linear-gradient(45deg, #6c757d, #545b62); color: white; }
+</style>
+
+<script>
+let currentFile = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const resultsSection = document.getElementById('resultsSection');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const progressSection = document.getElementById('progressSection');
+
+    // Drag & Drop events
+    dropZone.addEventListener('dragover', handleDragOver);
+    dropZone.addEventListener('dragleave', handleDragLeave);
+    dropZone.addEventListener('drop', handleDrop);
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // File input change
+    fileInput.addEventListener('change', handleFileSelect);
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    }
+
+    function handleDragLeave(e) {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            processFile(files[0]);
+        }
+    }
+
+    function handleFileSelect(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            processFile(files[0]);
+        }
+    }
+
+    function processFile(file) {
+        currentFile = file;
+
+        // Show progress
+        progressSection.style.display = 'block';
+        resultsSection.style.display = 'none';
+
+        // Create FormData
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Send to server
+        fetch('/file-scanner/api/file-scan', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            progressSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+
+            if (data.success) {
+                displayResults(data);
+            } else {
+                displayError(data.error);
+            }
+        })
+        .catch(error => {
+            progressSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            displayError('Netzwerkfehler: ' + error.message);
+        });
+    }
+
+    function displayResults(data) {
+        const fileInfo = data.file_info;
+        const recommendation = data.recommendation;
+
+        let html = `
+            <div class="result-card card border-${recommendation.level} mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="file-icon ${getFileIconClass(fileInfo.type)}">
+                            <i class="bi ${getFileIcon(fileInfo.type)}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1">${fileInfo.name}</h5>
+                            <small class="text-muted">
+                                Größe: ${formatFileSize(fileInfo.size)} |
+                                Hash: ${fileInfo.hash.substring(0, 16)}...
+                            </small>
+                        </div>
+                        <span class="badge bg-${recommendation.level} risk-badge">
+                            ${getRiskText(recommendation.level)}
+                        </span>
+                    </div>
+
+                    <div class="alert alert-${recommendation.level}" role="alert">
+                        <strong>${getRecommendationIcon(recommendation.level)} ${recommendation.message}</strong>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="showDetails(${JSON.stringify(data).replace(/"/g, '&quot;')})">
+                                <i class="bi bi-eye"></i> Details anzeigen
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-secondary btn-sm w-100" onclick="scanAgain()">
+                                <i class="bi bi-arrow-repeat"></i> Neue Datei scannen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        resultsContainer.innerHTML = html;
+    }
+
+    function displayError(error) {
+        resultsContainer.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+                <h5><i class="bi bi-exclamation-triangle"></i> Fehler beim Scannen</h5>
+                <p>${error}</p>
+            </div>
+        `;
+    }
+
+    function showDetails(data) {
+        const modal = new bootstrap.Modal(document.getElementById('resultModal'));
+        const modalBody = document.getElementById('modalBody');
+
+        let html = '<div class="row">';
+
+        // File Info
+        html += `
+            <div class="col-md-6">
+                <h6><i class="bi bi-file-earmark"></i> Datei-Informationen</h6>
+                <table class="table table-sm">
+                    <tr><td>Name:</td><td>${data.file_info.name}</td></tr>
+                    <tr><td>Größe:</td><td>${formatFileSize(data.file_info.size)}</td></tr>
+                    <tr><td>Typ:</td><td>${data.file_info.type.toUpperCase()}</td></tr>
+                    <tr><td>SHA256:</td><td><small>${data.file_info.hash}</small></td></tr>
+                </table>
+            </div>
+        `;
+
+        // VirusTotal Results
+        if (data.virustotal.available) {
+            html += `
+                <div class="col-md-6">
+                    <h6><i class="bi bi-cloud"></i> VirusTotal Ergebnisse</h6>
+                    <table class="table table-sm">
+            `;
+
+            if (data.virustotal.scanned) {
+                html += `
+                    <tr><td>Erkannt als bösartig:</td><td>${data.virustotal.positives}/${data.virustotal.total}</td></tr>
+                `;
+
+                if (data.virustotal.threats && data.virustotal.threats.length > 0) {
+                    html += `<tr><td>Bedrohungen:</td><td><small>${data.virustotal.threats.slice(0, 3).join('<br>')}</small></td></tr>`;
+                }
+
+                if (data.virustotal.link) {
+                    html += `<tr><td>Link:</td><td><a href="${data.virustotal.link}" target="_blank">Details</a></td></tr>`;
+                }
+            } else {
+                html += `<tr><td>Status:</td><td>${data.virustotal.message || 'Wird analysiert...'}</td></tr>`;
+            }
+
+            html += '</table></div>';
+        }
+
+        // Local Analysis
+        if (data.local_analysis) {
+            html += `
+                <div class="col-12 mt-3">
+                    <h6><i class="bi bi-search"></i> Lokale Analyse</h6>
+                    <div class="alert alert-info">
+                        <strong>Risiko-Level:</strong> ${getRiskText(data.local_analysis.risk_level)}<br>
+            `;
+
+            if (data.local_analysis.suspicious_patterns && data.local_analysis.suspicious_patterns.length > 0) {
+                html += '<strong>Verdächtige Muster:</strong><ul>';
+                data.local_analysis.suspicious_patterns.forEach(pattern => {
+                    html += `<li>${pattern}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            html += '</div></div>';
+        }
+
+        html += '</div>';
+        modalBody.innerHTML = html;
+        modal.show();
+    }
+
+    function scanAgain() {
+        resultsSection.style.display = 'none';
+        fileInput.value = '';
+        currentFile = null;
+    }
+
+    // Helper functions
+    function getFileIconClass(type) {
+        const iconMap = {
+            'exe': 'exe', 'dll': 'exe', 'bat': 'exe', 'cmd': 'exe',
+            'pdf': 'pdf', 'doc': 'doc', 'docx': 'doc', 'xls': 'doc', 'xlsx': 'doc',
+            'zip': 'zip', 'rar': 'zip', '7z': 'zip', 'tar': 'zip', 'gz': 'zip',
+            'txt': 'txt', 'rtf': 'txt', 'html': 'txt', 'xml': 'txt', 'json': 'txt'
+        };
+        return iconMap[type] || 'default';
+    }
+
+    function getFileIcon(type) {
+        const iconMap = {
+            'exe': 'bi-cpu', 'dll': 'bi-cpu', 'bat': 'bi-terminal', 'cmd': 'bi-terminal',
+            'pdf': 'bi-file-earmark-pdf', 'doc': 'bi-file-earmark-word', 'docx': 'bi-file-earmark-word',
+            'xls': 'bi-file-earmark-excel', 'xlsx': 'bi-file-earmark-excel',
+            'zip': 'bi-file-earmark-zip', 'rar': 'bi-file-earmark-zip',
+            'txt': 'bi-file-earmark-text', 'html': 'bi-file-earmark-code', 'xml': 'bi-file-earmark-code'
+        };
+        return iconMap[type] || 'bi-file-earmark';
+    }
+
+    function getRiskText(level) {
+        const texts = {
+            'success': 'SICHER',
+            'warning': 'VERDÄCHTIG',
+            'danger': 'GEFÄHRLICH'
+        };
+        return texts[level] || level.toUpperCase();
+    }
+
+    function getRecommendationIcon(level) {
+        const icons = {
+            'success': '✅',
+            'warning': '⚠️',
+            'danger': '🚨'
+        };
+        return icons[level] || '❓';
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+});
+</script>
+{% endblock %}
