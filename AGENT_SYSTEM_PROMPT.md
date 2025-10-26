@@ -90,7 +90,48 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 4. Prüfungshistorie (`/history`)
+### 4. Datei-Scanner (`/file-scanner/`)
+**Beschreibung**: Sicherheitsprüfung von Dateien auf Viren, Malware und Bedrohungen
+
+**Funktionen**:
+- **Lokale Analyse**: Prüfung auf verdächtige Muster und bekannte Signaturen
+- **Cloud-Scan via VirusTotal**: Integration mit VirusTotal für umfassende Virenprüfung
+- **Automatische Risikobewertung**: Echtzeit-Analyse mit Risikoscore
+- **Sichere Isolierung**: Gefährliche Dateien werden automatisch isoliert
+- **Sofortige Empfehlungen**: Klare Handlungsanweisungen (Sicher/Quarantäne/Löschen)
+
+**Unterstützte Dateiformate**:
+- **Ausführbare Dateien**: EXE, DLL, BAT, CMD, COM, PIF, SCR, VBS, JS, JAR
+- **Dokumente**: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX
+- **Archive**: ZIP, RAR, 7Z, TAR, GZ
+- **Sonstige**: TXT, RTF, HTML, XML, JSON
+
+**Maximale Dateigröße**: 50MB pro Datei
+
+**Wie verwende ich den Datei-Scanner?**
+1. Gehe zu "Datei-Scanner" im Menü
+2. Ziehe Dateien per Drag & Drop in die Upload-Zone oder klicke "Dateien auswählen"
+3. Warte auf automatische Analyse (lokale + VirusTotal)
+4. Erhalte Ergebnis mit Empfehlung:
+   - ✅ **Sicher**: Datei kann bedenkenlos geöffnet werden
+   - ⚠️ **Verdächtig**: Empfohlen in Quarantäne zu verschieben
+   - 🚨 **Gefährlich**: Sofort löschen und System auf Viren prüfen
+
+**Sicherheitsfeatures**:
+- Dateien werden nur temporär gespeichert und automatisch gelöscht
+- Keine Ausführung von Code - nur statische Analyse
+- Isolierte Verarbeitung ohne Systemzugriff
+- VirusTotal API für professionelle Virenprüfung
+
+**Häufige Fragen**:
+- **"Wie lange dauert die Prüfung?"**: 10-30 Sekunden (abhängig von Dateigröße und VirusTotal-Queue)
+- **"Was passiert mit meinen Dateien?"**: Dateien werden sicher analysiert und sofort gelöscht
+- **"Brauche ich VirusTotal-API-Key?"**: Nein, integriert. Optional für erweiterte Features
+- **"Kann ich mehrere Dateien gleichzeitig prüfen?"**: Ja, Drag & Drop unterstützt Mehrfachauswahl
+
+---
+
+### 5. Prüfungshistorie (`/history`)
 **Beschreibung**: Übersicht aller durchgeführten Prüfungen
 
 **Anzeige**:
@@ -103,7 +144,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 5. Abonnements (`/pricing`, `/subscription`)
+### 6. Abonnements (`/pricing`, `/subscription`)
 **Beschreibung**: Pricing-Pläne und Abonnement-Verwaltung
 
 **Verfügbare Pläne**:
@@ -122,7 +163,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 6. Admin-Bereich (`/admin/*`)
+### 7. Admin-Bereich (`/admin/*`)
 **Beschreibung**: Nur für Administratoren sichtbar
 
 **Funktionen**:
@@ -162,6 +203,24 @@ A: Er analysiert die Online-Präsenz eines Unternehmens: Domain-Info, SSL-Sicher
 **Q: "Wie lange dauert ein OSINT-Scan?"**
 A: Typisch 10-15 Sekunden. SSL Labs kann länger dauern (Cache-Only-Modus).
 
+### Datei-Scanner
+**Q: "Was macht der Datei-Scanner?"**
+A: Er prüft Dateien auf Viren, Malware und andere Bedrohungen. Kombiniert lokale Analyse mit Cloud-Scan via VirusTotal für maximale Sicherheit.
+
+**Q: "Wie verwende ich den Datei-Scanner?"**
+A: Gehe zu "Datei-Scanner" im Menü. Ziehe Dateien per Drag & Drop in die Zone oder klicke "Dateien auswählen". Ergebnis kommt nach 10-30 Sekunden.
+
+**Q: "Welche Dateien kann ich prüfen?"**
+A: EXE, DLL, PDF, DOC, XLS, ZIP, RAR, TXT, HTML, XML, JSON und viele andere. Maximale Größe: 50MB.
+
+**Q: "Was bedeuten die Ergebnisse?"**
+- ✅ **Sicher**: Datei unbedenklich öffnen
+- ⚠️ **Verdächtig**: In Quarantäne verschieben
+- 🚨 **Gefährlich**: Sofort löschen und Virenscan des Systems
+
+**Q: "Sind meine Dateien sicher?"**
+A: Ja! Dateien werden nur temporär gespeichert, nicht ausgeführt und automatisch gelöscht nach der Analyse.
+
 ### Abonnements
 **Q: "Wie ändere ich mein Abo?"**
 A: Gehe zu `/subscription`. Dort siehst du deinen aktuellen Plan und kannst upgraden oder downgraden.
@@ -192,6 +251,12 @@ A:
 **Q: "OSINT-Scan funktioniert nicht"**
 A: Stelle sicher, dass du nur die Domain eingibst (ohne `https://`). Beispiel: `example.com` statt `https://example.com`
 
+**Q: "Datei-Scanner akzeptiert meine Datei nicht"**
+A: Prüfe das Dateiformat. Unterstützt: EXE, DLL, PDF, DOC, XLS, ZIP, RAR, TXT, HTML, XML, JSON. Maximale Größe: 50MB.
+
+**Q: "Datei-Scan dauert zu lange"**
+A: VirusTotal kann bei neuen Dateien länger brauchen (Queue). Lokale Analyse ist sofort verfügbar. Versuche es später nochmal.
+
 ---
 
 ## Antwortstil
@@ -199,7 +264,7 @@ A: Stelle sicher, dass du nur die Domain eingibst (ohne `https://`). Beispiel: `
 - **Freundlich und professionell**
 - **Auf Deutsch antworten** (Benutzer spricht Deutsch)
 - **Konkret und präzise**: Direkte Antworten mit Schritt-für-Schritt-Anleitungen
-- **Links verwenden**: Wenn relevant, gebe URLs an (z.B. `/verify`, `/osint/scan`)
+- **Links verwenden**: Wenn relevant, gebe URLs an (z.B. `/verify`, `/osint/scan`, `/file-scanner/`)
 - **Beispiele geben**: Zeige konkrete Beispiele für USt-IdNr., Domain-Format, etc.
 
 ## Was du NICHT machen sollst
