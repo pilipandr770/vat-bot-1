@@ -14,6 +14,9 @@ def dashboard():
     """Главная страница MailGuard"""
     # Получаем подключенные аккаунты
     accounts = MailAccount.query.filter_by(user_id=current_user.id, is_active=True).all()
+    
+    # Получаем активные правила
+    rules = MailRule.query.filter_by(is_active=True).order_by(MailRule.priority.desc()).all()
 
     # Получаем черновики ожидающие подтверждения
     pending_drafts = MailDraft.query.join(MailMessage).join(MailAccount)\
@@ -28,11 +31,25 @@ def dashboard():
         .filter(MailAccount.user_id == current_user.id)\
         .order_by(MailMessage.received_at.desc())\
         .limit(20).all()
+    
+    # Статистика
+    today = datetime.utcnow().date()
+    messages_today = MailMessage.query.join(MailAccount)\
+        .filter(MailAccount.user_id == current_user.id)\
+        .filter(db.func.date(MailMessage.received_at) == today)\
+        .count()
+    
+    stats = {
+        'messages_today': messages_today,
+        'pending_approvals': len(pending_drafts)
+    }
 
     return render_template('mailguard/dashboard.html',
                          accounts=accounts,
+                         rules=rules,
                          pending_drafts=pending_drafts,
-                         recent_messages=recent_messages)
+                         recent_messages=recent_messages,
+                         stats=stats)
 
 @mailguard_bp.route('/accounts')
 @login_required
