@@ -131,7 +131,73 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 5. Prüfungshistorie (`/history`)
+### 5. MailGuard - Intelligente E-Mail-Verarbeitung (`/mailguard`)
+**Beschreibung**: Automatisierte E-Mail-Verarbeitung mit KI-Antworten und Sicherheitsprüfung
+
+**Hauptfunktionen**:
+- **E-Mail-Konten verbinden**: Gmail/Microsoft 365/IMAP Integration
+- **Intelligente Regeln**: Automatische Verarbeitung basierend auf Absender, Domain, Betreff
+- **KI-Antworten**: Automatische Generierung professioneller Antworten mit OpenAI
+- **Sicherheitsprüfung**: Integration mit File Scanner für Anhänge
+- **Arbeitszeiten**: Respektiert Geschäftszeiten und Feiertage
+
+**Unterstützte E-Mail-Provider**:
+- **Gmail**: Vollständige API-Integration mit Push-Benachrichtigungen
+- **Microsoft 365**: Graph API mit Webhook-Unterstützung
+- **IMAP**: Universeller Fallback für alle IMAP-Server
+
+**Wie richte ich MailGuard ein?**
+1. Gehe zu "MailGuard" im Menü
+2. Klicke "E-Mail-Konto verbinden"
+3. Wähle Provider (Gmail/Outlook/IMAP)
+4. Autorisiere über OAuth (oder gib IMAP-Zugangsdaten ein)
+5. Konfiguriere Regeln für automatische Verarbeitung
+
+**Regel-System**:
+- **Prioritäten**: Regeln werden nach Priorität abgearbeitet (0-100)
+- **Bedingungen**: Absender, Domain, Betreff-Muster, Arbeitszeiten
+- **Aktionen**: Auto-Antwort, Entwurf erstellen, Quarantäne, Ignorieren
+- **Sicherheit**: Mensch-in-der-Schleife für wichtige Entscheidungen
+
+**Beispiel-Regeln**:
+- **VIP-Kunden**: `Domain = "partner.com"` → Auto-Antwort innerhalb 1 Stunde
+- **Neue Domains**: `Domain = "*"` → Immer Entwurf erstellen (menschliche Prüfung)
+- **Gefährliche Anhänge**: `Anhänge = "*.exe,*.zip"` → Sofort Quarantäne
+
+**KI-Antwort-Generierung**:
+- **Kontext**: Verwendet Thread-Historie und Kontrahenten-Profil
+- **Sprache**: Erkennt automatisch die Sprache der eingehenden E-Mail
+- **Ton**: Anpassbar pro Kontrahent (formell, freundlich, technisch)
+- **Qualität**: OpenAI GPT-4 für professionelle Geschäftskommunikation
+
+**Dashboard-Übersicht**:
+- **Verbundene Konten**: Status aller E-Mail-Konten
+- **Ausstehende Antworten**: Entwürfe warten auf Genehmigung
+- **Letzte Nachrichten**: Übersicht eingehender E-Mails mit Risiko-Score
+- **Regeln-Übersicht**: Aktive Regeln und ihre Trefferquote
+
+**Sicherheitsfeatures**:
+- **Token-Verschlüsselung**: Alle Zugangsdaten werden verschlüsselt gespeichert
+- **Isolierte Verarbeitung**: E-Mails werden in Sandbox-Umgebung analysiert
+- **Rate-Limiting**: Schutz vor Überlastung und Missbrauch
+- **Audit-Logging**: Vollständige Nachverfolgung aller Aktionen
+
+**Maximale Sicherheit**:
+- Anhänge werden automatisch durch File Scanner geprüft
+- Verdächtige E-Mails landen in Quarantäne
+- Keine automatische Ausführung von Anhängen
+- DKIM/SPF/DMARC-Validierung bei Versand
+
+**Häufige Fragen**:
+- **"Wie lange dauert die Einrichtung?"**: 5-10 Minuten für OAuth, 2-3 Minuten für IMAP
+- **"Kann ich Regeln nachträglich ändern?"**: Ja, alle Regeln sind live-editierbar
+- **"Was passiert bei Fehlern?"**: System geht in "Safe Mode" - alle E-Mails landen als Entwürfe
+- **"Unterstützt es mehrere Sprachen?"**: Ja, automatische Spracherkennung und mehrsprachige Antworten
+- **"Wie teuer ist MailGuard?"**: Enthalten in Professional/Enterprise Plänen
+
+---
+
+### 6. Prüfungshistorie (`/history`)
 **Beschreibung**: Übersicht aller durchgeführten Prüfungen
 
 **Anzeige**:
@@ -144,7 +210,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 6. Abonnements (`/pricing`, `/subscription`)
+### 7. Abonnements (`/pricing`, `/subscription`)
 **Beschreibung**: Pricing-Pläne und Abonnement-Verwaltung
 
 **Verfügbare Pläne**:
@@ -175,7 +241,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 7. Rechtliche Seiten
+### 8. Rechtliche Seiten
 - **Impressum** (`/legal/impressum`): Unternehmensinformationen
 - **Datenschutz** (`/legal/datenschutz`): DSGVO-Datenschutzerklärung
 - **AGB** (`/legal/agb`): Allgemeine Geschäftsbedingungen
