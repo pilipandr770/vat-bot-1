@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailGuard - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('mailguard.dashboard') }}">
+                MailGuard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    MailGuard: <span class="badge bg-success">Aktiv</span>
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('mailguard.accounts') }}">Accounts</a>
+                <a class="btn btn-outline-light btn-sm ms-2" href="{{ url_for('mailguard.rules') }}">Regeln</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>MailGuard Dashboard</h1>
+                <p class="text-muted">Intelligente E-Mail-Verarbeitung und Sicherheitsprüfung</p>
+            </div>
+        </div>
+
+        <!-- Подключенные аккаунты -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Verbundene E-Mail-Konten</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if accounts %}
+                            <div class="row">
+                                {% for account in accounts %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ account.provider.title() }}</h6>
+                                            <p class="card-text">{{ account.email }}</p>
+                                            <span class="badge bg-{{ 'success' if account.is_active else 'secondary' }}">
+                                                {{ 'Aktiv' if account.is_active else 'Inaktiv' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">Keine E-Mail-Konten verbunden.</p>
+                            <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-primary">Konto hinzufügen</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ожидающие черновики -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Ausstehende Antworten ({{ pending_drafts|length }})</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if pending_drafts %}
+                            <div class="list-group">
+                                {% for draft in pending_drafts %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ draft.subject }}</h6>
+                                        <small>{{ draft.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                                    </div>
+                                    <p class="mb-1">Von: {{ draft.message.from_email }}</p>
+                                    <small class="text-muted">
+                                        Vorgeschlagen von: {{ draft.suggested_by }}
+                                        {% if draft.message.risk_score %}
+                                            | Risiko: {{ draft.message.risk_score }}/100
+                                        {% endif %}
+                                    </small>
+                                    <div class="mt-2">
+                                        <form method="POST" action="{{ url_for('mailguard.approve_and_send', draft_id=draft.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-success btn-sm">Senden</button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('mailguard.reject_draft', draft_id=draft.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm">Ablehnen</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">Keine ausstehenden Antworten.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Последние сообщения -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Letzte Nachrichten</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_messages %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Von</th>
+                                            <th>Betreff</th>
+                                            <th>Erhalten</th>
+                                            <th>Status</th>
+                                            <th>Risiko</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for message in recent_messages %}
+                                        <tr>
+                                            <td>{{ message.from_email }}</td>
+                                            <td>{{ message.subject[:50] }}{% if message.subject|length > 50 %}...{% endif %}</td>
+                                            <td>{{ message.received_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ {'new': 'primary', 'scanned': 'info', 'drafted': 'warning', 'sent': 'success', 'quarantined': 'danger', 'skipped': 'secondary'}[message.status] }}">
+                                                    {{ {'new': 'Neu', 'scanned': 'Gescannt', 'drafted': 'Entwurf', 'sent': 'Gesendet', 'quarantined': 'Quarantäne', 'skipped': 'Übersprungen'}[message.status] }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if message.risk_score %}
+                                                    <span class="badge bg-{{ 'danger' if message.risk_score > 70 else 'warning' if message.risk_score > 40 else 'success' }}">
+                                                        {{ message.risk_score }}/100
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">Keine Nachrichten gefunden.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

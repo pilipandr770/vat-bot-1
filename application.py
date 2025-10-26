@@ -10,6 +10,7 @@ from services.vies import VIESService
 from services.handelsregister import HandelsregisterService
 from services.sanctions import SanctionsService
 from crm.save_results import ResultsSaver
+from file_scanner.routes import file_scanner
 import asyncio
 from datetime import datetime
 
@@ -64,6 +65,11 @@ def create_app(config_name=None):
     
     from file_scanner.routes import file_scanner
     app.register_blueprint(file_scanner, url_prefix='/file-scanner')
+    
+    from app.mailguard import mailguard_bp
+    app.register_blueprint(mailguard_bp)
+    
+    # Mailguard models use the same db instance
     
     # Add Jinja2 filter for JSON formatting
     import json
