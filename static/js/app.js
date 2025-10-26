@@ -152,7 +152,7 @@ class CounterpartyVerification {
         requiredFields.forEach(fieldName => {
             const field = document.querySelector(`[name="${fieldName}"]`);
             if (field && !field.value.trim()) {
-                this.showValidationFeedback(field, false, 'Це поле обов\'язкове');
+                this.showValidationFeedback(field, false, 'Dieses Feld ist erforderlich');
                 isValid = false;
             }
         });
@@ -193,9 +193,9 @@ class CounterpartyVerification {
         if (submitButton) {
             submitButton.disabled = show;
             if (show) {
-                submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Перевірка...';
+                submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Prüfung läuft...';
             } else {
-                submitButton.innerHTML = '<i class="bi bi-search"></i> Запустити перевірку';
+                submitButton.innerHTML = '<i class="bi bi-search"></i> Prüfung starten';
             }
         }
     }
@@ -219,17 +219,17 @@ class CounterpartyVerification {
         let html = `
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0">Загальний результат:</h6>
+                    <h6 class="mb-0">Gesamtergebnis:</h6>
                     <span class="badge ${overallStatusClass}">${this.getStatusText(data.overall_status)}</span>
                 </div>
                 <div class="progress">
                     <div class="progress-bar ${this.getProgressBarClass(data.confidence_score)}" 
                          style="width: ${confidencePercentage}%" 
-                         title="Рівень довіри: ${confidencePercentage}%">
+                         title="Konfidenz: ${confidencePercentage}%">
                         ${confidencePercentage}%
                     </div>
                 </div>
-                <small class="text-muted">Перевірка ID: ${data.check_id}</small>
+                <small class="text-muted">Prüfung ID: ${data.check_id}</small>
             </div>
         `;
 
@@ -280,11 +280,11 @@ class CounterpartyVerification {
 
     formatServiceDetails(service, result) {
         let html = `<div class="mb-3">`;
-        
+
         // Status and confidence
         const confidence = result.confidence || result.confidence_score || 0;
         const confidencePercent = Math.round(confidence * 100);
-        
+
         html += `
             <div class="row mb-2">
                 <div class="col-6">
@@ -296,11 +296,10 @@ class CounterpartyVerification {
             </div>
         `;
 
-        // Service-specific data formatting
+        // Service-specific formatted data display
         if (result.data) {
             html += '<div class="mt-3">';
-            html += `<strong>Результат:</strong>`;
-            html += `<pre class="bg-light p-2 mt-2 rounded small">${JSON.stringify(result.data, null, 2)}</pre>`;
+            html += this.formatServiceData(service, result.data);
             html += '</div>';
         }
 
@@ -323,6 +322,264 @@ class CounterpartyVerification {
         return html;
     }
 
+    formatServiceData(service, data) {
+        switch(service) {
+            case 'vies':
+                return this.formatVIESData(data);
+            case 'handelsregister':
+                return this.formatHandelsregisterData(data);
+            case 'sanctions':
+                return this.formatSanctionsData(data);
+            case 'whois':
+            case 'dns':
+            case 'ssllabs':
+            case 'security_headers':
+            case 'robots':
+            case 'social_links':
+            case 'email_basic':
+                return this.formatOSINTData(service, data);
+            default:
+                // Fallback to formatted JSON for unknown services
+                return `<strong>Результат:</strong><pre class="bg-light p-2 mt-2 rounded small">${JSON.stringify(data, null, 2)}</pre>`;
+        }
+    }
+
+    formatVIESData(data) {
+        let html = '<strong>VAT перевірка (VIES):</strong>';
+        html += '<div class="mt-2">';
+
+        // Main validation result
+        const validIcon = data.valid ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
+        const validText = data.valid ? 'Дійсний' : 'Недійсний';
+
+        html += `
+            <div class="mb-2">
+                <strong>Статус VAT:</strong> ${validIcon} ${validText}
+            </div>
+        `;
+
+        // VAT details
+        if (data.country_code && data.vat_number) {
+            html += `
+                <div class="mb-2">
+                    <strong>VAT номер:</strong> ${data.country_code}${data.vat_number}
+                </div>
+            `;
+        }
+
+        // Company information
+        if (data.company_name) {
+            html += `
+                <div class="mb-2">
+                    <strong>Назва компанії:</strong> ${data.company_name}
+                </div>
+            `;
+        }
+
+        if (data.company_address) {
+            html += `
+                <div class="mb-2">
+                    <strong>Адреса:</strong> ${data.company_address.replace(/\n/g, '<br>')}
+                </div>
+            `;
+        }
+
+        if (data.request_date) {
+            html += `
+                <div class="mb-2">
+                    <strong>Дата перевірки:</strong> ${new Date(data.request_date).toLocaleString()}
+                </div>
+            `;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    formatHandelsregisterData(data) {
+        let html = '<strong>Handelsregister (Німеччина):</strong>';
+        html += '<div class="mt-2">';
+
+        if (data.message) {
+            html += `<div class="alert alert-info">${data.message}</div>`;
+        }
+
+        if (data.total_matches !== undefined) {
+            html += `<div class="mb-2"><strong>Знайдено записів:</strong> ${data.total_matches}</div>`;
+        }
+
+        if (data.best_match) {
+            const match = data.best_match;
+            html += '<div class="mb-3"><strong>Найкраще співпадіння:</strong></div>';
+            html += '<div class="ms-3">';
+
+            if (match.name) html += `<div><strong>Назва:</strong> ${match.name}</div>`;
+            if (match.registration_number) html += `<div><strong>Реєстраційний номер:</strong> ${match.registration_number}</div>`;
+            if (match.legal_form) html += `<div><strong>Правова форма:</strong> ${match.legal_form}</div>`;
+            if (match.address) html += `<div><strong>Адреса:</strong> ${match.address}</div>`;
+            if (match.active !== undefined) {
+                const activeIcon = match.active ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
+                html += `<div><strong>Активна:</strong> ${activeIcon} ${match.active ? 'Так' : 'Ні'}</div>`;
+            }
+            if (match.match_confidence) {
+                const confidence = Math.round(match.match_confidence * 100);
+                html += `<div><strong>Точність співпадіння:</strong> ${confidence}%</div>`;
+            }
+
+            html += '</div>';
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    formatSanctionsData(data) {
+        let html = '<strong>Санкційні списки (EU/OFAC/UK):</strong>';
+        html += '<div class="mt-2">';
+
+        if (data.checked_lists) {
+            html += `<div class="mb-2"><strong>Перевірені списки:</strong> ${data.checked_lists.join(', ')}</div>`;
+        }
+
+        if (data.matches && data.matches.length > 0) {
+            html += '<div class="alert alert-danger"><strong>⚠️ Знайдені співпадіння в санкційних списках!</strong></div>';
+            data.matches.forEach(match => {
+                html += '<div class="ms-3 mb-2 p-2 border-start border-danger border-3">';
+                if (match.name) html += `<div><strong>Ім'я:</strong> ${match.name}</div>`;
+                if (match.list) html += `<div><strong>Список:</strong> ${match.list}</div>`;
+                if (match.reason) html += `<div><strong>Причина:</strong> ${match.reason}</div>`;
+                html += '</div>';
+            });
+        } else {
+            html += '<div class="alert alert-success"><strong>✅ Співпадінь у санкційних списках не знайдено</strong></div>';
+        }
+
+        if (data.last_updated) {
+            html += `<div class="mt-2"><small class="text-muted">Останнє оновлення: ${new Date(data.last_updated).toLocaleString()}</small></div>`;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    formatOSINTData(service, data) {
+        const serviceNames = {
+            'whois': 'WHOIS інформація',
+            'dns': 'DNS записи',
+            'ssllabs': 'SSL сертифікат',
+            'security_headers': 'Заголовки безпеки',
+            'robots': 'Robots.txt',
+            'social_links': 'Соціальні мережі',
+            'email_basic': 'Email перевірка'
+        };
+
+        const displayName = serviceNames[service] || service.toUpperCase();
+        let html = `<strong>${displayName}:</strong>`;
+        html += '<div class="mt-2">';
+
+        if (data.status === 'ok' || data.status === 'success') {
+            html += '<div class="alert alert-success"><i class="bi bi-check-circle"></i> Дані отримані успішно</div>';
+        } else if (data.status === 'warn' || data.status === 'warning') {
+            html += '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> Неповні дані</div>';
+        } else if (data.status === 'error') {
+            html += '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> Помилка отримання даних</div>';
+        }
+
+        // Format specific data based on service type
+        if (service === 'whois' && data.domain_name) {
+            html += '<div class="row">';
+            html += '<div class="col-md-6">';
+            if (data.domain_name) html += `<div><strong>Домен:</strong> ${Array.isArray(data.domain_name) ? data.domain_name[0] : data.domain_name}</div>`;
+            if (data.registrar) html += `<div><strong>Реєстратор:</strong> ${data.registrar}</div>`;
+            html += '</div>';
+            html += '<div class="col-md-6">';
+            if (data.creation_date) html += `<div><strong>Створений:</strong> ${new Date(data.creation_date).toLocaleDateString()}</div>`;
+            if (data.expiration_date) html += `<div><strong>Закінчується:</strong> ${new Date(data.expiration_date).toLocaleDateString()}</div>`;
+            html += '</div>';
+            html += '</div>';
+        }
+
+        else if (service === 'dns' && data.records) {
+            html += '<div><strong>DNS записи:</strong></div>';
+            html += '<div class="ms-3">';
+            Object.entries(data.records).forEach(([type, records]) => {
+                html += `<div><strong>${type}:</strong> ${Array.isArray(records) ? records.join(', ') : records}</div>`;
+            });
+            html += '</div>';
+        }
+
+        else if (service === 'ssllabs' && data.grade) {
+            const gradeColor = data.grade === 'A+' || data.grade === 'A' ? 'success' :
+                             data.grade === 'B' ? 'warning' : 'danger';
+            html += `<div><strong>SSL оцінка:</strong> <span class="badge bg-${gradeColor}">${data.grade}</span></div>`;
+            if (data.valid_from) html += `<div><strong>Дійсний з:</strong> ${new Date(data.valid_from).toLocaleDateString()}</div>`;
+            if (data.valid_until) html += `<div><strong>Дійсний до:</strong> ${new Date(data.valid_until).toLocaleDateString()}</div>`;
+        }
+
+        else if (service === 'security_headers') {
+            const headers = data.headers || {};
+            const securityScore = data.security_score || 0;
+            const scoreColor = securityScore >= 80 ? 'success' : securityScore >= 60 ? 'warning' : 'danger';
+
+            html += `<div><strong>Рівень безпеки:</strong> <span class="badge bg-${scoreColor}">${securityScore}/100</span></div>`;
+
+            if (Object.keys(headers).length > 0) {
+                html += '<div class="mt-2"><strong>Заголовки:</strong></div>';
+                html += '<div class="ms-3 small">';
+                Object.entries(headers).forEach(([key, value]) => {
+                    html += `<div><code>${key}: ${value}</code></div>`;
+                });
+                html += '</div>';
+            }
+        }
+
+        else if (service === 'email_basic' && data.valid !== undefined) {
+            const validIcon = data.valid ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
+            const validText = data.valid ? 'Дійсний' : 'Недійсний';
+            html += `<div><strong>Статус email:</strong> ${validIcon} ${validText}</div>`;
+
+            if (data.mx_records) {
+                html += `<div><strong>MX сервери:</strong> ${data.mx_records.join(', ')}</div>`;
+            }
+        }
+
+        else if (service === 'robots' && data.allowed) {
+            html += '<div><strong>Доступність для пошукових систем:</strong></div>';
+            html += '<div class="ms-3">';
+            html += `<div><strong>Дозволені шляхи:</strong> ${data.allowed.join(', ')}</div>`;
+            if (data.disallowed && data.disallowed.length > 0) {
+                html += `<div><strong>Заборонені шляхи:</strong> ${data.disallowed.join(', ')}</div>`;
+            }
+            html += '</div>';
+        }
+
+        else if (service === 'social_links' && data.profiles) {
+            html += '<div><strong>Знайдені профілі в соцмережах:</strong></div>';
+            html += '<div class="ms-3">';
+            data.profiles.forEach(profile => {
+                html += `<div><i class="bi bi-${profile.platform}"></i> <a href="${profile.url}" target="_blank">${profile.platform}</a></div>`;
+            });
+            html += '</div>';
+        }
+
+        // Show notes if available
+        if (data.notes) {
+            html += `<div class="mt-2"><small class="text-muted">${data.notes}</small></div>`;
+        }
+
+        // Fallback: show raw data if no specific formatting
+        if (html === `<strong>${displayName}:</strong><div class="mt-2">` + (data.status ? (data.status === 'ok' || data.status === 'success' ?
+            '<div class="alert alert-success"><i class="bi bi-check-circle"></i> Дані отримані успішно</div>' :
+            data.status === 'warn' || data.status === 'warning' ?
+            '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> Неповні дані</div>' :
+            '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> Помилка отримання даних</div>') : '')) {
+            html += `<pre class="bg-light p-2 mt-2 rounded small">${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
     displayError(message) {
         const resultsPanel = document.getElementById('resultsPanel');
         if (!resultsPanel) return;
@@ -330,7 +587,7 @@ class CounterpartyVerification {
         resultsPanel.innerHTML = `
             <div class="alert alert-danger">
                 <i class="bi bi-exclamation-triangle"></i>
-                <strong>Помилка:</strong> ${message}
+                <strong>Fehler:</strong> ${message}
             </div>
         `;
     }
@@ -378,10 +635,13 @@ class CounterpartyVerification {
 
     getStatusText(status) {
         switch(status) {
-            case 'valid': return '✅ Валідно';
-            case 'warning': return '⚠️ Попередження';
-            case 'error': return '❌ Проблема';
-            default: return '⏳ Очікування';
+            case 'valid': return '✅ Gültig';
+            case 'warning': return '⚠️ Warnung';
+            case 'error': return '❌ Problem';
+            case 'ok': return '✅ OK';
+            case 'success': return '✅ Erfolgreich';
+            case 'warn': return '⚠️ Warnung';
+            default: return '⏳ Warten';
         }
     }
 
@@ -393,11 +653,18 @@ class CounterpartyVerification {
 
     getServiceDisplayName(service) {
         const names = {
-            'vies': 'VIES VAT Перевірка',
+            'vies': 'VIES VAT Überprüfung',
             'handelsregister': 'Handelsregister DE',
-            'sanctions': 'Санкційні списки',
-            'insolvency': 'Банкрутства',
-            'opencorporates': 'OpenCorporates'
+            'sanctions': 'Sanktionslisten EU/OFAC/UK',
+            'insolvency': 'Insolvenzbekanntmachungen',
+            'opencorporates': 'OpenCorporates',
+            'whois': 'WHOIS Domain-Info',
+            'dns': 'DNS Records',
+            'ssllabs': 'SSL Zertifikat Analyse',
+            'security_headers': 'Sicherheits-Header',
+            'robots': 'Robots.txt Analyse',
+            'social_links': 'Soziale Netzwerke',
+            'email_basic': 'E-Mail Validierung'
         };
         return names[service] || service.toUpperCase();
     }
