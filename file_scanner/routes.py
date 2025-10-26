@@ -6,6 +6,7 @@ from flask import render_template, request, jsonify, current_app, flash, redirec
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import logging
+import shutil
 
 from . import file_scanner
 
@@ -19,10 +20,30 @@ ALLOWED_EXTENSIONS = {
     'txt', 'rtf', 'html', 'xml', 'json'
 }
 
+# Запрещённые имена файлов (системные файлы)
+FORBIDDEN_NAMES = {
+    'con', 'prn', 'aux', 'nul', 'com1', 'com2', 'com3', 'com4', 'com5', 'com6', 'com7', 'com8', 'com9',
+    'lpt1', 'lpt2', 'lpt3', 'lpt4', 'lpt5', 'lpt6', 'lpt7', 'lpt8', 'lpt9'
+}
+
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+MAX_CONCURRENT_SCANS = 3  # Максимум одновременных сканирований
+
+# Счётчик активных сканирований
+active_scans = 0
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    if not filename or '.' not in filename:
+        return False
+
+    name_part = filename.rsplit('.', 1)[0].lower()
+    ext_part = filename.rsplit('.', 1)[1].lower()
+
+    # Проверяем запрещённые имена
+    if name_part in FORBIDDEN_NAMES:
+        return False
+
+    return ext_part in ALLOWED_EXTENSIONS
 
 @file_scanner.route('/')
 @login_required
@@ -34,7 +55,18 @@ def scan_page():
 @login_required
 def scan_file():
     """API для сканирования файла"""
+    global active_scans
+
+    # Проверяем лимит одновременных сканирований
+    if active_scans >= MAX_CONCURRENT_SCANS:
+        return jsonify({
+            'success': False,
+            'error': 'Zu viele gleichzeitige Scans. Bitte warten Sie.'
+        }), 429
+
     try:
+        active_scans += 1
+
         if 'file' not in request.files:
             return jsonify({
                 'success': False,
@@ -66,12 +98,16 @@ def scan_file():
                 'error': f'Datei zu groß. Maximum: {MAX_FILE_SIZE // (1024*1024)}MB'
             }), 400
 
-        # Создаём временный файл для анализа
-        with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{secure_filename(file.filename)}") as temp_file:
-            file.save(temp_file.name)
-            temp_path = temp_file.name
+        # Создаём временный файл для анализа в системной temp директории
+        temp_dir = tempfile.gettempdir()
+        temp_fd, temp_path = tempfile.mkstemp(suffix=f"_scan_{secure_filename(file.filename)}", dir=temp_dir)
+        os.close(temp_fd)  # Закрываем дескриптор, файл будет открыт заново
 
         try:
+            # Сохраняем файл безопасно
+            with open(temp_path, 'wb') as temp_file:
+                shutil.copyfileobj(file, temp_file)
+
             # Вычисляем хэш файла
             sha256_hash = hashlib.sha256()
             with open(temp_path, 'rb') as f:
@@ -102,11 +138,17 @@ def scan_file():
             return jsonify(result)
 
         finally:
-            # Удаляем временный файл
+            # Гарантированное удаление временного файла
             try:
-                os.unlink(temp_path)
-            except:
-                pass
+                if os.path.exists(temp_path):
+                    os.unlink(temp_path)
+            except Exception as e:
+                logger.error(f"Failed to delete temp file {temp_path}: {e}")
+                # В крайнем случае попробуем удалить позже
+                try:
+                    os.remove(temp_path)
+                except:
+                    pass
 
     except Exception as e:
         logger.error(f"Error scanning file: {str(e)}")
@@ -114,9 +156,11 @@ def scan_file():
             'success': False,
             'error': 'Fehler beim Scannen der Datei'
         }), 500
+    finally:
+        active_scans -= 1
 
 def scan_with_virustotal(file_path, file_hash, filename):
-    """Сканирование через VirusTotal API"""
+    """Сканирование через VirusTotal API - ТОЛЬКО ЗАГРУЗКА, БЕЗ ВЫПОЛНЕНИЯ"""
     try:
         api_key = current_app.config.get('VIRUSTOTAL_API_KEY')
         if not api_key:
@@ -125,9 +169,18 @@ def scan_with_virustotal(file_path, file_hash, filename):
                 'error': 'VirusTotal API nicht konfiguriert'
             }
 
+        # Проверяем размер файла перед отправкой (VirusTotal limit ~650MB, но мы ограничиваем)
+        file_size = os.path.getsize(file_path)
+        if file_size > 32 * 1024 * 1024:  # 32MB для VirusTotal
+            return {
+                'available': True,
+                'scanned': False,
+                'message': 'Datei zu groß für VirusTotal Upload. Verwenden Sie lokale Analyse.'
+            }
+
         # Сначала проверяем, есть ли уже результат для этого хэша
         headers = {'x-apikey': api_key}
-        response = requests.get(f'https://www.virustotal.com/api/v3/files/{file_hash}', headers=headers)
+        response = requests.get(f'https://www.virustotal.com/api/v3/files/{file_hash}', headers=headers, timeout=10)
 
         if response.status_code == 200:
             # Файл уже сканировался
@@ -143,22 +196,29 @@ def scan_with_virustotal(file_path, file_hash, filename):
             }
         elif response.status_code == 404:
             # Файл не сканировался, загружаем для анализа
-            with open(file_path, 'rb') as f:
-                files = {'file': (filename, f)}
-                response = requests.post('https://www.virustotal.com/api/v3/files', headers=headers, files=files)
+            try:
+                with open(file_path, 'rb') as f:
+                    files = {'file': (secure_filename(filename), f)}
+                    response = requests.post('https://www.virustotal.com/api/v3/files',
+                                           headers=headers, files=files, timeout=30)
 
-            if response.status_code == 200:
-                analysis_id = response.json()['data']['id']
+                if response.status_code == 200:
+                    analysis_id = response.json()['data']['id']
+                    return {
+                        'available': True,
+                        'scanned': False,
+                        'analysis_id': analysis_id,
+                        'message': 'Datei wurde zur Analyse hochgeladen. Ergebnis wird in Kürze verfügbar sein.'
+                    }
+                else:
+                    return {
+                        'available': True,
+                        'error': f'Upload fehlgeschlagen: {response.status_code}'
+                    }
+            except requests.exceptions.RequestException as e:
                 return {
                     'available': True,
-                    'scanned': False,
-                    'analysis_id': analysis_id,
-                    'message': 'Datei wurde zur Analyse hochgeladen. Ergebnis wird in Kürze verfügbar sein.'
-                }
-            else:
-                return {
-                    'available': True,
-                    'error': f'Upload fehlgeschlagen: {response.status_code}'
+                    'error': f'Netzwerkfehler: {str(e)}'
                 }
         else:
             return {
@@ -174,7 +234,7 @@ def scan_with_virustotal(file_path, file_hash, filename):
         }
 
 def analyze_file_locally(file_path, filename):
-    """Локальный анализ файла"""
+    """Локальный анализ файла - ТОЛЬКО ЧТЕНИЕ, БЕЗ ВЫПОЛНЕНИЯ КОДА"""
     analysis = {
         'suspicious_patterns': [],
         'file_properties': {},
@@ -182,6 +242,11 @@ def analyze_file_locally(file_path, filename):
     }
 
     try:
+        # Проверяем, что файл существует и доступен для чтения
+        if not os.path.exists(file_path):
+            analysis['error'] = 'Файл не найден'
+            return analysis
+
         # Проверяем размер файла
         file_size = os.path.getsize(file_path)
         analysis['file_properties']['size'] = file_size
@@ -192,40 +257,55 @@ def analyze_file_locally(file_path, filename):
             analysis['file_properties']['extension'] = ext
 
             # Проверяем подозрительные комбинации
-            suspicious_extensions = ['exe', 'bat', 'cmd', 'scr', 'pif', 'com']
+            suspicious_extensions = ['exe', 'bat', 'cmd', 'scr', 'pif', 'com', 'dll']
             if ext in suspicious_extensions:
-                analysis['suspicious_patterns'].append(f'Выполняемый файл ({ext})')
+                analysis['suspicious_patterns'].append(f'Выполняемый файл ({ext}) - повышенная осторожность')
                 analysis['risk_level'] = 'medium'
 
-        # Проверяем на подозрительные строки в текстовых файлах
-        if filename.lower().endswith(('.txt', '.js', '.html', '.xml', '.json')):
+        # Проверяем на подозрительные строки ТОЛЬКО в текстовых файлах
+        text_extensions = ['txt', 'js', 'html', 'xml', 'json', 'rtf']
+        if any(filename.lower().endswith('.' + ext) for ext in text_extensions):
             try:
+                # Читаем только первые 2048 байт для анализа
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                    content = f.read(1024)  # Проверяем только начало файла
+                    content = f.read(2048)
 
+                    # Список подозрительных паттернов (только строковые)
                     suspicious_strings = [
-                        'eval(', 'exec(', 'system(', 'shell_exec(',
+                        'eval(', 'exec(', 'system(', 'shell_exec(', 'popen(',
                         'javascript:', 'vbscript:', 'data:',
-                        '<script', 'onload=', 'onerror='
+                        '<script', 'onload=', 'onerror=', 'onmouseover=',
+                        'document.cookie', 'localStorage', 'sessionStorage',
+                        'innerHTML', 'outerHTML', 'insertAdjacentHTML'
                     ]
 
+                    found_patterns = []
                     for pattern in suspicious_strings:
                         if pattern.lower() in content.lower():
-                            analysis['suspicious_patterns'].append(f'Подозрительная строка: {pattern}')
-                            analysis['risk_level'] = 'high'
-                            break
+                            found_patterns.append(pattern)
 
-            except:
-                pass
+                    if found_patterns:
+                        analysis['suspicious_patterns'].extend([f'Подозрительная строка: {p}' for p in found_patterns[:5]])  # Макс 5 паттернов
+                        analysis['risk_level'] = 'high'
 
-        # Для исполняемых файлов - повышенная осторожность
-        if filename.lower().endswith(('.exe', '.dll', '.bat', '.cmd')):
-            analysis['suspicious_patterns'].append('Исполняемый файл - требуется дополнительная проверка')
+            except Exception as e:
+                logger.warning(f"Error reading text file {filename}: {e}")
+                analysis['suspicious_patterns'].append('Ошибка чтения файла')
+
+        # Для исполняемых файлов - автоматическое повышение риска
+        if filename.lower().endswith(('.exe', '.dll', '.bat', '.cmd', '.scr', '.pif', '.com')):
+            analysis['suspicious_patterns'].append('Исполняемый файл - требует дополнительной проверки')
             analysis['risk_level'] = 'high'
 
+        # Проверка на слишком маленький размер (может быть пустышкой)
+        if file_size < 10:
+            analysis['suspicious_patterns'].append('Файл слишком маленький')
+            analysis['risk_level'] = 'medium'
+
     except Exception as e:
-        logger.error(f"Local analysis error: {str(e)}")
-        analysis['error'] = str(e)
+        logger.error(f"Local analysis error for {filename}: {str(e)}")
+        analysis['error'] = f'Ошибка анализа: {str(e)}'
+        analysis['risk_level'] = 'medium'
 
     return analysis
 
