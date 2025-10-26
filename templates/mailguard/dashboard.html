@@ -57,13 +57,13 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Email Accounts</h5>
                     <div>
-                        <a href="{{ url_for('mailguard.connect_gmail') }}" class="btn btn-sm btn-primary">
+                        <a href="#" onclick="alert('Gmail OAuth integration coming soon'); return false;" class="btn btn-sm btn-primary">
                             <i class="fab fa-google"></i> Connect Gmail
                         </a>
-                        <a href="{{ url_for('mailguard.connect_microsoft') }}" class="btn btn-sm btn-info">
+                        <a href="#" onclick="alert('Microsoft 365 OAuth integration coming soon'); return false;" class="btn btn-sm btn-info">
                             <i class="fab fa-microsoft"></i> Connect Microsoft 365
                         </a>
-                        <a href="{{ url_for('mailguard.add_imap') }}" class="btn btn-sm btn-secondary">
+                        <a href="#" onclick="alert('IMAP setup coming soon'); return false;" class="btn btn-sm btn-secondary">
                             <i class="fas fa-envelope"></i> Add IMAP Account
                         </a>
                     </div>
@@ -104,7 +104,7 @@
                                     </td>
                                     <td>{{ account.updated_at.strftime('%Y-%m-%d %H:%M') if account.updated_at else 'Never' }}</td>
                                     <td>
-                                        <a href="{{ url_for('mailguard.account_details', account_id=account.id) }}" class="btn btn-sm btn-info">
+                                        <a href="#" onclick="alert('Account details coming soon'); return false;" class="btn btn-sm btn-info">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button class="btn btn-sm btn-danger" onclick="disconnectAccount({{ account.id }})">
@@ -131,7 +131,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Processing Rules</h5>
-                    <a href="{{ url_for('mailguard.create_rule') }}" class="btn btn-sm btn-success">
+                    <a href="#" onclick="alert('Rule creation coming soon'); return false;" class="btn btn-sm btn-success">
                         <i class="fas fa-plus"></i> Create Rule
                     </a>
                 </div>
@@ -174,14 +174,14 @@
                                         <span class="badge badge-secondary">{{ rule.priority }}</span>
                                     </td>
                                     <td>
-                                        {% if rule.is_active %}
+                                        {% if rule.is_enabled %}
                                             <span class="badge badge-success">Active</span>
                                         {% else %}
                                             <span class="badge badge-secondary">Inactive</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('mailguard.edit_rule', rule_id=rule.id) }}" class="btn btn-sm btn-warning">
+                                        <a href="#" onclick="alert('Rule editing coming soon'); return false;" class="btn btn-sm btn-warning">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <button class="btn btn-sm btn-danger" onclick="deleteRule({{ rule.id }})">
@@ -229,7 +229,7 @@
                                 <td>{{ draft.body[:100] }}...</td>
                                 <td>{{ draft.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                 <td>
-                                    <a href="{{ url_for('mailguard.approve_draft', draft_id=draft.id) }}" class="btn btn-sm btn-success">
+                                    <a href="{{ url_for('mailguard.approve', draft_id=draft.id) }}" class="btn btn-sm btn-success">
                                         <i class="fas fa-check"></i> Approve
                                     </a>
                                     <button class="btn btn-sm btn-danger" onclick="rejectDraft({{ draft.id }})">
