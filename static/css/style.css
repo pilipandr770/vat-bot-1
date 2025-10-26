@@ -550,6 +550,11 @@ p {
     font-size: 0.875rem;
 }
 
+/* File scanner info card */
+.card-body ul li {
+    color: #00ff00 !important;
+}
+
 .border-start-success {
     border-left: 4px solid #198754 !important;
 }
