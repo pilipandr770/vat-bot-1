@@ -2,7 +2,7 @@ services:
   # Web Service
   - type: web
     name: vat-verification-platform
-    runtime: python
+    runtime: python3
     region: frankfurt
     plan: free
     branch: main
