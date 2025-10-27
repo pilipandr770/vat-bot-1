@@ -3,6 +3,54 @@
 {% block title %}Geschäftspartner Prüfung{% endblock %}
 
 {% block content %}
+<!-- CRM Alerts Section -->
+{% if recent_alerts %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Neue CRM Alerts ({{ recent_alerts|length }})</h5>
+                <a href="/crm/" class="btn btn-sm btn-dark">
+                    <i class="bi bi-arrow-right-circle"></i> Zum CRM
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for alert in recent_alerts %}
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="d-flex align-items-center">
+                                {% if alert.severity == 'critical' %}
+                                    <span class="badge bg-danger me-2">Kritisch</span>
+                                {% elif alert.severity == 'high' %}
+                                    <span class="badge bg-warning text-dark me-2">Hoch</span>
+                                {% elif alert.severity == 'medium' %}
+                                    <span class="badge bg-info me-2">Mittel</span>
+                                {% else %}
+                                    <span class="badge bg-success me-2">Niedrig</span>
+                                {% endif %}
+                                <strong>{{ alert.verification_check.counterparty.company_name }}</strong>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                <i class="bi bi-info-circle"></i> {{ alert.message }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ alert.created_at.strftime('%d.%m.%Y %H:%M') }}
+                            </small>
+                        </div>
+                        <a href="/crm/counterparty/{{ alert.verification_check.counterparty_id }}" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> Details
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class="row">
     <!-- Left Column: Company Data -->
     <div class="col-lg-4">

@@ -69,6 +69,21 @@ def create_app(config_name=None):
     from app.mailguard import mailguard_bp
     app.register_blueprint(mailguard_bp)
     
+    # Register CRM blueprint
+    from crm.routes import crm_bp
+    app.register_blueprint(crm_bp)
+    
+    # Initialize monitoring services
+    from services.alerts import init_alert_service
+    from services.scheduler import init_scheduler
+    
+    # Init alert service with mail
+    init_alert_service(mail)
+    
+    # Init scheduler (only in production/when not in debug reload)
+    if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+        init_scheduler()
+    
     # Mailguard models use the same db instance
     
     # Add Jinja2 filter for JSON formatting
@@ -110,11 +125,19 @@ def create_app(config_name=None):
             VerificationCheck.check_date.desc()
         ).limit(5).all()
         
+        # Get recent CRM alerts
+        from crm.models import Alert
+        recent_alerts = Alert.query.join(VerificationCheck)\
+            .filter(VerificationCheck.user_id == current_user.id)\
+            .order_by(Alert.created_at.desc())\
+            .limit(5).all()
+        
         return render_template('index.html',
                              subscription=subscription,
                              total_checks=total_checks,
                              monthly_checks=monthly_checks,
-                             recent_checks=recent_checks)
+                             recent_checks=recent_checks,
+                             recent_alerts=recent_alerts)
     
     @app.route('/test')
     def test_form():

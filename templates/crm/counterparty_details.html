@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}{{ counterparty.company_name }} - Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-5">{{ counterparty.company_name }}</h1>
+                    <p class="lead text-muted">
+                        <span class="badge bg-secondary">{{ counterparty.country }}</span>
+                        {% if counterparty.vat_number %}
+                            <code class="ms-2">{{ counterparty.vat_number }}</code>
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ url_for('crm.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Zurück zur Liste
+                    </a>
+                    <button class="btn btn-warning" onclick="editCounterparty()">
+                        <i class="fas fa-edit"></i> Bearbeiten
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteCounterparty()">
+                        <i class="fas fa-trash"></i> Löschen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Company Information -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-building"></i> Firmendaten</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Firmenname:</th>
+                            <td>{{ counterparty.company_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Land:</th>
+                            <td>{{ counterparty.country }}</td>
+                        </tr>
+                        <tr>
+                            <th>USt-IdNr.:</th>
+                            <td>
+                                {% if counterparty.vat_number %}
+                                    <code>{{ counterparty.vat_number }}</code>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>E-Mail:</th>
+                            <td>
+                                {% if counterparty.email %}
+                                    <a href="mailto:{{ counterparty.email }}">{{ counterparty.email }}</a>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Domain:</th>
+                            <td>
+                                {% if counterparty.domain %}
+                                    <a href="http://{{ counterparty.domain }}" target="_blank">{{ counterparty.domain }}</a>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Adresse:</th>
+                            <td>{{ counterparty.address or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Kontaktperson:</th>
+                            <td>{{ counterparty.contact_person or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Erstellt:</th>
+                            <td>{{ counterparty.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Monitoring Status -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-radar"></i> Monitoring Status</h5>
+                </div>
+                <div class="card-body">
+                    {% set latest_check = counterparty.verification_checks|sort(attribute='check_date', reverse=True)|first %}
+                    {% if latest_check %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                {% if latest_check.is_monitoring_active %}
+                                    <span class="badge bg-success fs-6">
+                                        <i class="fas fa-check-circle"></i> Monitoring Aktiv
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="fas fa-pause-circle"></i> Monitoring Inaktiv
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if latest_check.is_monitoring_active %}
+                                    <button class="btn btn-sm btn-secondary" onclick="toggleMonitoring(false)">
+                                        <i class="fas fa-pause"></i> Deaktivieren
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-success" onclick="toggleMonitoring(true)">
+                                        <i class="fas fa-play"></i> Aktivieren
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h4>{{ counterparty.verification_checks|length }}</h4>
+                                <small>Gesamte Checks</small>
+                            </div>
+                            <div class="col-4">
+                                <h4>{{ counterparty.verification_checks|selectattr('overall_status', 'equalto', 'valid')|list|length }}</h4>
+                                <small class="text-success">Erfolgreich</small>
+                            </div>
+                            <div class="col-4">
+                                <h4>{{ alerts|length }}</h4>
+                                <small class="text-warning">Alerts</small>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <p class="mb-1"><strong>Letzter Check:</strong> {{ latest_check.check_date.strftime('%d.%m.%Y %H:%M') }}</p>
+                        <p class="mb-0"><strong>Gesamtstatus:</strong>
+                            {% if latest_check.overall_status == 'valid' %}
+                                <span class="badge bg-success">Valid</span>
+                            {% elif latest_check.overall_status == 'warning' %}
+                                <span class="badge bg-warning">Warnung</span>
+                            {% else %}
+                                <span class="badge bg-danger">Problem</span>
+                            {% endif %}
+                        </p>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Dieser Kontrahent wurde noch nicht geprüft.
+                            <button class="btn btn-sm btn-primary ms-2" onclick="runCheck()">
+                                Jetzt prüfen
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-bolt"></i> Schnellaktionen</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="runCheck()">
+                            <i class="fas fa-sync"></i> Neue Prüfung starten
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="exportData()">
+                            <i class="fas fa-download"></i> Daten exportieren
+                        </button>
+                        <button class="btn btn-outline-info" onclick="viewTimeline()">
+                            <i class="fas fa-chart-line"></i> Zeitverlauf anzeigen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Alerts -->
+    {% if alerts %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Alerts ({{ alerts|length }})</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Priorität</th>
+                                    <th>Typ</th>
+                                    <th>Nachricht</th>
+                                    <th>Datum</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for alert in alerts %}
+                                <tr>
+                                    <td>
+                                        {% if alert.severity == 'critical' %}
+                                            <span class="badge bg-danger">Kritisch</span>
+                                        {% elif alert.severity == 'high' %}
+                                            <span class="badge bg-warning">Hoch</span>
+                                        {% elif alert.severity == 'medium' %}
+                                            <span class="badge bg-info">Mittel</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Niedrig</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><code>{{ alert.alert_type }}</code></td>
+                                    <td>{{ alert.message }}</td>
+                                    <td>{{ alert.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td>
+                                        {% if alert.is_sent %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> Gesendet
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-clock"></i> Ausstehend
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Verification History -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-history"></i> Prüfungshistorie ({{ counterparty.verification_checks|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if counterparty.verification_checks %}
+                        <div class="accordion" id="checksAccordion">
+                            {% for check in counterparty.verification_checks|sort(attribute='check_date', reverse=True) %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" 
+                                            type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#check{{ check.id }}">
+                                        <div class="d-flex justify-content-between w-100 me-3">
+                                            <span>
+                                                <strong>{{ check.check_date.strftime('%d.%m.%Y %H:%M') }}</strong>
+                                                {% if check.is_monitoring_active %}
+                                                    <span class="badge bg-success ms-2">Monitoring</span>
+                                                {% endif %}
+                                            </span>
+                                            <span>
+                                                {% if check.overall_status == 'valid' %}
+                                                    <span class="badge bg-success">✓ Valid</span>
+                                                {% elif check.overall_status == 'warning' %}
+                                                    <span class="badge bg-warning">⚠ Warnung</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">✗ Problem</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="check{{ check.id }}" 
+                                     class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
+                                     data-bs-parent="#checksAccordion">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            {% for result in check.check_results %}
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card h-100">
+                                                    <div class="card-header d-flex justify-content-between">
+                                                        <strong>{{ result.check_type.replace('_', ' ').title() }}</strong>
+                                                        {% if result.status == 'valid' %}
+                                                            <span class="badge bg-success">✓</span>
+                                                        {% elif result.status == 'warning' %}
+                                                            <span class="badge bg-warning">⚠</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">✗</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <small class="d-block mb-2 text-muted">
+                                                            {{ result.checked_at.strftime('%d.%m.%Y %H:%M:%S') }}
+                                                        </small>
+                                                        {% if result.data %}
+                                                            <pre style="font-size: 0.85em; max-height: 200px; overflow-y: auto;">{{ result.data|tojson(indent=2) }}</pre>
+                                                        {% endif %}
+                                                        {% if result.error_message %}
+                                                            <div class="alert alert-danger mt-2 mb-0">
+                                                                {{ result.error_message }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Keine Prüfungshistorie vorhanden.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMonitoring(enable) {
+    fetch(`/crm/api/counterparties/{{ counterparty.id }}/monitoring`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({is_active: enable})
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert(enable ? 'Monitoring aktiviert!' : 'Monitoring deaktiviert!');
+            location.reload();
+        } else {
+            alert('Fehler: ' + result.error);
+        }
+    });
+}
+
+function runCheck() {
+    if (confirm('Möchten Sie eine neue Prüfung starten? Dies kann einige Minuten dauern.')) {
+        alert('Prüfung wird gestartet... (Diese Funktion muss noch mit dem Verification-System verbunden werden)');
+        // TODO: Implement connection to verification system
+    }
+}
+
+function editCounterparty() {
+    alert('Edit-Funktion coming soon...');
+    // TODO: Show edit modal with current data
+}
+
+function deleteCounterparty() {
+    if (confirm('Möchten Sie diesen Kontrahenten wirklich löschen? Dies kann nicht rückgängig gemacht werden!')) {
+        fetch(`/crm/api/counterparties/{{ counterparty.id }}`, {method: 'DELETE'})
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Kontrahent erfolgreich gelöscht!');
+                    window.location.href = '/crm/';
+                } else {
+                    alert('Fehler: ' + result.error);
+                }
+            });
+    }
+}
+
+function exportData() {
+    alert('Export-Funktion coming soon...');
+    // TODO: Export to PDF/CSV
+}
+
+function viewTimeline() {
+    alert('Timeline-Ansicht coming soon...');
+    // TODO: Show interactive timeline chart
+}
+</script>
+{% endblock %}
