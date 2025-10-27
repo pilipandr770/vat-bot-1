@@ -41,8 +41,11 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <button class="btn btn-success" onclick="showAddCounterpartyModal()">
+                    <button class="btn btn-success mb-2 w-100" onclick="showAddCounterpartyModal()">
                         <i class="fas fa-plus"></i> Neu Hinzufügen
+                    </button>
+                    <button class="btn btn-outline-warning w-100" onclick="findDuplicates()">
+                        <i class="fas fa-copy"></i> Duplikate finden
                     </button>
                 </div>
             </div>
@@ -117,6 +120,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Kontrahenten Liste</h5>
                     <div class="btn-group">
+                        <button class="btn btn-sm btn-danger me-2" id="deleteSelectedBtn" 
+                                onclick="deleteSelected()" style="display: none;">
+                            <i class="fas fa-trash-alt"></i> Ausgewählte löschen (<span id="selectedCount">0</span>)
+                        </button>
                         <input type="text" class="form-control form-control-sm" id="searchInput" 
                                placeholder="Suchen..." style="width: 200px;">
                         <select class="form-select form-select-sm ms-2" id="countryFilter" style="width: 150px;">
@@ -138,6 +145,9 @@
                         <table class="table table-hover" id="counterpartiesTable">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                    </th>
                                     <th>USt-IdNr.</th>
                                     <th>Firmenname</th>
                                     <th>Land</th>
@@ -150,6 +160,10 @@
                             <tbody>
                                 {% for cp in counterparties %}
                                 <tr data-counterparty-id="{{ cp.id }}">
+                                    <td>
+                                        <input type="checkbox" class="counterparty-checkbox" 
+                                               value="{{ cp.id }}" onchange="updateSelectedCount()">
+                                    </td>
                                     <td><code>{{ cp.vat_number or '-' }}</code></td>
                                     <td><strong>{{ cp.company_name }}</strong></td>
                                     <td><span class="badge bg-secondary">{{ cp.country }}</span></td>
@@ -314,17 +328,61 @@ function editCounterparty(id) {
 }
 
 function deleteCounterparty(id) {
-    if (confirm('Möchten Sie diesen Kontrahenten wirklich löschen?')) {
-        fetch(`/crm/api/counterparties/${id}`, {method: 'DELETE'})
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    alert('Kontrahent gelöscht!');
-                    location.reload();
+    // Get company name from table for better UX
+    const row = document.querySelector(`tr[data-counterparty-id="${id}"]`);
+    const companyName = row?.querySelector('strong')?.textContent || 'diesen Kontrahenten';
+    
+    const confirmMessage = `⚠️ WARNUNG: Möchten Sie "${companyName}" wirklich DAUERHAFT löschen?\n\n` +
+                          `Dies wird auch löschen:\n` +
+                          `• Alle Prüfungshistorien\n` +
+                          `• Alle Prüfungsergebnisse\n` +
+                          `• Alle Alerts und Benachrichtigungen\n\n` +
+                          `Diese Aktion kann NICHT rückgängig gemacht werden!`;
+    
+    if (confirm(confirmMessage)) {
+        // Show loading indicator
+        const deleteBtn = row?.querySelector('.btn-danger');
+        if (deleteBtn) {
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+        
+        fetch(`/crm/api/counterparties/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                // Visual feedback - fade out row
+                if (row) {
+                    row.style.backgroundColor = '#d4edda';
+                    row.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        row.style.opacity = '0';
+                        setTimeout(() => location.reload(), 500);
+                    }, 300);
                 } else {
-                    alert('Fehler: ' + result.error);
+                    alert('✅ Kontrahent erfolgreich gelöscht!');
+                    location.reload();
                 }
-            });
+            } else {
+                alert('❌ Fehler beim Löschen: ' + result.error);
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                }
+            }
+        })
+        .catch(error => {
+            alert('❌ Netzwerkfehler: ' + error.message);
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            }
+        });
     }
 }
 
@@ -363,5 +421,209 @@ function filterCounterparties() {
 
 // Real-time search
 document.getElementById('searchInput')?.addEventListener('input', filterCounterparties);
+
+// Checkbox selection functions
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.counterparty-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = selectAllCheckbox.checked;
+    });
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const selectedCheckboxes = document.querySelectorAll('.counterparty-checkbox:checked');
+    const count = selectedCheckboxes.length;
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    const countSpan = document.getElementById('selectedCount');
+    
+    if (count > 0) {
+        deleteBtn.style.display = 'inline-block';
+        countSpan.textContent = count;
+    } else {
+        deleteBtn.style.display = 'none';
+    }
+    
+    // Update "select all" checkbox state
+    const allCheckboxes = document.querySelectorAll('.counterparty-checkbox');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    selectAllCheckbox.checked = (count === allCheckboxes.length && count > 0);
+}
+
+function deleteSelected() {
+    const selectedCheckboxes = document.querySelectorAll('.counterparty-checkbox:checked');
+    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+    
+    if (selectedIds.length === 0) {
+        alert('⚠️ Bitte wählen Sie mindestens einen Kontrahenten aus.');
+        return;
+    }
+    
+    // Get company names for confirmation
+    const companyNames = Array.from(selectedCheckboxes).map(cb => {
+        const row = cb.closest('tr');
+        return row.querySelector('strong')?.textContent || 'Unbekannt';
+    });
+    
+    const confirmMessage = `⚠️⚠️ WARNUNG: MASSENLÖSCHUNG ⚠️⚠️\n\n` +
+                          `Sie sind dabei ${selectedIds.length} Kontrahenten DAUERHAFT zu löschen:\n\n` +
+                          companyNames.map((name, i) => `${i+1}. ${name}`).join('\n') + '\n\n' +
+                          `Dies wird auch löschen:\n` +
+                          `• Alle Prüfungshistorien\n` +
+                          `• Alle Prüfungsergebnisse\n` +
+                          `• Alle Alerts und Benachrichtigungen\n\n` +
+                          `Diese Aktion kann NICHT rückgängig gemacht werden!\n\n` +
+                          `Fortfahren?`;
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    // Second confirmation for safety
+    const finalConfirm = prompt(
+        `Letzte Bestätigung!\n\n` +
+        `Geben Sie "LÖSCHEN" ein um ${selectedIds.length} Kontrahenten zu löschen:`,
+        ''
+    );
+    
+    if (finalConfirm !== 'LÖSCHEN') {
+        alert('❌ Aktion abgebrochen. Die Kontrahenten wurden NICHT gelöscht.');
+        return;
+    }
+    
+    // Show progress
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lösche...';
+    
+    // Delete one by one
+    let deletedCount = 0;
+    let errors = [];
+    
+    const deletePromises = selectedIds.map(id => {
+        return fetch(`/crm/api/counterparties/${id}`, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                deletedCount++;
+                // Visual feedback
+                const row = document.querySelector(`tr[data-counterparty-id="${id}"]`);
+                if (row) {
+                    row.style.backgroundColor = '#d4edda';
+                    row.style.opacity = '0.5';
+                }
+            } else {
+                errors.push(`ID ${id}: ${result.error}`);
+            }
+        })
+        .catch(error => {
+            errors.push(`ID ${id}: ${error.message}`);
+        });
+    });
+    
+    Promise.all(deletePromises).then(() => {
+        if (errors.length === 0) {
+            alert(`✅ Erfolgreich! ${deletedCount} Kontrahenten wurden gelöscht.`);
+        } else {
+            alert(`⚠️ Teilweise erfolgreich:\n\n` +
+                  `✅ Gelöscht: ${deletedCount}\n` +
+                  `❌ Fehler: ${errors.length}\n\n` +
+                  `Fehlerdetails:\n${errors.join('\n')}`);
+        }
+        setTimeout(() => location.reload(), 1000);
+    });
+}
+
+function findDuplicates() {
+    // Show loading
+    const btn = event.target;
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Suche...';
+    
+    fetch('/crm/api/counterparties/duplicates')
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+            
+            if (data.total_duplicates === 0) {
+                alert('✅ Keine Duplikate gefunden!\n\nAlle Kontrahenten sind einzigartig.');
+                return;
+            }
+            
+            // Build detailed message
+            let message = `🔍 DUPLIKATE GEFUNDEN: ${data.total_duplicates}\n\n`;
+            
+            if (data.vat_duplicates.length > 0) {
+                message += `📋 Duplikate nach USt-IdNr (${data.vat_duplicates.length}):\n\n`;
+                data.vat_duplicates.forEach((dup, i) => {
+                    message += `${i+1}. USt-IdNr: ${dup.vat_number} (${dup.count} Einträge)\n`;
+                    dup.counterparties.forEach(cp => {
+                        message += `   • ${cp.company_name} (${cp.country}) - ID: ${cp.id}\n`;
+                        message += `     Erstellt: ${new Date(cp.created_at).toLocaleDateString('de-DE')}\n`;
+                    });
+                    message += '\n';
+                });
+            }
+            
+            if (data.name_duplicates.length > 0) {
+                message += `🏢 Duplikate nach Firmenname (${data.name_duplicates.length}):\n\n`;
+                data.name_duplicates.forEach((dup, i) => {
+                    message += `${i+1}. "${dup.company_name}" (${dup.count} Einträge)\n`;
+                    dup.counterparties.forEach(cp => {
+                        message += `   • USt-IdNr: ${cp.vat_number} (${cp.country}) - ID: ${cp.id}\n`;
+                        message += `     Erstellt: ${new Date(cp.created_at).toLocaleDateString('de-DE')}\n`;
+                    });
+                    message += '\n';
+                });
+            }
+            
+            message += '\n💡 Tipp: Nutzen Sie die Checkbox-Auswahl und "Ausgewählte löschen" um Duplikate zu entfernen.';
+            
+            alert(message);
+            
+            // Optionally highlight duplicates in the table
+            if (confirm('Möchten Sie die Duplikate in der Tabelle hervorheben?')) {
+                highlightDuplicates(data);
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+            alert('❌ Fehler beim Suchen von Duplikaten: ' + error.message);
+        });
+}
+
+function highlightDuplicates(data) {
+    // Remove previous highlights
+    document.querySelectorAll('.duplicate-highlight').forEach(el => {
+        el.classList.remove('duplicate-highlight');
+    });
+    
+    // Collect all duplicate IDs
+    const duplicateIds = new Set();
+    data.vat_duplicates.forEach(dup => {
+        dup.counterparties.forEach(cp => duplicateIds.add(cp.id));
+    });
+    data.name_duplicates.forEach(dup => {
+        dup.counterparties.forEach(cp => duplicateIds.add(cp.id));
+    });
+    
+    // Highlight rows
+    duplicateIds.forEach(id => {
+        const row = document.querySelector(`tr[data-counterparty-id="${id}"]`);
+        if (row) {
+            row.style.backgroundColor = '#fff3cd';
+            row.classList.add('duplicate-highlight');
+        }
+    });
+    
+    alert(`✅ ${duplicateIds.size} Duplikate wurden in der Tabelle gelb markiert.`);
+}
 </script>
 {% endblock %}

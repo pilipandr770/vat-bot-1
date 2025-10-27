@@ -221,17 +221,42 @@ def api_delete_counterparty(counterparty_id):
     if not counterparty:
         return jsonify({'success': False, 'error': 'Counterparty not found'}), 404
     
-    # Delete related verification checks (cascade will handle check_results and alerts)
-    VerificationCheck.query.filter_by(counterparty_id=counterparty_id).delete()
+    # Store info for logging
+    company_name = counterparty.company_name
+    vat_number = counterparty.vat_number
     
-    # Delete counterparty
-    db.session.delete(counterparty)
-    db.session.commit()
+    # Count related records before deletion
+    checks_count = VerificationCheck.query.filter_by(counterparty_id=counterparty_id).count()
     
-    return jsonify({
-        'success': True,
-        'message': 'Counterparty deleted successfully'
-    })
+    try:
+        # Delete related verification checks (cascade will handle check_results and alerts)
+        VerificationCheck.query.filter_by(counterparty_id=counterparty_id).delete()
+        
+        # Delete counterparty
+        db.session.delete(counterparty)
+        db.session.commit()
+        
+        # Log the deletion
+        from datetime import datetime
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Counterparty deleted: {company_name} (VAT: {vat_number}) by user {current_user.email}. "
+                   f"Deleted {checks_count} verification checks and related data.")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Counterparty "{company_name}" deleted successfully',
+            'deleted_checks': checks_count
+        })
+    
+    except Exception as e:
+        db.session.rollback()
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error deleting counterparty {counterparty_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Database error: {str(e)}'
+        }), 500
 
 @crm_bp.route('/api/counterparties/<int:counterparty_id>/monitoring', methods=['POST'])
 @login_required
@@ -262,3 +287,83 @@ def api_toggle_monitoring(counterparty_id):
             'success': False,
             'error': 'No verification checks found for this counterparty'
         }), 400
+
+@crm_bp.route('/api/counterparties/duplicates', methods=['GET'])
+@login_required
+def api_find_duplicates():
+    """Find potential duplicate counterparties"""
+    from sqlalchemy import func
+    
+    # Find duplicates by VAT number
+    vat_duplicates = db.session.query(
+        Counterparty.vat_number,
+        func.count(Counterparty.id).label('count')
+    ).filter(
+        Counterparty.user_id == current_user.id,
+        Counterparty.vat_number.isnot(None),
+        Counterparty.vat_number != ''
+    ).group_by(
+        Counterparty.vat_number
+    ).having(
+        func.count(Counterparty.id) > 1
+    ).all()
+    
+    # Find duplicates by company name
+    name_duplicates = db.session.query(
+        Counterparty.company_name,
+        func.count(Counterparty.id).label('count')
+    ).filter(
+        Counterparty.user_id == current_user.id,
+        Counterparty.company_name.isnot(None)
+    ).group_by(
+        Counterparty.company_name
+    ).having(
+        func.count(Counterparty.id) > 1
+    ).all()
+    
+    # Get full details of duplicates
+    duplicates = {
+        'vat_duplicates': [],
+        'name_duplicates': [],
+        'total_duplicates': 0
+    }
+    
+    for vat, count in vat_duplicates:
+        counterparties = Counterparty.query.filter_by(
+            user_id=current_user.id,
+            vat_number=vat
+        ).all()
+        duplicates['vat_duplicates'].append({
+            'vat_number': vat,
+            'count': count,
+            'counterparties': [{
+                'id': cp.id,
+                'company_name': cp.company_name,
+                'country': cp.country,
+                'created_at': cp.created_at.isoformat()
+            } for cp in counterparties]
+        })
+    
+    for name, count in name_duplicates:
+        counterparties = Counterparty.query.filter_by(
+            user_id=current_user.id,
+            company_name=name
+        ).all()
+        # Skip if already in VAT duplicates
+        if not any(cp.vat_number for cp in counterparties if any(
+            dup['vat_number'] == cp.vat_number for dup in duplicates['vat_duplicates']
+        )):
+            duplicates['name_duplicates'].append({
+                'company_name': name,
+                'count': count,
+                'counterparties': [{
+                    'id': cp.id,
+                    'vat_number': cp.vat_number or 'N/A',
+                    'country': cp.country,
+                    'created_at': cp.created_at.isoformat()
+                } for cp in counterparties]
+            })
+    
+    duplicates['total_duplicates'] = len(duplicates['vat_duplicates']) + len(duplicates['name_duplicates'])
+    
+    return jsonify(duplicates)

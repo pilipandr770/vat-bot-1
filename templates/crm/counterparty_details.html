@@ -368,18 +368,69 @@ function editCounterparty() {
 }
 
 function deleteCounterparty() {
-    if (confirm('Möchten Sie diesen Kontrahenten wirklich löschen? Dies kann nicht rückgängig gemacht werden!')) {
-        fetch(`/crm/api/counterparties/{{ counterparty.id }}`, {method: 'DELETE'})
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    alert('Kontrahent erfolgreich gelöscht!');
-                    window.location.href = '/crm/';
-                } else {
-                    alert('Fehler: ' + result.error);
-                }
-            });
+    const companyName = "{{ counterparty.company_name }}";
+    const checksCount = {{ counterparty.verification_checks|length }};
+    const alertsCount = {{ alerts|length }};
+    
+    const confirmMessage = `⚠️⚠️ WARNUNG: DAUERHAFTES LÖSCHEN ⚠️⚠️\n\n` +
+                          `Kontrahent: "${companyName}"\n` +
+                          `USt-IdNr: {{ counterparty.vat_number or 'N/A' }}\n` +
+                          `Land: {{ counterparty.country }}\n\n` +
+                          `Dies wird DAUERHAFT löschen:\n` +
+                          `• ${checksCount} Prüfungshistorie(n)\n` +
+                          `• Alle zugehörigen Prüfungsergebnisse\n` +
+                          `• ${alertsCount} Alert(s) und Benachrichtigungen\n\n` +
+                          `Diese Aktion kann NICHT rückgängig gemacht werden!\n\n` +
+                          `Sind Sie ABSOLUT SICHER?`;
+    
+    if (!confirm(confirmMessage)) {
+        return;
     }
+    
+    // Second confirmation with company name verification
+    const verification = prompt(
+        `Letzte Bestätigung!\n\n` +
+        `Geben Sie den Firmennamen exakt ein um zu bestätigen:\n\n` +
+        `"${companyName}"`,
+        ''
+    );
+    
+    if (verification !== companyName) {
+        alert('❌ Aktion abgebrochen. Firmenname stimmt nicht überein.\n\nDer Kontrahent wurde NICHT gelöscht.');
+        return;
+    }
+    
+    // Show loading state
+    const deleteBtn = document.querySelector('.btn-danger');
+    if (deleteBtn) {
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lösche...';
+    }
+    
+    fetch(`/crm/api/counterparties/{{ counterparty.id }}`, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert('✅ Kontrahent "' + companyName + '" wurde erfolgreich gelöscht!');
+            window.location.href = '/crm/';
+        } else {
+            alert('❌ Fehler beim Löschen: ' + result.error);
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Löschen';
+            }
+        }
+    })
+    .catch(error => {
+        alert('❌ Netzwerkfehler: ' + error.message);
+        if (deleteBtn) {
+            deleteBtn.disabled = false;
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Löschen';
+        }
+    });
 }
 
 function exportData() {
