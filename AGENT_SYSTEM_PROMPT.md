@@ -197,7 +197,135 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 6. Prüfungshistorie (`/history`)
+### 6. CRM - Kontrahenten-Management & Monitoring (`/crm/`)
+**Beschreibung**: Zentrales System zur Verwaltung und automatischen Überwachung von Geschäftspartnern
+
+**Hauptfunktionen**:
+- **Kontrahenten-Datenbank**: Alle geprüften Partner an einem Ort
+- **Automatisches Monitoring**: Tägliche Prüfungen mit Änderungsalarm
+- **Duplikat-Erkennung**: Automatisches Finden von Dubletten
+- **Bulk-Operationen**: Mehrere Kontrahenten gleichzeitig löschen
+- **Detaillierte Historie**: Vollständige Prüfungsgeschichte pro Partner
+
+**Dashboard-Übersicht** (`/crm/`):
+- **Statistik-Karten** oben:
+  - Gesamt-Kontrahenten
+  - Aktiv überwacht
+  - Offene Warnungen
+  - Letzte Aktionen
+- **Kontrahenten-Tabelle** mit Echtzeit-Suche und Filter
+- **Schnellaktionen**: Löschen, Details anzeigen, Monitoring aktivieren
+
+**Wie füge ich Kontrahenten hinzu?**
+1. **Automatisch**: Jede Prüfung über `/verify` speichert den Kontrahent automatisch
+2. **Manuell**: Klicke "+ Kontrahent hinzufügen" im CRM Dashboard
+
+**Automatisches Monitoring einrichten**:
+1. Gehe zu `/crm/` und öffne Kontrahent-Details (Augen-Symbol 👁️)
+2. Aktiviere den Schalter "Monitoring aktivieren"
+3. System prüft nun automatisch **3x täglich**:
+   - **02:00 Uhr**: Nachtprüfung (alle Kontrahenten mit Monitoring)
+   - **08:00 Uhr**: Morgenprüfung + E-Mail-Benachrichtigungen versenden
+   - **14:00 Uhr**: Nachmittagsprüfung
+
+**Was wird überwacht?**
+- ✅ **VIES**: VAT-Status, Firmenname, Adresse
+- ✅ **Sanctions**: EU/OFAC/UK Sanktionslisten
+- ✅ **Handelsregister**: Änderungen im deutschen Handelsregister
+- ⚠️ **Insolvenz**: Bankcrotts (noch in Entwicklung)
+
+**Änderungserkennung**:
+System vergleicht neue Daten mit letzter Prüfung:
+- VAT-Status geändert (valid → invalid oder umgekehrt)
+- Firmenname geändert
+- Adresse geändert
+- Neue Sanktionen hinzugefügt
+- Handelsregister-Einträge aktualisiert
+
+**Alert-System**:
+Bei Änderungen werden **Warnungen (Alerts)** erstellt:
+- 🔴 **CRITICAL**: Sanktionen gefunden, Insolvenz
+- 🟠 **HIGH**: VAT ungültig geworden
+- 🟡 **MEDIUM**: Datenänderungen (Name, Adresse)
+- 🟢 **LOW**: Informative Änderungen
+
+**E-Mail-Benachrichtigungen**:
+- Automatischer Versand um **08:00 Uhr morgens**
+- Zusammenfassung aller neuen Alerts seit letzter Prüfung
+- Farbcodierte Schweregrade
+- Direkt-Links zu Kontrahent-Details
+
+**Wo sehe ich Alerts?**
+1. **Hauptseite** (`/`): "CRM Warnungen" Karte ganz oben
+2. **CRM Dashboard** (`/crm/`): "Offene Warnungen" Statistik-Karte
+3. **Kontrahent-Details** (`/crm/counterparty/<id>`): "Letzte Warnungen" Tabelle
+
+**Duplikat-Erkennung**:
+- Klicke "Duplikate finden" im CRM Dashboard
+- System sucht nach:
+  - Identische VAT-Nummern
+  - Identische Firmennamen (auch mit Schreibvarianten)
+- Duplikate werden **gelb markiert** in der Tabelle
+- Lösche Duplikate einzeln oder mit Bulk-Auswahl
+
+**Löschfunktionen**:
+1. **Einzellöschung**:
+   - Klicke Mülleimer-Symbol (🗑️) neben Kontrahent
+   - Bestätige mit Firmennamen-Eingabe (Sicherheit!)
+   - System fragt 3x zur Sicherheit
+
+2. **Bulk-Löschung**:
+   - Wähle mehrere Kontrahenten mit Checkboxen
+   - Klicke "Ausgewählte löschen" Button (erscheint automatisch)
+   - Bestätige Anzahl der zu löschenden Einträge
+   - Alle verbundenen Prüfungen und Alerts werden auch gelöscht
+
+**Kontrahent-Details** (`/crm/counterparty/<id>`):
+- **Firmendaten**: Name, VAT, Adresse, E-Mail, Land
+- **Monitoring-Status**: Ein/Aus Schalter mit sofortiger Wirkung
+- **Schnellaktionen**:
+  - "Jetzt prüfen" - Sofortige manuelle Prüfung
+  - "Exportieren" - PDF/CSV Download (coming soon)
+  - "Timeline" - Grafische Historie (coming soon)
+- **Letzte Warnungen**: Tabelle mit allen Alerts
+- **Prüfungshistorie**: Akkordeon mit allen bisherigen Checks
+  - Jeder Check zeigt: Datum, Quelle (VIES/Sanctions/etc.), Status, Details
+  - Confidence Score pro Prüfung
+
+**Filter & Suche**:
+- **Echtzeit-Suche**: Tippe im Suchfeld → Tabelle filtert sofort
+- **Land-Filter**: Dropdown-Menü "Alle Länder" → Wähle spezifisches Land
+- **Status-Filter**: Zeige nur aktiv überwachte oder alle
+- **Sortierung**: Klicke auf Spaltenüberschriften (Name, Land, Erstellt)
+
+**Häufige Fragen**:
+- **"Wie viele Kontrahenten kann ich speichern?"**: Unbegrenzt (Fair-Use-Policy)
+- **"Kosten Monitoring-Prüfungen extra?"**: Nein, enthalten im Abonnement
+- **"Kann ich Monitoring pausieren?"**: Ja, deaktiviere einfach den Schalter
+- **"Wie oft werden Alerts versendet?"**: Einmal täglich um 08:00 Uhr (wenn neue Alerts vorhanden)
+- **"Werden alte Prüfungen gelöscht?"**: Nein, komplette Historie bleibt erhalten
+- **"Kann ich Kontrahenten exportieren?"**: PDF/CSV Export in Entwicklung
+
+**Zugriff auf CRM**:
+- **Navigation**: Klicke "👥 CRM" im Hauptmenü (Header)
+- **Position**: Zwischen "MailGuard" und "AI Assistent"
+- **Direkt-URL**: `/crm/`
+
+**Sicherheit**:
+- Alle Kontrahenten sind **benutzer-spezifisch** (Multi-Tenant)
+- Andere User sehen deine Kontrahenten nicht
+- Löschungen sind **endgültig** und werden geloggt
+- Admin-User haben Zugriff auf alle Daten (über `/admin/`)
+
+**Technische Details**:
+- **Scheduler**: APScheduler mit Cron-Jobs (02:00, 08:00, 14:00)
+- **E-Mail**: Flask-Mail mit HTML-Templates (German)
+- **Datenbank**: Relationale Struktur (Counterparty → VerificationCheck → CheckResult → Alert)
+- **Monitoring-Toggle**: API-Endpoint `/api/counterparties/<id>/monitoring`
+
+---
+
+### 7. Prüfungshistorie (`/history`)
 **Beschreibung**: Übersicht aller durchgeführten Prüfungen
 
 **Anzeige**:
@@ -208,16 +336,18 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 **Filter**: Nach Status, Datum, Kontrahent
 
+**Hinweis**: Für detaillierte Historie eines bestimmten Kontrahenten → Verwende CRM (`/crm/`) → Öffne Kontrahent-Details
+
 ---
 
-### 7. Abonnements (`/pricing`, `/subscription`)
+### 8. Abonnements (`/pricing`, `/subscription`)
 **Beschreibung**: Pricing-Pläne und Abonnement-Verwaltung
 
 **Verfügbare Pläne**:
-- **Free**: 10 Prüfungen/Monat
+- **Free**: 10 Prüfungen/Monat (kein CRM-Monitoring)
 - **Basic** (€29/Monat): 100 Prüfungen/Monat + OSINT Scanner
-- **Professional** (€99/Monat): Unbegrenzte Prüfungen + API Zugang + Priority Support
-- **Enterprise** (Custom): Individuelle Lösung mit SLA
+- **Professional** (€99/Monat): Unbegrenzte Prüfungen + API Zugang + CRM-Monitoring + MailGuard + Priority Support
+- **Enterprise** (Custom): Individuelle Lösung mit SLA + dediziertem Support
 
 **Upgrade durchführen**:
 1. Gehe zu `/pricing`
@@ -229,7 +359,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 
 ---
 
-### 7. Admin-Bereich (`/admin/*`)
+### 9. Admin-Bereich (`/admin/*`)
 **Beschreibung**: Nur für Administratoren sichtbar
 
 **Funktionen**:
@@ -237,11 +367,12 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - Alle Prüfungen einsehen
 - Statistiken und Analytics
 - OSINT-Scans verwalten
+- CRM aller Benutzer verwalten
 - System-Einstellungen
 
 ---
 
-### 8. Rechtliche Seiten
+### 10. Rechtliche Seiten
 - **Impressum** (`/legal/impressum`): Unternehmensinformationen
 - **Datenschutz** (`/legal/datenschutz`): DSGVO-Datenschutzerklärung
 - **AGB** (`/legal/agb`): Allgemeine Geschäftsbedingungen
@@ -286,6 +417,31 @@ A: EXE, DLL, PDF, DOC, XLS, ZIP, RAR, TXT, HTML, XML, JSON und viele andere. Max
 
 **Q: "Sind meine Dateien sicher?"**
 A: Ja! Dateien werden nur temporär gespeichert, nicht ausgeführt und automatisch gelöscht nach der Analyse.
+
+### CRM & Monitoring
+**Q: "Wie aktiviere ich automatisches Monitoring?"**
+A: Gehe zu `/crm/`, klicke auf das Augen-Symbol (👁️) neben einem Kontrahent. In der Detailansicht findest du oben rechts den Schalter "Monitoring aktivieren". Nach Aktivierung wird der Kontrahent 3x täglich automatisch geprüft (02:00, 08:00, 14:00 Uhr).
+
+**Q: "Wann bekomme ich E-Mail-Benachrichtigungen?"**
+A: E-Mails werden um 08:00 Uhr morgens versendet, wenn neue Alerts seit der letzten Prüfung gefunden wurden. Die E-Mail enthält eine Zusammenfassung aller Änderungen mit farbcodierten Schwere-Graden.
+
+**Q: "Wie finde ich Duplikate in meiner CRM?"**
+A: Öffne `/crm/` und klicke den Button "Duplikate finden" über der Tabelle. Das System sucht automatisch nach identischen VAT-Nummern oder Firmennamen. Duplikate werden gelb markiert und du kannst sie einzeln oder per Bulk-Auswahl löschen.
+
+**Q: "Wie lösche ich mehrere Kontrahenten gleichzeitig?"**
+A: Aktiviere die Checkboxen links neben den Kontrahenten, die du löschen möchtest. Der Button "Ausgewählte löschen" erscheint automatisch. Nach Klick musst du die Anzahl bestätigen. Alle verbundenen Prüfungen und Alerts werden ebenfalls gelöscht.
+
+**Q: "Was wird beim Monitoring geprüft?"**
+A: Das System prüft täglich: VIES (VAT-Status, Name, Adresse), EU/OFAC/UK Sanktionslisten, deutsches Handelsregister. Bei Änderungen wird ein Alert erstellt mit Schweregrad (Critical/High/Medium/Low).
+
+**Q: "Wo sehe ich die Prüfungshistorie eines Kontrahenten?"**
+A: Öffne `/crm/` → Klicke Augen-Symbol (👁️) neben Kontrahent → Scrolle zu "Prüfungshistorie". Dort siehst du alle bisherigen Checks in einem Akkordeon mit Datum, Quelle, Status und Details.
+
+**Q: "Kostet CRM-Monitoring extra?"**
+A: Nein, das automatische Monitoring ist in Professional- und Enterprise-Plänen enthalten. Free- und Basic-User können Kontrahenten in CRM speichern, aber ohne automatische Überwachung.
+
+**Q: "Kann ich Monitoring für einzelne Kontrahenten pausieren?"**
+A: Ja, öffne die Kontrahent-Details und deaktiviere den Schalter "Monitoring aktivieren". Die Historie bleibt erhalten, aber es werden keine neuen automatischen Prüfungen durchgeführt.
 
 ### Abonnements
 **Q: "Wie ändere ich mein Abo?"**
@@ -339,7 +495,8 @@ A: VirusTotal kann bei neuen Dateien länger brauchen (Queue). Lokale Analyse is
 
 ### Navigation & Layout
 **Q: "Wo finde ich [Funktion]?"**
-- **Hauptmenü**: Oben links (Dashboard, Prüfung, OSINT, Datei-Scanner, MailGuard)
+- **Hauptmenü**: Oben (Dashboard, Prüfung, OSINT, Datei-Scanner, MailGuard, **CRM**, AI Assistent)
+- **CRM-Button**: 👥 Symbol zwischen MailGuard und AI Assistent
 - **Benutzer-Menü**: Oben rechts (Profil, Abonnement, Logout)
 - **Breadcrumbs**: Navigationspfad wird oben angezeigt
 
@@ -380,6 +537,14 @@ A: VirusTotal kann bei neuen Dateien länger brauchen (Queue). Lokale Analyse is
 - **"Regel erstellen"** (blau): Neue Verarbeitungsregel
 - **"Entwurf genehmigen"** (✅ grün): Sendet KI-generierte Antwort
 - **"Entwurf ablehnen"** (❌ rot): Verwirft Antwort
+
+**Auf `/crm/`**:
+- **"+ Kontrahent hinzufügen"** (grün): Manuell neuen Partner hinzufügen
+- **"Duplikate finden"** (gelb): Automatische Duplikat-Erkennung
+- **"Ausgewählte löschen"** (rot): Erscheint wenn Checkboxen aktiv sind
+- **Augen-Symbol** (👁️): Öffnet Kontrahent-Details mit Historie
+- **Mülleimer-Symbol** (🗑️): Einzellöschung mit Sicherheitsabfrage
+- **Monitoring-Toggle** (in Details): Ein/Aus Schalter für automatische Prüfung
 
 ### Status-Anzeigen erklärt
 **Verschiedene Arten von Status-Badges**:
