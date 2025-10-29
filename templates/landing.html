@@ -37,24 +37,26 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h1 class="display-4 fw-bold mb-4">
-                        Automatische <span class="text-primary">Geschäftspartner</span> Verifizierung
+                        Komplette <span class="text-primary">Business Intelligence</span> Plattform
                     </h1>
                     <p class="lead mb-4">
-                        Prüfen Sie USt-IdNr., Sanktionslisten und Handelsregistereinträge Ihrer Geschäftspartner in Sekunden. 
-                        Compliance-konform und DSGVO-sicher.
+                        Mehr als nur VAT-Prüfung: Geschäftspartner-Verifizierung, OSINT-Analyse, 
+                        Malware-Scans, Email-Intelligence und KI-gestütztes CRM. 
+                        Alles in einer DSGVO-konformen Plattform.
                     </p>
                     <div class="d-flex gap-3">
                         <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
                             <i class="bi bi-rocket"></i> Jetzt kostenlos starten
                         </a>
-                        <a href="#demo" class="btn btn-outline-secondary btn-lg">
-                            <i class="bi bi-play-circle"></i> Demo ansehen
+                        <a href="#features" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-stars"></i> Alle Features
                         </a>
                     </div>
                     <div class="mt-4">
                         <small class="text-muted">
                             <i class="bi bi-check-circle text-success"></i> Keine Kreditkarte erforderlich 
                             <i class="bi bi-check-circle text-success ms-3"></i> 5 kostenlose Prüfungen
+                            <i class="bi bi-check-circle text-success ms-3"></i> 10+ Module
                         </small>
                     </div>
                 </div>
@@ -70,11 +72,12 @@
     <section id="features" class="py-5 bg-light">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold">Alle Prüfungen an einem Ort</h2>
-                <p class="lead text-muted">Umfassende Geschäftspartner Due Diligence in Echtzeit</p>
+                <h2 class="display-5 fw-bold">10+ Module für Ihre Business Intelligence</h2>
+                <p class="lead text-muted">Umfassende Due Diligence, Sicherheit und Automatisierung</p>
             </div>
             
             <div class="row g-4">
+                <!-- VAT Verification -->
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -90,6 +93,7 @@
                     </div>
                 </div>
                 
+                <!-- Sanctions Lists -->
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -105,6 +109,7 @@
                     </div>
                 </div>
                 
+                <!-- Business Registry -->
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -120,6 +125,103 @@
                     </div>
                 </div>
                 
+                <!-- OSINT Scanner - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-purple text-white rounded-circle mb-3" style="background-color: #6f42c1 !important;">
+                                <i class="bi bi-search fs-1"></i>
+                            </div>
+                            <h3 class="h5">OSINT Scanner <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Domain-Analyse, DNS-Records, SSL-Zertifikate, WHOIS, Security Headers 
+                                und Social Media Präsenz prüfen.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- File Scanner - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="bi bi-file-earmark-lock fs-1"></i>
+                            </div>
+                            <h3 class="h5">Malware Scanner <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Prüfen Sie Dateien auf Viren und Malware. Integration mit VirusTotal 
+                                für maximale Sicherheit (bis 50MB).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MailGuard - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <i class="bi bi-envelope-at fs-1"></i>
+                            </div>
+                            <h3 class="h5">MailGuard AI <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                KI-gestützte Email-Verwaltung mit automatischen Antworten, 
+                                Gmail/Outlook-Integration und Sicherheitsprüfung.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CRM - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-dark text-white rounded-circle mb-3">
+                                <i class="bi bi-people fs-1"></i>
+                            </div>
+                            <h3 class="h5">Smart CRM <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Automatische Speicherung geprüfter Kontrahenten, Notizen, 
+                                Tags und vollständige Prüfungshistorie an einem Ort.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Company Profile - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-warning text-white rounded-circle mb-3">
+                                <i class="bi bi-person-badge fs-1"></i>
+                            </div>
+                            <h3 class="h5">Firmenprofil <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Speichern Sie Ihre Firmendaten einmal und nutzen Sie Auto-Fill 
+                                bei jeder Prüfung. Spart 60 Sekunden pro Prüfung!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Assistant - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                <i class="bi bi-robot fs-1"></i>
+                            </div>
+                            <h3 class="h5">KI-Assistent <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Intelligenter Chatbot beantwortet Ihre Fragen zur Plattform 
+                                24/7 und hilft bei der Navigation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- History & Reports -->
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -135,10 +237,11 @@
                     </div>
                 </div>
                 
+                <!-- Monitoring & Alerts -->
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-warning text-white rounded-circle mb-3">
+                            <div class="feature-icon bg-warning text-dark rounded-circle mb-3">
                                 <i class="bi bi-bell fs-1"></i>
                             </div>
                             <h3 class="h5">Monitoring & Alerts</h3>
@@ -150,6 +253,7 @@
                     </div>
                 </div>
                 
+                <!-- REST API -->
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -158,7 +262,7 @@
                             </div>
                             <h3 class="h5">REST API</h3>
                             <p class="text-muted">
-                                Integrieren Sie die Prüfungen nahtlos in Ihre bestehenden 
+                                Integrieren Sie alle Module nahtlos in Ihre bestehenden 
                                 Systeme über unsere RESTful API.
                             </p>
                         </div>
@@ -189,7 +293,13 @@
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 5 Prüfungen pro Monat</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> VIES Validierung</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Basis Sanktionsprüfung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> OSINT Scanner</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> File Scanner (10 Files/Monat)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (10 Kontakte)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> KI-Assistent</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Firmenprofil</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> E-Mail Support</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> MailGuard AI</li>
                                 <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> API Zugang</li>
                                 <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> Handelsregister</li>
                             </ul>
@@ -216,6 +326,10 @@
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Validierungsdienste</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Handelsregister Prüfung</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Erweiterte Sanktionslisten</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> OSINT Scanner (unbegrenzt)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> File Scanner (100 Files/Monat)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> MailGuard AI (3 Accounts)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (1000 Kontakte)</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> API Zugang</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verlauf & Berichte</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Prioritäts-Support</li>
@@ -238,6 +352,9 @@
                             <ul class="list-unstyled mb-4">
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Unbegrenzte Prüfungen</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Professional Features</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> MailGuard AI (Unbegrenzt)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> File Scanner (Unbegrenzt)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (Unbegrenzt)</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> White-Label Lösung</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Custom API Integration</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Dedizierter Account Manager</li>
