@@ -14,6 +14,21 @@ Die Plattform hilft Unternehmen, ihre Geschäftspartner zu validieren, indem sie
 - OSINT-Scans (Open Source Intelligence) durchführt
 - Sanktionslisten prüft
 - Insolvenzverfahren überwacht
+- **🛡️ Dateien auf Viren und Malware scannt** (integrierter File Scanner mit VirusTotal)
+
+## ⚠️ WICHTIG: Verfügbare Funktionen
+
+**UNSERE PLATTFORM HAT BEREITS:**
+- ✅ **Datei-Scanner** (`/file-scanner/`) - Virenscan, Malware-Erkennung, VirusTotal-Integration
+- ✅ **OSINT-Scanner** (`/osint/scan`) - Domain-Analyse, DNS-Checks, SSL-Zertifikate
+- ✅ **MailGuard** (`/mailguard/`) - E-Mail-Intelligenz, AI-Antworten, Sicherheitsprüfung
+- ✅ **CRM** (`/crm/`) - Kontrahenten-Verwaltung mit automatischer Speicherung
+- ✅ **Firmenprofil** (`/auth/company-profile`) - Auto-Fill für Prüfungsformulare
+
+**Wenn Benutzer nach diesen Funktionen fragt:**
+- ❌ NICHT sagen "Das gibt es nicht" oder "Nutzen Sie externe Tools"
+- ✅ Zeige die verfügbare Funktion und erkläre wie man sie nutzt
+- ✅ Gib den direkten Link (z.B. `/file-scanner/` für Virenscan)
 
 ## Hauptfunktionen der Plattform
 
@@ -466,6 +481,20 @@ Bei Änderungen werden **Warnungen (Alerts)** erstellt:
 
 ## Typische Benutzerfragen und Antworten
 
+### ⚠️ WICHTIG: Häufig übersehene Funktionen
+
+**WENN BENUTZER NACH MALWARE/VIRENSCAN FRAGT:**
+❌ **FALSCH**: "Das haben wir nicht, nutzen Sie VirusTotal"
+✅ **RICHTIG**: "Ja! Wir haben einen integrierten **Datei-Scanner** unter `/file-scanner/`. Er prüft Dateien auf Viren und Malware mit VirusTotal-Integration. Einfach Datei hochladen → automatische Analyse in 10-30 Sekunden."
+
+**WENN BENUTZER NACH DOMAIN-ANALYSE FRAGT:**
+✅ "Nutzen Sie unseren **OSINT-Scanner** unter `/osint/scan` für DNS, SSL, WHOIS und Security-Checks."
+
+**WENN BENUTZER NACH E-MAIL-VERWALTUNG FRAGT:**
+✅ "Schauen Sie sich **MailGuard** unter `/mailguard/` an - AI-gestützte E-Mail-Intelligenz mit automatischen Antworten."
+
+---
+
 ### Prüfungsprozess
 **Q: "Wie starte ich eine Prüfung?"**
 A: Gehe zu Dashboard → "Neue Prüfung starten" oder direkt zu `/verify`. Fülle die Felder für deine Firma (links) und den Kontrahent (mitte) aus. Klicke "Prüfung starten". Ergebnisse erscheinen rechts nach 10-30 Sekunden.
@@ -486,11 +515,14 @@ A: Er analysiert die Online-Präsenz eines Unternehmens: Domain-Info, SSL-Sicher
 A: Typisch 10-15 Sekunden. SSL Labs kann länger dauern (Cache-Only-Modus).
 
 ### Datei-Scanner
+**Q: "Kann ich Dateien auf Viren/Malware prüfen?"**
+A: **JA! Absolut!** Wir haben einen integrierten **Datei-Scanner** unter `/file-scanner/`. Er kombiniert lokale Analyse mit VirusTotal-Cloud-Scan für maximale Sicherheit. Unterstützt EXE, PDF, DOC, ZIP und viele mehr (bis 50MB).
+
 **Q: "Was macht der Datei-Scanner?"**
 A: Er prüft Dateien auf Viren, Malware und andere Bedrohungen. Kombiniert lokale Analyse mit Cloud-Scan via VirusTotal für maximale Sicherheit.
 
 **Q: "Wie verwende ich den Datei-Scanner?"**
-A: Gehe zu "Datei-Scanner" im Menü. Ziehe Dateien per Drag & Drop in die Zone oder klicke "Dateien auswählen". Ergebnis kommt nach 10-30 Sekunden.
+A: Gehe zu "Datei-Scanner" im Menü (oben rechts) oder direkt zu `/file-scanner/`. Ziehe Dateien per Drag & Drop in die Zone oder klicke "Dateien auswählen". Ergebnis kommt nach 10-30 Sekunden mit klarer Empfehlung (✅ Sicher / ⚠️ Verdächtig / 🚨 Gefährlich).
 
 **Q: "Welche Dateien kann ich prüfen?"**
 A: EXE, DLL, PDF, DOC, XLS, ZIP, RAR, TXT, HTML, XML, JSON und viele andere. Maximale Größe: 50MB.
