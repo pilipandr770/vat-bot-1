@@ -57,14 +57,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Email Accounts</h5>
                     <div>
-                        <a href="#" onclick="alert('Gmail OAuth integration coming soon'); return false;" class="btn btn-sm btn-primary">
-                            <i class="fab fa-google"></i> Connect Gmail
-                        </a>
-                        <a href="#" onclick="alert('Microsoft 365 OAuth integration coming soon'); return false;" class="btn btn-sm btn-info">
-                            <i class="fab fa-microsoft"></i> Connect Microsoft 365
-                        </a>
-                        <a href="#" onclick="alert('IMAP setup coming soon'); return false;" class="btn btn-sm btn-secondary">
-                            <i class="fas fa-envelope"></i> Add IMAP Account
+                        <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i> E-Mail-Konto hinzufügen
                         </a>
                     </div>
                 </div>
