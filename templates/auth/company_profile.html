@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Mein Firmenprofil - VAT Bot{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-building"></i> Mein Firmenprofil
+                </h2>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Zurück
+                </a>
+            </div>
+
+            <!-- Info Alert -->
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> <strong>Tipp:</strong> 
+                Füllen Sie Ihre Firmendaten einmal aus. Diese werden dann automatisch 
+                bei jeder Prüfung verwendet. Sie müssen nicht jedes Mal neu eingeben!
+            </div>
+
+            <!-- Success/Error Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                            <i class="bi bi-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }}"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Company Profile Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i> Firmendaten
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.company_profile') }}" id="companyForm">
+                        <div class="row">
+                            <!-- Company Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="company_name" class="form-label">
+                                    Firmenname <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="company_name" 
+                                       name="company_name" 
+                                       value="{{ current_user.company_name or '' }}"
+                                       placeholder="z.B. Beispiel GmbH"
+                                       required>
+                            </div>
+
+                            <!-- VAT Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="company_vat_number" class="form-label">
+                                    USt-IdNr. <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="company_vat_number" 
+                                       name="company_vat_number" 
+                                       value="{{ current_user.company_vat_number or '' }}"
+                                       placeholder="z.B. DE123456789"
+                                       required>
+                                <small class="form-text text-muted">
+                                    Format: DE + 9 Ziffern
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Country -->
+                            <div class="col-md-6 mb-3">
+                                <label for="country" class="form-label">
+                                    Land <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">-- Land auswählen --</option>
+                                    {% set countries = [
+                                        ('DE', 'Deutschland'),
+                                        ('AT', 'Österreich'),
+                                        ('CH', 'Schweiz'),
+                                        ('FR', 'Frankreich'),
+                                        ('IT', 'Italien'),
+                                        ('NL', 'Niederlande'),
+                                        ('BE', 'Belgien'),
+                                        ('ES', 'Spanien'),
+                                        ('PL', 'Polen'),
+                                        ('CZ', 'Tschechien')
+                                    ] %}
+                                    {% for code, name in countries %}
+                                        <option value="{{ code }}" {% if current_user.country == code %}selected{% endif %}>
+                                            {{ name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Company Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="company_email" class="form-label">
+                                    Firmen-E-Mail <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="company_email" 
+                                       name="company_email" 
+                                       value="{{ current_user.company_email or current_user.email }}"
+                                       placeholder="info@firma.de"
+                                       required>
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label for="company_address" class="form-label">
+                                Firmenadresse <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" 
+                                      id="company_address" 
+                                      name="company_address" 
+                                      rows="3" 
+                                      placeholder="Straße, Hausnummer&#10;PLZ Ort"
+                                      required>{{ current_user.company_address or '' }}</textarea>
+                            <small class="form-text text-muted">
+                                z.B. Hauptstraße 123, 10115 Berlin
+                            </small>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label for="company_phone" class="form-label">
+                                Telefonnummer
+                            </label>
+                            <input type="tel" 
+                                   class="form-control" 
+                                   id="company_phone" 
+                                   name="company_phone" 
+                                   value="{{ current_user.company_phone or '' }}"
+                                   placeholder="+49 30 12345678">
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> Speichern
+                            </button>
+                            
+                            {% if current_user.company_vat_number %}
+                            <button type="button" class="btn btn-outline-danger" onclick="clearProfile()">
+                                <i class="bi bi-trash"></i> Profil löschen
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Current Profile Preview -->
+            {% if current_user.company_vat_number %}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-check-circle"></i> Aktuelles Profil
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Firma:</strong> {{ current_user.company_name }}</p>
+                            <p><strong>USt-IdNr.:</strong> {{ current_user.company_vat_number }}</p>
+                            <p><strong>Land:</strong> {{ current_user.country }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>E-Mail:</strong> {{ current_user.company_email }}</p>
+                            <p><strong>Adresse:</strong> {{ current_user.company_address }}</p>
+                            {% if current_user.company_phone %}
+                            <p><strong>Telefon:</strong> {{ current_user.company_phone }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="alert alert-success mt-3 mb-0">
+                        <i class="bi bi-lightning-charge"></i> 
+                        <strong>Bereit!</strong> Ihre Firmendaten werden automatisch bei jeder Prüfung verwendet.
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<script>
+function clearProfile() {
+    if (confirm('Möchten Sie wirklich Ihr Firmenprofil löschen?\n\nSie müssen dann bei jeder Prüfung Ihre Daten neu eingeben.')) {
+        // Clear all form fields
+        document.getElementById('company_name').value = '';
+        document.getElementById('company_vat_number').value = '';
+        document.getElementById('country').value = '';
+        document.getElementById('company_email').value = '{{ current_user.email }}';
+        document.getElementById('company_address').value = '';
+        document.getElementById('company_phone').value = '';
+        
+        // Submit form
+        document.getElementById('companyForm').submit();
+    }
+}
+</script>
+{% endblock %}

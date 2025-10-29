@@ -25,6 +25,12 @@ class User(UserMixin, db.Model):
     phone = db.Column(db.String(50))
     country = db.Column(db.String(2))  # ISO country code
     
+    # Company information (for verification requests)
+    company_vat_number = db.Column(db.String(20))
+    company_address = db.Column(db.Text)
+    company_email = db.Column(db.String(120))
+    company_phone = db.Column(db.String(50))
+    
     # Account status
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)

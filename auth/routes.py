@@ -218,6 +218,36 @@ def profile():
     return render_template('auth/profile.html', form=form)
 
 
+@auth_bp.route('/company-profile', methods=['GET', 'POST'])
+@login_required
+def company_profile():
+    """Firmenprofil - Company profile page for automatic form filling."""
+    if request.method == 'POST':
+        # Get form data
+        current_user.company_name = request.form.get('company_name', '').strip()
+        current_user.company_vat_number = request.form.get('company_vat_number', '').strip()
+        current_user.country = request.form.get('country', '').strip()
+        current_user.company_email = request.form.get('company_email', '').strip()
+        current_user.company_address = request.form.get('company_address', '').strip()
+        current_user.company_phone = request.form.get('company_phone', '').strip()
+        
+        # If all required fields are empty, user wants to delete profile
+        if not current_user.company_vat_number:
+            current_user.company_name = None
+            current_user.company_vat_number = None
+            current_user.company_address = None
+            current_user.company_email = None
+            current_user.company_phone = None
+            flash('Ihr Firmenprofil wurde gelöscht.', 'success')
+        else:
+            flash('Ihr Firmenprofil wurde erfolgreich gespeichert!', 'success')
+        
+        db.session.commit()
+        return redirect(url_for('auth.company_profile'))
+    
+    return render_template('auth/company_profile.html')
+
+
 # Helper functions
 
 def send_confirmation_email(user):

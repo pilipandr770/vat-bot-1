@@ -55,37 +55,57 @@
     <!-- Left Column: Company Data -->
     <div class="col-lg-4">
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5><i class="bi bi-building"></i> Ihre Firmendaten</h5>
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-building"></i> Ihre Firmendaten</h5>
+                <a href="{{ url_for('auth.company_profile') }}" class="btn btn-sm btn-light" title="Profil verwalten">
+                    <i class="bi bi-gear"></i>
+                </a>
             </div>
             <div class="card-body">
+                {% if current_user.company_vat_number %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i> <strong>Automatisch ausgefüllt</strong> aus Ihrem Profil
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% else %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="bi bi-lightbulb"></i> <strong>Tipp:</strong> 
+                    <a href="{{ url_for('auth.company_profile') }}" class="alert-link">Speichern Sie Ihre Firmendaten</a>, 
+                    damit sie automatisch ausgefüllt werden!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
                 <form id="verificationForm">
                     <div class="mb-3">
                         <label for="company_vat" class="form-label">USt-IdNr. <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="company_vat" name="company_vat" 
+                               value="{{ current_user.company_vat_number or '' }}"
                                placeholder="DE123456789" required>
                         <div class="form-text">Ihre USt-IdNr. für VIES-Prüfung</div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="company_name" class="form-label">Firmenname <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="company_name" name="company_name" required>
+                        <input type="text" class="form-control" id="company_name" name="company_name" 
+                               value="{{ current_user.company_name or '' }}" required>
                     </div>
                     
                     <div class="mb-3">
                         <label for="company_address" class="form-label">Geschäftsadresse <span class="text-danger">*</span></label>
                         <textarea class="form-control" id="company_address" name="company_address" 
-                                  rows="3" required></textarea>
+                                  rows="3" required>{{ current_user.company_address or '' }}</textarea>
                     </div>
                     
                     <div class="mb-3">
                         <label for="company_email" class="form-label">E-Mail</label>
-                        <input type="email" class="form-control" id="company_email" name="company_email">
+                        <input type="email" class="form-control" id="company_email" name="company_email"
+                               value="{{ current_user.company_email or current_user.email }}">
                     </div>
                     
                     <div class="mb-3">
                         <label for="company_phone" class="form-label">Telefon</label>
-                        <input type="tel" class="form-control" id="company_phone" name="company_phone">
+                        <input type="tel" class="form-control" id="company_phone" name="company_phone"
+                               value="{{ current_user.company_phone or '' }}">
                     </div>
             </div>
         </div>
