@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Почтовые аккаунты - MailGuard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-envelope-at"></i> Мои почтовые аккаунты</h2>
+        <a href="{{ url_for('mailguard.dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Описание для пользователя -->
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> 
+        <strong>Как подключить почту?</strong><br>
+        Нажмите кнопку "Подключить Gmail" или "Подключить Outlook", затем разрешите доступ в появившемся окне.
+        Это займет 30 секунд. Ваши пароли остаются у вас — мы используем безопасный OAuth протокол.
+    </div>
+
+    <!-- Кнопки подключения новых аккаунтов -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Подключить новую почту</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Gmail -->
+                <div class="col-md-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="bi bi-google" style="font-size: 3rem; color: #DB4437;"></i>
+                            <h5 class="card-title mt-3">Gmail</h5>
+                            <p class="text-muted">Google Workspace, @gmail.com</p>
+                            <a href="{{ url_for('mailguard.auth_gmail') }}" class="btn btn-danger w-100">
+                                <i class="bi bi-box-arrow-in-right"></i> Подключить Gmail
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Microsoft -->
+                <div class="col-md-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="bi bi-microsoft" style="font-size: 3rem; color: #0078D4;"></i>
+                            <h5 class="card-title mt-3">Outlook / Office 365</h5>
+                            <p class="text-muted">Microsoft 365, @outlook.com</p>
+                            <a href="{{ url_for('mailguard.auth_microsoft') }}" class="btn btn-primary w-100">
+                                <i class="bi bi-box-arrow-in-right"></i> Подключить Microsoft
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IMAP (любая другая почта) -->
+                <div class="col-md-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="bi bi-envelope-fill" style="font-size: 3rem; color: #6c757d;"></i>
+                            <h5 class="card-title mt-3">Другая почта</h5>
+                            <p class="text-muted">Любой IMAP/SMTP провайдер</p>
+                            <a href="{{ url_for('mailguard.add_imap_account') }}" class="btn btn-secondary w-100">
+                                <i class="bi bi-gear"></i> Настроить IMAP
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Список подключенных аккаунтов -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-check-circle"></i> Подключенные аккаунты</h5>
+        </div>
+        <div class="card-body">
+            {% if accounts %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Провайдер</th>
+                                <th>Email</th>
+                                <th>Статус</th>
+                                <th>Последняя синхронизация</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in accounts %}
+                            <tr>
+                                <td>
+                                    {% if account.provider == 'gmail' %}
+                                        <i class="bi bi-google text-danger"></i> Gmail
+                                    {% elif account.provider == 'microsoft' %}
+                                        <i class="bi bi-microsoft text-primary"></i> Microsoft
+                                    {% else %}
+                                        <i class="bi bi-envelope"></i> IMAP
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ account.email }}</strong>
+                                </td>
+                                <td>
+                                    {% if account.is_active %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Активен
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-exclamation-triangle"></i> Неактивен
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if account.last_sync_at %}
+                                        {{ account.last_sync_at.strftime('%d.%m.%Y %H:%M') }}
+                                    {% else %}
+                                        <span class="text-muted">Еще не синхронизирован</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('mailguard.sync_account', account_id=account.id) }}" 
+                                           class="btn btn-outline-primary"
+                                           title="Синхронизировать сейчас">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </a>
+                                        <a href="{{ url_for('mailguard.toggle_account', account_id=account.id) }}" 
+                                           class="btn btn-outline-warning"
+                                           title="Включить/Выключить">
+                                            <i class="bi bi-power"></i>
+                                        </a>
+                                        <a href="{{ url_for('mailguard.delete_account', account_id=account.id) }}" 
+                                           class="btn btn-outline-danger"
+                                           onclick="return confirm('Удалить этот аккаунт? Все связанные письма останутся в базе.');"
+                                           title="Удалить">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">Пока нет подключенных аккаунтов</p>
+                    <p class="text-muted">Выберите провайдера выше, чтобы начать</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}
