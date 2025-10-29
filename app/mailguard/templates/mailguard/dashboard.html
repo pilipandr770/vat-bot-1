@@ -64,73 +64,15 @@
                                 {% endfor %}
                             </div>
                         {% else %}
-                            <p class="text-muted mb-3">Keine E-Mail-Konten verbunden. Verbinden Sie Ihr erstes Konto:</p>
-                            <div class="row g-3">
-                                <!-- Gmail -->
-                                <div class="col-md-4">
-                                    <div class="card h-100 text-center">
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <svg width="48" height="48" viewBox="0 0 48 48">
-                                                    <path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"></path>
-                                                    <path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"></path>
-                                                    <polygon fill="#e53935" points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17"></polygon>
-                                                    <path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"></path>
-                                                    <path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0 C43.076,8,45,9.924,45,12.298z"></path>
-                                                </svg>
-                                            </div>
-                                            <h5 class="card-title">Gmail</h5>
-                                            <p class="text-muted small">Google Workspace, @gmail.com</p>
-                                            <a href="{{ url_for('mailguard.auth_gmail') }}" class="btn btn-danger w-100">
-                                                <i class="bi bi-box-arrow-in-right"></i> Gmail verbinden
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Microsoft -->
-                                <div class="col-md-4">
-                                    <div class="card h-100 text-center">
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <svg width="48" height="48" viewBox="0 0 48 48">
-                                                    <path fill="#ff5722" d="M6 6H22V22H6z" transform="rotate(-180 14 14)"></path>
-                                                    <path fill="#4caf50" d="M26 6H42V22H26z" transform="rotate(-180 34 14)"></path>
-                                                    <path fill="#ffc107" d="M26 26H42V42H26z" transform="rotate(-180 34 34)"></path>
-                                                    <path fill="#03a9f4" d="M6 26H22V42H6z" transform="rotate(-180 14 34)"></path>
-                                                </svg>
-                                            </div>
-                                            <h5 class="card-title">Outlook / Office 365</h5>
-                                            <p class="text-muted small">Microsoft 365, @outlook.com</p>
-                                            <a href="{{ url_for('mailguard.auth_microsoft') }}" class="btn btn-primary w-100">
-                                                <i class="bi bi-box-arrow-in-right"></i> Microsoft verbinden
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- IMAP -->
-                                <div class="col-md-4">
-                                    <div class="card h-100 text-center">
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <svg width="48" height="48" viewBox="0 0 48 48">
-                                                    <path fill="#607D8B" d="M40 12H8c-2.21 0-4 1.79-4 4v16c0 2.21 1.79 4 4 4h32c2.21 0 4-1.79 4-4V16c0-2.21-1.79-4-4-4zm0 4l-16 10L8 16h32z"></path>
-                                                </svg>
-                                            </div>
-                                            <h5 class="card-title">Andere E-Mail</h5>
-                                            <p class="text-muted small">Beliebiger IMAP/SMTP-Anbieter</p>
-                                            <a href="{{ url_for('mailguard.add_imap_account') }}" class="btn btn-secondary w-100">
-                                                <i class="bi bi-gear"></i> IMAP konfigurieren
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-3 text-center">
-                                <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-outline-primary btn-sm">
-                                    Alle Konten verwalten →
+                            <div class="text-center py-5">
+                                <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+                                <p class="text-muted mt-3 mb-4">Keine E-Mail-Konten verbunden</p>
+                                <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-plus-circle"></i> E-Mail-Konto hinzufügen
                                 </a>
+                                <p class="text-muted small mt-3">
+                                    Gmail, Outlook, Office 365 oder IMAP
+                                </p>
                             </div>
                         {% endif %}
                     </div>
