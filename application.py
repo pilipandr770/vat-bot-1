@@ -242,9 +242,9 @@ def create_app(config_name=None):
                 logger.warning(f"Missing counterparty required fields. Name: {counterparty_data.get('company_name')}, Country: {counterparty_data.get('country')}")
                 return jsonify({'success': False, 'error': 'Counterparty name and country are required'}), 400
             
-            # Save or get company and counterparty
-            company = get_or_create_company(company_data)
-            counterparty = get_or_create_counterparty(counterparty_data)
+            # Save or get company and counterparty (with user_id for multi-tenancy)
+            company = get_or_create_company(company_data, current_user.id)
+            counterparty = get_or_create_counterparty(counterparty_data, current_user.id)
             
             # Create verification check
             verification_check = VerificationCheck(
@@ -328,31 +328,42 @@ def create_app(config_name=None):
             'results': results
         })
     
-    def get_or_create_company(company_data):
-        """Get existing company or create new one."""
-        company = Company.query.filter_by(vat_number=company_data['vat_number']).first()
+    def get_or_create_company(company_data, user_id):
+        """Get existing company or create new one for current user."""
+        # Search only within user's companies (multi-tenant)
+        company = Company.query.filter_by(
+            vat_number=company_data['vat_number'],
+            user_id=user_id
+        ).first()
+        
         if not company:
+            company_data['user_id'] = user_id
             company = Company(**company_data)
             db.session.add(company)
             db.session.commit()
         return company
     
-    def get_or_create_counterparty(counterparty_data):
-        """Get existing counterparty or create new one."""
-        # Try to find by VAT number first, then by name + country
+    def get_or_create_counterparty(counterparty_data, user_id):
+        """Get existing counterparty or create new one for current user."""
+        # Try to find by VAT number first (within user's counterparties)
         counterparty = None
         if counterparty_data.get('vat_number'):
             counterparty = Counterparty.query.filter_by(
-                vat_number=counterparty_data['vat_number']
+                vat_number=counterparty_data['vat_number'],
+                user_id=user_id
             ).first()
         
+        # If not found, try by name + country (within user's counterparties)
         if not counterparty:
             counterparty = Counterparty.query.filter_by(
                 company_name=counterparty_data['company_name'],
-                country=counterparty_data['country']
+                country=counterparty_data['country'],
+                user_id=user_id
             ).first()
         
+        # Create new counterparty if not exists
         if not counterparty:
+            counterparty_data['user_id'] = user_id
             counterparty = Counterparty(**counterparty_data)
             db.session.add(counterparty)
             db.session.commit()
