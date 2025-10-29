@@ -1,22 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Почтовые аккаунты - MailGuard{% endblock %}
+{% block title %}E-Mail-Konten - MailGuard{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
+    <!-- Навигация -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Hauptmenü</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('mailguard.dashboard') }}">MailGuard</a></li>
+            <li class="breadcrumb-item active">E-Mail-Konten</li>
+        </ol>
+    </nav>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-envelope-at"></i> Мои почтовые аккаунты</h2>
+        <h2><i class="bi bi-envelope-at"></i> Meine E-Mail-Konten</h2>
         <a href="{{ url_for('mailguard.dashboard') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Назад
+            <i class="bi bi-arrow-left"></i> Zurück zum Dashboard
         </a>
     </div>
 
     <!-- Описание для пользователя -->
     <div class="alert alert-info">
         <i class="bi bi-info-circle"></i> 
-        <strong>Как подключить почту?</strong><br>
-        Нажмите кнопку "Подключить Gmail" или "Подключить Outlook", затем разрешите доступ в появившемся окне.
-        Это займет 30 секунд. Ваши пароли остаются у вас — мы используем безопасный OAuth протокол.
+        <strong>Wie verbinde ich E-Mail?</strong><br>
+        Klicken Sie auf "Gmail verbinden" oder "Outlook verbinden" und erlauben Sie den Zugriff im erscheinenden Fenster.
+        Das dauert 30 Sekunden. Ihre Passwörter bleiben bei Ihnen — wir verwenden das sichere OAuth-Protokoll.
     </div>
 
     <!-- Кнопки подключения новых аккаунтов -->
