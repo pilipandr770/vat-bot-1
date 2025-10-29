@@ -86,6 +86,16 @@ def refresh_gmail_token(refresh_token):
     response.raise_for_status()
     return response.json()
 
+def get_gmail_email(access_token):
+    """Получить email пользователя через Gmail API"""
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.get(
+        'https://www.googleapis.com/gmail/v1/users/me/profile',
+        headers=headers
+    )
+    response.raise_for_status()
+    return response.json().get('emailAddress')
+
 # Microsoft OAuth
 MS_SCOPES = [
     'https://graph.microsoft.com/Mail.ReadWrite',

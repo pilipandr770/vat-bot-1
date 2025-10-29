@@ -53,6 +53,14 @@ class Config:
     STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
     STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
     
+    # MailGuard OAuth Configuration
+    GMAIL_CLIENT_ID = os.environ.get('GMAIL_CLIENT_ID')
+    GMAIL_CLIENT_SECRET = os.environ.get('GMAIL_CLIENT_SECRET')
+    MS_CLIENT_ID = os.environ.get('MS_CLIENT_ID')
+    MS_CLIENT_SECRET = os.environ.get('MS_CLIENT_SECRET')
+    MS_TENANT_ID = os.environ.get('MS_TENANT_ID', 'common')
+    MAILGUARD_ENCRYPTION_KEY = os.environ.get('MAILGUARD_ENCRYPTION_KEY')
+    
     # Redis and Celery
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0'
     CELERY_BROKER_URL = REDIS_URL
