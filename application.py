@@ -418,6 +418,52 @@ def create_app(config_name=None):
         
         print("All API tests completed!")
     
+    # Security headers middleware
+    @app.after_request
+    def add_security_headers(response):
+        """Add comprehensive security headers to all responses."""
+        
+        # Content Security Policy - allow Bootstrap CDN and OAuth providers
+        csp_policy = (
+            "default-src 'self'; "
+            "script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; "
+            "style-src 'self' cdn.jsdelivr.net 'unsafe-inline'; "
+            "font-src 'self' cdn.jsdelivr.net data:; "
+            "img-src 'self' data: https:; "
+            "connect-src 'self' https://accounts.google.com https://login.microsoftonline.com; "
+            "frame-src 'self' https://accounts.google.com https://login.microsoftonline.com; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'; "
+            "frame-ancestors 'none'; "
+            "upgrade-insecure-requests"
+        )
+        response.headers['Content-Security-Policy'] = csp_policy
+        
+        # Prevent clickjacking attacks
+        response.headers['X-Frame-Options'] = 'DENY'
+        
+        # Prevent MIME type sniffing
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        
+        # Force HTTPS with HSTS (63072000 seconds = 2 years)
+        response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
+        
+        # Prevent sensitive data caching
+        if request.endpoint and any(x in request.endpoint for x in ['verify', 'crm', 'mailguard', 'admin']):
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, private'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        else:
+            response.headers['Cache-Control'] = 'public, max-age=3600'
+        
+        # Additional security headers
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+        
+        return response
+    
     return app
 
 # Create app instance for WSGI servers (Gunicorn, etc.)
