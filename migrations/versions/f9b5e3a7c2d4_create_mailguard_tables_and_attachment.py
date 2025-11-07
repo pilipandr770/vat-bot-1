@@ -17,6 +17,13 @@ depends_on = None
 
 
 def upgrade():
+    # Drop existing enum types if they exist (from failed migrations)
+    op.execute('DROP TYPE IF EXISTS vat_verification.provider_types CASCADE')
+    op.execute('DROP TYPE IF EXISTS vat_verification.action_types CASCADE')
+    op.execute('DROP TYPE IF EXISTS vat_verification.status_types CASCADE')
+    op.execute('DROP TYPE IF EXISTS vat_verification.suggested_by_types CASCADE')
+    op.execute('DROP TYPE IF EXISTS vat_verification.verdict_types CASCADE')
+    
     # Create mail_account table in vat_verification schema
     op.create_table('mail_account',
     sa.Column('id', sa.Integer(), nullable=False),
