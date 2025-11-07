@@ -21,6 +21,9 @@
                 <a class="btn btn-outline-light btn-sm ms-2" href="{{ url_for('mailguard.accounts') }}">
                     <i class="bi bi-envelope-at"></i> Konten
                 </a>
+                <a class="btn btn-outline-light btn-sm ms-2" href="{{ url_for('mailguard.messages') }}">
+                    <i class="bi bi-inbox"></i> Posteingang
+                </a>
                 <a class="btn btn-outline-light btn-sm ms-2" href="{{ url_for('mailguard.rules') }}">
                     <i class="bi bi-funnel"></i> Regeln
                 </a>
@@ -146,12 +149,23 @@
                                         {% for message in recent_messages %}
                                         <tr>
                                             <td>{{ message.from_email }}</td>
-                                            <td>{{ message.subject[:50] }}{% if message.subject|length > 50 %}...{% endif %}</td>
+                                            <td>
+                                                <a href="{{ url_for('mailguard.message_detail', message_id=message.id) }}" class="text-decoration-none">
+                                                    {{ message.subject[:50] if message.subject else '(без темы)' }}{% if message.subject and message.subject|length > 50 %}...{% endif %}
+                                                </a>
+                                            </td>
                                             <td>{{ message.received_at.strftime('%d.%m.%Y %H:%M') }}</td>
                                             <td>
-                                                <span class="badge bg-{{ {'new': 'primary', 'scanned': 'info', 'drafted': 'warning', 'sent': 'success', 'quarantined': 'danger', 'skipped': 'secondary'}[message.status] }}">
-                                                    {{ {'new': 'Neu', 'scanned': 'Gescannt', 'drafted': 'Entwurf', 'sent': 'Gesendet', 'quarantined': 'Quarantäne', 'skipped': 'Übersprungen'}[message.status] }}
-                                                </span>
+                                                {% set status_map = {
+                                                    'new': ('primary', 'Neu'),
+                                                    'scanned': ('info', 'Gescannt'),
+                                                    'drafted': ('warning', 'Entwurf'),
+                                                    'sent': ('success', 'Gesendet'),
+                                                    'quarantined': ('danger', 'Quarantäne'),
+                                                    'skipped': ('secondary', 'Übersprungen')
+                                                } %}
+                                                {% set status_badge = status_map.get(message.status or 'new', ('secondary', message.status or 'Unbekannt')) %}
+                                                <span class="badge bg-{{ status_badge[0] }}">{{ status_badge[1] }}</span>
                                             </td>
                                             <td>
                                                 {% if message.risk_score %}

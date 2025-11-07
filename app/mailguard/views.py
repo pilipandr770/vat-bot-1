@@ -58,6 +58,53 @@ def dashboard():
                          recent_messages=recent_messages,
                          stats=stats)
 
+
+    @mailguard_bp.route('/messages')
+    @login_required
+    def messages():
+        """Просмотр входящих сообщений"""
+        page = request.args.get('page', 1, type=int)
+
+        message_query = MailMessage.query.join(MailAccount).filter(
+            MailAccount.user_id == current_user.id
+        ).order_by(MailMessage.received_at.desc())
+
+        pagination = message_query.paginate(page=page, per_page=15, error_out=False)
+
+        return render_template(
+            'mailguard/messages.html',
+            pagination=pagination,
+            messages=pagination.items
+        )
+
+
+    @mailguard_bp.route('/messages/<int:message_id>')
+    @login_required
+    def message_detail(message_id):
+        """Подробности сообщения"""
+        message = MailMessage.query.join(MailAccount).filter(
+            MailAccount.user_id == current_user.id,
+            MailMessage.id == message_id
+        ).first_or_404()
+
+        drafts = MailDraft.query.filter_by(message_id=message.id).order_by(
+            MailDraft.created_at.desc()
+        ).all()
+
+        reports = ScanReport.query.filter_by(message_id=message.id).order_by(
+            ScanReport.created_at.desc()
+        ).all()
+
+        attachments = message.get_attachments()
+
+        return render_template(
+            'mailguard/message_detail.html',
+            message=message,
+            attachments=attachments,
+            drafts=drafts,
+            reports=reports
+        )
+
 @mailguard_bp.route('/accounts')
 @login_required
 def accounts():
@@ -229,7 +276,10 @@ def gmail_callback():
             existing.expires_at = datetime.utcnow() + timedelta(seconds=tokens.get('expires_in', 3600))
             existing.is_active = True
             db.session.commit()
+            synced = sync_gmail_account(existing)
             flash(f'Gmail аккаунт {email} успешно переподключен!', 'success')
+            if synced:
+                flash(f'Получено новых писем: {synced}', 'success')
         else:
             # Создаем новый аккаунт
             account = MailAccount(
@@ -243,7 +293,10 @@ def gmail_callback():
             )
             db.session.add(account)
             db.session.commit()
+            synced = sync_gmail_account(account)
             flash(f'Gmail аккаунт {email} успешно подключен!', 'success')
+            if synced:
+                flash(f'Получено новых писем: {synced}', 'success')
 
     except Exception as e:
         current_app.logger.error(f"Gmail callback error: {e}")
