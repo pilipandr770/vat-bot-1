@@ -24,6 +24,7 @@ class MailAccount(db.Model):
     login = db.Column(db.String(255), nullable=True)  # Для IMAP
     password = db.Column(db.Text, nullable=True)  # Зашифрованный, для IMAP
     settings_json = db.Column(db.Text, default='{}')  # JSON с настройками
+    reply_instructions = db.Column(db.Text, nullable=True)
     last_sync_at = db.Column(db.DateTime, nullable=True)
     last_history_id = db.Column(db.String(255), nullable=True)
     is_active = db.Column(db.Boolean, default=True)

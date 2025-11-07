@@ -30,6 +30,7 @@ class Config:
     OPENCORPORATES_API_KEY = os.environ.get('OPENCORPORATES_API_KEY')
     SANCTIONS_API_KEY = os.environ.get('SANCTIONS_API_KEY')
     VIRUSTOTAL_API_KEY = os.environ.get('VIRUSTOTAL_API_KEY')
+    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
     
     # Flask-Mail Configuration
     MAIL_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')

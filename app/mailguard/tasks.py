@@ -136,7 +136,7 @@ def process_incoming_email(account_id, message_data):
 
         # Создаем черновик ответа
         if action in ['auto_reply', 'draft']:
-            draft = create_reply_draft(message, counterparty, normalized_msg, matched_rule)
+            draft = create_reply_draft(message, counterparty, normalized_msg, matched_rule, account)
 
             if action == 'auto_reply' and not requires_human:
                 # Автоматическая отправка
@@ -214,7 +214,7 @@ def find_or_create_counterparty(email):
 
     return counterparty
 
-def create_reply_draft(message, counterparty, message_data, matched_rule):
+def create_reply_draft(message, counterparty, message_data, matched_rule, account=None):
     """Создать черновик ответа"""
     from .models import MailDraft
     from .nlp_reply import build_reply, get_counterparty_profile
@@ -225,8 +225,15 @@ def create_reply_draft(message, counterparty, message_data, matched_rule):
     # Получаем историю переписки
     thread_history = []  # TODO: Реализовать
 
+    assistant_profile = None
+    account = account or getattr(message, 'account', None)
+    if account and account.reply_instructions:
+        assistant_profile = {
+            'instructions': account.reply_instructions
+        }
+
     # Генерируем ответ
-    reply = build_reply(profile, thread_history, message_data)
+    reply = build_reply(profile, thread_history, message_data, assistant_profile=assistant_profile)
 
     # Создаем черновик
     draft = MailDraft(

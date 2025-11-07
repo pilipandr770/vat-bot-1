@@ -512,3 +512,23 @@ def delete_account(account_id):
         flash('Ошибка удаления аккаунта', 'error')
     
     return redirect(url_for('mailguard.accounts'))
+
+
+@mailguard_bp.route('/accounts/<int:account_id>/instructions', methods=['POST'])
+@login_required
+def update_account_instructions(account_id):
+    """Обновить инструкции для генерации ответов"""
+    account = MailAccount.query.filter_by(id=account_id, user_id=current_user.id).first_or_404()
+
+    try:
+        instructions = (request.form.get('instructions') or '').strip()
+        account.reply_instructions = instructions or None
+        db.session.commit()
+
+        flash('Инструкции для AI-ответов обновлены', 'success')
+    except Exception as e:
+        current_app.logger.error(f"Instruction update error: {e}")
+        db.session.rollback()
+        flash('Не удалось сохранить инструкции', 'error')
+
+    return redirect(url_for('mailguard.accounts'))

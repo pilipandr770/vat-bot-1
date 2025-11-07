@@ -133,6 +133,15 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
+                                        <button type="button"
+                                                class="btn btn-outline-info"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#instructions-{{ account.id }}"
+                                                aria-expanded="false"
+                                                aria-controls="instructions-{{ account.id }}"
+                                                title="KI-Instruktionen">
+                                            <i class="bi bi-sliders"></i>
+                                        </button>
                                         <a href="{{ url_for('mailguard.sync_account', account_id=account.id) }}" 
                                            class="btn btn-outline-primary"
                                            title="Синхронизировать сейчас">
@@ -149,6 +158,35 @@
                                            title="Удалить">
                                             <i class="bi bi-trash"></i>
                                         </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" class="p-0">
+                                    <div class="collapse" id="instructions-{{ account.id }}">
+                                        <div class="bg-light p-3 border-top">
+                                            <form method="POST" action="{{ url_for('mailguard.update_account_instructions', account_id=account.id) }}">
+                                                <div class="mb-2">
+                                                    <label for="instructions-{{ account.id }}-textarea" class="form-label fw-semibold">
+                                                        Individuelle Antwortanweisungen
+                                                    </label>
+                                                    <textarea class="form-control"
+                                                              id="instructions-{{ account.id }}-textarea"
+                                                              name="instructions"
+                                                              rows="4"
+                                                              placeholder="Beschreiben Sie auf Deutsch, wie der Assistent antworten soll (Ton, Pflichtinfos, Signatur)...">{{ account.reply_instructions or '' }}</textarea>
+                                                    <div class="form-text">
+                                                        Diese Hinweise werden bei jeder KI-Antwort berücksichtigt. Leer lassen, um die Standardlogik zu verwenden.
+                                                    </div>
+                                                </div>
+                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-save"></i> Speichern
+                                                </button>
+                                                {% if account.reply_instructions %}
+                                                    <span class="text-muted ms-2">Zuletzt aktualisiert: {{ account.updated_at.strftime('%d.%m.%Y %H:%M') if account.updated_at else '' }}</span>
+                                                {% endif %}
+                                            </form>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
