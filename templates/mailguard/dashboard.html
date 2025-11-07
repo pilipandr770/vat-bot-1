@@ -217,18 +217,34 @@
                         </thead>
                         <tbody>
                             {% for draft in pending_drafts %}
+                            {% set preview_source = draft.body_text or (draft.body_html | striptags if draft.body_html else '') %}
                             <tr>
-                                <td>{{ draft.message.sender_email }}</td>
+                                <td>{{ draft.message.from_email }}</td>
                                 <td>{{ draft.message.subject }}</td>
-                                <td>{{ draft.body[:100] }}...</td>
+                                <td>
+                                    {% if preview_source %}
+                                        {{ preview_source[:120] }}{% if preview_source|length > 120 %}…{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">–</span>
+                                    {% endif %}
+                                </td>
                                 <td>{{ draft.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                 <td>
-                                    <a href="{{ url_for('mailguard.approve', draft_id=draft.id) }}" class="btn btn-sm btn-success">
-                                        <i class="fas fa-check"></i> Approve
-                                    </a>
-                                    <button class="btn btn-sm btn-danger" onclick="rejectDraft({{ draft.id }})">
-                                        <i class="fas fa-times"></i> Reject
-                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ url_for('mailguard.message_detail', message_id=draft.message_id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <form method="POST" action="{{ url_for('mailguard.approve_and_send', draft_id=draft.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('mailguard.reject_draft', draft_id=draft.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
