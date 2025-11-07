@@ -5,7 +5,10 @@ All text in German (Deutsche).
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.urls import url_parse
+try:
+    from werkzeug.urls import url_parse
+except ImportError:
+    from urllib.parse import urlparse as url_parse
 from datetime import datetime
 from auth.models import User, Subscription
 from auth.forms import (RegistrationForm, LoginForm, PasswordResetRequestForm, 

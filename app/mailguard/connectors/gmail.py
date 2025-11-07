@@ -172,7 +172,10 @@ def extract_message_content(payload):
     return text_content, html_content
 
 def extract_attachments(service, message):
-    """Извлечь вложения из сообщения"""
+    """Извлечь вложения из сообщения + СКАНИРОВАТЬ на безопасность"""
+    from ..attachment_scanner import AttachmentScanner
+    
+    scanner = AttachmentScanner()
     attachments = []
 
     def extract_from_parts(parts):
@@ -181,8 +184,9 @@ def extract_attachments(service, message):
                 attachment_id = part['body']['attachmentId']
                 filename = part['filename']
                 mime_type = part.get('mimeType', '')
+                size = part.get('body', {}).get('size', 0)
 
-                # Скачиваем вложение
+                # Скачиваем вложение В ПАМЯТЬ (base64)
                 try:
                     attachment = service.users().messages().attachments().get(
                         userId='me',
@@ -190,15 +194,47 @@ def extract_attachments(service, message):
                         id=attachment_id
                     ).execute()
 
-                    data = attachment['data']
+                    data_b64 = attachment['data']
+                    
+                    # 🛡️ СКАНИРУЕМ НА СЕРВЕРЕ (ДО того как пользователь скачает!)
+                    current_app.logger.info(f"Scanning attachment: {filename}")
+                    scan_result = scanner.scan_gmail_attachment(
+                        attachment_data_b64=data_b64,
+                        filename=filename,
+                        mime_type=mime_type,
+                        size=size
+                    )
+                    
+                    current_app.logger.info(
+                        f"Scan complete for {filename}: "
+                        f"risk_level={scan_result['risk_level']}, "
+                        f"is_safe={scan_result.get('is_safe')}"
+                    )
+                    
                     attachments.append({
                         'filename': filename,
                         'content_type': mime_type,
-                        'data': data  # base64
+                        'size': size,
+                        'data': data_b64,  # Сохраняем base64 для дальнейшей загрузки
+                        'scan_result': scan_result,  # ← НОВОЕ! Результаты сканирования
+                        'is_safe': scan_result.get('is_safe'),
+                        'risk_level': scan_result.get('risk_level'),
+                        'sha256': scan_result.get('sha256'),
+                        'threats': scan_result.get('threats', [])
                     })
 
                 except Exception as e:
-                    current_app.logger.error(f"Error downloading attachment {filename}: {e}")
+                    current_app.logger.error(f"Error processing attachment {filename}: {e}", exc_info=True)
+                    # Добавляем вложение с ошибкой сканирования
+                    attachments.append({
+                        'filename': filename,
+                        'content_type': mime_type,
+                        'size': size,
+                        'scan_result': {'error': str(e)},
+                        'is_safe': False,
+                        'risk_level': 'warning',
+                        'threats': ['Ошибка сканирования']
+                    })
 
             elif 'parts' in part:
                 extract_from_parts(part['parts'])

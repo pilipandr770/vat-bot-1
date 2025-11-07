@@ -94,6 +94,14 @@ class MailMessage(db.Model):
     status = db.Column(Enum('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types'), default='new')
     labels = db.Column(db.String(500), nullable=True)  # JSON с метками
     meta_json = db.Column(db.Text, default='{}')  # Дополнительные метаданные
+    
+    # Attachment security fields
+    attachments_json = db.Column(db.Text, default='[]')  # JSON array с вложениями + scan results
+    has_attachments = db.Column(db.Boolean, default=False)
+    has_dangerous_attachments = db.Column(db.Boolean, default=False)
+    is_quarantined = db.Column(db.Boolean, default=False)
+    quarantine_reason = db.Column(db.String(500), nullable=True)
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Связи
@@ -105,6 +113,27 @@ class MailMessage(db.Model):
 
     def set_meta(self, meta):
         self.meta_json = json.dumps(meta)
+    
+    def get_attachments(self):
+        """Получить список вложений с результатами сканирования"""
+        return json.loads(self.attachments_json) if self.attachments_json else []
+    
+    def set_attachments(self, attachments):
+        """Сохранить вложения с результатами сканирования"""
+        self.attachments_json = json.dumps(attachments)
+        self.has_attachments = len(attachments) > 0
+        
+        # Проверяем наличие опасных вложений
+        self.has_dangerous_attachments = any(
+            att.get('risk_level') == 'danger' for att in attachments
+        )
+        
+        # Автоматически помещаем в карантин если есть опасные вложения
+        if self.has_dangerous_attachments:
+            self.is_quarantined = True
+            dangerous_files = [att['filename'] for att in attachments if att.get('risk_level') == 'danger']
+            self.quarantine_reason = f"Опасные вложения: {', '.join(dangerous_files)}"
+            self.status = 'quarantined'
 
 class MailDraft(db.Model):
     """Черновики ответов"""
