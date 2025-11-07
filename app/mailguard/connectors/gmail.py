@@ -6,6 +6,7 @@ from flask import current_app
 import base64
 import json
 from email.mime.text import MIMEText
+from email.utils import parseaddr
 from datetime import datetime
 
 from ..oauth import decrypt_token
@@ -122,10 +123,16 @@ def get_message_details(service, message_id):
         # Извлекаем вложения
         attachments = extract_attachments(service, message)
 
+        from_header = headers.get('from', '')
+        _, parsed_from = parseaddr(from_header)
+        from_email = parsed_from or from_header
+
+        history_id = message.get('historyId')
+
         return {
             'id': message_id,
             'thread_id': message.get('threadId'),
-            'from_email': headers.get('from', ''),
+            'from_email': from_email,
             'subject': headers.get('subject', ''),
             'text': text_content,
             'html': html_content,
@@ -133,8 +140,11 @@ def get_message_details(service, message_id):
             'attachments': attachments,
             'meta': {
                 'labels': message.get('labelIds', []),
-                'size': message.get('sizeEstimate', 0)
-            }
+                'size': message.get('sizeEstimate', 0),
+                'history_id': history_id,
+                'snippet': message.get('snippet')
+            },
+            'history_id': history_id
         }
 
     except Exception as e:

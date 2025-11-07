@@ -1,7 +1,5 @@
 from flask import current_app
-import time
-from datetime import datetime
-import json
+from datetime import datetime, timedelta
 
 # Для простоты используем APScheduler вместо RQ/Redis
 # В продакшене лучше использовать RQ + Redis или Celery
@@ -11,7 +9,7 @@ def process_incoming_email(account_id, message_data):
     Обработать входящее сообщение
     Эта функция вызывается из webhook или polling
     """
-    from .models import db, MailAccount, MailMessage, KnownCounterparty
+    from .models import db, MailAccount, MailMessage, KnownCounterparty, ScanReport
     from .rules import apply_rules
     from .scanner_client import scan_message
     from .nlp_reply import build_reply, get_counterparty_profile
@@ -27,48 +25,99 @@ def process_incoming_email(account_id, message_data):
 
         # Нормализуем данные сообщения
         normalized_msg = normalize_message(message_data)
+        provider_msg_id = normalized_msg.get('provider_msg_id')
+
+        if not provider_msg_id:
+            current_app.logger.warning("Skipping message without provider_msg_id")
+            return
 
         # Проверяем, не обрабатывали ли уже это сообщение
         existing = MailMessage.query.filter_by(
-            provider_msg_id=normalized_msg['provider_msg_id']
+            provider_msg_id=provider_msg_id
         ).first()
         if existing:
-            current_app.logger.info(f"Message {normalized_msg['provider_msg_id']} already processed")
+            current_app.logger.info(f"Message {provider_msg_id} already processed")
             return
 
         # Определяем контрагента
-        counterparty = find_or_create_counterparty(normalized_msg['from_email'])
+        counterparty = find_or_create_counterparty(normalized_msg.get('from_email'))
+
+        # Подготавливаем вложения
+        attachments_with_data = normalized_msg.get('attachments', []) or []
+        sanitized_attachments = sanitize_attachments_for_storage(attachments_with_data)
 
         # Создаем запись сообщения
         message = MailMessage(
-            provider_msg_id=normalized_msg['provider_msg_id'],
+            provider_msg_id=provider_msg_id,
             thread_id=normalized_msg.get('thread_id'),
             account_id=account.id,
             counterparty_id=counterparty.id if counterparty else None,
-            from_email=normalized_msg['from_email'],
-            subject=normalized_msg['subject'],
+            from_email=normalized_msg.get('from_email', ''),
+            subject=normalized_msg.get('subject', ''),
+            body_text=normalized_msg.get('text'),
+            body_html=normalized_msg.get('html'),
             received_at=normalized_msg['received_at'],
             status='new'
         )
         message.set_meta(normalized_msg.get('meta', {}))
-        db.session.add(message)
-        db.session.commit()
+        message.set_attachments(sanitized_attachments)
 
-        # Сканируем на угрозы
+        db.session.add(message)
+        db.session.flush()
+
+        # Проверяем результаты сканирования вложений
+        if message.has_dangerous_attachments or message.is_quarantined:
+            message.status = 'quarantined'
+            message.risk_score = 100
+
+            report = ScanReport(
+                message_id=message.id,
+                verdict='malicious',
+                score=100
+            )
+            report.set_details({
+                'source': 'attachment_scanner',
+                'reason': message.quarantine_reason,
+                'attachments': sanitized_attachments
+            })
+            db.session.add(report)
+            db.session.commit()
+
+            current_app.logger.warning(
+                f"Message {provider_msg_id} quarantined due to dangerous attachments"
+            )
+            return
+
+        # Сканируем на угрозы (контент и ссылки)
         scan_result = scan_message(normalized_msg)
-        message.risk_score = scan_result['score']
+        verdict = scan_result.get('verdict', 'error')
+        score = scan_result.get('score', 0)
+
+        # Усиливаем балл риска если вложения помечены как warning
+        if any(att.get('risk_level') == 'warning' for att in sanitized_attachments):
+            score = max(score, 60)
+
+        message.risk_score = score
         message.status = 'scanned'
 
-        # Сохраняем отчёт сканирования
-        from .models import ScanReport
+        report_verdict = verdict if verdict in ['safe', 'suspicious', 'malicious'] else 'suspicious'
         report = ScanReport(
             message_id=message.id,
-            verdict=scan_result['verdict'],
-            score=scan_result['score']
+            verdict=report_verdict,
+            score=score
         )
-        report.set_details(scan_result['details'])
+        report_details = scan_result.get('details') or {}
+        report_details['attachments'] = sanitized_attachments
+        report.set_details(report_details)
         db.session.add(report)
-        db.session.commit()
+
+        if verdict == 'malicious':
+            message.status = 'quarantined'
+            db.session.commit()
+            current_app.logger.warning(
+                f"Message {provider_msg_id} quarantined after content scan"
+            )
+            return
 
         # Применяем правила
         action, requires_human, matched_rule = apply_rules(normalized_msg)
@@ -93,33 +142,56 @@ def process_incoming_email(account_id, message_data):
                 draft.sent_at = datetime.utcnow()
                 message.status = 'sent'
                 # TODO: Реализовать отправку
-                current_app.logger.info(f"Auto-reply sent for message {message.id}")
+                current_app.logger.info(f"Auto-reply queued for message {message.id}")
             else:
                 message.status = 'drafted'
 
-            db.session.commit()
+        db.session.commit()
 
     except Exception as e:
-        current_app.logger.error(f"Error processing incoming email: {e}")
+        current_app.logger.error(f"Error processing incoming email: {e}", exc_info=True)
         db.session.rollback()
 
 def normalize_message(raw_message):
     """Нормализовать данные сообщения"""
+    received_at = raw_message.get('received_at')
+
+    if isinstance(received_at, str):
+        try:
+            received_at = datetime.fromisoformat(received_at.replace('Z', '+00:00'))
+        except ValueError:
+            received_at = datetime.utcnow()
+    elif not isinstance(received_at, datetime):
+        received_at = datetime.utcnow()
+
+    from_email = raw_message.get('from', {}).get('email')
+    if not from_email:
+        from_email = raw_message.get('from_email', '')
+
+    meta = raw_message.get('meta', {}) or {}
+    history_id = raw_message.get('history_id')
+    if history_id and 'history_id' not in meta:
+        meta['history_id'] = history_id
+
     return {
         'provider_msg_id': raw_message.get('id', raw_message.get('message_id')),
         'thread_id': raw_message.get('thread_id'),
-        'from_email': raw_message.get('from', {}).get('email', raw_message.get('from_email', '')),
+        'from_email': from_email,
         'subject': raw_message.get('subject', ''),
         'text': raw_message.get('text', ''),
         'html': raw_message.get('html', ''),
-        'received_at': raw_message.get('received_at', datetime.utcnow()),
+        'received_at': received_at,
         'attachments': raw_message.get('attachments', []),
-        'meta': raw_message.get('meta', {})
+        'meta': meta,
+        'history_id': history_id
     }
 
 def find_or_create_counterparty(email):
     """Найти или создать контрагента"""
     from .models import KnownCounterparty
+
+    if not email:
+        return None
 
     # Извлекаем домен
     domain = email.split('@')[-1] if '@' in email else ''
@@ -168,29 +240,100 @@ def create_reply_draft(message, counterparty, message_data, matched_rule):
     db.session.add(draft)
     return draft
 
+def sanitize_attachments_for_storage(attachments):
+    """Удалить бинарные данные из вложений перед сохранением в БД"""
+    sanitized = []
+    for attachment in attachments:
+        if not isinstance(attachment, dict):
+            continue
+        sanitized.append({k: v for k, v in attachment.items() if k != 'data'})
+    return sanitized
+
+def sync_imap_account(account):
+    """Синхронизировать отдельный IMAP аккаунт"""
+    from .models import db
+    from .connectors.imap import fetch_new_imap
+
+    try:
+        current_app.logger.info(f"Polling IMAP for account {account.email}")
+        new_messages = fetch_new_imap(account)
+
+        processed = 0
+        for msg_data in new_messages:
+            process_incoming_email(account.id, msg_data)
+            processed += 1
+
+        account.last_sync_at = datetime.utcnow()
+        db.session.commit()
+        return processed
+
+    except Exception as e:
+        current_app.logger.error(f"Error polling IMAP for {account.email}: {e}")
+        db.session.rollback()
+        return 0
+
+def sync_gmail_account(account):
+    """Синхронизировать отдельный Gmail аккаунт"""
+    from .models import db
+    from .connectors.gmail import list_new_messages
+
+    history_id = account.last_history_id
+    current_app.logger.info(
+        f"Polling Gmail for {account.email} (history_id={history_id})"
+    )
+
+    try:
+        new_messages = list_new_messages(account, history_id=history_id)
+
+        latest_history = history_id
+        processed = 0
+        for msg_data in new_messages:
+            process_incoming_email(account.id, msg_data)
+            processed += 1
+            msg_history_id = (
+                msg_data.get('history_id')
+                or (msg_data.get('meta') or {}).get('history_id')
+            )
+            if msg_history_id:
+                latest_history = msg_history_id
+
+        if latest_history:
+            account.last_history_id = str(latest_history)
+
+        account.last_sync_at = datetime.utcnow()
+        db.session.commit()
+        return processed
+
+    except Exception as e:
+        current_app.logger.error(
+            f"Error polling Gmail for {account.email}: {e}",
+            exc_info=True
+        )
+        db.session.rollback()
+        return 0
+
 def poll_imap_accounts():
     """Опрос IMAP аккаунтов на новые сообщения"""
     from .models import MailAccount
-    from .connectors.imap import fetch_new_imap
 
     accounts = MailAccount.query.filter_by(provider='imap', is_active=True).all()
 
     for account in accounts:
-        try:
-            current_app.logger.info(f"Polling IMAP for account {account.email}")
-            new_messages = fetch_new_imap(account)
+        sync_imap_account(account)
 
-            for msg_data in new_messages:
-                process_incoming_email(account.id, msg_data)
+def poll_gmail_accounts():
+    """Опрос Gmail аккаунтов на новые сообщения"""
+    from .models import MailAccount
 
-        except Exception as e:
-            current_app.logger.error(f"Error polling IMAP for {account.email}: {e}")
+    accounts = MailAccount.query.filter_by(provider='gmail', is_active=True).all()
+
+    for account in accounts:
+        sync_gmail_account(account)
 
 def check_expired_tokens():
     """Проверить и обновить истёкшие токены"""
     from .models import MailAccount
     from .oauth import refresh_gmail_token, refresh_ms_token, decrypt_token, encrypt_token
-    from datetime import datetime
 
     accounts = MailAccount.query.filter(
         MailAccount.expires_at < datetime.utcnow(),
@@ -226,9 +369,23 @@ def setup_scheduler(app):
 
     scheduler = BackgroundScheduler()
 
+    def job_wrapper(func):
+        def wrapped():
+            with app.app_context():
+                func()
+        return wrapped
+
+    # Опрос Gmail чаще, чтобы черновики появлялись почти сразу
+    scheduler.add_job(
+        func=job_wrapper(poll_gmail_accounts),
+        trigger="interval",
+        minutes=2,
+        id='poll_gmail'
+    )
+
     # Опрос IMAP каждые 5 минут
     scheduler.add_job(
-        func=lambda: app.app_context().push() or poll_imap_accounts(),
+        func=job_wrapper(poll_imap_accounts),
         trigger="interval",
         minutes=5,
         id='poll_imap'
@@ -236,7 +393,7 @@ def setup_scheduler(app):
 
     # Проверка токенов каждый час
     scheduler.add_job(
-        func=lambda: app.app_context().push() or check_expired_tokens(),
+        func=job_wrapper(check_expired_tokens),
         trigger="interval",
         hours=1,
         id='check_tokens'

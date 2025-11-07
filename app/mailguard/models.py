@@ -24,6 +24,8 @@ class MailAccount(db.Model):
     login = db.Column(db.String(255), nullable=True)  # Для IMAP
     password = db.Column(db.Text, nullable=True)  # Зашифрованный, для IMAP
     settings_json = db.Column(db.Text, default='{}')  # JSON с настройками
+    last_sync_at = db.Column(db.DateTime, nullable=True)
+    last_history_id = db.Column(db.String(255), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -105,6 +107,8 @@ class MailMessage(db.Model):
     counterparty_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.known_counterparty.id'), nullable=True)
     from_email = db.Column(db.String(255), nullable=False)
     subject = db.Column(db.String(500), nullable=False)
+    body_text = db.Column(db.Text, nullable=True)
+    body_html = db.Column(db.Text, nullable=True)
     received_at = db.Column(db.DateTime, nullable=False)
     risk_score = db.Column(db.Integer, default=0)  # 0-100
     status = db.Column(Enum('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types', schema=SCHEMA), default='new')

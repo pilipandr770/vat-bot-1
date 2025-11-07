@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 from . import mailguard_bp
 from .models import db, MailAccount, KnownCounterparty, MailRule, MailMessage, MailDraft, ScanReport
+from .tasks import sync_gmail_account, sync_imap_account
 from .oauth import (
     get_gmail_auth_url, exchange_gmail_code, 
     get_ms_auth_url, exchange_ms_code,
@@ -403,10 +404,20 @@ def sync_account(account_id):
     account = MailAccount.query.filter_by(id=account_id, user_id=current_user.id).first_or_404()
     
     try:
-        # TODO: Trigger manual sync через background task
-        account.last_sync_at = datetime.utcnow()
-        db.session.commit()
-        flash(f'Синхронизация {account.email} запущена', 'success')
+        processed = 0
+
+        if account.provider == 'gmail':
+            processed = sync_gmail_account(account)
+        elif account.provider == 'imap':
+            processed = sync_imap_account(account)
+        else:
+            flash('Провайдер не поддерживает ручную синхронизацию', 'warning')
+            return redirect(url_for('mailguard.accounts'))
+
+        flash(
+            f'Синхронизация {account.email} завершена. Новых писем: {processed}',
+            'success'
+        )
     except Exception as e:
         current_app.logger.error(f"Sync error: {e}")
         flash('Ошибка синхронизации', 'error')

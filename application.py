@@ -76,6 +76,7 @@ def create_app(config_name=None):
     # Initialize monitoring services
     from services.alerts import init_alert_service
     from services.scheduler import init_scheduler
+    from app.mailguard.tasks import setup_scheduler as setup_mailguard_scheduler
     
     # Init alert service with mail
     init_alert_service(mail)
@@ -83,6 +84,7 @@ def create_app(config_name=None):
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         init_scheduler()
+        app.mailguard_scheduler = setup_mailguard_scheduler(app)
     
     # Mailguard models use the same db instance
     
