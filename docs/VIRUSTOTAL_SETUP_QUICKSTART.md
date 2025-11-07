@@ -69,44 +69,73 @@ flask db current
 
 **Ожидаемый вывод:**
 ```
-e8a4b92c5d11 (head)
+f9b5e3a7c2d4 (head)
 ```
 
-Проверьте что новые поля созданы:
+Проверьте что новые таблицы созданы:
 ```bash
-psql $DATABASE_URL -c "\d mail_messages" | grep attachments
+psql $DATABASE_URL -c "\dt vat_verification.*" | grep mail
 ```
 
 **Ожидаемый вывод:**
 ```
-attachments_json        | text
-has_attachments         | boolean
-has_dangerous_attachments | boolean
-is_quarantined         | boolean
-quarantine_reason      | character varying(500)
+ vat_verification | mail_account       | table | ...
+ vat_verification | mail_draft         | table | ...
+ vat_verification | mail_message       | table | ...
+ vat_verification | mail_rule          | table | ...
+ vat_verification | known_counterparty | table | ...
+ vat_verification | scan_report        | table | ...
+```
+
+Проверьте attachment scanning поля:
+```bash
+psql $DATABASE_URL -c "\d vat_verification.mail_message" | grep -E "(attachments|quarantine)"
+```
+
+**Ожидаемый вывод:**
+```
+ attachments_json          | text
+ has_attachments           | boolean
+ has_dangerous_attachments | boolean
+ is_quarantined           | boolean
+ quarantine_reason        | character varying(500)
 ```
 
 ---
 
 ### Тест 2: Проверка VirusTotal API
 
-В Render Shell:
+В Render Shell выполните пошагово:
 
-```python
+```bash
+# 1. Запустить Python в контексте приложения
 python
->>> from app.mailguard.attachment_scanner import AttachmentScanner
->>> from flask import current_app
->>> with app.app_context():
-...     scanner = AttachmentScanner()
-...     print(f"API Key configured: {bool(scanner.vt_api_key)}")
-...     print(f"API Key: {scanner.vt_api_key[:10]}...")
+
+# 2. Внутри Python REPL выполните:
+from wsgi import app
+from app.mailguard.attachment_scanner import AttachmentScanner
+from flask import current_app
+
+# 3. Создать app context и проверить API ключ
+with app.app_context():
+    scanner = AttachmentScanner()
+    print(f"API Key configured: {bool(scanner.vt_api_key)}")
+    if scanner.vt_api_key:
+        print(f"API Key preview: {scanner.vt_api_key[:10]}...")
+    else:
+        print("ERROR: API Key not found!")
 ```
 
 **Ожидаемый вывод:**
 ```
 API Key configured: True
-API Key: a1b2c3d4e5...
+API Key preview: 7977663b17...
 ```
+
+**Если видите `API Key configured: False`:**
+- Проверьте Environment Variables в Render Dashboard
+- Убедитесь что `VIRUSTOTAL_API_KEY` добавлен
+- Перезапустите сервис (Manual Deploy)
 
 ---
 
@@ -210,13 +239,25 @@ echo $VIRUSTOTAL_API_KEY
 **Проверка:**
 ```bash
 flask db current
-# Должно показать: e8a4b92c5d11
+# Должно показать: f9b5e3a7c2d4 (head)
 ```
 
-**Если нет:**
+**Если показывает старую версию (af13f0999271):**
 ```bash
 flask db upgrade
 ```
+
+**Если таблицы не созданы:**
+```bash
+# Проверить список таблиц в вашей схеме
+psql $DATABASE_URL -c "\dt vat_verification.*"
+
+# Если mail_account, mail_message отсутствуют:
+flask db upgrade head
+```
+
+**ВАЖНО:** Таблицы создаются в схеме `vat_verification`, НЕ в `public`!  
+Убедитесь что `DB_SCHEMA=vat_verification` установлен в Environment Variables.
 
 ---
 
