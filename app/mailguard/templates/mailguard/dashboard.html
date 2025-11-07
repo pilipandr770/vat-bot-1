@@ -100,6 +100,12 @@
                                         <small>{{ draft.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
                                     </div>
                                     <p class="mb-1">Von: {{ draft.message.from_email }}</p>
+                                    {% set preview_source = draft.body_text or (draft.body_html | striptags if draft.body_html else '') %}
+                                    {% if preview_source %}
+                                        <p class="text-muted small mb-2">
+                                            {{ preview_source[:160] }}{% if preview_source|length > 160 %}…{% endif %}
+                                        </p>
+                                    {% endif %}
                                     <small class="text-muted">
                                         Vorgeschlagen von: {{ draft.suggested_by }}
                                         {% if draft.message.risk_score %}
@@ -107,6 +113,9 @@
                                         {% endif %}
                                     </small>
                                     <div class="mt-2">
+                                        <a href="{{ url_for('mailguard.message_detail', message_id=draft.message_id) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-eye"></i> Nachricht
+                                        </a>
                                         <form method="POST" action="{{ url_for('mailguard.approve_and_send', draft_id=draft.id) }}" class="d-inline">
                                             <button type="submit" class="btn btn-success btn-sm">Senden</button>
                                         </form>
