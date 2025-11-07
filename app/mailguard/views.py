@@ -397,7 +397,7 @@ def add_imap_account():
 
     return redirect(url_for('mailguard.accounts'))
 
-@mailguard_bp.route('/accounts/<int:account_id>/sync', methods=['POST'])
+@mailguard_bp.route('/accounts/<int:account_id>/sync', methods=['POST', 'GET'])
 @login_required
 def sync_account(account_id):
     """Синхронизировать аккаунт вручную"""
@@ -424,7 +424,7 @@ def sync_account(account_id):
     
     return redirect(url_for('mailguard.accounts'))
 
-@mailguard_bp.route('/accounts/<int:account_id>/toggle', methods=['POST'])
+@mailguard_bp.route('/accounts/<int:account_id>/toggle', methods=['POST', 'GET'])
 @login_required
 def toggle_account(account_id):
     """Включить/выключить аккаунт"""
