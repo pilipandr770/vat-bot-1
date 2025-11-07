@@ -8,11 +8,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from crm.models import db
 import secrets
+import os
+
+# Определяем схему из переменной окружения
+SCHEMA = os.environ.get('DB_SCHEMA', 'public')
 
 
 class User(UserMixin, db.Model):
     """User model with authentication and subscription management."""
     __tablename__ = 'users'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)

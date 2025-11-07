@@ -7,6 +7,10 @@ import os
 # Определяем схему из переменной окружения
 SCHEMA = os.environ.get('DB_SCHEMA', 'public')
 
+# Импортируем User для правильной работы ForeignKey
+# Это необходимо, чтобы SQLAlchemy мог найти таблицу users в метаданных
+from auth.models import User
+
 class MailAccount(db.Model):
     """Почтовые аккаунты пользователей"""
     __tablename__ = 'mail_account'
