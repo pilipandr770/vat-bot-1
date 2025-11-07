@@ -1,15 +1,20 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import json
+import os
 
 db = SQLAlchemy()
+
+# Определяем схему из переменной окружения
+SCHEMA = os.environ.get('DB_SCHEMA', 'public')
 
 class Company(db.Model):
     """Requester company data (left column in UI)."""
     __tablename__ = 'companies'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=True, index=True)
     vat_number = db.Column(db.String(20), nullable=False, index=True)
     company_name = db.Column(db.String(255), nullable=False)
     legal_address = db.Column(db.Text, nullable=False)
@@ -26,9 +31,10 @@ class Company(db.Model):
 class Counterparty(db.Model):
     """Target verification company (middle column in UI)."""
     __tablename__ = 'counterparties'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=True, index=True)
     vat_number = db.Column(db.String(20), nullable=True, index=True)
     company_name = db.Column(db.String(255), nullable=False, index=True)
     address = db.Column(db.Text, nullable=True)
@@ -47,11 +53,12 @@ class Counterparty(db.Model):
 class VerificationCheck(db.Model):
     """Individual verification session."""
     __tablename__ = 'verification_checks'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
-    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
-    counterparty_id = db.Column(db.Integer, db.ForeignKey('counterparties.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=False, index=True)
+    company_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.companies.id'), nullable=False)
+    counterparty_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.counterparties.id'), nullable=False)
     check_date = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     overall_status = db.Column(db.String(20), nullable=False)  # valid, warning, error
     confidence_score = db.Column(db.Float, default=0.0)
@@ -74,9 +81,10 @@ class VerificationCheck(db.Model):
 class CheckResult(db.Model):
     """Results from each verification service."""
     __tablename__ = 'check_results'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    check_id = db.Column(db.Integer, db.ForeignKey('verification_checks.id'), nullable=False)
+    check_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.verification_checks.id'), nullable=False)
     service_name = db.Column(db.String(50), nullable=False, index=True)  # vies, handelsregister, sanctions, etc.
     status = db.Column(db.String(20), nullable=False)  # valid, warning, error
     confidence_score = db.Column(db.Float, default=0.0)
@@ -109,9 +117,10 @@ class CheckResult(db.Model):
 class Alert(db.Model):
     """Monitoring alerts for status changes."""
     __tablename__ = 'alerts'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    check_id = db.Column(db.Integer, db.ForeignKey('verification_checks.id'), nullable=False)
+    check_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.verification_checks.id'), nullable=False)
     alert_type = db.Column(db.String(50), nullable=False)  # sanctions_found, insolvency_started, vat_invalid, etc.
     message = db.Column(db.Text, nullable=False)
     severity = db.Column(db.String(20), nullable=False)  # low, medium, high, critical
