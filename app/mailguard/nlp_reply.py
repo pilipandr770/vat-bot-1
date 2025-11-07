@@ -68,22 +68,33 @@ def build_reply(counterparty_profile, thread_history, inbound_message, assistant
 
 def build_system_prompt(counterparty_profile, assistant_profile=None):
     """Создать системный промпт для OpenAI"""
-    tone = counterparty_profile.get('tone', 'профессиональный')
+    tone = counterparty_profile.get('tone', 'professionell')
     language = detect_language(counterparty_profile)
 
-    prompt = f"""Ты корпоративный ассистент. Держись стиля: {tone}.
-Отвечай на языке: {language}.
-Будь вежливым, конкретным и полезным.
-Если вопрос требует действий - предложи конкретные шаги.
-Если нужны дополнительные данные - вежливо запроси их.
-Избегай слишком длинных ответов."""
+    prompt_sections = [
+        "Du bist der offizielle E-Mail-Assistent der MailGuard-Plattform unseres Unternehmens und betreust die offizielle Geschäftskorrespondenz.",
+        "Deine Aufgabe ist es, für eingehende Geschäftsmails einen Entwurf zu erstellen, der die Inhalte des erhaltenen Schreibens aufgreift und alle bereitgestellten Richtlinien beachtet.",
+        "Der Entwurf bleibt ein Vorschlag und wird nicht automatisch versendet.",
+        "Arbeite stets auf Grundlage der folgenden Leitplanken:",
+        f"- Sprache: {language}",
+        f"- Ton: {tone} (sachlich, freundlich, präzise)",
+        "- Struktur: kurze Einleitung, klare Antworten auf die Anliegen, konkrete nächste Schritte, abschließender Gruß",
+        "- Falls Informationen fehlen, frage höflich nach den notwendigen Details",
+        "- Nutze Aufzählungen oder nummerierte Listen, wenn sie die Lesbarkeit verbessern",
+        "- Erfinde keine Fakten und nenne nur Inhalte, die aus dem E-Mail-Text oder den Richtlinien hervorgehen"
+    ]
 
-    if assistant_profile:
-        prompt += f"\n\nСпецифические инструкции: {assistant_profile.get('instructions', '')}"
-        if 'faq' in assistant_profile:
-            prompt += f"\n\nЧасто задаваемые вопросы:\n{assistant_profile['faq']}"
+    if assistant_profile and assistant_profile.get('instructions'):
+        prompt_sections.append(
+            "Zusätzliche benutzerdefinierte Richtlinie:\n" + assistant_profile['instructions']
+        )
 
-    return prompt
+    if assistant_profile and assistant_profile.get('faq'):
+        prompt_sections.append(
+            "Relevante FAQ-Auszüge:\n" + assistant_profile['faq']
+        )
+
+    return "\n\n".join(prompt_sections)
 
 def build_user_prompt(thread_history, inbound_message):
     """Создать пользовательский промпт"""
