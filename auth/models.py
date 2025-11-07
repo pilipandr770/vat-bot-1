@@ -133,9 +133,10 @@ class User(UserMixin, db.Model):
 class Subscription(db.Model):
     """User subscription model with plan management."""
     __tablename__ = 'subscriptions'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=False)
     
     # Subscription details
     plan = db.Column(db.String(50), nullable=False, index=True)  # free, pro, enterprise
@@ -243,10 +244,11 @@ class Subscription(db.Model):
 class Payment(db.Model):
     """Payment transaction history."""
     __tablename__ = 'payments'
+    __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    subscription_id = db.Column(db.Integer, db.ForeignKey('subscriptions.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=False)
+    subscription_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.subscriptions.id'))
     
     # Stripe details
     stripe_payment_intent_id = db.Column(db.String(100), unique=True)
