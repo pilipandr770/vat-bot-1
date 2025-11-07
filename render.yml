@@ -9,6 +9,8 @@ services:
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
+      flask db upgrade
+    preDeployCommand: flask db upgrade
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: FLASK_ENV
@@ -45,6 +47,8 @@ services:
       - key: OPENCORPORATES_API_KEY
         sync: false
       - key: SANCTIONS_API_KEY
+        sync: false
+      - key: VIRUSTOTAL_API_KEY
         sync: false
       # OpenAI Agents SDK (set manually)
       - key: OPENAI_API_KEY
