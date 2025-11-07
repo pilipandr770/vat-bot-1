@@ -1,6 +1,8 @@
 from flask import current_app
 from datetime import datetime, timedelta
 
+from .models import db
+
 # Для простоты используем APScheduler вместо RQ/Redis
 # В продакшене лучше использовать RQ + Redis или Celery
 
@@ -9,7 +11,7 @@ def process_incoming_email(account_id, message_data):
     Обработать входящее сообщение
     Эта функция вызывается из webhook или polling
     """
-    from .models import db, MailAccount, MailMessage, KnownCounterparty, ScanReport
+    from .models import MailAccount, MailMessage, KnownCounterparty, ScanReport
     from .rules import apply_rules
     from .scanner_client import scan_message
     from .nlp_reply import build_reply, get_counterparty_profile
@@ -251,7 +253,6 @@ def sanitize_attachments_for_storage(attachments):
 
 def sync_imap_account(account):
     """Синхронизировать отдельный IMAP аккаунт"""
-    from .models import db
     from .connectors.imap import fetch_new_imap
 
     try:
@@ -274,7 +275,6 @@ def sync_imap_account(account):
 
 def sync_gmail_account(account):
     """Синхронизировать отдельный Gmail аккаунт"""
-    from .models import db
     from .connectors.gmail import list_new_messages
 
     history_id = account.last_history_id
