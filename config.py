@@ -31,6 +31,11 @@ class Config:
     SANCTIONS_API_KEY = os.environ.get('SANCTIONS_API_KEY')
     VIRUSTOTAL_API_KEY = os.environ.get('VIRUSTOTAL_API_KEY')
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+
+    # External security scanners
+    FILE_SCANNER_URL = os.environ.get('FILE_SCANNER_URL')
+    FILE_SCANNER_ENABLED = os.environ.get('FILE_SCANNER_ENABLED', 'true').lower() not in {'0', 'false', 'no'}
+    FILE_SCANNER_TIMEOUT = int(os.environ.get('FILE_SCANNER_TIMEOUT', 30))
     
     # Flask-Mail Configuration
     MAIL_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')

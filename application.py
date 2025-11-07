@@ -25,6 +25,11 @@ def create_app(config_name=None):
     
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+
+    if not app.config.get('FILE_SCANNER_URL') or not app.config.get('FILE_SCANNER_ENABLED', True):
+        app.logger.warning(
+            'FILE_SCANNER_URL not configured or scanner disabled; MailGuard will rely on local heuristics.'
+        )
     
     # Initialize extensions
     db.init_app(app)

@@ -49,6 +49,13 @@ class AttachmentScanner:
         """Инициализация с API ключом из конфигурации"""
         self.vt_api_key = current_app.config.get('VIRUSTOTAL_API_KEY')
         self.vt_base_url = 'https://www.virustotal.com/api/v3'
+        if not self.vt_api_key:
+            warned = current_app.config.get('_VT_KEY_WARNING_SHOWN')
+            if not warned:
+                logger.warning(
+                    "VirusTotal API key is not configured; attachment scanning will rely on heuristics only."
+                )
+                current_app.config['_VT_KEY_WARNING_SHOWN'] = True
     
     def scan_gmail_attachment(self, attachment_data_b64, filename, mime_type, size=None):
         """
