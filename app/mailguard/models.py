@@ -134,6 +134,20 @@ class MailMessage(db.Model):
 
     def set_meta(self, meta):
         self.meta_json = json.dumps(meta)
+
+    def get_security_meta(self):
+        """Вернуть данные о результате проверки безопасности."""
+        meta = self.get_meta() or {}
+        security = meta.get('security') or {}
+        # Гарантируем наличие ключевых полей для удобства шаблонов
+        if security and 'status' not in security:
+            security['status'] = 'review'
+        return security
+
+    def get_security_status(self):
+        """Короткий статус безопасности (safe/warning/blocked/review)."""
+        security = self.get_security_meta()
+        return security.get('status') or ('blocked' if self.is_quarantined else None)
     
     def get_attachments(self):
         """Получить список вложений с результатами сканирования"""

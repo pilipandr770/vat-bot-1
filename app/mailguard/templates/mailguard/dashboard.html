@@ -42,6 +42,73 @@
             </div>
         </div>
 
+        <div class="row mt-3">
+            <div class="col-md-12">
+                {% set counts = security_overview.counts %}
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Sicherheitsüberblick</h5>
+                        <span class="text-muted small">Letzte 20 Nachrichten</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-sm-3 col-6 mb-3 mb-sm-0">
+                                <div class="display-6 text-success">{{ counts.safe or 0 }}</div>
+                                <div class="text-muted">Sicher</div>
+                            </div>
+                            <div class="col-sm-3 col-6 mb-3 mb-sm-0">
+                                <div class="display-6 text-warning">{{ counts.warning or 0 }}</div>
+                                <div class="text-muted">Warnungen</div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <div class="display-6 text-danger">{{ counts.blocked or 0 }}</div>
+                                <div class="text-muted">Blockiert</div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <div class="display-6 text-secondary">{{ counts.review or 0 }}</div>
+                                <div class="text-muted">Manuell prüfen</div>
+                            </div>
+                        </div>
+
+                        {% if security_overview.flagged %}
+                            <div class="mt-4">
+                                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#securityFlagged">
+                                    Detailbericht anzeigen
+                                </button>
+                                <div class="collapse mt-3" id="securityFlagged">
+                                    <div class="list-group">
+                                        {% for item in security_overview.flagged %}
+                                            <a href="{{ url_for('mailguard.message_detail', message_id=item.id) }}" class="list-group-item list-group-item-action">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <span class="badge bg-{{ item.flag_color }} me-2">{{ item.status_label }}</span>
+                                                        <strong>{{ item.subject }}</strong>
+                                                        <div class="text-muted small">Von: {{ item.from_email }}</div>
+                                                    </div>
+                                                    <div class="text-muted small text-end">
+                                                        {% if item.score is not none %}
+                                                            Score: {{ item.score }}/100<br>
+                                                        {% endif %}
+                                                        {{ item.received_at.strftime('%d.%m.%Y %H:%M') if item.received_at else '' }}
+                                                    </div>
+                                                </div>
+                                                {% if item.summary %}
+                                                    <div class="small text-muted mt-2">{{ item.summary }}</div>
+                                                {% endif %}
+                                                {% if item.checked_at_display %}
+                                                    <div class="small text-muted mt-1">Geprüft: {{ item.checked_at_display }}</div>
+                                                {% endif %}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Подключенные аккаунты -->
         <div class="row mt-4">
             <div class="col-md-12">
@@ -147,6 +214,7 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
+                                            <th style="width: 60px;">Sicherheit</th>
                                             <th>Von</th>
                                             <th>Betreff</th>
                                             <th>Erhalten</th>
@@ -156,7 +224,15 @@
                                     </thead>
                                     <tbody>
                                         {% for message in recent_messages %}
+                                        {% set security = message.get_security_meta() %}
                                         <tr>
+                                            <td>
+                                                {% set flag_icon = (security.flag_icon if security else None) or 'bi-shield' %}
+                                                {% set flag_color = (security.flag_color if security else 'secondary') %}
+                                                <span class="badge bg-{{ flag_color }}">
+                                                    <i class="bi {{ flag_icon }}"></i>
+                                                </span>
+                                            </td>
                                             <td>{{ message.from_email }}</td>
                                             <td>
                                                 <a href="{{ url_for('mailguard.message_detail', message_id=message.id) }}" class="text-decoration-none">

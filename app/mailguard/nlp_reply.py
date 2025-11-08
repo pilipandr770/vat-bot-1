@@ -81,7 +81,10 @@ def build_system_prompt(counterparty_profile, assistant_profile=None):
         "- Struktur: kurze Einleitung, klare Antworten auf die Anliegen, konkrete nächste Schritte, abschließender Gruß",
         "- Falls Informationen fehlen, frage höflich nach den notwendigen Details",
         "- Nutze Aufzählungen oder nummerierte Listen, wenn sie die Lesbarkeit verbessern",
-        "- Erfinde keine Fakten und nenne nur Inhalte, die aus dem E-Mail-Text oder den Richtlinien hervorgehen"
+        "- Erfinde keine Fakten und nenne nur Inhalte, die aus dem E-Mail-Text oder den Richtlinien hervorgehen",
+        "- Beginne mit einem klaren Sicherheitsstatus (z.B. 'Sicherheitsprüfung: ✅ ...') basierend auf den gelieferten Prüfungsdaten und weise auf Warnungen hin",
+        "- Fasse danach das eingegangene Schreiben in maximal drei Sätzen zusammen, bevor du konkrete Antworten formulierst",
+        "- Kennzeichne deutlich, falls eine manuelle Sicherheitsprüfung oder Zurückhaltung geboten ist"
     ]
 
     if assistant_profile and assistant_profile.get('instructions'):
@@ -104,6 +107,35 @@ def build_user_prompt(thread_history, inbound_message):
 
 """
 
+    security = inbound_message.get('security') or {}
+    if security:
+        status_label = security.get('status_label') or security.get('status') or 'Unbekannt'
+        score = security.get('score')
+        source = security.get('source') or 'unbekannt'
+        summary = security.get('summary')
+        prompt += "Sicherheitsbewertung:\n"
+        prompt += f"- Status: {status_label} ({security.get('status')})\n"
+        if score is not None:
+            prompt += f"- Score: {score}/100\n"
+        prompt += f"- Quelle: {source}\n"
+        if summary:
+            prompt += f"- Zusammenfassung: {summary}\n"
+        if security.get('dangerous_attachments'):
+            prompt += f"- Blockierte Anhänge: {', '.join(security['dangerous_attachments'])}\n"
+        if security.get('warning_attachments'):
+            prompt += f"- Warnungen bei Anhängen: {', '.join(security['warning_attachments'])}\n"
+        if security.get('fallback_used'):
+            prompt += "- Hinweis: Ergebnis basiert auf heuristischer Ersatzanalyse.\n"
+        prompt += "\n"
+
+    if inbound_message.get('attachments'):
+        attachment_lines = []
+        for attachment in inbound_message['attachments']:
+            name = attachment.get('filename', 'Datei')
+            risk = attachment.get('risk_level', 'unbekannt')
+            attachment_lines.append(f"{name} (Risiko: {risk})")
+        prompt += "Anhänge:\n" + "\n".join(f"- {line}" for line in attachment_lines) + "\n\n"
+
     if thread_history:
         prompt += "История переписки:\n"
         for msg in thread_history[-3:]:  # Последние 3 сообщения
@@ -111,6 +143,7 @@ def build_user_prompt(thread_history, inbound_message):
         prompt += "\n"
 
     prompt += """Сформируй вежливый деловой ответ с конкретными шагами.
+Начни с краткого Abschnitt "Kurzüberblick" (2-3 предложения), затем перечисли Sicherheitsstatus und Empfehlungen.
 Добавь bullets, если уместно. Будь краток, но информативен."""
 
     return prompt

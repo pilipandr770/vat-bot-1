@@ -38,6 +38,35 @@ def dashboard():
         .filter(MailAccount.user_id == current_user.id)\
         .order_by(MailMessage.received_at.desc())\
         .limit(20).all()
+
+    security_counts = {'safe': 0, 'warning': 0, 'blocked': 0, 'review': 0}
+    flagged_messages = []
+
+    for message in recent_messages:
+        security = message.get_security_meta() or {}
+        status = security.get('status') or ('blocked' if message.is_quarantined else 'review')
+        if status not in security_counts:
+            security_counts[status] = 0
+        security_counts[status] += 1
+
+        if status in ('warning', 'blocked', 'review'):
+            flagged_messages.append({
+                'id': message.id,
+                'subject': message.subject or '(без темы)',
+                'from_email': message.from_email,
+                'received_at': message.received_at,
+                'status': status,
+                'status_label': security.get('status_label', status.title()),
+                'flag_color': security.get('flag_color', 'secondary'),
+                'summary': security.get('summary'),
+                'score': security.get('score'),
+                'checked_at_display': security.get('checked_at_display')
+            })
+
+    security_overview = {
+        'counts': security_counts,
+        'flagged': flagged_messages[:6]
+    }
     
     # Статистика
     today = datetime.utcnow().date()
@@ -57,7 +86,8 @@ def dashboard():
         rules=rules,
         pending_drafts=pending_drafts,
         recent_messages=recent_messages,
-        stats=stats
+        stats=stats,
+        security_overview=security_overview
     )
 
 

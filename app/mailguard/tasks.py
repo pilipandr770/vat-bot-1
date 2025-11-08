@@ -3,6 +3,106 @@ from datetime import datetime, timedelta
 
 from .models import db
 
+
+def build_security_metadata(verdict, score, scan_result, attachments):
+    """Сформировать агрегированный отчёт о безопасности для сохранения в метаданных."""
+    checked_at = datetime.utcnow()
+    details = scan_result.get('details') or {}
+
+    dangerous_attachments = [att for att in attachments if att.get('risk_level') == 'danger']
+    warning_attachments = [att for att in attachments if att.get('risk_level') == 'warning']
+    total_attachments = len(attachments)
+
+    fallback_used = (scan_result.get('source') == 'fallback') or (not scan_result.get('success'))
+    fallback_reason = details.get('fallback_reason') if isinstance(details, dict) else None
+
+    status = 'safe'
+    if dangerous_attachments or verdict == 'malicious' or score >= 80:
+        status = 'blocked'
+    elif warning_attachments or verdict == 'suspicious' or score >= 50:
+        status = 'warning'
+    elif fallback_used:
+        status = 'review'
+
+    status_labels = {
+        'safe': 'Sicher',
+        'warning': 'Warnung',
+        'blocked': 'Blockiert',
+        'review': 'Überprüfung nötig'
+    }
+    flag_colors = {
+        'safe': 'success',
+        'warning': 'warning',
+        'blocked': 'danger',
+        'review': 'secondary'
+    }
+    flag_icons = {
+        'safe': 'bi-shield-check',
+        'warning': 'bi-shield-exclamation',
+        'blocked': 'bi-shield-x',
+        'review': 'bi-question-circle'
+    }
+
+    summary_parts = []
+    if status == 'blocked':
+        summary_parts.append('Bedrohung erkannt – Nachricht in Quarantäne.')
+    elif status == 'warning':
+        summary_parts.append('Verdächtige Signale erkannt. Bitte manuell prüfen.')
+    elif status == 'safe':
+        summary_parts.append('Keine Bedrohungen festgestellt.')
+    else:
+        summary_parts.append('Sicherheitsprüfung unvollständig – manuelle Kontrolle empfohlen.')
+
+    if total_attachments:
+        summary_parts.append(
+            f"Anhänge geprüft: {total_attachments} Dateien, {len(warning_attachments)} Warnung(en), {len(dangerous_attachments)} blockiert."  # noqa: E501
+        )
+
+    links_checked = len(details.get('links') or []) if isinstance(details, dict) else 0
+    if links_checked:
+        summary_parts.append(f'{links_checked} Link(s) überprüft.')
+
+    if fallback_used:
+        summary_parts.append('Externer Scanner nicht verfügbar, heuristische Analyse genutzt.')
+
+    notes = []
+    if isinstance(details, dict):
+        if details.get('notes'):
+            notes.extend(details.get('notes'))
+        if details.get('suspicious_keywords'):
+            notes.append('Schlüsselwörter: ' + ', '.join(details.get('suspicious_keywords')))
+        if fallback_reason:
+            notes.append(f'Fallback: {fallback_reason}')
+
+    return {
+        'status': status,
+        'status_label': status_labels.get(status, status.title()),
+        'flag_color': flag_colors.get(status, 'secondary'),
+        'flag_icon': flag_icons.get(status, 'bi-question-circle'),
+        'verdict': verdict,
+        'score': int(score) if score is not None else None,
+        'source': scan_result.get('source'),
+        'success': scan_result.get('success', False),
+        'fallback_used': fallback_used,
+        'checked_at': checked_at.isoformat() + 'Z',
+        'checked_at_display': checked_at.strftime('%d.%m.%Y %H:%M UTC'),
+        'summary': ' '.join(summary_parts),
+        'notes': notes,
+        'links_checked': links_checked,
+        'attachments': [
+            {
+                'filename': att.get('filename'),
+                'content_type': att.get('content_type'),
+                'risk_level': att.get('risk_level', 'unknown'),
+                'size': att.get('size'),
+                'threats': att.get('threats')
+            }
+            for att in attachments
+        ],
+        'dangerous_attachments': [att.get('filename') for att in dangerous_attachments],
+        'warning_attachments': [att.get('filename') for att in warning_attachments]
+    }
+
 # Для простоты используем APScheduler вместо RQ/Redis
 # В продакшене лучше использовать RQ + Redis или Celery
 
@@ -45,8 +145,9 @@ def process_incoming_email(account_id, message_data):
         counterparty = find_or_create_counterparty(normalized_msg.get('from_email'))
 
         # Подготавливаем вложения
-        attachments_with_data = normalized_msg.get('attachments', []) or []
-        sanitized_attachments = sanitize_attachments_for_storage(attachments_with_data)
+    attachments_with_data = normalized_msg.get('attachments', []) or []
+    sanitized_attachments = sanitize_attachments_for_storage(attachments_with_data)
+    normalized_msg['attachments'] = sanitized_attachments
 
         # Создаем запись сообщения
         message = MailMessage(
@@ -72,6 +173,23 @@ def process_incoming_email(account_id, message_data):
             message.status = 'quarantined'
             message.risk_score = 100
 
+            security_meta = build_security_metadata(
+                verdict='malicious',
+                score=100,
+                scan_result={
+                    'source': 'attachment_precheck',
+                    'success': True,
+                    'details': {
+                        'notes': ['Gefährliche Anhänge blockiert'],
+                        'attachments': sanitized_attachments
+                    }
+                },
+                attachments=sanitized_attachments
+            )
+            meta_payload = message.get_meta()
+            meta_payload['security'] = security_meta
+            message.set_meta(meta_payload)
+
             report = ScanReport(
                 message_id=message.id,
                 verdict='malicious',
@@ -91,9 +209,9 @@ def process_incoming_email(account_id, message_data):
             return
 
         # Сканируем на угрозы (контент и ссылки)
-        scan_result = scan_message(normalized_msg)
-        verdict = scan_result.get('verdict', 'error')
-        score = scan_result.get('score', 0)
+    scan_result = scan_message(normalized_msg)
+    verdict = scan_result.get('verdict', 'error')
+    score = scan_result.get('score', 0)
 
         # Усиливаем балл риска если вложения помечены как warning
         if any(att.get('risk_level') == 'warning' for att in sanitized_attachments):
@@ -110,7 +228,18 @@ def process_incoming_email(account_id, message_data):
         )
         report_details = scan_result.get('details') or {}
         report_details['attachments'] = sanitized_attachments
+        security_meta = build_security_metadata(
+            verdict=verdict,
+            score=score,
+            scan_result=scan_result,
+            attachments=sanitized_attachments
+        )
+        report_details['security'] = security_meta
         report.set_details(report_details)
+        normalized_msg['security'] = security_meta
+        meta_payload = message.get_meta()
+        meta_payload['security'] = security_meta
+        message.set_meta(meta_payload)
         db.session.add(report)
 
         if verdict == 'malicious':
@@ -122,7 +251,7 @@ def process_incoming_email(account_id, message_data):
             return
 
         # Применяем правила
-        action, requires_human, matched_rule = apply_rules(normalized_msg)
+    action, requires_human, matched_rule = apply_rules(normalized_msg)
 
         if action == 'ignore':
             message.status = 'skipped'

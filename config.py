@@ -36,6 +36,7 @@ class Config:
     FILE_SCANNER_URL = os.environ.get('FILE_SCANNER_URL')
     FILE_SCANNER_ENABLED = os.environ.get('FILE_SCANNER_ENABLED', 'true').lower() not in {'0', 'false', 'no'}
     FILE_SCANNER_TIMEOUT = int(os.environ.get('FILE_SCANNER_TIMEOUT', 30))
+    FILE_SCANNER_TOKEN = os.environ.get('FILE_SCANNER_TOKEN')
     
     # Flask-Mail Configuration
     MAIL_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')

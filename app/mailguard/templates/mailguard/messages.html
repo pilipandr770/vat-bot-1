@@ -26,6 +26,7 @@
                 <thead class="table-light">
                     <tr>
                         <th style="width: 40px;"></th>
+                        <th style="width: 60px;">Sicherheit</th>
                         <th>Absender</th>
                         <th>Betreff</th>
                         <th>Status</th>
@@ -36,6 +37,7 @@
                 </thead>
                 <tbody>
                     {% for message in messages %}
+                    {% set security = message.get_security_meta() %}
                     <tr>
                         <td>
                             {% if message.has_dangerous_attachments %}
@@ -43,6 +45,13 @@
                             {% elif message.has_attachments %}
                                 <span class="badge bg-info text-dark" title="Anhänge vorhanden"><i class="bi bi-paperclip"></i></span>
                             {% endif %}
+                        </td>
+                        <td>
+                            {% set flag_icon = (security.flag_icon if security else None) or 'bi-shield' %}
+                            {% set flag_color = (security.flag_color if security else 'secondary') %}
+                            <span class="badge bg-{{ flag_color }}" title="{{ security.status_label if security else 'Keine Daten' }}">
+                                <i class="bi {{ flag_icon }}"></i>
+                            </span>
                         </td>
                         <td>
                             <strong>{{ message.from_email }}</strong><br>

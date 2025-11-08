@@ -2,7 +2,7 @@ import requests
 import base64
 import tempfile
 import os
-from flask import current_app
+from flask import current_app, request
 from werkzeug.utils import secure_filename
 
 
@@ -40,11 +40,16 @@ def scan_message(message_data):
             raise ScannerUnavailable('External file scanner disabled')
 
         headers = {'Content-Type': 'application/json'}
+        token = current_app.config.get('FILE_SCANNER_TOKEN')
+        if token:
+            headers['Authorization'] = f'Bearer {token}'
+
         response = requests.post(
             scanner_url,
             json=scan_payload,
             headers=headers,
-            timeout=scanner_timeout
+            timeout=scanner_timeout,
+            cookies=request.cookies if request else None
         )
 
         if response.status_code == 200:

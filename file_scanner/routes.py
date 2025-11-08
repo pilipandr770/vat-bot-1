@@ -52,10 +52,22 @@ def scan_page():
     return render_template('file_scanner/scan.html')
 
 @file_scanner.route('/api/file-scan', methods=['POST'])
-@login_required
 def scan_file():
     """API для сканирования файла"""
     global active_scans
+
+    # Проверяем авторизацию по токену для сервисных вызовов
+    expected_token = current_app.config.get('FILE_SCANNER_TOKEN')
+    if expected_token:
+        provided = request.headers.get('Authorization', '').replace('Bearer ', '').strip()
+        if not provided:
+            provided = request.headers.get('X-Scanner-Token', '').strip()
+        if provided != expected_token:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    else:
+        # Без токена допускаем запросы только от авторизованных пользователей
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
 
     # Проверяем лимит одновременных сканирований
     if active_scans >= MAX_CONCURRENT_SCANS:
