@@ -66,8 +66,8 @@
                         <div class="list-group">
                             {% for report in reports %}
                             <div class="list-group-item">
-                                <div class="d-flex justify-content-between">
-                                    <div>
+                                <div class="d-flex flex-wrap justify-content-between gap-2">
+                                    <div class="d-flex align-items-center gap-2">
                                         {% if report.verdict == 'malicious' %}
                                             <span class="badge bg-danger">Malware</span>
                                         {% elif report.verdict == 'suspicious' %}
@@ -75,15 +75,107 @@
                                         {% else %}
                                             <span class="badge bg-success">Sauber</span>
                                         {% endif %}
-                                        <span class="ms-2 text-muted">Score: {{ report.score }}</span>
+                                        <span class="badge bg-dark text-white">Score: {{ report.score }}</span>
                                     </div>
                                     <div class="text-muted small">
                                         {{ report.created_at.strftime('%d.%m.%Y %H:%M') if report.created_at else '' }}
                                     </div>
                                 </div>
+
                                 {% set details = report.get_details() %}
+                                {% set security = details.get('security') if details else None %}
+
+                                {% if security %}
+                                    {% set alert_class = {
+                                        'danger': 'alert-danger',
+                                        'warning': 'alert-warning',
+                                        'success': 'alert-success',
+                                        'secondary': 'alert-secondary'
+                                    }.get(security.flag_color, 'alert-info') %}
+                                    <div class="alert {{ alert_class }} mt-3 mb-2">
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <strong><i class="bi {{ security.flag_icon or 'bi-shield' }}"></i> {{ security.status_label }}</strong>
+                                            {% if security.summary %}
+                                                <span class="small">{{ security.summary }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <ul class="list-unstyled small mb-0 mt-2">
+                                            <li><strong>Quelle:</strong> {{ security.source or 'unbekannt' }}</li>
+                                            <li><strong>Score:</strong> {{ security.score if security.score is not none else 'n/a' }}/100</li>
+                                            <li><strong>Geprüft:</strong> {{ security.checked_at_display or '—' }}</li>
+                                            {% if security.fallback_used %}
+                                                <li class="text-warning"><i class="bi bi-exclamation-triangle"></i> Externer Scanner nicht verfügbar (Fallback genutzt)</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+
                                 {% if details %}
-                                <pre class="mt-2 mb-0 bg-light p-2 rounded"><code>{{ details | tojsonpretty }}</code></pre>
+                                    {% set attachments = details.get('attachments') if details is mapping else details.attachments if details else [] %}
+                                    {% if attachments %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Anhänge</h6>
+                                            <ul class="list-group list-group-flush small">
+                                                {% for att in attachments %}
+                                                    <li class="list-group-item px-0">
+                                                        <i class="bi bi-paperclip"></i>
+                                                        <strong>{{ att.filename or 'Datei' }}</strong>
+                                                        {% set risk = att.risk_level or att.get('risk_level') %}
+                                                        <span class="badge bg-{{ 'danger' if risk == 'danger' else 'warning text-dark' if risk == 'warning' else 'secondary' }} ms-2">
+                                                            Risiko: {{ risk|default('unbekannt')|title }}
+                                                        </span>
+                                                        {% if att.threats or att.get('threats') %}
+                                                            {% set threats = att.threats or att.get('threats') %}
+                                                            <div class="text-muted mt-1">Hinweise: {{ threats | join(', ') }}</div>
+                                                        {% endif %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if details.get('suspicious_keywords') %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Auffällige Schlüsselwörter</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                {% for keyword in details.get('suspicious_keywords') %}
+                                                    <span class="badge bg-warning text-dark">{{ keyword }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if details.get('links') %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Gefundene Links</h6>
+                                            <ul class="list-unstyled small mb-0">
+                                                {% for link in details.get('links') %}
+                                                    <li>
+                                                        <i class="bi bi-link-45deg"></i>
+                                                        <a href="{{ link }}" target="_blank" rel="noopener" class="text-decoration-none">{{ link }}</a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if details.get('notes') %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Hinweise</h6>
+                                            <ul class="list-unstyled small mb-0">
+                                                {% for note in details.get('notes') %}
+                                                    <li><i class="bi bi-info-circle"></i> {{ note }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    <button class="btn btn-outline-secondary btn-sm mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#reportRaw{{ report.id }}" aria-expanded="false" aria-controls="reportRaw{{ report.id }}">
+                                        Technische Details
+                                    </button>
+                                    <div class="collapse mt-2" id="reportRaw{{ report.id }}">
+                                        <pre class="bg-light p-2 rounded"><code>{{ details | tojsonpretty }}</code></pre>
+                                    </div>
                                 {% endif %}
                             </div>
                             {% endfor %}
