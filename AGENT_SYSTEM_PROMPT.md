@@ -154,13 +154,14 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 ---
 
 ### 5. MailGuard - Intelligente E-Mail-Verarbeitung (`/mailguard`)
-**Beschreibung**: Automatisierte E-Mail-Verarbeitung mit KI-Antworten und Sicherheitsprüfung
+**Beschreibung**: Automatisierte E-Mail-Verarbeitung mit KI-Antworten, Bedrohungsanalyse und klaren Sicherheitshinweisen
 
 **Hauptfunktionen**:
 - **E-Mail-Konten verbinden**: Gmail/Microsoft 365/IMAP Integration
 - **Intelligente Regeln**: Automatische Verarbeitung basierend auf Absender, Domain, Betreff
 - **KI-Antworten**: Automatische Generierung professioneller Antworten mit OpenAI
 - **Sicherheitsprüfung**: Integration mit File Scanner für Anhänge
+- **Sicherheitsübersicht**: Einheitliche Risiko-Scans mit Badges, Zusammenfassungen und Handlungsempfehlungen
 - **Arbeitszeiten**: Respektiert Geschäftszeiten und Feiertage
 
 **Unterstützte E-Mail-Provider**:
@@ -190,13 +191,21 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - **Kontext**: Verwendet Thread-Historie und Kontrahenten-Profil
 - **Sprache**: Erkennt automatisch die Sprache der eingehenden E-Mail
 - **Ton**: Anpassbar pro Kontrahent (formell, freundlich, technisch)
-- **Qualität**: OpenAI GPT-4 für professionelle Geschäftskommunikation
+- **Qualität**: OpenAI GPT-4 für professionelle Geschäftskommunikation und explizite Hinweise auf Scan-Ergebnisse
 
 **Dashboard-Übersicht**:
 - **Verbundene Konten**: Status aller E-Mail-Konten
 - **Ausstehende Antworten**: Entwürfe warten auf Genehmigung
-- **Letzte Nachrichten**: Übersicht eingehender E-Mails mit Risiko-Score
+- **Letzte Nachrichten**: Übersicht eingehender E-Mails mit Risiko-Score und Sicherheits-Badges (✅ Sicher, ⚠️ Achtung, 🚨 Kritisch)
 - **Regeln-Übersicht**: Aktive Regeln und ihre Trefferquote
+- **Security Overview**: Karte mit Scan-Zusammenfassung, auffälligen Nachrichten und Direktlinks zu geflaggten Threads
+
+**Automatisierte Sicherheitsanalyse**:
+- Jede eingehende Nachricht erhält strukturierte Sicherheitsmetadaten (Status, Confidence, zusammengefasste Funde, empfohlene Aktion)
+- Anhänge laufen durch den Datei-Scanner inklusive optionalem VirusTotal-Abgleich; Ergebnisse werden im MailGuard-UI konsolidiert
+- Detailansichten zeigen eine kompakte Sicherheitskarte, technische JSON-Daten sind bei Bedarf über "Technische Details" einblendbar
+- Geflaggte Nachrichten erscheinen im Dashboard und in der Nachrichtenliste mit klaren Badges sowie Quick Actions
+- KI-Entwürfe referenzieren automatisch den letzten Scan-Status und warnen vor offenen Risiken
 
 **Sicherheitsfeatures**:
 - **Token-Verschlüsselung**: Alle Zugangsdaten werden verschlüsselt gespeichert
@@ -209,6 +218,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - Verdächtige E-Mails landen in Quarantäne
 - Keine automatische Ausführung von Anhängen
 - DKIM/SPF/DMARC-Validierung bei Versand
+- Sicherheitsmetadaten bleiben in `MailMessage.security_meta` gespeichert und stehen Dashboard, Listen- und Detailansichten zur Verfügung
 
 **Häufige Fragen**:
 - **"Wie lange dauert die Einrichtung?"**: 5-10 Minuten für OAuth, 2-3 Minuten für IMAP
@@ -216,6 +226,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - **"Was passiert bei Fehlern?"**: System geht in "Safe Mode" - alle E-Mails landen als Entwürfe
 - **"Unterstützt es mehrere Sprachen?"**: Ja, automatische Spracherkennung und mehrsprachige Antworten
 - **"Wie teuer ist MailGuard?"**: Enthalten in Professional/Enterprise Plänen
+- **"Wo sehe ich Scan-Ergebnisse?"**: Im Dashboard (Security Overview Karte), in der Nachrichtenliste (Badges) und in der Detailansicht unter "Sicherheitsprüfung"
 
 ---
 
