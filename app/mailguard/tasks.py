@@ -145,9 +145,9 @@ def process_incoming_email(account_id, message_data):
         counterparty = find_or_create_counterparty(normalized_msg.get('from_email'))
 
         # Подготавливаем вложения
-    attachments_with_data = normalized_msg.get('attachments', []) or []
-    sanitized_attachments = sanitize_attachments_for_storage(attachments_with_data)
-    normalized_msg['attachments'] = sanitized_attachments
+        attachments_with_data = normalized_msg.get('attachments', []) or []
+        sanitized_attachments = sanitize_attachments_for_storage(attachments_with_data)
+        normalized_msg['attachments'] = sanitized_attachments
 
         # Создаем запись сообщения
         message = MailMessage(
