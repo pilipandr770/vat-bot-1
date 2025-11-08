@@ -72,11 +72,12 @@
 
                         {% if security_overview.flagged %}
                             <div class="mt-4">
-                                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#securityFlagged">
-                                    Detailbericht anzeigen
+                                <button class="btn btn-outline-secondary w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#securityFlagged" aria-expanded="false" aria-controls="securityFlagged">
+                                    <span><i class="bi bi-shield-check me-2"></i>Detailbericht anzeigen</span>
+                                    <i class="bi bi-chevron-down"></i>
                                 </button>
                                 <div class="collapse mt-3" id="securityFlagged">
-                                    <div class="list-group">
+                                    <div class="list-group list-group-flush w-100">
                                         {% for item in security_overview.flagged %}
                                             <a href="{{ url_for('mailguard.message_detail', message_id=item.id) }}" class="list-group-item list-group-item-action">
                                                 <div class="d-flex justify-content-between align-items-start">
