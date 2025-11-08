@@ -107,10 +107,7 @@ def build_security_metadata(verdict, score, scan_result, attachments):
 # В продакшене лучше использовать RQ + Redis или Celery
 
 def process_incoming_email(account_id, message_data):
-    """
-    Обработать входящее сообщение
-    Эта функция вызывается из webhook или polling
-    """
+    """Обработать входящее сообщение из очереди/вебхука."""
     from .models import MailAccount, MailMessage, KnownCounterparty, ScanReport
     from .rules import apply_rules
     from .scanner_client import scan_message
@@ -119,37 +116,28 @@ def process_incoming_email(account_id, message_data):
     try:
         current_app.logger.info(f"Processing incoming email for account {account_id}")
 
-        # Получаем аккаунт
         account = MailAccount.query.get(account_id)
         if not account:
             current_app.logger.error(f"Account {account_id} not found")
             return
 
-        # Нормализуем данные сообщения
         normalized_msg = normalize_message(message_data)
         provider_msg_id = normalized_msg.get('provider_msg_id')
-
         if not provider_msg_id:
             current_app.logger.warning("Skipping message without provider_msg_id")
             return
 
-        # Проверяем, не обрабатывали ли уже это сообщение
-        existing = MailMessage.query.filter_by(
-            provider_msg_id=provider_msg_id
-        ).first()
+        existing = MailMessage.query.filter_by(provider_msg_id=provider_msg_id).first()
         if existing:
             current_app.logger.info(f"Message {provider_msg_id} already processed")
             return
 
-        # Определяем контрагента
         counterparty = find_or_create_counterparty(normalized_msg.get('from_email'))
 
-        # Подготавливаем вложения
         attachments_with_data = normalized_msg.get('attachments', []) or []
         sanitized_attachments = sanitize_attachments_for_storage(attachments_with_data)
         normalized_msg['attachments'] = sanitized_attachments
 
-        # Создаем запись сообщения
         message = MailMessage(
             provider_msg_id=provider_msg_id,
             thread_id=normalized_msg.get('thread_id'),
@@ -168,7 +156,6 @@ def process_incoming_email(account_id, message_data):
         db.session.add(message)
         db.session.flush()
 
-        # Проверяем результаты сканирования вложений
         if message.has_dangerous_attachments or message.is_quarantined:
             message.status = 'quarantined'
             message.risk_score = 100
@@ -208,12 +195,10 @@ def process_incoming_email(account_id, message_data):
             )
             return
 
-        # Сканируем на угрозы (контент и ссылки)
-    scan_result = scan_message(normalized_msg)
-    verdict = scan_result.get('verdict', 'error')
-    score = scan_result.get('score', 0)
+        scan_result = scan_message(normalized_msg)
+        verdict = scan_result.get('verdict', 'error')
+        score = scan_result.get('score', 0)
 
-        # Усиливаем балл риска если вложения помечены как warning
         if any(att.get('risk_level') == 'warning' for att in sanitized_attachments):
             score = max(score, 60)
 
@@ -236,10 +221,12 @@ def process_incoming_email(account_id, message_data):
         )
         report_details['security'] = security_meta
         report.set_details(report_details)
+
         normalized_msg['security'] = security_meta
         meta_payload = message.get_meta()
         meta_payload['security'] = security_meta
         message.set_meta(meta_payload)
+
         db.session.add(report)
 
         if verdict == 'malicious':
@@ -250,8 +237,7 @@ def process_incoming_email(account_id, message_data):
             )
             return
 
-        # Применяем правила
-    action, requires_human, matched_rule = apply_rules(normalized_msg)
+        action, requires_human, matched_rule = apply_rules(normalized_msg)
 
         if action == 'ignore':
             message.status = 'skipped'
@@ -263,16 +249,13 @@ def process_incoming_email(account_id, message_data):
             db.session.commit()
             return
 
-        # Создаем черновик ответа
         if action in ['auto_reply', 'draft']:
             draft = create_reply_draft(message, counterparty, normalized_msg, matched_rule, account)
 
             if action == 'auto_reply' and not requires_human:
-                # Автоматическая отправка
                 draft.approved_by_user = True
                 draft.sent_at = datetime.utcnow()
                 message.status = 'sent'
-                # TODO: Реализовать отправку
                 current_app.logger.info(f"Auto-reply queued for message {message.id}")
             else:
                 message.status = 'drafted'
