@@ -3,7 +3,7 @@
 {% block title %}Nachricht {{ message.subject or "(без темы)" }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4 px-3 px-md-4 px-xl-5">
+<div class="container-fluid mailguard-message-detail mt-4 px-3 px-md-4 px-xl-5">
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Hauptmenü</a></li>

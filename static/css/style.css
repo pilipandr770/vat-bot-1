@@ -560,6 +560,31 @@ p {
     color: #2ecc71 !important;
 }
 
+/* MailGuard message detail layout */
+.mailguard-message-detail {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mailguard-message-detail .card,
+.mailguard-message-detail .list-group,
+.mailguard-message-detail .list-group-item {
+    width: 100%;
+}
+
+.mailguard-message-detail pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.mailguard-message-detail .badge {
+    font-size: 0.85rem;
+}
+
 .border-start-success {
     border-left: 4px solid #198754 !important;
 }
