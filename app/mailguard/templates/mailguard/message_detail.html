@@ -3,7 +3,7 @@
 {% block title %}Nachricht {{ message.subject or "(без темы)" }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid mt-4 px-3 px-md-4 px-xl-5">
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Hauptmenü</a></li>
@@ -26,7 +26,7 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-8">
+        <div class="col-12 col-xl-8 col-xxl-9">
             <div class="card mb-4 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
@@ -95,7 +95,7 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
+    <div class="col-12 col-xl-4 col-xxl-3">
             {% set security = message.get_security_meta() %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light fw-semibold">
