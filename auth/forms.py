@@ -4,6 +4,7 @@ German language forms using Flask-WTF.
 """
 
 from flask_wtf import FlaskForm
+from flask_login import current_user
 from wtforms import StringField, PasswordField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from auth.models import User
@@ -148,3 +149,29 @@ class ProfileUpdateForm(FlaskForm):
         ('GB', 'Großbritannien'),
         ('US', 'USA')
     ])
+
+
+class ChangePasswordForm(FlaskForm):
+    """Formular zum Ändern des Passworts im eingeloggten Zustand."""
+
+    current_password = PasswordField('Aktuelles Passwort', validators=[
+        DataRequired(message='Bitte geben Sie Ihr aktuelles Passwort ein')
+    ])
+
+    new_password = PasswordField('Neues Passwort', validators=[
+        DataRequired(message='Neues Passwort ist erforderlich'),
+        Length(min=8, message='Das neue Passwort muss mindestens 8 Zeichen lang sein')
+    ])
+
+    new_password_confirm = PasswordField('Neues Passwort bestätigen', validators=[
+        DataRequired(message='Bitte bestätigen Sie Ihr neues Passwort'),
+        EqualTo('new_password', message='Die Passwörter stimmen nicht überein')
+    ])
+
+    def validate_current_password(self, field):
+        if not current_user.is_authenticated or not current_user.check_password(field.data):
+            raise ValidationError('Das aktuelle Passwort ist nicht korrekt.')
+
+    def validate_new_password(self, field):
+        if current_user.is_authenticated and current_user.check_password(field.data):
+            raise ValidationError('Das neue Passwort darf nicht mit dem aktuellen Passwort übereinstimmen.')

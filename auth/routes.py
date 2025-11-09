@@ -12,7 +12,7 @@ except ImportError:
 from datetime import datetime
 from auth.models import User, Subscription
 from auth.forms import (RegistrationForm, LoginForm, PasswordResetRequestForm, 
-                        PasswordResetForm, ProfileUpdateForm)
+                        PasswordResetForm, ProfileUpdateForm, ChangePasswordForm)
 from crm.models import db
 from notifications.alerts import send_email
 import secrets
@@ -219,6 +219,21 @@ def profile():
         return redirect(url_for('auth.profile'))
     
     return render_template('auth/profile.html', form=form)
+
+
+@auth_bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    """Passwort ändern - Change password for authenticated users."""
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+        current_user.set_password(form.new_password.data)
+        db.session.commit()
+        flash('Ihr Passwort wurde erfolgreich aktualisiert.', 'success')
+        return redirect(url_for('auth.profile'))
+
+    return render_template('auth/change_password.html', form=form)
 
 
 @auth_bp.route('/company-profile', methods=['GET', 'POST'])

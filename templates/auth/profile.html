@@ -133,6 +133,13 @@
                             {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
+                            <strong>Passwort:</strong>
+                            <p class="mb-0">Bitte ändern Sie Ihr Passwort regelmäßig.</p>
+                            <a href="{{ url_for('auth.change_password') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="bi bi-key"></i> Passwort ändern
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <strong>Mitglied seit:</strong>
                             <p class="mb-0">{{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
                         </div>
