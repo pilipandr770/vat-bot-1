@@ -534,6 +534,15 @@ def delete_account(account_id):
     
     try:
         email = account.email
+
+        messages = MailMessage.query.filter_by(account_id=account.id).all()
+        for message in messages:
+            db.session.query(ScanReport).filter_by(message_id=message.id).delete(synchronize_session=False)
+            db.session.query(MailDraft).filter_by(message_id=message.id).delete(synchronize_session=False)
+            db.session.delete(message)
+
+        db.session.query(MailDraft).filter_by(account_id=account.id).delete(synchronize_session=False)
+
         db.session.delete(account)
         db.session.commit()
         flash(f'Аккаунт {email} удален', 'info')
