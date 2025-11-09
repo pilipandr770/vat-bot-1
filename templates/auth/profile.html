@@ -196,6 +196,18 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card mt-3 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-trash"></i> Konto löschen</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Gemäß DSGVO können Sie Ihr Konto jederzeit vollständig löschen. Alle Verifikationen, MailGuard-Daten und gespeicherten Firmeninformationen werden entfernt.</p>
+                    <a href="{{ url_for('auth.delete_account') }}" class="btn btn-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Konto unwiderruflich löschen
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

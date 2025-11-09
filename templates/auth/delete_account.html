@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Konto löschen - VAT Verifizierung{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Konto unwiderruflich löschen</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Achtung:</strong> Diese Aktion entfernt <u>alle</u> verknüpften Daten endgültig:
+                        <ul class="mb-0 mt-2">
+                            <li>Verifikationshistorie, Ergebnisse und Alerts</li>
+                            <li>CRM-Einträge (Kontrahenten, Firmenprofile)</li>
+                            <li>MailGuard-Konten, Nachrichten, Scans und KI-Entwürfe</li>
+                            <li>Abonnements, Rechnungen und gespeicherte Tokens</li>
+                        </ul>
+                    </div>
+                    <p class="mb-4">Um Ihr Konto gemäß DSGVO zu löschen, bestätigen Sie unten Ihr aktuelles Passwort und geben Sie zur Sicherheit <strong>LÖSCHEN</strong> ein.</p>
+
+                    <form method="POST" action="{{ url_for('auth.delete_account') }}">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.current_password.label(class="form-label fw-bold") }}
+                            {{ form.current_password(class="form-control " + ("is-invalid" if form.current_password.errors else "")) }}
+                            {% if form.current_password.errors %}
+                                <div class="invalid-feedback">{{ form.current_password.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.confirm_phrase.label(class="form-label fw-bold") }}
+                            {{ form.confirm_phrase(class="form-control text-uppercase " + ("is-invalid" if form.confirm_phrase.errors else ""), placeholder="LÖSCHEN") }}
+                            <div class="form-text">Schreiben Sie zur Bestätigung "LÖSCHEN" (oder "DELETE").</div>
+                            {% if form.confirm_phrase.errors %}
+                                <div class="invalid-feedback">{{ form.confirm_phrase.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Konto jetzt löschen
+                            </button>
+                            <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary">Abbrechen</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

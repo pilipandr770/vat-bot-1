@@ -175,3 +175,23 @@ class ChangePasswordForm(FlaskForm):
     def validate_new_password(self, field):
         if current_user.is_authenticated and current_user.check_password(field.data):
             raise ValidationError('Das neue Passwort darf nicht mit dem aktuellen Passwort übereinstimmen.')
+
+
+class DeleteAccountForm(FlaskForm):
+    """Formular zur bestätigten Kontolöschung gemäß DSGVO."""
+
+    current_password = PasswordField('Aktuelles Passwort', validators=[
+        DataRequired(message='Bitte bestätigen Sie Ihr aktuelles Passwort')
+    ])
+
+    confirm_phrase = StringField('Bestätigung', validators=[
+        DataRequired(message='Bitte geben Sie zur Bestätigung "LÖSCHEN" ein')
+    ])
+
+    def validate_current_password(self, field):
+        if not current_user.is_authenticated or not current_user.check_password(field.data):
+            raise ValidationError('Das aktuelle Passwort ist nicht korrekt.')
+
+    def validate_confirm_phrase(self, field):
+        if field.data.strip().lower() not in {'löschen', 'delete'}:
+            raise ValidationError('Bitte geben Sie exakt "LÖSCHEN" ein, um Ihr Konto zu entfernen.')

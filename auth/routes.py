@@ -12,7 +12,7 @@ except ImportError:
 from datetime import datetime
 from auth.models import User, Subscription
 from auth.forms import (RegistrationForm, LoginForm, PasswordResetRequestForm, 
-                        PasswordResetForm, ProfileUpdateForm, ChangePasswordForm)
+                        PasswordResetForm, ProfileUpdateForm, ChangePasswordForm, DeleteAccountForm)
 from crm.models import db
 from notifications.alerts import send_email
 import secrets
@@ -234,6 +234,61 @@ def change_password():
         return redirect(url_for('auth.profile'))
 
     return render_template('auth/change_password.html', form=form)
+
+
+@auth_bp.route('/delete-account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    """Konto löschen - DSGVO-konforme Profilentfernung."""
+    form = DeleteAccountForm()
+
+    if form.validate_on_submit():
+        user = current_user
+        user_id = user.id
+
+        # Lazy imports to avoid circular dependencies
+    from crm.models import Company, Counterparty, VerificationCheck, Alert, CheckResult
+        try:
+            from app.mailguard.models import MailAccount, MailMessage, MailDraft, ScanReport
+        except ImportError:
+            MailAccount = MailMessage = MailDraft = ScanReport = None  # MailGuard optional
+
+        try:
+            # MailGuard cleanup (if module available)
+            if MailAccount:
+                accounts = MailAccount.query.filter_by(user_id=user_id).all()
+                for account in accounts:
+                    message_ids = [mid for (mid,) in db.session.query(MailMessage.id).filter_by(account_id=account.id).all()]
+                    if message_ids:
+                        db.session.query(ScanReport).filter(ScanReport.message_id.in_(message_ids)).delete(synchronize_session=False)
+                        db.session.query(MailDraft).filter(MailDraft.message_id.in_(message_ids)).delete(synchronize_session=False)
+                        db.session.query(MailMessage).filter(MailMessage.id.in_(message_ids)).delete(synchronize_session=False)
+                    db.session.query(MailDraft).filter_by(account_id=account.id).delete(synchronize_session=False)
+                    db.session.delete(account)
+
+            # Verification history cleanup
+            verification_ids = [vid for (vid,) in db.session.query(VerificationCheck.id).filter_by(user_id=user_id).all()]
+            if verification_ids:
+                db.session.query(CheckResult).filter(CheckResult.check_id.in_(verification_ids)).delete(synchronize_session=False)
+                db.session.query(Alert).filter(Alert.check_id.in_(verification_ids)).delete(synchronize_session=False)
+                db.session.query(VerificationCheck).filter(VerificationCheck.id.in_(verification_ids)).delete(synchronize_session=False)
+
+            # Related company data
+            db.session.query(Company).filter_by(user_id=user_id).delete(synchronize_session=False)
+            db.session.query(Counterparty).filter_by(user_id=user_id).delete(synchronize_session=False)
+
+            # Subscription, payments cascade via relationships on User
+            logout_user()
+            db.session.delete(user)
+            db.session.commit()
+            flash('Ihr Konto und alle zugehörigen Daten wurden gelöscht. Wir bedauern, Sie zu verlieren.', 'success')
+            return redirect(url_for('landing'))
+        except Exception as exc:
+            db.session.rollback()
+            current_app.logger.error(f'Account deletion failed for user {user_id}: {exc}')
+            flash('Beim Löschen Ihres Kontos ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Support.', 'error')
+
+    return render_template('auth/delete_account.html', form=form)
 
 
 @auth_bp.route('/company-profile', methods=['GET', 'POST'])
