@@ -247,7 +247,7 @@ def delete_account():
         user_id = user.id
 
         # Lazy imports to avoid circular dependencies
-    from crm.models import Company, Counterparty, VerificationCheck, Alert, CheckResult
+        from crm.models import Company, Counterparty, VerificationCheck, Alert, CheckResult
         try:
             from app.mailguard.models import MailAccount, MailMessage, MailDraft, ScanReport
         except ImportError:
