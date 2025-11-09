@@ -93,12 +93,15 @@ def create_default_rules():
     """Создать стандартные правила в БД"""
     from .models import db
 
-    existing_rules = MailRule.query.count()
-    if existing_rules > 0:
-        return  # Правила уже созданы
+    existing_names = {rule.name for rule in MailRule.query.all()}
 
+    created_any = False
     for rule_data in get_default_rules():
+        if rule_data['name'] in existing_names:
+            continue
         rule = MailRule(**rule_data)
         db.session.add(rule)
+        created_any = True
 
-    db.session.commit()
+    if created_any:
+        db.session.commit()

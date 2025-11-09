@@ -1,4 +1,12 @@
-from flask import render_template, request, jsonify, redirect, url_for, flash, current_app
+from flask import (
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    url_for,
+    flash,
+    current_app,
+)
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import json
@@ -7,13 +15,23 @@ import requests
 from datetime import datetime, timedelta
 
 from . import mailguard_bp
-from .models import db, MailAccount, KnownCounterparty, MailRule, MailMessage, MailDraft, ScanReport
+from .models import (
+    db,
+    MailAccount,
+    KnownCounterparty,
+    MailRule,
+    MailMessage,
+    MailDraft,
+    ScanReport,
+)
 from .tasks import sync_gmail_account, sync_imap_account
 from .oauth import (
     get_gmail_auth_url, exchange_gmail_code, 
     get_ms_auth_url, exchange_ms_code,
     encrypt_token, get_gmail_email
 )
+from .rules import create_default_rules
+import json
 
 @mailguard_bp.route('/')
 @login_required
@@ -144,12 +162,73 @@ def accounts():
     accounts = MailAccount.query.filter_by(user_id=current_user.id).all()
     return render_template('mailguard/accounts.html', accounts=accounts)
 
-@mailguard_bp.route('/rules')
+@mailguard_bp.route('/rules', methods=['GET', 'POST'])
 @login_required
 def rules():
     """Управление правилами"""
-    rules = MailRule.query.order_by(MailRule.priority.desc()).all()
-    return render_template('mailguard/rules.html', rules=rules)
+    accounts = MailAccount.query.filter_by(user_id=current_user.id).order_by(MailAccount.email).all()
+
+    if request.method == 'POST':
+        name = (request.form.get('name') or '').strip()
+        match_from = (request.form.get('match_from') or '').strip() or None
+        match_domain = (request.form.get('match_domain') or '').strip() or None
+        match_subject_regex = (request.form.get('match_subject_regex') or '').strip() or None
+        action = request.form.get('action') or 'draft'
+        requires_human = bool(request.form.get('requires_human'))
+        is_enabled = bool(request.form.get('is_enabled', 'on'))
+
+        try:
+            priority = int(request.form.get('priority') or 50)
+        except ValueError:
+            priority = 50
+
+        if priority < 0:
+            priority = 0
+        if priority > 100:
+            priority = 100
+
+        if not name:
+            flash('Bitte vergeben Sie einen Namen für die Regel.', 'error')
+            return redirect(url_for('mailguard.rules'))
+
+        if not any([match_from, match_domain, match_subject_regex]):
+            flash('Definieren Sie mindestens eine Bedingung (Absender, Domain oder Betreff).', 'error')
+            return redirect(url_for('mailguard.rules'))
+
+        workhours_preset = request.form.get('workhours_preset', 'always')
+        workhours_json = None
+        if workhours_preset == 'business':
+            workhours_json = json.dumps({
+                'tz': 'Europe/Berlin',
+                'start': '09:00',
+                'end': '18:00',
+                'weekdays': [0, 1, 2, 3, 4]
+            })
+
+        rule = MailRule(
+            name=name,
+            match_from=match_from,
+            match_domain=match_domain,
+            match_subject_regex=match_subject_regex,
+            action=action,
+            requires_human=requires_human,
+            is_enabled=is_enabled,
+            priority=priority,
+            workhours_json=workhours_json
+        )
+
+        db.session.add(rule)
+        db.session.commit()
+        flash('Neue Regel gespeichert.', 'success')
+        return redirect(url_for('mailguard.rules'))
+
+    rules = MailRule.query.order_by(MailRule.priority.desc(), MailRule.name.asc()).all()
+
+    return render_template(
+        'mailguard/rules.html',
+        rules=rules,
+        accounts=accounts
+    )
 
 @mailguard_bp.route('/counterparties')
 @login_required
