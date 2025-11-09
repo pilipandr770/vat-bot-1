@@ -116,6 +116,57 @@ body {
     box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
 }
 
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-danger,
+.btn-outline-warning,
+.btn-outline-info {
+    border: 2px solid currentColor;
+    background: rgba(255, 255, 255, 0.08);
+    color: inherit;
+}
+
+.btn-outline-primary {
+    color: #0d6efd;
+    border-color: rgba(13, 110, 253, 0.65);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    color: #fff;
+    background: #0d6efd;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35);
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border-color: rgba(108, 117, 125, 0.55);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+    color: #fff;
+    background: #6c757d;
+}
+
+.btn-outline-danger {
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.6);
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+    color: #fff;
+    background: #dc3545;
+    box-shadow: 0 6px 18px rgba(220, 53, 69, 0.35);
+}
+
+.btn-sm {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+    border-radius: 10px;
+}
+
 .btn-warning {
     background: var(--warning-gradient);
     color: #fff;

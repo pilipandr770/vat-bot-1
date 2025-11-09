@@ -32,7 +32,7 @@
                         <th>Status</th>
                         <th>Risiko</th>
                         <th style="width: 160px;">Eingang</th>
-                        <th style="width: 60px;"></th>
+                        <th style="width: 140px;">Aktionen</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,9 +90,12 @@
                         <td>
                             {{ message.received_at.strftime('%d.%m.%Y %H:%M') if message.received_at else '—' }}
                         </td>
-                        <td class="text-end">
-                            <a href="{{ url_for('mailguard.message_detail', message_id=message.id) }}" class="btn btn-outline-primary btn-sm">
+                        <td class="text-end text-nowrap">
+                            <a href="{{ url_for('mailguard.message_detail', message_id=message.id) }}"
+                               class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1"
+                               title="Nachricht öffnen">
                                 <i class="bi bi-eye"></i>
+                                <span class="d-none d-sm-inline">Details</span>
                             </a>
                         </td>
                     </tr>
