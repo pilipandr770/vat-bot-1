@@ -121,18 +121,19 @@
                 <div class="mb-3">
                     <label for="counterparty_vat" class="form-label">USt-IdNr.</label>
                     <input type="text" class="form-control" id="counterparty_vat" name="counterparty_vat" 
-                           placeholder="DE987654321">
+                           placeholder="DE987654321" data-prefill-watch="true">
                     <div class="form-text">USt-IdNr. des Geschäftspartners (falls bekannt)</div>
+                    <div id="vatPrefillHint" class="form-text text-muted small"></div>
                 </div>
                 
                 <div class="mb-3">
                     <label for="counterparty_name" class="form-label">Firmenname <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="counterparty_name" name="counterparty_name" required>
+                    <input type="text" class="form-control" id="counterparty_name" name="counterparty_name" required data-prefill-watch="true">
                 </div>
                 
                 <div class="mb-3">
                     <label for="counterparty_country" class="form-label">Land <span class="text-danger">*</span></label>
-                    <select class="form-select" id="counterparty_country" name="counterparty_country" required>
+                    <select class="form-select" id="counterparty_country" name="counterparty_country" required data-prefill-watch="true">
                         <option value="">Land auswählen</option>
                         {% if registry_catalog.available %}
                         <optgroup label="Kostenlos verfügbar (inkl. Handelsregister)">
@@ -144,8 +145,8 @@
                         {% if registry_catalog.planned %}
                         <optgroup label="In Arbeit / Premium">
                             {% for entry in registry_catalog.planned %}
-                                <option value="{{ entry.code }}" disabled>
-                                    {{ entry.label }} – {{ 'Premium' if 'premium' in entry.description|lower or 'kostenpflichtig' in entry.description|lower else 'In Entwicklung' }}
+                                <option value="{{ entry.code }}" data-premium="true">
+                                    {{ entry.label }} {% if 'premium' in entry.description|lower or 'kostenpflichtig' in entry.description|lower %}(Premium) {% else %}(In Entwicklung){% endif %}
                                 </option>
                             {% endfor %}
                         </optgroup>
@@ -162,7 +163,7 @@
                 
                 <div class="mb-3">
                     <label for="counterparty_address" class="form-label">Adresse aus Impressum</label>
-                    <textarea class="form-control" id="counterparty_address" name="counterparty_address" rows="3"></textarea>
+                    <textarea class="form-control" id="counterparty_address" name="counterparty_address" rows="3" data-prefill-watch="true"></textarea>
                 </div>
                 
                 <div class="mb-3">
@@ -173,7 +174,7 @@
                 <div class="mb-3">
                     <label for="counterparty_domain" class="form-label">Webseiten-Domain</label>
                     <input type="text" class="form-control" id="counterparty_domain" name="counterparty_domain" 
-                           placeholder="beispiel.de">
+                           placeholder="beispiel.de" data-prefill-watch="true">
                 </div>
                 
                 <div class="mb-3">

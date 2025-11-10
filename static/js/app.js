@@ -2,6 +2,8 @@
 
 class CounterpartyVerification {
     constructor() {
+        this.prefillAbortController = null;
+        this.lastPrefillVat = null;
         this.initializeEventListeners();
         this.initializeFormValidation();
     }
@@ -13,6 +15,10 @@ class CounterpartyVerification {
         
         if (countrySelect && vatInput) {
             countrySelect.addEventListener('change', (e) => {
+                if (e.target.dataset.prefillApplying === 'true') {
+                    return;
+                }
+
                 const country = e.target.value;
                 const currentVat = vatInput.value;
                 
@@ -21,12 +27,16 @@ class CounterpartyVerification {
                     vatInput.value = country;
                     vatInput.focus();
                 }
+
+                // Allow VAT lookup for same VAT with different country selection
+                this.lastPrefillVat = null;
             });
         }
 
         // Real-time VAT format validation
         if (vatInput) {
             vatInput.addEventListener('input', this.validateVATFormat.bind(this));
+            vatInput.addEventListener('blur', this.handleVatPrefill.bind(this));
         }
 
         // Domain field auto-format
@@ -43,6 +53,8 @@ class CounterpartyVerification {
                 e.target.value = domain;
             });
         }
+
+        this.registerPrefillWatchers();
     }
 
     initializeFormValidation() {
@@ -755,6 +767,222 @@ class CounterpartyVerification {
             'opencorporates': 'bi-globe'
         };
         return icons[service] || 'bi-gear';
+    }
+
+    registerPrefillWatchers() {
+        const fields = document.querySelectorAll('[data-prefill-watch="true"]');
+        fields.forEach((field) => {
+            if (!field.dataset.autofilled) {
+                field.dataset.autofilled = 'false';
+            }
+            if (!field.dataset.userEdited) {
+                field.dataset.userEdited = field.value ? 'true' : 'false';
+            }
+
+            const handler = () => {
+                if (field.dataset.prefillApplying === 'true') {
+                    field.dataset.prefillApplying = 'false';
+                    return;
+                }
+                this.markManualEdit(field);
+            };
+
+            if (field.tagName === 'SELECT') {
+                field.addEventListener('change', handler);
+            } else {
+                field.addEventListener('input', handler);
+            }
+        });
+    }
+
+    markManualEdit(field) {
+        field.dataset.userEdited = 'true';
+        field.dataset.autofilled = 'false';
+        field.classList.remove('autofill-highlight');
+        const group = field.closest('.mb-3, .form-group');
+        if (group) {
+            group.querySelectorAll('.autofill-highlight').forEach((el) => {
+                el.classList.remove('autofill-highlight');
+            });
+        }
+    }
+
+    async handleVatPrefill(event) {
+        const vatRaw = (event.target.value || '').trim().toUpperCase();
+        if (!vatRaw || vatRaw.length < 4) {
+            this.lastPrefillVat = null;
+            this.showVatPrefillMessages({ messages: [] }, true);
+            return;
+        }
+
+        if (vatRaw === this.lastPrefillVat) {
+            return;
+        }
+
+        if (this.prefillAbortController) {
+            this.prefillAbortController.abort();
+        }
+
+        this.prefillAbortController = new AbortController();
+
+        const payload = { vat_number: vatRaw };
+        const countrySelect = document.getElementById('counterparty_country');
+        if (countrySelect && countrySelect.value) {
+            payload.country_code = countrySelect.value;
+        }
+
+        this.showVatPrefillMessages('search');
+
+        try {
+            const response = await fetch('/api/vat-lookup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: this.prefillAbortController.signal
+            });
+
+            if (response.status === 401) {
+                const data = await response.json();
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+                return;
+            }
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.lastPrefillVat = vatRaw;
+                this.applyPrefill(data.prefill || {});
+                this.showVatPrefillMessages(data);
+            } else {
+                this.lastPrefillVat = null;
+                this.showVatPrefillMessages(data, true);
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                return;
+            }
+            this.lastPrefillVat = null;
+            this.showVatPrefillMessages({
+                messages: [{ level: 'danger', text: error.message || 'Unbekannter Fehler beim VAT-Lookup' }]
+            }, true);
+        } finally {
+            this.prefillAbortController = null;
+        }
+    }
+
+    applyPrefill(prefill) {
+        if (!prefill) return;
+
+        const vatInput = document.getElementById('counterparty_vat');
+        if (prefill.counterparty_vat && vatInput) {
+            this.setFieldValue(vatInput, prefill.counterparty_vat.toUpperCase());
+        }
+
+        if (prefill.counterparty_name) {
+            const nameField = document.getElementById('counterparty_name');
+            this.setFieldValue(nameField, prefill.counterparty_name);
+        }
+
+        if (prefill.counterparty_address) {
+            const addressField = document.getElementById('counterparty_address');
+            this.setFieldValue(addressField, prefill.counterparty_address);
+        }
+
+        if (prefill.counterparty_country) {
+            this.setSelectValue(document.getElementById('counterparty_country'), prefill.counterparty_country);
+        }
+
+        if (prefill.counterparty_domain) {
+            const domainField = document.getElementById('counterparty_domain');
+            this.setFieldValue(domainField, prefill.counterparty_domain);
+        }
+    }
+
+    setFieldValue(field, value) {
+        if (!field || value === undefined || value === null) {
+            return;
+        }
+        if (field.dataset.userEdited === 'true' && field.value) {
+            return;
+        }
+        field.dataset.prefillApplying = 'true';
+        field.value = value;
+        field.dataset.autofilled = 'true';
+        field.dataset.userEdited = 'false';
+        field.classList.add('autofill-highlight');
+        setTimeout(() => field.classList.remove('autofill-highlight'), 3500);
+        field.dataset.prefillApplying = 'false';
+    }
+
+    setSelectValue(select, value) {
+        if (!select || !value) {
+            return;
+        }
+
+        if (select.dataset.userEdited === 'true' && select.value) {
+            return;
+        }
+
+        let option = Array.from(select.options).find(opt => opt.value === value);
+        if (!option) {
+            option = new Option(value, value, true, true);
+            select.add(option);
+        } else {
+            option.selected = true;
+        }
+
+        select.dataset.prefillApplying = 'true';
+        select.dataset.autofilled = 'true';
+        select.dataset.userEdited = 'false';
+        select.classList.add('autofill-highlight');
+        setTimeout(() => select.classList.remove('autofill-highlight'), 3500);
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        select.dataset.prefillApplying = 'false';
+    }
+
+    showVatPrefillMessages(payload, isError = false) {
+        const hintEl = document.getElementById('vatPrefillHint');
+        if (!hintEl) return;
+
+        if (payload === 'search') {
+            hintEl.innerHTML = '<span class="text-primary"><span class="spinner-border spinner-border-sm me-2"></span>Daten werden anhand der VAT-Nummer gesucht...</span>';
+            return;
+        }
+
+        const messages = (payload && payload.messages) ? [...payload.messages] : [];
+        if ((!messages.length) && payload && payload.error) {
+            messages.push({ level: 'danger', text: payload.error });
+        }
+
+        if (!messages.length) {
+            hintEl.innerHTML = isError ? '' : '<span class="text-success"><i class="bi bi-check-circle"></i> VAT-Daten geladen</span>';
+            return;
+        }
+
+        const levelClass = {
+            success: 'text-success',
+            info: 'text-primary',
+            warning: 'text-warning',
+            danger: 'text-danger',
+            error: 'text-danger'
+        };
+
+        const levelIcon = {
+            success: 'bi-check-circle',
+            info: 'bi-info-circle',
+            warning: 'bi-exclamation-triangle',
+            danger: 'bi-exclamation-octagon',
+            error: 'bi-exclamation-octagon'
+        };
+
+        hintEl.innerHTML = messages.map((msg) => {
+            const level = msg.level || 'info';
+            const css = levelClass[level] || 'text-primary';
+            const icon = levelIcon[level] || 'bi-info-circle';
+            return `<span class="d-block ${css}"><i class="bi ${icon} me-1"></i>${msg.text}</span>`;
+        }).join('');
     }
 
     displayQuotaExceededError(response) {

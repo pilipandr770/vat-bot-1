@@ -11,6 +11,7 @@ from services.sanctions import SanctionsService
 from crm.save_results import ResultsSaver
 from file_scanner.routes import file_scanner
 from services.business_registry import BusinessRegistryManager
+from services.vat_lookup import VatLookupService
 import asyncio
 from datetime import datetime
 
@@ -109,6 +110,7 @@ def create_app(config_name=None):
     sanctions_service = SanctionsService()
     results_saver = ResultsSaver(db)
     registry_manager = BusinessRegistryManager()
+    vat_lookup_service = VatLookupService()
     
     @app.route('/')
     def landing():
@@ -411,6 +413,47 @@ def create_app(config_name=None):
         results['sanctions'] = sanctions_result
         
         return results
+
+    @app.route('/api/vat-lookup', methods=['POST'])
+    def api_vat_lookup():
+        """Provide VAT-based prefill data for counterparty forms."""
+        if not current_user.is_authenticated:
+            return jsonify({
+                'success': False,
+                'error': 'Bitte melden Sie sich an',
+                'redirect': url_for('auth.login')
+            }), 401
+
+        payload = request.get_json(silent=True) or {}
+        vat_number = payload.get('vat_number', '').strip()
+        country_code = payload.get('country_code')
+        company_name_hint = payload.get('company_name')
+
+        if not vat_number:
+            return jsonify({
+                'success': False,
+                'error': 'Bitte geben Sie eine VAT-Nummer ein.'
+            }), 400
+
+        try:
+            lookup_result = vat_lookup_service.lookup(
+                vat_number,
+                country_code=country_code,
+                company_name_hint=company_name_hint
+            )
+            status_code = 200 if lookup_result.get('success', False) else 200
+            return jsonify(lookup_result), status_code
+        except ValueError as exc:
+            return jsonify({
+                'success': False,
+                'error': str(exc)
+            }), 400
+        except Exception as exc:  # pragma: no cover - fall-back
+            app.logger.exception('VAT lookup failed: %s', exc)
+            return jsonify({
+                'success': False,
+                'error': 'Interner Fehler bei der VAT-Suche'
+            }), 500
     
     # CLI commands for database management
     @app.cli.command()
