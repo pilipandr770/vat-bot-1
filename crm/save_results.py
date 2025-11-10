@@ -91,6 +91,8 @@ class ResultsSaver:
             'vies': 0.4,           # VAT validation is very important
             'sanctions': 0.35,      # Sanctions check is critical
             'handelsregister': 0.15, # German register is useful but not critical
+            'registry_cz': 0.15,
+            'registry_pl': 0.15,
             'insolvency': 0.1,     # Insolvency is important but less frequent
             'opencorporates': 0.05  # Additional verification
         }

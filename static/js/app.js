@@ -328,6 +328,10 @@ class CounterpartyVerification {
                 return this.formatVIESData(data);
             case 'handelsregister':
                 return this.formatHandelsregisterData(data);
+            case 'registry_cz':
+                return this.formatCzechRegistryData(data);
+            case 'registry_pl':
+                return this.formatPolishRegistryData(data);
             case 'sanctions':
                 return this.formatSanctionsData(data);
             case 'whois':
@@ -390,6 +394,75 @@ class CounterpartyVerification {
                     <strong>Дата перевірки:</strong> ${new Date(data.request_date).toLocaleString()}
                 </div>
             `;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    formatCzechRegistryData(data) {
+        let html = '<strong>ARES Unternehmensregister (Tschechien):</strong>';
+        html += '<div class="mt-2">';
+
+        if (data.message) {
+            html += `<div class="alert alert-info">${data.message}</div>`;
+        }
+
+        if (data.company_name) {
+            html += `<div class="mb-2"><strong>Firma:</strong> ${data.company_name}</div>`;
+        }
+
+        if (data.ico) {
+            html += `<div class="mb-2"><strong>IČO:</strong> ${data.ico}</div>`;
+        }
+
+        if (data.legal_form) {
+            html += `<div class="mb-2"><strong>Rechtsform:</strong> ${data.legal_form}</div>`;
+        }
+
+        if (data.address) {
+            const address = typeof data.address === 'string' ? data.address : JSON.stringify(data.address, null, 2);
+            html += `<div class="mb-2"><strong>Sitz:</strong> ${address}</div>`;
+        }
+
+        if (data.status) {
+            html += `<div class="mb-2"><strong>Status:</strong> ${data.status}</div>`;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    formatPolishRegistryData(data) {
+        let html = '<strong>Biała lista podatników VAT (Polen):</strong>';
+        html += '<div class="mt-2">';
+
+        if (data.message) {
+            html += `<div class="alert alert-info">${data.message}</div>`;
+        }
+
+        if (data.company_name) {
+            html += `<div class="mb-2"><strong>Nazwa:</strong> ${data.company_name}</div>`;
+        }
+
+        if (data.nip) {
+            html += `<div class="mb-2"><strong>NIP:</strong> ${data.nip}</div>`;
+        }
+
+        if (data.regon) {
+            html += `<div class="mb-2"><strong>REGON:</strong> ${data.regon}</div>`;
+        }
+
+        if (data.status_vat) {
+            html += `<div class="mb-2"><strong>Status VAT:</strong> ${data.status_vat}</div>`;
+        }
+
+        if (Array.isArray(data.account_numbers) && data.account_numbers.length) {
+            html += '<div class="mb-2"><strong>Konto bankowe:</strong><ul class="mb-0">';
+            data.account_numbers.forEach(account => {
+                html += `<li><code>${account}</code></li>`;
+            });
+            html += '</ul></div>';
         }
 
         html += '</div>';
@@ -655,6 +728,8 @@ class CounterpartyVerification {
         const names = {
             'vies': 'VIES VAT Überprüfung',
             'handelsregister': 'Handelsregister DE',
+            'registry_cz': 'ARES Firmenregister CZ',
+            'registry_pl': 'Polen VAT-White-List',
             'sanctions': 'Sanktionslisten EU/OFAC/UK',
             'insolvency': 'Insolvenzbekanntmachungen',
             'opencorporates': 'OpenCorporates',
@@ -673,6 +748,8 @@ class CounterpartyVerification {
         const icons = {
             'vies': 'bi-patch-check',
             'handelsregister': 'bi-building',
+            'registry_cz': 'bi-bank',
+            'registry_pl': 'bi-bank2',
             'sanctions': 'bi-shield-exclamation',
             'insolvency': 'bi-exclamation-triangle',
             'opencorporates': 'bi-globe'

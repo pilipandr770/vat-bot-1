@@ -134,18 +134,30 @@
                     <label for="counterparty_country" class="form-label">Land <span class="text-danger">*</span></label>
                     <select class="form-select" id="counterparty_country" name="counterparty_country" required>
                         <option value="">Land auswählen</option>
-                        <option value="DE">Deutschland</option>
-                        <option value="AT">Österreich</option>
-                        <option value="NL">Niederlande</option>
-                        <option value="FR">Frankreich</option>
-                        <option value="IT">Italien</option>
-                        <option value="ES">Spanien</option>
-                        <option value="PL">Polen</option>
-                        <option value="CZ">Tschechien</option>
-                        <option value="UA">Ukraine</option>
-                        <option value="US">USA</option>
-                        <option value="GB">Großbritannien</option>
+                        {% if registry_catalog.available %}
+                        <optgroup label="Kostenlos verfügbar (inkl. Handelsregister)">
+                            {% for entry in registry_catalog.available %}
+                                <option value="{{ entry.code }}">{{ entry.label }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endif %}
+                        {% if registry_catalog.planned %}
+                        <optgroup label="In Arbeit / Premium">
+                            {% for entry in registry_catalog.planned %}
+                                <option value="{{ entry.code }}" disabled>
+                                    {{ entry.label }} – {{ 'Premium' if 'premium' in entry.description|lower or 'kostenpflichtig' in entry.description|lower else 'In Entwicklung' }}
+                                </option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endif %}
                     </select>
+                    <div class="form-text">
+                        <strong>Verfügbar:</strong>
+                        {% for entry in registry_catalog.available %}
+                            {{ entry.label }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        . Weitere EU-Länder sind für Premium-Tarife oder zukünftige Integrationen vorgesehen.
+                    </div>
                 </div>
                 
                 <div class="mb-3">

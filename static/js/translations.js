@@ -10,6 +10,8 @@ const translations = {
         services: {
             vies: 'VIES USt-IdNr. Prüfung',
             handelsregister: 'Handelsregister',
+            registry_cz: 'ARES Firmenregister (CZ)',
+            registry_pl: 'Polnische White List',
             sanctions: 'Sanktionslisten'
         },
         labels: {

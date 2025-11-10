@@ -7,10 +7,10 @@ from config import config
 from crm.models import db, Company, Counterparty, VerificationCheck, CheckResult
 from auth.models import User
 from services.vies import VIESService
-from services.handelsregister import HandelsregisterService
 from services.sanctions import SanctionsService
 from crm.save_results import ResultsSaver
 from file_scanner.routes import file_scanner
+from services.business_registry import BusinessRegistryManager
 import asyncio
 from datetime import datetime
 
@@ -106,9 +106,9 @@ def create_app(config_name=None):
     
     # Initialize services
     vies_service = VIESService()
-    handelsregister_service = HandelsregisterService()
     sanctions_service = SanctionsService()
     results_saver = ResultsSaver(db)
+    registry_manager = BusinessRegistryManager()
     
     @app.route('/')
     def landing():
@@ -139,12 +139,17 @@ def create_app(config_name=None):
             .order_by(Alert.created_at.desc())\
             .limit(5).all()
         
-        return render_template('index.html',
-                             subscription=subscription,
-                             total_checks=total_checks,
-                             monthly_checks=monthly_checks,
-                             recent_checks=recent_checks,
-                             recent_alerts=recent_alerts)
+        registry_catalog = registry_manager.get_catalog_grouped()
+
+        return render_template(
+            'index.html',
+            subscription=subscription,
+            total_checks=total_checks,
+            monthly_checks=monthly_checks,
+            recent_checks=recent_checks,
+            recent_alerts=recent_alerts,
+            registry_catalog=registry_catalog
+        )
     
     @app.route('/test')
     def test_form():
@@ -390,11 +395,13 @@ def create_app(config_name=None):
             results['vies'] = vies_result
         
         # Handelsregister (for German companies)
-        if counterparty_data['country'].upper() == 'DE':
-            handelsregister_result = handelsregister_service.check_company(
-                counterparty_data['company_name']
-            )
-            results['handelsregister'] = handelsregister_result
+        registry_result = registry_manager.lookup(
+            counterparty_data['country'],
+            counterparty_data['company_name'],
+            vat_number=counterparty_data.get('vat_number')
+        )
+        if registry_result:
+            results[registry_result.get('source', f"registry_{counterparty_data['country'].lower()}")] = registry_result
         
         # Sanctions check
         sanctions_result = sanctions_service.check_sanctions(
