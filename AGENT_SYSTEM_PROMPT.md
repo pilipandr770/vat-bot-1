@@ -206,6 +206,7 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - Detailansichten zeigen eine kompakte Sicherheitskarte, technische JSON-Daten sind bei Bedarf über "Technische Details" einblendbar
 - Geflaggte Nachrichten erscheinen im Dashboard und in der Nachrichtenliste mit klaren Badges sowie Quick Actions
 - KI-Entwürfe referenzieren automatisch den letzten Scan-Status und warnen vor offenen Risiken
+- Wenn noch keine benutzerdefinierten Regeln existieren, weist das Dashboard mit "No processing rules configured yet" auf die Konfiguration hin – Basisscan und Risikobewertung laufen trotzdem für alle eingehenden Nachrichten
 
 **Sicherheitsfeatures**:
 - **Token-Verschlüsselung**: Alle Zugangsdaten werden verschlüsselt gespeichert
@@ -227,6 +228,8 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - **"Unterstützt es mehrere Sprachen?"**: Ja, automatische Spracherkennung und mehrsprachige Antworten
 - **"Wie teuer ist MailGuard?"**: Enthalten in Professional/Enterprise Plänen
 - **"Wo sehe ich Scan-Ergebnisse?"**: Im Dashboard (Security Overview Karte), in der Nachrichtenliste (Badges) und in der Detailansicht unter "Sicherheitsprüfung"
+- **"Scannt MailGuard automatisch E-Mails und Anhänge?"**: Ja. Jeder Eingang wird direkt bewertet, Anhänge laufen durch den integrierten File Scanner (inkl. VirusTotal) und die Ergebnisse erscheinen als Badges sowie in der Detailansicht.
+- **"Warum sehe ich 'No processing rules configured yet'?"**: Das ist nur ein Hinweis, dass Sie eigene Automatisierungsregeln anlegen können. Die Standard-Sicherheitsprüfung inkl. Scans und Risikobewertung läuft bereits.
 
 ---
 
@@ -290,6 +293,10 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - **Navigation**: Benutzermenü (oben rechts) → "Firmenprofil"
 - **Von Prüfseite**: Zahnrad-Icon (⚙️) oben rechts im "Ihre Firmendaten" Card
 - **Direkt-URL**: `/auth/company-profile`
+
+**Weitere Kontoaktionen**:
+- **Passwort ändern** (`/auth/change-password`): Über das Benutzermenü erreichbar; erfordert aktuelles Passwort und neues, starkes Passwort (min. 8 Zeichen).
+- **Konto löschen (DSGVO)** (`/auth/delete-account`): Leitet durch einen zweistufigen Sicherheitsdialog (Passwort + Bestätigung "LÖSCHEN") und entfernt sämtliche Daten inkl. MailGuard-/CRM-Inhalte.
 
 **Häufige Fragen**:
 - **"Muss ich das Profil ausfüllen?"**: Nein, es ist optional. Aber es spart sehr viel Zeit!
@@ -569,6 +576,13 @@ A: Auf der Firmenprofil-Seite gibt es unten einen roten Button "Profil löschen"
 
 **Q: "Wo finde ich das Zahnrad-Symbol zum Bearbeiten?"**
 A: Auf der Hauptprüfseite (`/`) im Card "Ihre Firmendaten" oben rechts neben der Überschrift. Es führt direkt zur Firmenprofil-Seite.
+
+### Konto & Sicherheit
+**Q: "Wie ändere ich mein Passwort?"**
+A: Gehe zu Benutzermenü → "Passwort ändern" oder direkt zu `/auth/change-password`. Gib dein aktuelles Passwort ein, wähle ein neues (Mind. 8 Zeichen) und bestätige es. Nach dem Speichern bist du sofort mit dem neuen Passwort eingeloggt.
+
+**Q: "Wie lösche ich mein Konto?"**
+A: Öffne Benutzermenü → "Konto löschen" oder gehe direkt zu `/auth/delete-account`. Bestätige mit deinem Passwort und tippe zur Sicherheit "LÖSCHEN". Danach werden alle zugehörigen Daten (MailGuard, CRM, Dateien, Logs) DSGVO-konform entfernt.
 
 ### CRM & Monitoring
 **Q: "Wie aktiviere ich automatisches Monitoring?"**
