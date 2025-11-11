@@ -1,32 +1,59 @@
-# Counterparty Verification System
+# Counterparty Verification System + MailGuard
 
-Flask веб-додаток для автоматизованої перевірки контрагентів через інтеграцію з офіційними реєстрами та API. Система приймає дані компанії та контрагента, перевіряє їх через різні джерела (VIES, Handelsregister, санкційні списки) і надає комплексну оцінку надійності.
+Flask SaaS platform for automated business partner verification and intelligent email processing. The system integrates with official registries (VIES, Handelsregister, sanctions lists) and provides AI-powered email management with security scanning.
 
 ## 🎯 Основні можливості
 
+### Counterparty Verification
 - **3-колонковий веб-інтерфейс**: Дані компанії → Дані контрагента → Результати перевірки
 - **Автоматизовані перевірки**: VIES VAT, Handelsregister, санкційні списки EU/OFAC/UK
-- **Збереження результатів**: Повна історія перевірок з можливістю пошуку
-- **Моніторинг змін**: Щоденні перевірки з нотифікаціями про зміни
-- **Система алертів**: Email та Telegram повідомлення при виявленні проблем
+- **OSINT Scanner**: WHOIS, DNS, SSL Labs, Security Headers для digital due diligence
+- **CRM Integration**: Збереження контрагентів з історією перевірок
+- **Monitoring System**: Щоденні перевірки з алертами про зміни статусу
+
+### MailGuard Email Intelligence
+- **Multi-Provider Support**: Gmail (OAuth), Microsoft 365 (OAuth), IMAP
+- **AI Reply Generation**: OpenAI GPT-4 для автоматичних відповідей
+- **Security Scanning**: Аналіз вкладень, phishing detection, spam filtering
+- **Rule Engine**: Priority-based автоматична обробка по відправнику/темі/домену
+- **Approval Workflow**: Human-in-the-loop для критичних рішень
+
+### SaaS Features
+- **Authentication**: Flask-Login with email confirmation
+- **Subscriptions**: Free (5 checks/month), Starter, Professional, Enterprise
+- **Stripe Integration**: Automated billing with webhook handling
+- **Multi-tenant**: PostgreSQL schema-based isolation
 
 ## 🏗️ Архітектура
 
 ```
-├── app.py                    # Flask application entry point
-├── config.py                 # Configuration management  
+├── wsgi.py                   # Application entry point (resolves app/ directory conflict)
+├── application.py            # Flask factory with all blueprints
+├── config.py                 # Environment-based configuration
 ├── requirements.txt          # Python dependencies
-├── templates/                # Jinja2 templates (3-column UI)
+├── templates/                # Jinja2 templates (German UI)
 ├── static/                   # CSS/JS assets
 ├── services/                 # API integration modules
-│   ├── vies.py              # EU VAT validation
-│   ├── handelsregister.py   # German business register
-│   └── sanctions.py         # EU/OFAC/UK sanctions lists
-├── crm/                     # Database and CRM integration
-│   ├── models.py            # SQLAlchemy models
+│   ├── vies.py              # EU VAT validation (SOAP API)
+│   ├── handelsregister.py   # German business register scraper
+│   ├── sanctions.py         # EU/OFAC/UK sanctions lists
+│   └── osint/               # Open Source Intelligence scanner
+├── crm/                     # CRM and verification database
+│   ├── models.py            # Company, Counterparty, VerificationCheck
+│   ├── osint_models.py      # OsintScan, OsintFinding
 │   ├── save_results.py      # Result persistence logic
-│   └── monitor.py           # Daily monitoring
-└── notifications/           # Alert system
+│   └── monitor.py           # Daily monitoring service
+├── auth/                    # Authentication and subscriptions
+│   ├── models.py            # User, Subscription, Payment
+│   └── routes.py            # Login, register, password reset
+├── app/mailguard/           # MailGuard email intelligence module
+│   ├── models.py            # MailAccount, MailMessage, MailRule, MailDraft
+│   ├── views.py             # Dashboard, account management
+│   ├── oauth.py             # Gmail & Microsoft OAuth flows
+│   ├── connectors/          # Gmail, Microsoft Graph, IMAP, SMTP clients
+│   ├── nlp_reply.py         # OpenAI GPT-4 reply generation
+│   └── scanner.py           # Attachment security scanner
+└── migrations/              # Alembic database migrations (7 versions)
 ```
 
 ## 🚀 Швидкий старт
@@ -47,17 +74,37 @@ venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 ```
 
-### 2. Налаштування конфігурації
+### 2. Налаштування PostgreSQL бази даних
 
-Скопіюйте `.env` файл і налаштуйте свої API ключі:
+**Важливо**: Проект використовує PostgreSQL як основну базу даних (SQLite не підтримується).
+
+```bash
+# Переконайтеся, що PostgreSQL встановлено і запущено
+# Для Windows: Перевірте службу "PostgreSQL" у Services
+
+# Створіть базу даних (якщо вона не існує)
+createdb -U postgres vat_bot_dev
+
+# Або через psql:
+psql -U postgres
+CREATE DATABASE vat_bot_dev;
+\q
+```
+
+**Примітка**: Якщо PostgreSQL працює на нестандартному порту (наприклад, 5433), оновіть `DATABASE_URL` у `.env`.
+
+### 3. Налаштування конфігурації
+
+Створіть файл `.env` у корені проекту:
 
 ```bash
 # Flask Configuration
 FLASK_ENV=development
 SECRET_KEY=your-secret-key-change-in-production
 
-# Database (PostgreSQL локально)
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vat_bot_dev
+# Database (PostgreSQL)
+# ВАЖЛИВО: Перевірте ваш порт PostgreSQL (стандартно 5432, але може бути 5433)
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/vat_bot_dev
 DB_SCHEMA=vat_verification
 
 # API Keys (опціонально для тестування)
@@ -65,6 +112,15 @@ VIES_API_KEY=
 HANDELSREGISTER_API_KEY=
 OPENCORPORATES_API_KEY=
 SANCTIONS_API_KEY=
+
+# MailGuard OAuth (опціонально)
+GMAIL_CLIENT_ID=
+GMAIL_CLIENT_SECRET=
+MS_CLIENT_ID=
+MS_CLIENT_SECRET=
+
+# OpenAI для MailGuard AI-відповідей
+OPENAI_API_KEY=
 
 # Notifications (опціонально)
 TELEGRAM_BOT_TOKEN=
@@ -74,32 +130,45 @@ SMTP_USERNAME=
 SMTP_PASSWORD=
 ```
 
-⚠️ Перед запуском створіть локальну базу даних PostgreSQL `vat_bot_dev` і переконайтеся, що служба PostgreSQL запущена (`createdb vat_bot_dev`).
-
-### 3. Ініціалізація бази даних
+### 4. Ініціалізація бази даних
 
 ```bash
-# Ініціалізація міграцій
-flask db init
-
-# Створення міграції
-flask db migrate -m "Initial migration"
-
-# Застосування міграції
+# Застосування міграцій до PostgreSQL
 flask db upgrade
+
+# Перевірте, що всі міграції застосовано:
+# Шукайте повідомлення: "Running upgrade ... -> 7b1be3569a24, Add reply instructions to MailRule"
 ```
 
-### 4. Запуск додатку
+### 5. Створення адміністративного користувача
 
 ```bash
-# Режим розробки
+# Запустіть скрипт створення адміна
+python create_admin.py
+
+# Отримаєте:
+# Email: admin@example.com
+# Password: admin123
+# Plan: Free (5 checks/month)
+```
+
+⚠️ **Важливо**: Змініть пароль адміна після першого входу!
+
+### 6. Запуск додатку
+
+```bash
+# Режим розробки з автоперезавантаженням
 flask run --debug
 
 # Або через Python
-python app.py
+python wsgi.py
 ```
 
 Відкрийте браузер і перейдіть на `http://localhost:5000`
+
+**Авторизація**:
+- Email: `admin@example.com`
+- Password: `admin123`
 
 ## 🔧 Використання
 

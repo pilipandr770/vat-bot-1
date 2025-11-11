@@ -1,103 +1,250 @@
 # 🚀 Швидкий старт - Counterparty Verification System
 
-## ✅ Система успішно встановлена!
+## ✅ Локальна розробка з PostgreSQL
 
-Сервер запущено на: **http://127.0.0.1:5000**
-
----
-
-## 📋 Доступні сторінки:
-
-### 1. **Головна сторінка** (Основний інтерфейс)
-🔗 http://127.0.0.1:5000/
-
-3-колонковий інтерфейс для перевірки контрагентів:
-- Ліва колонка: Дані вашої компанії
-- Середня колонка: Дані контрагента  
-- Права колонка: Результати перевірки
-
-### 2. **Тестова форма** (Для налагодження)
-🔗 http://127.0.0.1:5000/test
-
-Проста тестова форма з попередньо заповненими даними для швидкого тестування API.
-
-### 3. **Історія перевірок**
-🔗 http://127.0.0.1:5000/history
-
-Перегляд всіх проведених перевірок з можливістю пагінації.
+Сервер запускається на: **http://127.0.0.1:5000**
 
 ---
 
-## 🧪 Тестування системи:
+## � Крок 1: Встановлення залежностей
+
+```bash
+# Клонування репозиторію
+git clone <repo-url>
+cd vat-bot-1
+
+# Віртуальне середовище
+python -m venv venv
+venv\Scripts\activate  # Windows
+
+# Встановлення пакетів
+pip install -r requirements.txt
+```
+
+---
+
+## 🐘 Крок 2: Налаштування PostgreSQL
+
+**Важливо**: Проект використовує PostgreSQL (SQLite не підтримується)
+
+```bash
+# Перевірте, що PostgreSQL запущено
+# Windows: Services → PostgreSQL Server
+
+# Створіть базу даних
+psql -U postgres
+CREATE DATABASE vat_bot_dev;
+\q
+```
+
+**Якщо PostgreSQL на нестандартному порту (5433 замість 5432)**:
+Оновіть `.env` файл з правильним портом.
+
+---
+
+## ⚙️ Крок 3: Конфігурація (.env файл)
+
+Створіть `.env` у корені проекту:
+
+```bash
+# Flask
+FLASK_ENV=development
+SECRET_KEY=your-secret-key-here
+
+# PostgreSQL (перевірте ваш порт!)
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/vat_bot_dev
+DB_SCHEMA=vat_verification
+
+# API Keys (опціонально для тестування)
+OPENAI_API_KEY=  # Для MailGuard AI-відповідей
+GMAIL_CLIENT_ID=  # Gmail OAuth
+GMAIL_CLIENT_SECRET=
+MS_CLIENT_ID=  # Microsoft OAuth
+MS_CLIENT_SECRET=
+```
+
+---
+
+## 🗄️ Крок 4: Міграції бази даних
+
+```bash
+# Застосувати всі міграції
+flask db upgrade
+
+# Має показати 7 міграцій:
+# - 361def0cfaed: Initial migration with all models
+# - cd954586ac25: Add OSINT tables
+# - c8560cadc898: Add user_id to counterparties
+# - f9b5e3a7c2d4: Create MailGuard tables
+# - a1b2c3d4e5f6: Add attachment_metadata
+# - 6d7e8f9a0b1c: Add OSINT indexes
+# - 7b1be3569a24: Add reply instructions to MailRule
+```
+
+---
+
+## 👤 Крок 5: Створення адміністратора
+
+```bash
+python create_admin.py
+```
+
+**Отримаєте**:
+- Email: `admin@example.com`
+- Password: `admin123`
+- Plan: Free (5 checks/month)
+
+⚠️ **Змініть пароль після першого входу!**
+
+---
+
+## 🚀 Крок 6: Запуск сервера
+
+```bash
+# Режим розробки з автоперезавантаженням
+flask run --debug
+
+# Або через Python
+python wsgi.py
+```
+
+Відкрийте: **http://127.0.0.1:5000**
+
+---
+
+## 📋 Доступні маршруты:
+
+### 🏠 Головні сторінки
+- **Landing Page**: http://127.0.0.1:5000/ (маркетингова сторінка)
+- **Dashboard**: http://127.0.0.1:5000/dashboard (після логіна)
+- **Login**: http://127.0.0.1:5000/auth/login
+- **Register**: http://127.0.0.1:5000/auth/register
+
+### ✅ Counterparty Verification
+- **Verification Interface**: http://127.0.0.1:5000/verify (3-колонковий інтерфейс)
+- **History**: http://127.0.0.1:5000/history (історія перевірок)
+
+### 🔍 OSINT Scanner
+- **OSINT Dashboard**: http://127.0.0.1:5000/osint
+- **New Scan**: http://127.0.0.1:5000/osint/scan
+
+### 📧 MailGuard
+- **MailGuard Dashboard**: http://127.0.0.1:5000/mailguard
+- **Account Management**: http://127.0.0.1:5000/mailguard/accounts
+- **Rules Management**: http://127.0.0.1:5000/mailguard/rules
+
+### 👥 CRM
+- **Counterparties List**: http://127.0.0.1:5000/crm/counterparties
+- **Add Counterparty**: http://127.0.0.1:5000/crm/counterparties/new
+
+### 💳 Subscriptions
+- **Pricing**: http://127.0.0.1:5000/pricing
+- **My Subscription**: http://127.0.0.1:5000/subscription
+
+---
+
+## 🧪 Тестування системи
 
 ### Варіант 1: Через веб-інтерфейс
-1. Відкрийте: http://127.0.0.1:5000/test
-2. Натисніть "Run Verification"
-3. Перевірте результати
+1. Залогіньтеся: http://127.0.0.1:5000/auth/login
+   - Email: `admin@example.com`
+   - Password: `admin123`
+2. Перейдіть на http://127.0.0.1:5000/verify
+3. Заповніть форму і натисніть "Verify Counterparty"
 
-### Варіант 2: Через тестовий скрипт
+### Варіант 2: Тестовий скрипт
 ```bash
 python test_system.py
 ```
 
-Цей скрипт перевірить:
-- ✅ Підключення до БД
+Перевіряє:
+- ✅ Підключення до PostgreSQL
 - ✅ VIES сервіс
 - ✅ Sanctions сервіс
 - ✅ Handelsregister сервіс
-- ✅ Створення тестових даних
 
 ---
 
-## 🔍 Якщо є проблема 400 (Bad Request):
+## � Усунення проблем
 
-### Діагностика:
-1. Відкрийте тестову форму: http://127.0.0.1:5000/test
-2. Заповніть форму і натисніть "Run Verification"
-3. Перевірте консоль браузера (F12) на помилки
-4. Перевірте термінал Flask на логи
+### Проблема: Connection refused on port 5432
+**Причина**: PostgreSQL працює на нестандартному порту 5433
 
-### Можливі причини:
-- ❌ Відсутні обов'язкові поля (VAT, company name, counterparty name, country)
-- ❌ Неправильний формат даних
-- ❌ Проблеми з CORS (якщо запит з іншого домену)
+**Рішення**:
+```bash
+# Оновіть .env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/vat_bot_dev
+```
 
-### Рішення:
-Перевірте, що всі обов'язкові поля заповнені:
+### Проблема: Authentication failed for user "postgres"
+**Причина**: Пароль PostgreSQL не встановлено
 
-**Для компанії:**
-- ✔️ VAT номер
-- ✔️ Назва компанії
-- ✔️ Юридична адреса
+**Рішення**:
+```bash
+psql -U postgres
+ALTER USER postgres WITH PASSWORD 'postgres';
+\q
+```
 
-**Для контрагента:**
-- ✔️ Назва компанії
-- ✔️ Країна
+### Проблема: ImportError: cannot import name 'Markup' from 'flask'
+**Причина**: Flask-WTF 1.1.1 несумісний з Flask 2.3
+
+**Рішення**:
+```bash
+pip install Flask-WTF==1.2.1 --upgrade
+```
 
 ---
 
-## 📊 Приклад правильного запиту:
+## 📊 Структура бази даних
 
-```javascript
-const formData = new FormData();
+**Схема**: `vat_verification` (PostgreSQL schema isolation)
 
-// Company data
-formData.append('company_vat', 'DE123456789');
-formData.append('company_name', 'Test Company GmbH');
-formData.append('company_address', 'Test Street 1, Berlin');
-formData.append('company_email', 'test@example.com');
-formData.append('company_phone', '+49 30 12345678');
+**Таблиці**:
+- `users` - Користувачі та аутентифікація
+- `subscriptions` - Підписки (Free/Starter/Pro/Enterprise)
+- `payments` - Історія платежів (Stripe)
+- `companies` - Ваші компанії
+- `counterparties` - Контрагенти
+- `verification_checks` - Результати перевірок
+- `check_results` - Детальні результати по сервісам
+- `osint_scans` - OSINT сканування
+- `osint_findings` - Результати OSINT
+- `mail_account` - Email акаунти для MailGuard
+- `mail_message` - Входящі emails
+- `mail_rule` - Правила обробки
+- `mail_draft` - AI-генерирувані відповіді
+- `known_counterparty` - Відомі контакти
+- `scan_report` - Результати сканування вкладень
 
-// Counterparty data
-formData.append('counterparty_name', 'Sample AG');
-formData.append('counterparty_country', 'DE');
-formData.append('counterparty_vat', 'DE987654321');
-formData.append('counterparty_address', 'Sample Street, Munich');
-formData.append('counterparty_email', 'contact@sample.com');
-formData.append('counterparty_domain', 'sample.com');
+---
 
-fetch('http://127.0.0.1:5000/verify', {
-    method: 'POST',
+## 🎯 Що далі?
+
+### Імплементовані можливості (Free Tier)
+✅ VIES VAT validation  
+✅ Sanctions checks (EU/OFAC/UK)  
+✅ OSINT Scanner (WHOIS, DNS, SSL Labs)  
+✅ CRM with monitoring  
+✅ MailGuard database models  
+✅ Stripe subscriptions  
+
+### Наступна фаза (Paid APIs Integration)
+🔄 OAuth flows (Gmail + Microsoft)  
+🔄 Email fetching background jobs  
+🔄 AI reply approval workflow  
+💰 Premium APIs (Creditsafe, Clearbit, Dow Jones)  
+💰 Enhanced verification data sources  
+
+---
+
+## 📚 Додаткова документація
+
+- **Development Guide**: `.github/copilot-instructions.md`
+- **MailGuard Implementation**: `MAILGUARD_IMPLEMENTATION_PLAN.md`
+- **CRM Features**: `CRM_IMPLEMENTATION_SUMMARY.md`
+- **OSINT Guide**: `OSINT_GUIDE.md`
+- **Deployment**: `RENDER_AUTO_DEPLOY.md`
     body: formData
 })
 .then(response => response.json())

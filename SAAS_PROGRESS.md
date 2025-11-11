@@ -1,96 +1,171 @@
 # VAT Verifizierung - SaaS Platform
 
-## Projektstatus: SaaS Transformation (Phase 1-3 abgeschlossen)
+## Projektstatus: Free Tier Features Complete (Phase 1-4 abgeschlossen, Phase 5 geplant)
 
-### 🎯 Ziel
-Umwandlung des VAT Verification Systems in eine vollwertige SaaS-Plattform mit:
-- Benutzerregistrierung & Authentifizierung
-- Abonnement-Management (Kostenlos/Pro/Enterprise)
-- Stripe-Zahlungsintegration
-- Admin-Dashboard
-- Deutsche Benutzeroberfläche
-
----
-
-## ✅ Was wurde implementiert
-
-### 1. **Lokalisierung auf Deutsch**
-- ✅ `templates/base.html` - Vollständig übersetzt
-- ✅ `templates/index.html` - Deutsche Formulare und Labels
-- ✅ `static/js/translations.js` - Übersetzungs-Helper
-- ✅ Alle UI-Texte auf Deutsch konvertiert
-
-### 2. **Authentifizierungssystem**
-- ✅ `auth/models.py` - User, Subscription, Payment Modelle
-- ✅ `auth/forms.py` - Registrierungs-, Login- und Passwort-Reset-Formulare (Deutsch)
-- ✅ Flask-Login Integration vorbereitet
-- ✅ E-Mail-Bestätigung Logik
-- ✅ Passwort-Hashing mit Werkzeug
-
-### 3. **Landing Page**
-- ✅ `templates/landing.html` - Vollständige Marketing-Seite
-- ✅ `static/css/landing.css` - Modernes Design mit Animationen
-- ✅ Funktionen-Sektion mit 6 Features
-- ✅ Preisübersicht (3 Pläne: Kostenlos/Pro/Enterprise)
-- ✅ FAQ-Sektion
-- ✅ Call-to-Action Bereiche
-
-### 4. **Abonnement-System**
-- ✅ Subscription Model mit Plan-Management
-- ✅ API-Quota-System (5/200/Unbegrenzt)
-- ✅ Nutzungsverfolgung pro Benutzer
-- ✅ Plan-Details Konfiguration:
-  - **Kostenlos**: 5 Prüfungen/Monat, 0€
-  - **Professional**: 200 Prüfungen/Monat, 49,99€
-  - **Enterprise**: Unbegrenzt, 199,99€
-- ✅ Zahlungs-Verlauf Modell
-
-### 5. **Abhängigkeiten**
-- ✅ Flask-Login==0.6.2 (Authentifizierung)
-- ✅ Flask-Mail==0.9.1 (E-Mail-Versand)
-- ✅ stripe==6.5.0 (Zahlungen)
-- ✅ email-validator==2.0.0 (E-Mail-Validierung)
-- ✅ itsdangerous==2.1.2 (Token-Sicherheit)
+### 🎯 Projektziel
+Multi-Modul SaaS-Plattform kombiniert:
+1. **Counterparty Verification**: Automatisierte EU-Geschäftspartner-Überprüfung mit VAT-Validierung, Sanktionsprüfungen, OSINT-Scans
+2. **MailGuard**: Intelligentes E-Mail-Verarbeitungssystem mit KI-gestützten Antworten, Sicherheitsprüfungen und Multi-Provider-Unterstützung (Gmail, Microsoft 365, IMAP)
+3. **CRM & Monitoring**: Kontrahenten-Management mit täglichen Statusüberwachungen
+4. **Subscription Management**: Stripe-basierte Abonnements mit automatischer Abrechnung
 
 ---
 
-## 🚧 In Entwicklung
+## ✅ Was wurde implementiert (FREE TIER KOMPLETT)
 
-### Authentifizierungsrouten (in Arbeit)
-Nächste Schritte:
-1. Login/Register Routen in `app.py`
-2. E-Mail-Versand-Service konfigurieren
-3. Session-Management einrichten
-4. Password-Reset-Funktionalität
+### 1. **Authentifizierung & Benutzerverwaltung** ✅
+- **Flask-Login Integration**: Vollständige Session-Verwaltung
+- **User Model** (`auth/models.py`): Email-Bestätigung, Passwort-Hashing, Abonnement-Tracking
+- **Registrierung/Login/Logout**: Deutsche UI mit E-Mail-Validierung
+- **Passwort-Reset**: Token-basiert mit itsdangerous
+- **Admin User Creation**: `create_admin.py` Skript (admin@example.com / admin123)
+
+### 2. **Subscription System** ✅
+- **Subscription Model**: Plan-Management (Free/Starter/Professional/Enterprise)
+- **API-Quota-System**: 
+  - Free: 5 Verifications/Monat
+  - Starter: 50/Monat (€29)
+  - Professional: 500/Monat (€99)
+  - Enterprise: Unbegrenzt (€299)
+- **Payment Model**: Stripe-Transaktionshistorie
+- **Quota Enforcement**: Middleware-basierte Limitierung (`can_perform_verification()`)
+
+### 3. **Stripe Integration** ✅
+- **Checkout Sessions**: `POST /payments/create-checkout-session`
+- **Webhook Handler**: `POST /payments/webhook` (7 Events verarbeitet)
+  - `checkout.session.completed` → Aktivierung
+  - `invoice.payment_succeeded` → Quota-Reset
+  - `customer.subscription.deleted` → Downgrade zu Free
+  - Weitere: updated, created, payment_failed
+- **Price IDs**: In `config.py` konfiguriert
+- **Signature Verification**: HMAC mit STRIPE_WEBHOOK_SECRET
+
+### 4. **Counterparty Verification (Free Services)** ✅
+- **VIES API Integration** (`services/vies.py`): EU VAT-Validierung (SOAP API)
+- **Handelsregister Scraper** (`services/handelsregister.py`): Deutsche Firmenregister
+- **Sanctions Checks** (`services/sanctions.py`): EU/OFAC/UK Sanktionslisten
+- **Result Persistence** (`crm/save_results.py`): Speicherung in `verification_checks` + `check_results`
+- **3-Column UI**: Company Data → Counterparty Data → Results (German interface)
+
+### 5. **OSINT Scanner** ✅
+- **OSINT Models** (`crm/osint_models.py`): OsintScan, OsintFinding
+- **Scanner Modules** (`services/osint/`):
+  - WHOIS Adapter (Domain-Registrierungsdaten)
+  - DNS Adapter (A, AAAA, MX, NS, TXT Records)
+  - SSL Labs Adapter (Zertifikatsprüfung, Bewertung)
+  - Security Headers Adapter (HTTP-Sicherheitsheader)
+  - Robots.txt Crawler
+  - Social Media Link Detector
+- **OSINT Dashboard**: `/osint` (Scanhistorie, neue Scans)
+- **Integration**: Automatische OSINT-Prüfung bei Kontrahenten-Verifizierung
+
+### 6. **CRM & Monitoring** ✅
+- **Models** (`crm/models.py`):
+  - Company (Ihre Firmen)
+  - Counterparty (Geschäftspartner)
+  - VerificationCheck (Prüfungshistorie)
+  - CheckResult (Detaillierte Ergebnisse)
+  - Alert (Benachrichtigungen)
+- **Monitoring Service** (`crm/monitor.py`):
+  - `run_daily_checks()` → Tägliche Statusprüfungen
+  - Change Detection: VAT-Status, Sanktionen, Insolvenz
+  - Alert-Generierung (critical/high/medium/low)
+- **CRM Dashboard**: `/crm/counterparties` (Liste, Details, Monitoring-Toggle)
+- **API Endpoints**: `/api/counterparties/<id>/monitoring` (Aktivierung/Deaktivierung)
+
+### 7. **MailGuard - Email Intelligence (Models & Core Logic)** ✅
+- **Database Models** (`app/mailguard/models.py`):
+  - MailAccount (Gmail/Microsoft/IMAP Konten, verschlüsselte Tokens)
+  - MailMessage (Eingangsnachrichten, Risikobewertung)
+  - MailRule (Priority-basierte Verarbeitungsregeln)
+  - MailDraft (KI-generierte Antworten, Genehmigungsworkflow)
+  - KnownCounterparty (Vertrauenswürdige Kontakte)
+  - ScanReport (Sicherheitsprüfungen: Antivirus, Phishing, Spam)
+- **Connectors** (`app/mailguard/connectors/`):
+  - Gmail API Client (`gmail.py`) - OAuth 2.0 Flow
+  - Microsoft Graph Client (`msgraph.py`) - MSAL Auth
+  - IMAP Client (`imap.py`) - IMAPClient
+  - SMTP Sender (`smtp.py`) - smtplib
+- **AI Reply Generator** (`app/mailguard/nlp_reply.py`): OpenAI GPT-4 Integration
+- **Rule Engine** (`app/mailguard/rules.py`): Priority-basiertes Matching
+- **Security Scanner** (`app/mailguard/scanner.py`): Attachment-Analyse (VirusTotal API ready)
+- **Dashboard**: `/mailguard` (Konten, Regeln, ausstehende Genehmigungen)
+
+### 8. **Landing Page & UI** ✅
+- **Marketing Page** (`templates/landing.html`): Deutsche Landingpage mit Preisübersicht
+- **Features Section**: 6 Hauptfunktionen dargestellt
+- **Pricing Tiers**: Free/Starter/Professional/Enterprise
+- **FAQ Section**: Häufige Fragen
+- **Legal Pages**: AGB (`/legal/agb`), Datenschutz (`/legal/datenschutz`), Impressum (`/legal/impressum`)
+
+### 9. **Database & Migrations** ✅
+- **PostgreSQL-First**: Keine SQLite-Unterstützung mehr
+- **Schema Isolation**: `vat_verification` Schema für Multi-Tenancy
+- **7 Alembic Migrations**: Idempotente, schema-aware Migrationen
+  - 361def0cfaed: Initial models (users, companies, subscriptions)
+  - cd954586ac25: OSINT tables
+  - c8560cadc898: user_id backfill für Counterparties
+  - f9b5e3a7c2d4: MailGuard tables
+  - a1b2c3d4e5f6: Attachment metadata
+  - 6d7e8f9a0b1c: OSINT indexes
+  - 7b1be3569a24: MailRule reply instructions
+- **Automatic Schema Creation**: `ensure_schema()` Hook in `application.py`
+
+### 10. **Deployment** ✅
+- **Render.com**: Produktions-Deployment (PostgreSQL)
+- **Entry Point**: `wsgi.py` (löst app/ Directory-Konflikt)
+- **Environment Variables**: 15+ ENV vars konfiguriert (.env Template)
+- **Auto-Deploy**: GitHub Push → Render Build → Migrations → Server Start
 
 ---
 
-## 📋 Noch zu implementieren
+## ⚠️ Teilweise implementiert (80% fertig)
 
-### 5. **Stripe-Integration**
-- [ ] Stripe Checkout Session
-- [ ] Webhook-Handler für Ereignisse
-- [ ] Abonnement-Erstellung/Aktualisierung
-- [ ] Rechnungsgenerierung
+### MailGuard OAuth Integration
+- **Code existiert**: `app/mailguard/oauth.py` (Gmail + Microsoft OAuth Flows)
+- **Nicht verbunden**: Routes `/auth/gmail`, `/auth/microsoft` sind Platzhalter
+- **Fehlende Implementation**:
+  - OAuth Callback-Handler (`/auth/gmail/callback`, `/auth/microsoft/callback`)
+  - IMAP Account Setup Form (`/accounts/add-imap`)
+  - Background Email Fetching (APScheduler Jobs nicht gestartet)
+  - Email Sending Integration (SMTP/Gmail API senden)
 
-### 6. **Admin-Dashboard**
-- [ ] Benutzer-Management-Ansicht
-- [ ] Statistiken (MRR, Abonnenten, API-Nutzung)
-- [ ] Logs & Monitoring
-- [ ] Moderationswerkzeuge
+### CRM-MailGuard Sync
+- **KnownCounterparty existiert**: Separate Tabelle für MailGuard-Kontakte
+- **Keine Synchronisation**: Kein Link zu `crm.Counterparty`
+- **Benötigt**: Automatische Verknüpfung bei E-Mail-Erkennung
 
-### 7. **Benutzer-Dashboard**
-- [ ] Profil-Seite
-- [ ] Prüfungsverlauf mit Filter
-- [ ] API-Quota-Anzeige
-- [ ] Abonnement-Verwaltung
-- [ ] Rechnungshistorie
+---
 
-### 8. **Dokumentation**
-- [ ] README auf Deutsch aktualisieren
-- [ ] API-Dokumentation erstellen
-- [ ] Deployment-Anleitung
-- [ ] Entwickler-Guidelines
+## 📋 Noch zu implementieren (PHASE 5: PAID APIS)
+
+### Nächste Priorität: MailGuard OAuth Fertigstellung
+1. **Gmail OAuth Flow**:
+   - `GET /mailguard/auth/gmail` → Start OAuth (redirect zu Google Consent)
+   - `GET /mailguard/auth/gmail/callback` → Code Exchange → Token-Speicherung
+   - Test: 1 E-Mail abrufen via Gmail API
+
+2. **Microsoft OAuth Flow**:
+   - `GET /mailguard/auth/microsoft` → MSAL Flow starten
+   - `GET /mailguard/auth/microsoft/callback` → Token-Austausch
+   - Test: 1 E-Mail abrufen via Microsoft Graph
+
+3. **IMAP Setup**:
+   - Form bei `/mailguard/accounts/add-imap`
+   - Validierung mit Test-Verbindung
+   - Verschlüsselte Speicherung (Fernet)
+
+4. **Background Email Fetching**:
+   - APScheduler Job (alle 5 Minuten)
+   - Fetch von allen aktiven `MailAccount`s
+   - Parsing (text, HTML, attachments) → `MailMessage` erstellen
+
+5. **Email Sending**:
+   - Senden via SMTP/Gmail API/Microsoft Graph
+   - `MailDraft.sent_at` Timestamp-Update
+   - `MailMessage.replied` Flag setzen
+
+### Premium API-Integration (Phase 5.2 - Bezahlt)
 
 ---
 
