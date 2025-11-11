@@ -1,18 +1,25 @@
 import requests
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class VIESService:
-    """VIES (VAT Information Exchange System) service integration."""
+    """VIES (VAT Information Exchange System) service integration with retry logic and caching."""
     
     def __init__(self):
         self.base_url = "http://ec.europa.eu/taxation_customs/vies/services/checkVatService"
         self.soap_action = "checkVat"
+        self.max_retries = 3
+        self.retry_delay = 2  # seconds
+        self._cache = {}  # Simple in-memory cache: {vat_key: (result, expiry_time)}
+        self.cache_ttl = 3600  # 1 hour cache
         
     def validate_vat(self, country_code: str, vat_number: str) -> Dict:
         """
-        Validate VAT number through VIES service.
+        Validate VAT number through VIES service with retry logic and caching.
         
         Args:
             country_code: 2-letter country code (e.g., 'DE', 'AT')
@@ -21,46 +28,77 @@ class VIESService:
         Returns:
             Standardized response dictionary
         """
-        start_time = time.time()
+        # Check cache first
+        cache_key = f"{country_code.upper()}:{vat_number}"
+        cached_result = self._get_cached(cache_key)
+        if cached_result:
+            logger.info(f"VIES cache hit for {cache_key}")
+            return cached_result
         
-        try:
-            # Clean VAT number (remove country prefix if present)
-            clean_vat = self._clean_vat_number(vat_number, country_code)
-            
-            # Prepare SOAP request
-            soap_envelope = self._build_soap_request(country_code, clean_vat)
-            
-            # Make request
-            headers = {
-                'Content-Type': 'text/xml; charset=utf-8',
-                'SOAPAction': self.soap_action
-            }
-            
-            response = requests.post(
-                self.base_url,
-                data=soap_envelope,
-                headers=headers,
-                timeout=30
-            )
-            
-            response_time = int((time.time() - start_time) * 1000)
-            
-            if response.status_code == 200:
-                return self._parse_vies_response(response.text, response_time)
-            else:
-                return self._create_error_response(
-                    f"VIES API error: HTTP {response.status_code}",
-                    response_time
+        start_time = time.time()
+        last_error = None
+        
+        for attempt in range(self.max_retries):
+            try:
+                # Clean VAT number (remove country prefix if present)
+                clean_vat = self._clean_vat_number(vat_number, country_code)
+                
+                # Prepare SOAP request
+                soap_envelope = self._build_soap_request(country_code, clean_vat)
+                
+                # Make request
+                headers = {
+                    'Content-Type': 'text/xml; charset=utf-8',
+                    'SOAPAction': self.soap_action
+                }
+                
+                response = requests.post(
+                    self.base_url,
+                    data=soap_envelope,
+                    headers=headers,
+                    timeout=30
                 )
                 
-        except requests.exceptions.Timeout:
-            return self._create_error_response("VIES service timeout", int((time.time() - start_time) * 1000))
+                response_time = int((time.time() - start_time) * 1000)
+                
+                if response.status_code == 200:
+                    result = self._parse_vies_response(response.text, response_time)
+                    
+                    # Check if we got MS_MAX_CONCURRENT_REQ error
+                    if result.get('status') == 'error' and 'MS_MAX_CONCURRENT_REQ' in str(result.get('error_message', '')):
+                        last_error = result
+                        if attempt < self.max_retries - 1:
+                            # Exponential backoff: 2s, 4s, 8s
+                            delay = self.retry_delay * (2 ** attempt)
+                            logger.warning(f"VIES rate limit hit, retrying in {delay}s (attempt {attempt + 1}/{self.max_retries})")
+                            time.sleep(delay)
+                            continue
+                    
+                    # Cache successful results (including errors to avoid hammering VIES)
+                    self._set_cache(cache_key, result)
+                    return result
+                else:
+                    return self._create_error_response(
+                        f"VIES API error: HTTP {response.status_code}",
+                        response_time
+                    )
+                    
+            except requests.exceptions.Timeout:
+                return self._create_error_response("VIES service timeout", int((time.time() - start_time) * 1000))
+            
+            except requests.exceptions.ConnectionError:
+                return self._create_error_response("Cannot connect to VIES service", int((time.time() - start_time) * 1000))
+            
+            except Exception as e:
+                last_error = self._create_error_response(f"VIES validation error: {str(e)}", int((time.time() - start_time) * 1000))
+                if attempt < self.max_retries - 1:
+                    delay = self.retry_delay * (2 ** attempt)
+                    logger.warning(f"VIES error, retrying in {delay}s: {str(e)}")
+                    time.sleep(delay)
+                    continue
         
-        except requests.exceptions.ConnectionError:
-            return self._create_error_response("Cannot connect to VIES service", int((time.time() - start_time) * 1000))
-        
-        except Exception as e:
-            return self._create_error_response(f"VIES validation error: {str(e)}", int((time.time() - start_time) * 1000))
+        # All retries exhausted
+        return last_error or self._create_error_response("VIES service unavailable after retries", int((time.time() - start_time) * 1000))
     
     def _clean_vat_number(self, vat_number: str, country_code: str) -> str:
         """Remove country prefix and clean VAT number."""
@@ -224,3 +262,23 @@ class VIESService:
             'pattern': pattern,
             'formatted_vat': full_vat
         }
+    def _get_cached(self, key: str) -> Optional[Dict]:
+        """Get cached VIES result if not expired."""
+        if key in self._cache:
+            result, expiry = self._cache[key]
+            if datetime.now() < expiry:
+                return result
+            else:
+                # Expired, remove from cache
+                del self._cache[key]
+        return None
+    
+    def _set_cache(self, key: str, result: Dict) -> None:
+        """Cache VIES result with TTL."""
+        expiry = datetime.now() + timedelta(seconds=self.cache_ttl)
+        self._cache[key] = (result, expiry)
+        
+        # Simple cache cleanup: remove expired entries if cache grows too large
+        if len(self._cache) > 1000:
+            now = datetime.now()
+            self._cache = {k: v for k, v in self._cache.items() if v[1] > now}
