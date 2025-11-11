@@ -56,8 +56,9 @@ pip install -r requirements.txt
 FLASK_ENV=development
 SECRET_KEY=your-secret-key-change-in-production
 
-# Database
-DATABASE_URL=sqlite:///counterparty_verification.db
+# Database (PostgreSQL локально)
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vat_bot_dev
+DB_SCHEMA=vat_verification
 
 # API Keys (опціонально для тестування)
 VIES_API_KEY=
@@ -72,6 +73,8 @@ SMTP_SERVER=
 SMTP_USERNAME=
 SMTP_PASSWORD=
 ```
+
+⚠️ Перед запуском створіть локальну базу даних PostgreSQL `vat_bot_dev` і переконайтеся, що служба PostgreSQL запущена (`createdb vat_bot_dev`).
 
 ### 3. Ініціалізація бази даних
 

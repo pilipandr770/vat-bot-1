@@ -84,16 +84,14 @@ flash('Registrierung erfolgreich! Sie können sich jetzt anmelden.', 'success')
 ### 2. `.env`
 
 ```env
-# Переключено на SQLite
-DATABASE_URL=sqlite:///counterparty_verification.db
-
-# PostgreSQL закомментирован для локального тестирования
-#DATABASE_URL=postgresql://...
+# Переключено на PostgreSQL
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vat_bot_dev
+DB_SCHEMA=vat_verification
 ```
 
 ### 3. База данных
 
-- ✅ Создана: `instance/counterparty_verification.db`
+- ✅ Используется база: PostgreSQL `vat_bot_dev`
 - ✅ Инициализирована: все таблицы созданы
 - ✅ Admin создан: admin@example.com / admin123
 

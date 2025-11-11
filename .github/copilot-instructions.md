@@ -127,13 +127,12 @@ pip install -r requirements.txt
 
 # 3. Environment configuration (.env)
 FLASK_ENV=development
-DATABASE_URL=sqlite:///counterparty_verification.db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vat_bot_dev
+DB_SCHEMA=vat_verification
 SECRET_KEY=your-secret-key
 # API keys for external services...
 
 # 4. Database initialization
-flask db init
-flask db migrate -m "Initial setup"
 flask db upgrade
 
 # 5. Start development server

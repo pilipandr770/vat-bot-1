@@ -12,16 +12,14 @@
 - [x] Все изменения помечены комментариями `# TEST MODE`
 
 ### 2. Конфигурация - .env ✅
-- [x] Переключено на SQLite для локального тестирования
-- [x] PostgreSQL закомментирован
-- [x] База данных: `sqlite:///counterparty_verification.db`
+- [x] Переключено на PostgreSQL для локального тестирования
+- [x] Локальная база: `postgresql://postgres:postgres@localhost:5432/vat_bot_dev`
 - [x] Схема: `vat_verification`
 
 ### 3. База данных ✅
-- [x] Инициализирована локальная SQLite база
+- [x] Настроена локальная база PostgreSQL `vat_bot_dev`
 - [x] Все таблицы созданы (users, subscriptions, etc.)
 - [x] Admin пользователь создан с `is_email_confirmed=True`
-- [x] Расположение: `instance/counterparty_verification.db`
 
 ### 4. Документация ✅
 - [x] `START_HERE.md` - точка входа для пользователя
@@ -58,8 +56,7 @@
 | Dashboard | ✅ | Доступен сразу |
 | Admin панель | ✅ | admin@example.com |
 | Hero-изображение | ✅ | Отображается |
-| SQLite база | ✅ | Локально работает |
-| PostgreSQL | ⏸️ | Закомментировано для локального тестирования |
+| PostgreSQL | ✅ | Используется и локально, и в продакшне |
 | Email отправка | ⏸️ | Отключено (тестовый режим) |
 
 ---
@@ -70,8 +67,6 @@
 vat-bot-1/
 ├── auth/
 │   └── routes.py ✅ (изменён)
-├── instance/
-│   └── counterparty_verification.db ✅ (создан)
 ├── .env ✅ (обновлён)
 ├── START_HERE.md ✅ (создан)
 ├── README_EMAIL_DISABLED.md ✅ (создан)

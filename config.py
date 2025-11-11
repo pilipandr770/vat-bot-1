@@ -7,16 +7,20 @@ class Config:
     """Base configuration class."""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
-    # Database Configuration with Schema Support
-    database_url = os.environ.get('DATABASE_URL') or 'sqlite:///counterparty_verification.db'
-    
+    # Database Configuration with Schema Support (PostgreSQL-first)
+    default_pg_url = os.environ.get(
+        'LOCAL_DATABASE_URL',
+        'postgresql://postgres:postgres@localhost:5432/vat_bot_dev',
+    )
+    database_url = os.environ.get('DATABASE_URL') or default_pg_url
+
     # Fix for Render.com: postgres:// -> postgresql://
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    
+
     SQLALCHEMY_DATABASE_URI = database_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
+
     # PostgreSQL Schema for multi-tenant database
     SQLALCHEMY_ENGINE_OPTIONS = {
         'connect_args': {

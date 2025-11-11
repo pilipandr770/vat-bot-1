@@ -66,18 +66,19 @@ http://localhost:5000/dashboard
 ## ⚙️ Настройки
 
 ### База данных
-- **Локально:** SQLite (`instance/counterparty_verification.db`)
+- **Локально:** PostgreSQL (`postgresql://postgres:postgres@localhost:5432/vat_bot_dev`)
 - **Продакшн:** PostgreSQL (настроено в `.env`)
 
 ### Переключение режимов
 
 **TEST MODE (текущий):**
-```env
-DATABASE_URL=sqlite:///counterparty_verification.db
+```
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vat_bot_dev
+DB_SCHEMA=vat_verification
 ```
 
 **PRODUCTION MODE:**
-```env
+```
 DATABASE_URL=postgresql://...
 MAIL_SERVER=smtp.gmail.com
 # + раскомментируйте код проверки email в auth/routes.py

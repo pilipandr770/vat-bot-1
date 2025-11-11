@@ -1,7 +1,7 @@
 """
 Create first admin user
 """
-from app import create_app
+from application import create_app
 from crm.models import db
 from auth.models import User, Subscription
 from datetime import datetime, timedelta
