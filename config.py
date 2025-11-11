@@ -21,12 +21,29 @@ class Config:
     SQLALCHEMY_DATABASE_URI = database_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # PostgreSQL Schema for multi-tenant database
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'connect_args': {
-            'options': f'-csearch_path={os.environ.get("DB_SCHEMA", "public")}'
+    # PostgreSQL Schema and Connection Settings
+    # SSL fix for Render: Add pool_pre_ping and SSL mode
+    engine_options = {
+        'pool_pre_ping': True,  # Test connections before using
+        'pool_recycle': 300,    # Recycle connections after 5 minutes
+        'pool_size': 10,
+        'max_overflow': 20
+    }
+    
+    # Add schema search path if PostgreSQL
+    if database_url.startswith('postgresql://'):
+        connect_args = {
+            'options': f'-csearch_path={os.environ.get("DB_SCHEMA", "public")}',
+            'connect_timeout': 10
         }
-    } if database_url.startswith('postgresql://') else {}
+        
+        # For Render: Add SSL settings to prevent SSL errors
+        if 'render.com' in database_url or os.environ.get('RENDER'):
+            connect_args['sslmode'] = 'require'
+        
+        engine_options['connect_args'] = connect_args
+    
+    SQLALCHEMY_ENGINE_OPTIONS = engine_options
     
     # API Keys
     VIES_API_KEY = os.environ.get('VIES_API_KEY')

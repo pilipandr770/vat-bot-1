@@ -15,10 +15,23 @@ from services.vat_lookup import VatLookupService
 import asyncio
 from datetime import datetime
 from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
+import psycopg2
 
 # Initialize Flask extensions
 login_manager = LoginManager()
 mail = Mail()
+
+
+def is_ssl_error(exception):
+    """Check if exception is SSL-related database error."""
+    if isinstance(exception, OperationalError):
+        error_msg = str(exception).lower()
+        return any(keyword in error_msg for keyword in [
+            'ssl error', 'ssl', 'decryption failed', 'bad record mac',
+            'connection reset', 'server closed the connection'
+        ])
+    return False
 
 
 def ensure_schema(app):
@@ -66,7 +79,13 @@ def create_app(config_name=None):
     
     @login_manager.user_loader
     def load_user(user_id):
-        return db.session.get(User, int(user_id))
+        try:
+            return db.session.get(User, int(user_id))
+        except Exception as e:
+            # Handle SSL errors and database connection issues
+            app.logger.error(f"Error loading user {user_id}: {str(e)}")
+            # Return None to force re-authentication
+            return None
     
     # Register blueprints
     from auth.routes import auth_bp
@@ -558,6 +577,34 @@ def create_app(config_name=None):
         response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
         
         return response
+    
+    # Add error handler for database SSL errors
+    @app.errorhandler(OperationalError)
+    def handle_db_error(error):
+        """Handle database connection errors, especially SSL issues."""
+        if is_ssl_error(error):
+            app.logger.error(f"SSL Database Error: {str(error)}")
+            # Try to recover by disposing the connection pool
+            try:
+                db.session.rollback()
+                db.engine.dispose()
+            except:
+                pass
+            
+            # Return user-friendly error for JSON requests
+            if request.is_json or request.path.startswith('/api/'):
+                return jsonify({
+                    'success': False,
+                    'error': 'Datenbankverbindungsfehler. Bitte versuchen Sie es erneut.',
+                    'retry': True
+                }), 500
+            
+            # For HTML requests
+            flash('Datenbankverbindungsfehler. Bitte laden Sie die Seite neu.', 'error')
+            return redirect(request.referrer or url_for('landing'))
+        
+        # Re-raise if not SSL error
+        raise error
     
     return app
 
