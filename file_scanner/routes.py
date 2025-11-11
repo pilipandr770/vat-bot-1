@@ -171,6 +171,192 @@ def scan_file():
     finally:
         active_scans -= 1
 
+
+@file_scanner.route('/api/email-scan', methods=['POST'])
+def scan_email():
+    """
+    API эндпоинт для сканирования email-сообщений от MailGuard.
+    Принимает JSON с текстом, ссылками и вложениями.
+    """
+    # Проверяем авторизацию по токену
+    expected_token = current_app.config.get('FILE_SCANNER_TOKEN')
+    if expected_token:
+        provided = request.headers.get('Authorization', '').replace('Bearer ', '').strip()
+        if not provided:
+            provided = request.headers.get('X-Scanner-Token', '').strip()
+        if provided != expected_token:
+            return jsonify({'success': False, 'error': 'Unauthorized', 'verdict': 'unknown', 'score': 0}), 401
+    else:
+        # Без токена допускаем запросы только от авторизованных пользователей
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': 'Unauthorized', 'verdict': 'unknown', 'score': 0}), 401
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No JSON data provided',
+                'verdict': 'unknown',
+                'score': 0
+            }), 400
+
+        # Извлекаем данные из запроса
+        source = data.get('source', 'mailguard')
+        content = data.get('content', {})
+        attachments = data.get('attachments', [])
+
+        # Результаты проверки
+        verdict = 'safe'
+        score = 0
+        details = {
+            'text_analysis': {},
+            'link_analysis': {},
+            'attachment_analysis': [],
+            'virustotal_results': []
+        }
+
+        # 1. Анализ текста на подозрительные ключевые слова
+        text = content.get('text', '') or ''
+        html = content.get('html', '') or ''
+        subject = content.get('subject', '') or ''
+        combined_text = f"{subject} {text} {html}".lower()
+
+        suspicious_keywords = [
+            'überweisen', 'zahlung dringend', 'bitcoin', 'passwort zurücksetzen',
+            'invoice attached', 'payment required', 'account suspended', 'verify your account',
+            'click here immediately', 'urgent action required', 'cryptocurrency', 'wallet address'
+        ]
+
+        detected_keywords = [kw for kw in suspicious_keywords if kw in combined_text]
+        if detected_keywords:
+            score += len(detected_keywords) * 10
+            details['text_analysis']['suspicious_keywords'] = detected_keywords
+            if len(detected_keywords) >= 3:
+                verdict = 'suspicious'
+
+        # 2. Анализ ссылок
+        links = content.get('links', [])
+        http_links = [link for link in links if link.startswith('http://')]
+        suspicious_domains = ['bit.ly', 'tinyurl.com', 'goo.gl']  # Короткие ссылки
+        shortened_links = [link for link in links if any(domain in link for domain in suspicious_domains)]
+
+        if http_links:
+            score += len(http_links) * 15
+            details['link_analysis']['http_links'] = http_links
+            if len(http_links) > 2:
+                verdict = 'suspicious'
+
+        if shortened_links:
+            score += len(shortened_links) * 10
+            details['link_analysis']['shortened_links'] = shortened_links
+
+        # 3. Сканирование вложений через VirusTotal
+        api_key = current_app.config.get('VIRUSTOTAL_API_KEY')
+        
+        for att in attachments:
+            filename = att.get('filename', 'unknown')
+            file_ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+            temp_path = att.get('temp_path')
+            file_size = att.get('size', 0)
+
+            att_result = {
+                'filename': filename,
+                'size': file_size,
+                'extension': file_ext,
+                'risk': 'unknown'
+            }
+
+            # Опасные расширения
+            dangerous_extensions = {'exe', 'dll', 'bat', 'cmd', 'vbs', 'js', 'jar', 'scr', 'pif', 'com'}
+            warning_extensions = {'zip', 'rar', '7z', 'gz', 'tar', 'iso'}
+
+            if file_ext in dangerous_extensions:
+                score += 50
+                verdict = 'malicious'
+                att_result['risk'] = 'danger'
+                att_result['reason'] = f'Dangerous file extension: .{file_ext}'
+            elif file_ext in warning_extensions:
+                score += 20
+                if verdict == 'safe':
+                    verdict = 'suspicious'
+                att_result['risk'] = 'warning'
+                att_result['reason'] = f'Archive file: .{file_ext}'
+
+            # Проверяем через VirusTotal если есть temp_path и API ключ
+            if temp_path and os.path.exists(temp_path) and api_key:
+                try:
+                    # Вычисляем хеш
+                    sha256_hash = hashlib.sha256()
+                    with open(temp_path, 'rb') as f:
+                        for chunk in iter(lambda: f.read(4096), b""):
+                            sha256_hash.update(chunk)
+                    file_hash = sha256_hash.hexdigest()
+
+                    # Проверяем в VirusTotal
+                    headers = {'x-apikey': api_key}
+                    response = requests.get(
+                        f'https://www.virustotal.com/api/v3/files/{file_hash}',
+                        headers=headers,
+                        timeout=10
+                    )
+
+                    if response.status_code == 200:
+                        vt_data = response.json()
+                        stats = vt_data['data']['attributes']['last_analysis_stats']
+                        malicious_count = stats.get('malicious', 0)
+                        total_engines = stats.get('total', 0)
+
+                        att_result['virustotal'] = {
+                            'malicious': malicious_count,
+                            'total': total_engines,
+                            'hash': file_hash,
+                            'link': f'https://www.virustotal.com/gui/file/{file_hash}'
+                        }
+
+                        if malicious_count > 0:
+                            score += malicious_count * 5
+                            verdict = 'malicious'
+                            att_result['risk'] = 'danger'
+                            att_result['reason'] = f'VirusTotal: {malicious_count}/{total_engines} engines detected malware'
+                        elif att_result.get('risk') == 'unknown':
+                            att_result['risk'] = 'safe'
+
+                except Exception as e:
+                    logger.warning(f"VirusTotal check failed for {filename}: {e}")
+                    att_result['virustotal_error'] = str(e)
+
+            details['attachment_analysis'].append(att_result)
+
+        # Нормализуем score (max 100)
+        score = min(score, 100)
+
+        # Финальный verdict
+        if score >= 70:
+            verdict = 'malicious'
+        elif score >= 40:
+            verdict = 'suspicious'
+        else:
+            verdict = 'safe'
+
+        return jsonify({
+            'success': True,
+            'verdict': verdict,
+            'score': score,
+            'details': details,
+            'source': 'file_scanner_email_api'
+        })
+
+    except Exception as e:
+        logger.error(f"Email scan error: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'verdict': 'unknown',
+            'score': 0
+        }), 500
+
+
 def scan_with_virustotal(file_path, file_hash, filename):
     """Сканирование через VirusTotal API - ТОЛЬКО ЗАГРУЗКА, БЕЗ ВЫПОЛНЕНИЯ"""
     try:

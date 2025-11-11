@@ -51,6 +51,7 @@ class KnownCounterparty(db.Model):
     email = db.Column(db.String(255), nullable=False)
     domain = db.Column(db.String(255), nullable=False)
     notes = db.Column(db.Text, nullable=True)
+    trust_level = db.Column(Enum('low', 'medium', 'high', 'vip', name='trust_levels', schema=SCHEMA), default='medium')
     priority = db.Column(db.Integer, default=0)  # 0=normal, 1=high, 2=vip
     assistant_profile_id = db.Column(db.String(100), nullable=True)  # ID профиля ассистента
     is_active = db.Column(db.Boolean, default=True)
@@ -104,6 +105,8 @@ class MailMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider_msg_id = db.Column(db.String(255), unique=True, nullable=False)
     thread_id = db.Column(db.String(255), nullable=True)
+    in_reply_to = db.Column(db.String(255), nullable=True)  # Message-ID родительского письма
+    references = db.Column(db.Text, nullable=True)  # Полная цепочка Message-IDs
     account_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.mail_account.id'), nullable=False)
     counterparty_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.known_counterparty.id'), nullable=True)
     from_email = db.Column(db.String(255), nullable=False)
@@ -169,6 +172,89 @@ class MailMessage(db.Model):
             dangerous_files = [att['filename'] for att in attachments if att.get('risk_level') == 'danger']
             self.quarantine_reason = f"Опасные вложения: {', '.join(dangerous_files)}"
             self.status = 'quarantined'
+    
+    def get_thread_history(self, limit=10):
+        """
+        Получить историю переписки в этом треде
+        
+        Args:
+            limit: максимальное количество сообщений (по умолчанию 10)
+        
+        Returns:
+            list: список сообщений в порядке от старых к новым
+        """
+        if not self.thread_id:
+            return []
+        
+        messages = MailMessage.query.filter_by(
+            thread_id=self.thread_id,
+            account_id=self.account_id
+        ).order_by(MailMessage.received_at.asc()).limit(limit).all()
+        
+        return messages
+    
+    def is_first_message_in_thread(self):
+        """Проверить, является ли это первым сообщением в треде"""
+        if not self.thread_id:
+            return True  # Нет thread_id = первое сообщение
+        
+        if not self.in_reply_to and not self.references:
+            return True  # Нет ссылок на предыдущие письма
+        
+        # Проверяем, есть ли более ранние сообщения в треде
+        earlier_message = MailMessage.query.filter(
+            MailMessage.thread_id == self.thread_id,
+            MailMessage.received_at < self.received_at,
+            MailMessage.account_id == self.account_id
+        ).first()
+        
+        return earlier_message is None
+    
+    def get_thread_context_for_ai(self, max_messages=5):
+        """
+        Получить контекст треда для AI в удобном формате
+        
+        Args:
+            max_messages: максимальное количество предыдущих сообщений
+        
+        Returns:
+            dict: {'is_first': bool, 'history': list, 'counterparty_context': dict}
+        """
+        is_first = self.is_first_message_in_thread()
+        history = []
+        
+        if not is_first:
+            thread_messages = self.get_thread_history(limit=max_messages + 1)
+            
+            for msg in thread_messages:
+                if msg.id == self.id:
+                    continue  # Пропускаем текущее сообщение
+                
+                history.append({
+                    'id': msg.id,
+                    'from_email': msg.from_email,
+                    'subject': msg.subject,
+                    'body_text': msg.body_text[:500] if msg.body_text else '',  # Первые 500 символов
+                    'received_at': msg.received_at.isoformat(),
+                    'direction': 'incoming' if msg.from_email != self.account.email else 'outgoing'
+                })
+        
+        # Контекст контрагента если есть
+        counterparty_context = {}
+        if self.counterparty_id and self.counterparty:
+            counterparty_context = {
+                'name': self.counterparty.display_name,
+                'email': self.counterparty.email,
+                'trust_level': self.counterparty.trust_level,
+                'notes': self.counterparty.notes
+            }
+        
+        return {
+            'is_first': is_first,
+            'history': history,
+            'counterparty_context': counterparty_context,
+            'thread_message_count': len(history) + 1
+        }
 
 class MailDraft(db.Model):
     """Черновики ответов"""

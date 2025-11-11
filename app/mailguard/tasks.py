@@ -137,10 +137,16 @@ def process_incoming_email(account_id, message_data):
         attachments_with_data = normalized_msg.get('attachments', []) or []
         sanitized_attachments = sanitize_attachments_for_storage(attachments_with_data)
         normalized_msg['attachments'] = sanitized_attachments
+        
+        # Извлекаем threading информацию из meta
+        meta = normalized_msg.get('meta', {})
+        thread_id = normalized_msg.get('thread_id') or meta.get('message_id', '')[:50]  # Используем Message-ID как thread_id если нет thread_id
 
         message = MailMessage(
             provider_msg_id=provider_msg_id,
-            thread_id=normalized_msg.get('thread_id'),
+            thread_id=thread_id,
+            in_reply_to=meta.get('in_reply_to'),
+            references=meta.get('references'),
             account_id=account.id,
             counterparty_id=counterparty.id if counterparty else None,
             from_email=normalized_msg.get('from_email', ''),
@@ -331,11 +337,19 @@ def create_reply_draft(message, counterparty, message_data, matched_rule, accoun
     from .models import MailDraft
     from .nlp_reply import build_reply, get_counterparty_profile
 
+    # Получаем контекст переписки из треда
+    thread_context = message.get_thread_context_for_ai(max_messages=5)
+    
     # Получаем профиль контрагента
-    profile = get_counterparty_profile(counterparty) if counterparty else {}
+    if counterparty:
+        profile = get_counterparty_profile(counterparty)
+    elif thread_context['counterparty_context']:
+        profile = thread_context['counterparty_context']
+    else:
+        profile = {}
 
-    # Получаем историю переписки
-    thread_history = []  # TODO: Реализовать
+    # История переписки из треда
+    thread_history = thread_context['history']
 
     assistant_profile = None
     account = account or getattr(message, 'account', None)
@@ -344,7 +358,7 @@ def create_reply_draft(message, counterparty, message_data, matched_rule, accoun
             'instructions': account.reply_instructions
         }
 
-    # Генерируем ответ
+    # Генерируем ответ с учетом контекста
     reply = build_reply(profile, thread_history, message_data, assistant_profile=assistant_profile)
 
     # Создаем черновик
