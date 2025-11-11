@@ -1,10 +1,132 @@
-# Counterparty Verification System + MailGuard + Enrichment - AI Development Guide
+# VAT Bot - Multi-Module SaaS Platform
 
-## Project Overview
-Multi-module Flask SaaS platform combining:
-1. **Counterparty Verification**: Automated EU business partner verification with VAT validation, sanctions checks, OSINT scans
-2. **Enrichment Orchestrator** 🆕: Intelligent auto-fill system combining VIES + Business Registries + OSINT for form auto-completion
-3. **MailGuard** ✅: Simple email processing system using IMAP/SMTP with Email Provider Presets - AI-powered responses, security scanning (OAuth removed for simplicity)
+## 🚀 Project Overview
+
+**VAT Bot** is a comprehensive Flask-based SaaS platform with THREE core modules:
+
+### 1. 🔍 Counterparty Verification (PRODUCTION)
+Automated EU business partner verification system for due diligence:
+- ✅ VAT ID validation via VIES API
+- ✅ Sanctions screening (EU/OFAC/UK lists)
+- ✅ Business registry lookups (Germany, Czech, Poland)
+- ✅ OSINT scans (WHOIS, DNS, SSL, domain analysis)
+- ✅ Subscription-based access (Free: 5/month, Paid: unlimited)
+- **URL:** `/verify`, `/dashboard`
+
+### 2. 📧 MailGuard - Email Intelligence System (PRODUCTION)
+**Internal email management platform with AI-powered security and responses:**
+- ✅ **IMAP/SMTP Integration**: Connect Gmail, Outlook, Yahoo, Mail.ru, Yandex, UKR.NET
+- ✅ **Security Scanning**: Automatic malware/phishing detection via VirusTotal API
+- ✅ **AI Reply Generation**: OpenAI GPT-4o-mini powered contextual responses
+- ✅ **Email Threading**: Track conversation history (in_reply_to, references)
+- ✅ **CRM Integration**: Link emails to business counterparties
+- ✅ **Rule Engine**: Priority-based email processing workflows
+- **URL:** `/mailguard/`
+- **Status:** Fully functional, awaiting auto-sync scheduler
+
+### 3. 🔄 Enrichment Orchestrator (PRODUCTION)
+Intelligent form auto-fill combining multiple free data sources:
+- ✅ VIES VAT validation
+- ✅ Business registry data
+- ✅ OSINT intelligence
+- **API:** `/api/enrichment/enrich`
+
+---
+
+## 📧 MailGuard - Complete Feature Set
+
+### ✅ IMPLEMENTED & WORKING
+
+**Email Account Management:**
+- Connect via IMAP/SMTP (no OAuth complexity)
+- 7 pre-configured providers with auto-fill
+- Encrypted password storage (Fernet)
+- Manual and automatic sync options
+
+**Security Scanning:**
+- **NEW:** `/file-scanner/api/email-scan` endpoint (Nov 2025)
+- VirusTotal integration (70+ antivirus engines)
+- Text analysis (phishing keywords detection)
+- Link analysis (HTTP/shortened URLs)
+- Attachment scanning (hash lookup + file upload)
+- Scoring system (0-100): safe/suspicious/malicious
+- **API Key:** `7977663b17d01aade4620f45d557de21525b7a67e91e21986ac2fb5f85574e66`
+
+**AI-Powered Replies:**
+- OpenAI GPT-4o-mini integration
+- Custom instructions per email account
+- Thread context awareness
+- Counterparty profile integration
+- Draft approval workflow
+
+**Email Threading:**
+- Extracts `in_reply_to` and `references` headers
+- Tracks conversation history
+- Loads thread context for AI
+- First message detection
+
+**CRM Integration:**
+- Links emails to `KnownCounterparty`
+- Trust levels (low/medium/high/vip)
+- Auto-reply preferences
+- Contact notes
+
+### ⏳ IN DEVELOPMENT
+
+**Auto-Sync Scheduler:**
+- APScheduler background jobs (PENDING)
+- Sync all active IMAP accounts every 5-10 minutes
+- Automatic email processing pipeline
+
+**UI Enhancements:**
+- Email inbox view (thread display)
+- Message detail page with security badges
+- Rule creation/editing forms
+
+---
+
+## 🛠️ Current Tech Stack
+
+**Backend:**
+- Flask 2.3.3
+- PostgreSQL 17 (schema: `vat_verification`)
+- SQLAlchemy ORM
+- Flask-Login authentication
+
+**Email Processing:**
+- IMAPClient 2.3.1 (IMAP protocol)
+- smtplib (SMTP sending)
+- email library (parsing)
+
+**Security:**
+- Cryptography (Fernet encryption)
+- VirusTotal API v3
+- OpenAI GPT-4o-mini
+
+**Background Jobs:**
+- APScheduler 3.10.4 (configured, not yet scheduled)
+
+---
+
+## 🔑 Environment Variables (Render Production)
+
+```bash
+# MailGuard Configuration
+FILE_SCANNER_URL=https://vat-bot-1.onrender.com/file-scanner/api/email-scan
+FILE_SCANNER_ENABLED=true
+FILE_SCANNER_TOKEN=<secure-token-required>
+VIRUSTOTAL_API_KEY=7977663b17d01aade4620f45d557de21525b7a67e91e21986ac2fb5f85574e66
+OPENAI_API_KEY=<your-key>
+MAILGUARD_ENCRYPTION_KEY=<32-byte-fernet-key>
+
+# Database
+DATABASE_URL=postgresql://...
+DB_SCHEMA=vat_verification
+
+# Flask
+SECRET_KEY=<your-secret>
+FLASK_ENV=production
+```
 
 ## Architecture & Core Patterns
 

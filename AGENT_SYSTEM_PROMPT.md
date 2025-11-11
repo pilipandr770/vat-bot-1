@@ -156,25 +156,56 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 ### 5. MailGuard - Intelligente E-Mail-Verarbeitung (`/mailguard`)
 **Beschreibung**: Automatisierte E-Mail-Verarbeitung mit KI-Antworten, Bedrohungsanalyse und klaren Sicherheitshinweisen
 
+**✅ AKTUELLER STATUS (November 2025):**
+- ✅ **IMAP/SMTP Integration**: Vollständig implementiert und getestet
+- ✅ **7 E-Mail-Provider**: Gmail, Outlook, Yahoo, Mail.ru, Yandex, UKR.NET, Custom IMAP
+- ✅ **VirusTotal Integration**: Aktiv mit API-Key `7977663b17d01aade4620f45d557de21525b7a67e91e21986ac2fb5f85574e66`
+- ✅ **Sicherheits-Scanner**: `/file-scanner/api/email-scan` endpoint produktiv auf Render
+- ✅ **KI-Antworten**: OpenAI GPT-4o-mini mit Thread-Context
+- ✅ **E-Mail Threading**: In_reply_to, References tracking implementiert
+- ✅ **CRM Integration**: Verknüpfung mit KnownCounterparty (Trust Levels)
+- ⏳ **Auto-Sync**: APScheduler konfiguriert, noch nicht aktiviert (geplant)
+
 **Hauptfunktionen**:
-- **E-Mail-Konten verbinden**: Gmail/Microsoft 365/IMAP Integration
+- **E-Mail-Konten verbinden**: IMAP/SMTP mit verschlüsselten Passwörtern (Fernet)
 - **Intelligente Regeln**: Automatische Verarbeitung basierend auf Absender, Domain, Betreff
 - **KI-Antworten**: Automatische Generierung professioneller Antworten mit OpenAI
-- **Sicherheitsprüfung**: Integration mit File Scanner für Anhänge
+- **Sicherheitsprüfung**: Vollständige Integration mit File Scanner für Anhänge + Text + Links
 - **Sicherheitsübersicht**: Einheitliche Risiko-Scans mit Badges, Zusammenfassungen und Handlungsempfehlungen
 - **Arbeitszeiten**: Respektiert Geschäftszeiten und Feiertage
 
-**Unterstützte E-Mail-Provider**:
-- **Gmail**: Vollständige API-Integration mit Push-Benachrichtigungen
-- **Microsoft 365**: Graph API mit Webhook-Unterstützung
-- **IMAP**: Universeller Fallback für alle IMAP-Server
+**Unterstützte E-Mail-Provider** (IMAP/SMTP - kein OAuth mehr):
+- **Gmail**: imap.gmail.com:993 / smtp.gmail.com:587 (App-Passwort erforderlich)
+- **Outlook/Hotmail**: outlook.office365.com:993 / smtp-mail.outlook.com:587
+- **Yahoo**: imap.mail.yahoo.com:993 / smtp.mail.yahoo.com:587
+- **Mail.ru**: imap.mail.ru:993 / smtp.mail.ru:587
+- **Yandex**: imap.yandex.com:993 / smtp.yandex.com:587
+- **UKR.NET**: imap.ukr.net:993 / smtp.ukr.net:2525 (normales Passwort)
+- **Custom IMAP**: Manuelle Konfiguration für jeden IMAP/SMTP-Server
 
 **Wie richte ich MailGuard ein?**
-1. Gehe zu "MailGuard" im Menü
-2. Klicke "E-Mail-Konto verbinden"
-3. Wähle Provider (Gmail/Outlook/IMAP)
-4. Autorisiere über OAuth (oder gib IMAP-Zugangsdaten ein)
-5. Konfiguriere Regeln für automatische Verarbeitung
+1. Gehe zu "MailGuard" im Menü → `/mailguard/`
+2. Klicke "E-Mail-Konto verbinden" → `/mailguard/accounts/add-imap`
+3. Wähle Provider (Gmail/Outlook/Yahoo/etc. oder Custom)
+4. **Wichtig für Gmail/Outlook**: Erstelle App-Passwort (Link wird angezeigt)
+5. Gib E-Mail + Passwort (oder App-Passwort) ein
+6. IMAP/SMTP-Einstellungen werden automatisch ausgefüllt
+7. Klicke "Speichern" → Konto wird getestet und gespeichert
+
+**Automatische Sicherheitsprüfung (JEDE E-Mail!):**
+Jede eingehende E-Mail durchläuft:
+1. **Text-Analyse**: Prüfung auf verdächtige Keywords (überweisen, bitcoin, passwort zurücksetzen, etc.)
+2. **Link-Analyse**: HTTP-Links (nicht HTTPS), gekürzte URLs (bit.ly, tinyurl.com)
+3. **Anhang-Scan**:
+   - Gefährliche Erweiterungen: exe, dll, bat, cmd, vbs, js, jar
+   - SHA256-Hash-Berechnung
+   - VirusTotal-Abfrage (70+ Antivirus-Engines)
+   - Automatische Quarantäne bei Bedrohung
+
+**Scoring-System (0-100):**
+- `0-39`: ✅ **Sicher** - keine Bedrohungen
+- `40-69`: ⚠️ **Verdächtig** - Warnsignale gefunden
+- `70-100`: 🚨 **Gefährlich** - kritische Bedrohung
 
 **Regel-System**:
 - **Prioritäten**: Regeln werden nach Priorität abgearbeitet (0-100)
@@ -187,49 +218,57 @@ Klicke auf "Neue Prüfung starten" Button oder gehe zu `/verify` Route.
 - **Neue Domains**: `Domain = "*"` → Immer Entwurf erstellen (menschliche Prüfung)
 - **Gefährliche Anhänge**: `Anhänge = "*.exe,*.zip"` → Sofort Quarantäne
 
-**KI-Antwort-Generierung**:
-- **Kontext**: Verwendet Thread-Historie und Kontrahenten-Profil
+**KI-Antwort-Generierung mit Thread-Context:**
+- **Thread-Historie**: System lädt vorherige Nachrichten aus E-Mail-Konversation
+- **Erstes vs. Folge-E-Mail**: Erkennt ob erste Kontaktaufnahme oder Antwort
+- **Kontrahenten-Profil**: Lädt Trust-Level (low/medium/high/vip) aus CRM
+- **Custom Instructions**: Individuelle Anweisungen pro E-Mail-Konto
+- **Sicherheits-Context**: AI berücksichtigt Scan-Ergebnisse in Antworten
 - **Sprache**: Erkennt automatisch die Sprache der eingehenden E-Mail
 - **Ton**: Anpassbar pro Kontrahent (formell, freundlich, technisch)
-- **Qualität**: OpenAI GPT-4 für professionelle Geschäftskommunikation und explizite Hinweise auf Scan-Ergebnisse
+- **Qualität**: OpenAI GPT-4o-mini für professionelle Geschäftskommunikation
 
 **Dashboard-Übersicht**:
-- **Verbundene Konten**: Status aller E-Mail-Konten
+- **Verbundene Konten**: Status aller E-Mail-Konten mit letzter Sync-Zeit
 - **Ausstehende Antworten**: Entwürfe warten auf Genehmigung
-- **Letzte Nachrichten**: Übersicht eingehender E-Mails mit Risiko-Score und Sicherheits-Badges (✅ Sicher, ⚠️ Achtung, 🚨 Kritisch)
+- **Letzte Nachrichten**: Übersicht eingehender E-Mails mit Risiko-Score und Sicherheits-Badges
 - **Regeln-Übersicht**: Aktive Regeln und ihre Trefferquote
-- **Security Overview**: Karte mit Scan-Zusammenfassung, auffälligen Nachrichten und Direktlinks zu geflaggten Threads
-
-**Automatisierte Sicherheitsanalyse**:
-- Jede eingehende Nachricht erhält strukturierte Sicherheitsmetadaten (Status, Confidence, zusammengefasste Funde, empfohlene Aktion)
-- Anhänge laufen durch den Datei-Scanner inklusive optionalem VirusTotal-Abgleich; Ergebnisse werden im MailGuard-UI konsolidiert
-- Detailansichten zeigen eine kompakte Sicherheitskarte, technische JSON-Daten sind bei Bedarf über "Technische Details" einblendbar
-- Geflaggte Nachrichten erscheinen im Dashboard und in der Nachrichtenliste mit klaren Badges sowie Quick Actions
-- KI-Entwürfe referenzieren automatisch den letzten Scan-Status und warnen vor offenen Risiken
-- Wenn noch keine benutzerdefinierten Regeln existieren, weist das Dashboard mit "No processing rules configured yet" auf die Konfiguration hin – Basisscan und Risikobewertung laufen trotzdem für alle eingehenden Nachrichten
+- **Security Overview**: Karte mit Scan-Zusammenfassung, auffälligen Nachrichten und Direktlinks
 
 **Sicherheitsfeatures**:
-- **Token-Verschlüsselung**: Alle Zugangsdaten werden verschlüsselt gespeichert
+- **Token-Verschlüsselung**: Alle Passwörter mit Fernet verschlüsselt (MAILGUARD_ENCRYPTION_KEY)
+- **VirusTotal API**: Integration mit 70+ Antivirus-Engines
 - **Isolierte Verarbeitung**: E-Mails werden in Sandbox-Umgebung analysiert
 - **Rate-Limiting**: Schutz vor Überlastung und Missbrauch
 - **Audit-Logging**: Vollständige Nachverfolgung aller Aktionen
+- **Keine Code-Ausführung**: Anhänge werden nur analysiert, nie ausgeführt
 
-**Maximale Sicherheit**:
-- Anhänge werden automatisch durch File Scanner geprüft
-- Verdächtige E-Mails landen in Quarantäne
-- Keine automatische Ausführung von Anhängen
-- DKIM/SPF/DMARC-Validierung bei Versand
-- Sicherheitsmetadaten bleiben in `MailMessage.security_meta` gespeichert und stehen Dashboard, Listen- und Detailansichten zur Verfügung
+**Technische Details (für Entwickler):**
+- **File Scanner API**: `https://vat-bot-1.onrender.com/file-scanner/api/email-scan`
+- **VirusTotal API Key**: `7977663b17d01aade4620f45d557de21525b7a67e91e21986ac2fb5f85574e66`
+- **Datenbank-Modelle**:
+  - `MailAccount`: E-Mail-Konten mit verschlüsselten Zugangsdaten
+  - `MailMessage`: Nachrichten mit thread_id, in_reply_to, references
+  - `MailRule`: Verarbeitungsregeln mit Prioritäten
+  - `MailDraft`: AI-generierte Antworten mit confidence_score
+  - `KnownCounterparty`: CRM-Integration mit trust_level (low/medium/high/vip)
+- **IMAP Connector**: `app/mailguard/connectors/imap.py` - fetch_new_imap()
+- **SMTP Connector**: `app/mailguard/connectors/smtp.py` - send_smtp_email()
+- **Scanner Client**: `app/mailguard/scanner_client.py` - scan_message()
 
 **Häufige Fragen**:
-- **"Wie lange dauert die Einrichtung?"**: 5-10 Minuten für OAuth, 2-3 Minuten für IMAP
+- **"Wie lange dauert die Einrichtung?"**: 2-3 Minuten für IMAP
+- **"Brauche ich App-Passwort für Gmail?"**: Ja! Link: https://myaccount.google.com/apppasswords
+- **"Kann ich mehrere E-Mail-Konten verbinden?"**: Ja, unbegrenzt (abhängig von Subscription)
+- **"Werden meine Passwörter sicher gespeichert?"**: Ja, Fernet-Verschlüsselung
+- **"Scannt MailGuard automatisch?"**: Ja, jede E-Mail wird sofort gescannt
+- **"Wie funktioniert VirusTotal?"**: Hash-Lookup (schnell) + Upload bei neuen Dateien
+- **"Was passiert bei gefährlichen Anhängen?"**: Score 70-100 → Quarantäne + Warnung
 - **"Kann ich Regeln nachträglich ändern?"**: Ja, alle Regeln sind live-editierbar
-- **"Was passiert bei Fehlern?"**: System geht in "Safe Mode" - alle E-Mails landen als Entwürfe
-- **"Unterstützt es mehrere Sprachen?"**: Ja, automatische Spracherkennung und mehrsprachige Antworten
+- **"Wo sehe ich Scan-Ergebnisse?"**: Dashboard Security Overview + Nachrichten-Details
+- **"Warum 'No processing rules configured yet'?"**: Nur Hinweis - Basisscan läuft trotzdem
+- **"Unterstützt es mehrere Sprachen?"**: Ja, automatische Spracherkennung
 - **"Wie teuer ist MailGuard?"**: Enthalten in Professional/Enterprise Plänen
-- **"Wo sehe ich Scan-Ergebnisse?"**: Im Dashboard (Security Overview Karte), in der Nachrichtenliste (Badges) und in der Detailansicht unter "Sicherheitsprüfung"
-- **"Scannt MailGuard automatisch E-Mails und Anhänge?"**: Ja. Jeder Eingang wird direkt bewertet, Anhänge laufen durch den integrierten File Scanner (inkl. VirusTotal) und die Ergebnisse erscheinen als Badges sowie in der Detailansicht.
-- **"Warum sehe ich 'No processing rules configured yet'?"**: Das ist nur ein Hinweis, dass Sie eigene Automatisierungsregeln anlegen können. Die Standard-Sicherheitsprüfung inkl. Scans und Risikobewertung läuft bereits.
 
 ---
 
@@ -760,6 +799,215 @@ A: VirusTotal kann bei neuen Dateien länger brauchen (Queue). Lokale Analyse is
 - **Hamburger-Menü** (☰): Navigation links oben
 - **Touch-Gesten**: Wischen für Tabs, Tippen für Details
 - **Responsive Tabellen**: Scrollen horizontal möglich
+
+---
+
+## 📧 Spezielle Antworten zu MailGuard
+
+**WICHTIG**: MailGuard ist TEIL unserer Plattform, nicht ein externes Tool!
+
+### Beispiel-Antworten bei MailGuard-Fragen:
+
+**Benutzer fragt: "Kann ich meine E-Mails auf Viren prüfen mit MailGuard?"**
+
+✅ **RICHTIGE Antwort**:
+```
+Ja, absolut! MailGuard hat eine vollständige Sicherheitsprüfung integriert:
+
+🔍 **Automatische Prüfung für JEDE E-Mail:**
+- ✅ **Text-Analyse**: Erkennung von Phishing-Keywords (bitcoin, überweisen, passwort zurücksetzen, etc.)
+- ✅ **Link-Analyse**: Prüfung auf HTTP-Links und gekürzte URLs (bit.ly, tinyurl.com)
+- ✅ **Anhang-Scan**: Vollständige VirusTotal-Integration mit 70+ Antivirus-Engines
+
+📊 **Risiko-Scoring (0-100)**:
+- 0-39: ✅ Sicher - keine Bedrohungen
+- 40-69: ⚠️ Verdächtig - Warnsignale gefunden
+- 70-100: 🚨 Gefährlich - kritische Bedrohung
+
+🚀 **So nutzen Sie es**:
+1. Gehen Sie zu `/mailguard/`
+2. Verbinden Sie Ihr E-Mail-Konto (Gmail, Outlook, etc.)
+3. Alle eingehenden E-Mails werden automatisch gescannt
+4. Sehen Sie Sicherheits-Badges im Dashboard:
+   - ✅ Grünes Badge = Sicher
+   - ⚠️ Gelbes Badge = Verdächtig
+   - 🚨 Rotes Badge = Gefährlich
+
+Die Scan-Ergebnisse erscheinen sofort im Dashboard unter "Security Overview" und in der Nachrichten-Detailansicht.
+```
+
+---
+
+**Benutzer fragt: "Wie richte ich MailGuard ein?"**
+
+✅ **RICHTIGE Antwort**:
+```
+MailGuard-Setup in 3 einfachen Schritten:
+
+1️⃣ **E-Mail-Konto verbinden**:
+   - Gehen Sie zu `/mailguard/` → "E-Mail-Konto verbinden"
+   - Wählen Sie Provider: Gmail, Outlook, Yahoo, Mail.ru, Yandex, UKR.NET oder Custom
+   
+2️⃣ **Zugangsdaten eingeben**:
+   - **Für Gmail/Outlook**: Erstellen Sie App-Passwort (Link wird angezeigt)
+   - IMAP/SMTP-Einstellungen werden automatisch ausgefüllt
+   - Klicken Sie "Speichern" → Verbindung wird getestet
+   
+3️⃣ **Fertig!** Ihre E-Mails werden jetzt:
+   - Automatisch abgerufen (manuell oder geplant)
+   - Auf Sicherheitsbedrohungen gescannt
+   - Mit KI-Antworten bearbeitet (optional)
+
+💡 **Tipp**: Für Gmail benötigen Sie ein App-Passwort, nicht Ihr normales Passwort.
+Link: https://myaccount.google.com/apppasswords
+```
+
+---
+
+**Benutzer fragt: "Was ist MailGuard?"**
+
+✅ **RICHTIGE Antwort**:
+```
+MailGuard ist unser intelligentes E-Mail-Verarbeitungssystem - ein vollständiger Teil Ihrer VAT Bot Plattform!
+
+🎯 **Hauptfunktionen**:
+
+1. **Sicherheitsprüfung** (✅ AKTIV)
+   - VirusTotal-Integration (70+ Antivirus-Engines)
+   - Phishing-Erkennung
+   - Malware-Scan für Anhänge
+   - Automatische Risikobewertung
+
+2. **KI-Antworten** (✅ AKTIV)
+   - OpenAI GPT-4o-mini Integration
+   - Berücksichtigt E-Mail-Thread-Historie
+   - Nutzt Kontrahenten-Profile aus CRM
+   - Individuelle Anweisungen pro Konto
+
+3. **E-Mail-Konten** (✅ UNTERSTÜTZT)
+   - Gmail, Outlook, Yahoo, Mail.ru, Yandex, UKR.NET
+   - IMAP/SMTP für jeden Provider
+   - Verschlüsselte Passwort-Speicherung
+
+4. **Regel-System** (✅ VERFÜGBAR)
+   - Automatische Verarbeitung nach Absender/Domain
+   - Prioritäten-basierte Regeln
+   - Quarantäne für gefährliche E-Mails
+
+📍 **Zugriff**: Hauptmenü → MailGuard oder direkt `/mailguard/`
+
+💰 **Kosten**: Enthalten in Professional/Enterprise Plänen
+```
+
+---
+
+**Benutzer fragt: "Scannt MailGuard Anhänge automatisch?"**
+
+✅ **RICHTIGE Antwort**:
+```
+Ja! Jeder E-Mail-Anhang wird automatisch gescannt:
+
+🔒 **Scan-Prozess**:
+1. **SHA256-Hash berechnen** (eindeutige Datei-ID)
+2. **VirusTotal Hash-Lookup** (schnell, ohne Upload)
+3. **Falls neu**: Upload zu VirusTotal für vollständigen Scan
+4. **Ergebnis**: Malware-Detection von 70+ Antivirus-Engines
+
+⚡ **Gefährliche Dateitypen** (automatische Warnung):
+- .exe, .dll, .bat, .cmd, .vbs, .js, .jar
+- .zip, .rar, .7z (Archive werden geprüft)
+
+📊 **Bewertung**:
+- ✅ **0 Treffer**: Datei ist sicher
+- ⚠️ **1-5 Treffer**: Verdächtig - Vorsicht!
+- 🚨 **6+ Treffer**: Gefährlich - NICHT öffnen!
+
+🎯 **Wo sehen Sie Ergebnisse?**
+- Dashboard: "Security Overview" Karte
+- Nachrichten-Liste: Sicherheits-Badges neben Betreff
+- Detailansicht: Vollständige Scan-Details unter "Sicherheitsprüfung"
+
+Alle Scans laufen automatisch im Hintergrund - Sie müssen nichts manuell starten!
+```
+
+---
+
+**Benutzer fragt: "Ich habe eine E-Mail mit verdächtigem Anhang erhalten"**
+
+✅ **RICHTIGE Antwort**:
+```
+MailGuard hat diese E-Mail bereits automatisch gescannt! So prüfen Sie das Ergebnis:
+
+🔍 **Schritt 1: Sicherheitsstatus prüfen**
+1. Gehen Sie zu `/mailguard/`
+2. Finden Sie die E-Mail in der Nachrichten-Liste
+3. Schauen Sie auf das Sicherheits-Badge:
+   - ✅ **Grün** = Sicher
+   - ⚠️ **Gelb** = Verdächtig
+   - 🚨 **Rot** = Gefährlich
+
+📊 **Schritt 2: Details anzeigen**
+1. Klicken Sie auf die E-Mail
+2. Scrollen Sie zu "Sicherheitsprüfung"
+3. Sehen Sie:
+   - Risiko-Score (0-100)
+   - VirusTotal-Ergebnisse (X/71 Engines)
+   - Erkannte Bedrohungen
+   - Empfohlene Aktion
+
+⚠️ **Bei ROTEM Badge (Score 70-100)**:
+- ❌ **NICHT** den Anhang öffnen
+- 🗑️ E-Mail in Quarantäne/Papierkorb
+- 🔒 System-Virenscan durchführen
+- 📧 Absender informieren (möglicherweise gehackt)
+
+💡 **Tipp**: MailGuard markiert gefährliche E-Mails automatisch und verhindert versehentliches Öffnen.
+```
+
+---
+
+**Benutzer fragt: "Warum bekomme ich von MailGuard keine automatischen Antworten?"**
+
+✅ **RICHTIGE Antwort**:
+```
+Lassen Sie uns prüfen, warum automatische Antworten nicht funktionieren:
+
+✅ **Checkliste**:
+
+1. **E-Mail-Konto verbunden?**
+   - Gehen Sie zu `/mailguard/` → "Konten"
+   - Status sollte "✅ Aktiv" sein
+   - Falls "❌ Inaktiv": Erneut verbinden
+
+2. **Regeln konfiguriert?**
+   - Gehen Sie zu `/mailguard/` → "Regeln"
+   - Mindestens 1 Regel muss aktiv sein
+   - Aktion sollte "Auto-Antwort" oder "Entwurf erstellen" sein
+
+3. **OpenAI API konfiguriert?** (für KI-Antworten)
+   - Dies ist eine Server-Einstellung
+   - Fragen Sie Ihren Administrator
+   - Oder schreiben Sie Support
+
+4. **Sicherheits-Score zu hoch?**
+   - Bei Score > 70 (gefährlich) werden KEINE Auto-Antworten gesendet
+   - Sicherheitsmaßnahme gegen Phishing/Spam
+
+💡 **Standard-Verhalten**:
+- **OHNE Regeln**: Entwürfe werden erstellt (manuelle Genehmigung)
+- **MIT Regeln**: Auto-Antworten nach Regel-Bedingungen
+- **Gefährliche E-Mails**: Immer Quarantäne, keine Antworten
+
+🚀 **Schnell-Setup**:
+1. `/mailguard/` → "Regel erstellen"
+2. Name: "Standard Auto-Reply"
+3. Bedingung: Alle E-Mails (leer lassen)
+4. Aktion: "Entwurf erstellen"
+5. Priorität: 50
+6. Speichern ✅
+
+Dann werden für alle E-Mails KI-Entwürfe erstellt, die Sie genehmigen können.
+```
 
 ---
 
