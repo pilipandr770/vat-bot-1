@@ -101,18 +101,18 @@ def upgrade():
             batch_op.create_index(batch_op.f('ix_counterparties_user_id'), ['user_id'], unique=False)
             batch_op.create_index(batch_op.f('ix_counterparties_company_name'), ['company_name'], unique=False)
 
-    if not table_exists('verification_checks'):
+    def create_verification_checks_table():
         op.create_table(
             'verification_checks',
             sa.Column('id', sa.Integer(), primary_key=True),
-            sa.Column('user_id', sa.Integer(), nullable=False),
+            sa.Column('user_id', sa.Integer(), nullable=True),
             sa.Column('company_id', sa.Integer(), nullable=False),
             sa.Column('counterparty_id', sa.Integer(), nullable=False),
             sa.Column('check_date', sa.DateTime(), nullable=True),
             sa.Column('overall_status', sa.String(length=20), nullable=False),
             sa.Column('confidence_score', sa.Float(), nullable=True),
             sa.Column('is_monitoring_active', sa.Boolean(), nullable=True),
-            sa.ForeignKeyConstraint(['user_id'], [f'{schema}.users.id']),
+            sa.ForeignKeyConstraint(['user_id'], [f'{schema}.users.id'], name='fk_verification_checks_user_id'),
             sa.ForeignKeyConstraint(['company_id'], [f'{schema}.companies.id']),
             sa.ForeignKeyConstraint(['counterparty_id'], [f'{schema}.counterparties.id']),
             **schema_kwargs,
@@ -121,10 +121,30 @@ def upgrade():
             batch_op.create_index(batch_op.f('ix_verification_checks_check_date'), ['check_date'], unique=False)
             batch_op.create_index(batch_op.f('ix_verification_checks_user_id'), ['user_id'], unique=False)
 
-    if not column_exists('verification_checks', 'user_id'):
-        with op.batch_alter_table('verification_checks', schema=schema) as batch_op:
-            batch_op.add_column(sa.Column('user_id', sa.Integer(), nullable=True))
-            batch_op.create_foreign_key('fk_verification_checks_user_id', f'{schema}.users', ['user_id'], ['id'])
+    if not table_exists('verification_checks'):
+        create_verification_checks_table()
+    else:
+        inspector = inspect(op.get_bind())
+        has_user_id = column_exists('verification_checks', 'user_id')
+        if not has_user_id:
+            with op.batch_alter_table('verification_checks', schema=schema) as batch_op:
+                batch_op.add_column(sa.Column('user_id', sa.Integer(), nullable=True))
+                batch_op.create_foreign_key(
+                    'fk_verification_checks_user_id',
+                    'users',
+                    ['user_id'],
+                    ['id'],
+                    referent_schema=schema,
+                )
+            has_user_id = True
+
+        existing_indexes = {idx['name'] for idx in inspector.get_indexes('verification_checks', schema=schema)}
+        if has_user_id and op.f('ix_verification_checks_user_id') not in existing_indexes:
+            with op.batch_alter_table('verification_checks', schema=schema) as batch_op:
+                batch_op.create_index(batch_op.f('ix_verification_checks_user_id'), ['user_id'], unique=False)
+        if op.f('ix_verification_checks_check_date') not in existing_indexes:
+            with op.batch_alter_table('verification_checks', schema=schema) as batch_op:
+                batch_op.create_index(batch_op.f('ix_verification_checks_check_date'), ['check_date'], unique=False)
 
     if not table_exists('check_results'):
         op.create_table(
