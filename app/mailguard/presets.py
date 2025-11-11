@@ -1,6 +1,6 @@
 """
 Email Provider Presets for Easy IMAP/SMTP Configuration
-Спрощує підключення популярних email провайдерів
+Vereinfacht die Verbindung beliebter E-Mail-Anbieter
 """
 
 EMAIL_PRESETS = {
@@ -15,18 +15,18 @@ EMAIL_PRESETS = {
         'smtp_tls': True,
         'instructions': '''
             <div class="alert alert-warning mb-2">
-                <strong>⚠️ Не використовуйте звичайний пароль!</strong><br>
-                Gmail потребує спеціальний <strong>App Password</strong> (пароль додатку).
+                <strong>⚠️ Verwenden Sie nicht Ihr normales Passwort!</strong><br>
+                Gmail benötigt ein spezielles <strong>App-Passwort</strong>.
             </div>
-            <strong>Як отримати App Password:</strong>
+            <strong>So erhalten Sie ein App-Passwort:</strong>
             <ol class="small mb-2">
-                <li>Увімкніть 2-Factor Authentication в Google</li>
-                <li>Перейдіть за посиланням нижче</li>
-                <li>Оберіть "Mail" та згенеруйте пароль</li>
-                <li>Скопіюйте 16-символьний код (без пробілів)</li>
+                <li>Aktivieren Sie die 2-Faktor-Authentifizierung bei Google</li>
+                <li>Klicken Sie auf den Link unten</li>
+                <li>Wählen Sie "Mail" und generieren Sie ein Passwort</li>
+                <li>Kopieren Sie den 16-stelligen Code (ohne Leerzeichen)</li>
             </ol>
             <a href="https://myaccount.google.com/apppasswords" target="_blank" class="btn btn-primary btn-sm">
-                <i class="bi bi-box-arrow-up-right"></i> Створити App Password в Google
+                <i class="bi bi-box-arrow-up-right"></i> App-Passwort in Google erstellen
             </a>
         '''
     },
@@ -41,18 +41,18 @@ EMAIL_PRESETS = {
         'smtp_tls': True,
         'instructions': '''
             <div class="alert alert-warning mb-2">
-                <strong>⚠️ Microsoft потребує App Password</strong><br>
-                Не використовуйте звичайний пароль від облікового запису!
+                <strong>⚠️ Microsoft benötigt ein App-Passwort</strong><br>
+                Verwenden Sie nicht Ihr normales Konto-Passwort!
             </div>
-            <strong>Як отримати App Password:</strong>
+            <strong>So erhalten Sie ein App-Passwort:</strong>
             <ol class="small mb-2">
-                <li>Увімкніть 2-Factor Authentication в Microsoft Account</li>
-                <li>Перейдіть: Security → Advanced security options</li>
-                <li>Створіть App Password для пошти</li>
-                <li>Використайте згенерований пароль</li>
+                <li>Aktivieren Sie die 2-Faktor-Authentifizierung im Microsoft-Konto</li>
+                <li>Gehen Sie zu: Sicherheit → Erweiterte Sicherheitsoptionen</li>
+                <li>Erstellen Sie ein App-Passwort für E-Mail</li>
+                <li>Verwenden Sie das generierte Passwort</li>
             </ol>
             <a href="https://account.microsoft.com/security" target="_blank" class="btn btn-primary btn-sm">
-                <i class="bi bi-box-arrow-up-right"></i> Налаштування безпеки Microsoft
+                <i class="bi bi-box-arrow-up-right"></i> Microsoft-Sicherheitseinstellungen
             </a>
         '''
     },
@@ -67,18 +67,18 @@ EMAIL_PRESETS = {
         'smtp_tls': True,
         'instructions': '''
             <div class="alert alert-warning mb-2">
-                <strong>⚠️ Yahoo потребує App Password</strong><br>
-                Звичайний пароль не працюватиме для IMAP/SMTP!
+                <strong>⚠️ Yahoo benötigt ein App-Passwort</strong><br>
+                Das normale Passwort funktioniert nicht für IMAP/SMTP!
             </div>
-            <strong>Як отримати App Password:</strong>
+            <strong>So erhalten Sie ein App-Passwort:</strong>
             <ol class="small mb-2">
-                <li>Перейдіть за посиланням нижче</li>
-                <li>Виберіть "Other App" та введіть "Mail Client"</li>
-                <li>Натисніть "Generate" та скопіюйте пароль</li>
-                <li>Використайте цей пароль в формі підключення</li>
+                <li>Klicken Sie auf den Link unten</li>
+                <li>Wählen Sie "Other App" und geben Sie "Mail Client" ein</li>
+                <li>Klicken Sie auf "Generate" und kopieren Sie das Passwort</li>
+                <li>Verwenden Sie dieses Passwort im Verbindungsformular</li>
             </ol>
             <a href="https://login.yahoo.com/account/security/app-passwords" target="_blank" class="btn btn-primary btn-sm">
-                <i class="bi bi-box-arrow-up-right"></i> Створити App Password в Yahoo
+                <i class="bi bi-box-arrow-up-right"></i> App-Passwort in Yahoo erstellen
             </a>
         '''
     },
@@ -93,18 +93,18 @@ EMAIL_PRESETS = {
         'smtp_tls': False,
         'instructions': '''
             <div class="alert alert-warning mb-2">
-                <strong>⚠️ Mail.ru потребує пароль додатку</strong><br>
-                Звичайний пароль не підходить для підключення!
+                <strong>⚠️ Mail.ru benötigt ein App-Passwort</strong><br>
+                Das normale Passwort ist für die Verbindung nicht geeignet!
             </div>
-            <strong>Як отримати пароль додатку:</strong>
+            <strong>So erhalten Sie ein App-Passwort:</strong>
             <ol class="small mb-2">
-                <li>Перейдіть в Налаштування → Пароль і безпека</li>
-                <li>Знайдіть "Паролі для зовнішніх додатків"</li>
-                <li>Натисніть "Згенерувати новий пароль"</li>
-                <li>Скопіюйте згенерований пароль</li>
+                <li>Gehen Sie zu Einstellungen → Passwort und Sicherheit</li>
+                <li>Suchen Sie "Passwörter für externe Anwendungen"</li>
+                <li>Klicken Sie auf "Neues Passwort generieren"</li>
+                <li>Kopieren Sie das generierte Passwort</li>
             </ol>
             <a href="https://account.mail.ru/user/2-step-auth/passwords/" target="_blank" class="btn btn-primary btn-sm">
-                <i class="bi bi-box-arrow-up-right"></i> Налаштування паролів Mail.ru
+                <i class="bi bi-box-arrow-up-right"></i> Mail.ru Passwort-Einstellungen
             </a>
         '''
     },
@@ -119,18 +119,18 @@ EMAIL_PRESETS = {
         'smtp_tls': False,
         'instructions': '''
             <div class="alert alert-warning mb-2">
-                <strong>⚠️ Yandex потребує пароль додатку</strong><br>
-                Основний пароль не працює для IMAP/SMTP!
+                <strong>⚠️ Yandex benötigt ein App-Passwort</strong><br>
+                Das Hauptpasswort funktioniert nicht für IMAP/SMTP!
             </div>
-            <strong>Як отримати пароль додатку:</strong>
+            <strong>So erhalten Sie ein App-Passwort:</strong>
             <ol class="small mb-2">
-                <li>Перейдіть за посиланням нижче</li>
-                <li>Натисніть "Створити пароль додатку"</li>
-                <li>Введіть назву (наприклад, "MailGuard")</li>
-                <li>Скопіюйте згенерований пароль</li>
+                <li>Klicken Sie auf den Link unten</li>
+                <li>Klicken Sie auf "App-Passwort erstellen"</li>
+                <li>Geben Sie einen Namen ein (z.B. "MailGuard")</li>
+                <li>Kopieren Sie das generierte Passwort</li>
             </ol>
             <a href="https://id.yandex.ru/security/app-passwords" target="_blank" class="btn btn-primary btn-sm">
-                <i class="bi bi-box-arrow-up-right"></i> Створити пароль додатку Yandex
+                <i class="bi bi-box-arrow-up-right"></i> Yandex App-Passwort erstellen
             </a>
         '''
     },
@@ -145,22 +145,22 @@ EMAIL_PRESETS = {
         'smtp_tls': False,
         'instructions': '''
             <div class="alert alert-success mb-2">
-                <strong>✅ UKR.NET підтримує звичайний пароль</strong><br>
-                Використовуйте той самий пароль, яким входите в поштову скриньку.
+                <strong>✅ UKR.NET unterstützt normale Passwörter</strong><br>
+                Verwenden Sie dasselbe Passwort, mit dem Sie sich in Ihr Postfach einloggen.
             </div>
-            <strong>Налаштування:</strong>
+            <strong>Einstellungen:</strong>
             <ul class="small mb-2">
-                <li>Email: ваша адреса @ukr.net</li>
-                <li>Пароль: звичайний пароль від пошти</li>
-                <li>Не потрібні додаткові App Passwords</li>
+                <li>E-Mail: Ihre Adresse @ukr.net</li>
+                <li>Passwort: Ihr normales E-Mail-Passwort</li>
+                <li>Keine zusätzlichen App-Passwörter erforderlich</li>
             </ul>
             <a href="https://www.ukr.net/" target="_blank" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-box-arrow-up-right"></i> Відкрити UKR.NET
+                <i class="bi bi-box-arrow-up-right"></i> UKR.NET öffnen
             </a>
         '''
     },
     'custom': {
-        'name': 'Інший провайдер (Custom)',
+        'name': 'Anderer Anbieter (Custom)',
         'imap_host': '',
         'imap_port': 993,
         'imap_ssl': True,
@@ -170,18 +170,18 @@ EMAIL_PRESETS = {
         'smtp_tls': True,
         'instructions': '''
             <div class="alert alert-info mb-2">
-                <strong>ℹ️ Налаштування вручну</strong><br>
-                Заповніть всі поля IMAP та SMTP самостійно.
+                <strong>ℹ️ Manuelle Konfiguration</strong><br>
+                Füllen Sie alle IMAP- und SMTP-Felder manuell aus.
             </div>
-            <strong>Де знайти налаштування:</strong>
+            <strong>Wo Sie die Einstellungen finden:</strong>
             <ul class="small mb-2">
-                <li>Перевірте документацію вашого email провайдера</li>
-                <li>Зазвичай: imap.yourdomain.com / smtp.yourdomain.com</li>
-                <li>Порти: IMAP 993 (SSL) або 143, SMTP 587 (TLS) або 465 (SSL)</li>
-                <li>Деякі провайдери потребують App Password</li>
+                <li>Prüfen Sie die Dokumentation Ihres E-Mail-Anbieters</li>
+                <li>Normalerweise: imap.ihredomain.com / smtp.ihredomain.com</li>
+                <li>Ports: IMAP 993 (SSL) oder 143, SMTP 587 (TLS) oder 465 (SSL)</li>
+                <li>Einige Anbieter benötigen App-Passwörter</li>
             </ul>
             <p class="small text-muted">
-                Популярні домени: FastMail, ProtonMail, Zoho, власні корпоративні сервери.
+                Beliebte Domains: FastMail, ProtonMail, Zoho, eigene Unternehmensserver.
             </p>
         '''
     }
@@ -189,12 +189,12 @@ EMAIL_PRESETS = {
 
 
 def get_preset(provider_key):
-    """Отримати preset для провайдера"""
+    """Preset für Anbieter abrufen"""
     return EMAIL_PRESETS.get(provider_key, EMAIL_PRESETS['custom'])
 
 
 def get_all_presets():
-    """Отримати список всіх доступних провайдерів"""
+    """Liste aller verfügbaren Anbieter abrufen"""
     return [
         {'key': key, 'name': preset['name']}
         for key, preset in EMAIL_PRESETS.items()

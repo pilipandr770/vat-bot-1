@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Підключити Email - MailGuard{% endblock %}
+{% block title %}E-Mail verbinden - MailGuard{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -9,14 +9,14 @@
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
-                        <i class="bi bi-envelope-plus"></i> Підключити Email Акаунт
+                        <i class="bi bi-envelope-plus"></i> E-Mail-Konto verbinden
                     </h4>
                 </div>
                 <div class="card-body">
                     <!-- Выбор провайдера -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">
-                            <i class="bi bi-building"></i> Оберіть свого email провайдера:
+                            <i class="bi bi-building"></i> Wählen Sie Ihren E-Mail-Anbieter:
                         </label>
                         <div class="row g-2">
                             <div class="col-md-2 col-4">
@@ -58,7 +58,7 @@
                                 <button type="button" class="btn btn-outline-secondary w-100 provider-btn" 
                                         data-provider="custom">
                                     <i class="bi bi-gear"></i><br>
-                                    <small>Інший</small>
+                                    <small>Andere</small>
                                 </button>
                             </div>
                         </div>
@@ -78,18 +78,18 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">
-                                    <i class="bi bi-envelope"></i> Email адрес *
+                                    <i class="bi bi-envelope"></i> E-Mail-Adresse *
                                 </label>
                                 <input type="email" 
                                        class="form-control form-control-lg" 
                                        id="email" 
                                        name="email" 
-                                       placeholder="your@email.com"
+                                       placeholder="ihre@email.com"
                                        required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">
-                                    <i class="bi bi-key"></i> Пароль додатку *
+                                    <i class="bi bi-key"></i> App-Passwort *
                                 </label>
                                 <input type="password" 
                                        class="form-control form-control-lg" 
@@ -98,7 +98,7 @@
                                        placeholder="••••••••"
                                        required>
                                 <small class="form-text text-muted">
-                                    ⚠️ Використовуйте "пароль додатку", не основний пароль!
+                                    ⚠️ Verwenden Sie ein "App-Passwort", nicht Ihr Hauptpasswort!
                                 </small>
                             </div>
                         </div>
@@ -109,26 +109,26 @@
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" 
                                             data-bs-toggle="collapse" data-bs-target="#collapseAdvanced">
-                                        <i class="bi bi-gear me-2"></i> Розширені налаштування (опціонально)
+                                        <i class="bi bi-gear me-2"></i> Erweiterte Einstellungen (optional)
                                     </button>
                                 </h2>
                                 <div id="collapseAdvanced" class="accordion-collapse collapse" 
                                      data-bs-parent="#advancedSettings">
                                     <div class="accordion-body">
                                         <!-- IMAP Settings -->
-                                        <h6 class="mb-3"><i class="bi bi-download"></i> IMAP (входящая почта)</h6>
+                                        <h6 class="mb-3"><i class="bi bi-download"></i> IMAP (eingehende E-Mails)</h6>
                                         <div class="row">
                                             <div class="col-md-8 mb-3">
-                                                <label for="imap_host" class="form-label">IMAP сервер</label>
+                                                <label for="imap_host" class="form-label">IMAP-Server</label>
                                                 <input type="text" 
                                                        class="form-control" 
                                                        id="imap_host" 
                                                        name="imap_host"
-                                                       placeholder="imap.example.com"
+                                                       placeholder="imap.beispiel.com"
                                                        required>
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label for="imap_port" class="form-label">Порт</label>
+                                                <label for="imap_port" class="form-label">Port</label>
                                                 <input type="number" 
                                                        class="form-control" 
                                                        id="imap_port" 
@@ -141,19 +141,19 @@
                                         <hr class="my-3">
 
                                         <!-- SMTP Settings -->
-                                        <h6 class="mb-3"><i class="bi bi-upload"></i> SMTP (исходящая почта)</h6>
+                                        <h6 class="mb-3"><i class="bi bi-upload"></i> SMTP (ausgehende E-Mails)</h6>
                                         <div class="row">
                                             <div class="col-md-8 mb-3">
-                                                <label for="smtp_host" class="form-label">SMTP сервер</label>
+                                                <label for="smtp_host" class="form-label">SMTP-Server</label>
                                                 <input type="text" 
                                                        class="form-control" 
                                                        id="smtp_host" 
                                                        name="smtp_host"
-                                                       placeholder="smtp.example.com"
+                                                       placeholder="smtp.beispiel.com"
                                                        required>
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label for="smtp_port" class="form-label">Порт</label>
+                                                <label for="smtp_port" class="form-label">Port</label>
                                                 <input type="number" 
                                                        class="form-control" 
                                                        id="smtp_port" 
@@ -170,10 +170,10 @@
                         <!-- Buttons -->
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-check-circle"></i> Підключити
+                                <i class="bi bi-check-circle"></i> Verbinden
                             </button>
                             <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-outline-secondary btn-lg">
-                                <i class="bi bi-x-circle"></i> Скасувати
+                                <i class="bi bi-x-circle"></i> Abbrechen
                             </a>
                         </div>
                     </form>
@@ -183,17 +183,17 @@
             <!-- Помощь -->
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6><i class="bi bi-question-circle"></i> Допомога</h6>
-                    <p class="mb-2"><strong>Що таке "пароль додатку"?</strong></p>
+                    <h6><i class="bi bi-question-circle"></i> Hilfe</h6>
+                    <p class="mb-2"><strong>Was ist ein "App-Passwort"?</strong></p>
                     <p class="text-muted small">
-                        Це спеціальний пароль, який ви створюєте в налаштуваннях вашої поштової скриньки 
-                        для використання в сторонніх додатках. Він безпечніший за основний пароль і може бути 
-                        видалений в будь-який момент без зміни основного пароля.
+                        Dies ist ein spezielles Passwort, das Sie in den Einstellungen Ihres E-Mail-Postfachs 
+                        für die Verwendung in Drittanbieter-Apps erstellen. Es ist sicherer als Ihr Hauptpasswort 
+                        und kann jederzeit gelöscht werden, ohne das Hauptpasswort zu ändern.
                     </p>
-                    <p class="mb-2"><strong>Чому не можна використати звичайний пароль?</strong></p>
+                    <p class="mb-2"><strong>Warum kann ich nicht mein normales Passwort verwenden?</strong></p>
                     <p class="text-muted small">
-                        Більшість сучасних провайдерів (Gmail, Outlook, Yandex) вимагають використання 
-                        паролів додатків для IMAP/SMTP з метою безпеки. Це захищає ваш основний пароль.
+                        Die meisten modernen Anbieter (Gmail, Outlook, Yandex) verlangen aus Sicherheitsgründen 
+                        die Verwendung von App-Passwörtern für IMAP/SMTP. Dies schützt Ihr Hauptpasswort.
                     </p>
                 </div>
             </div>

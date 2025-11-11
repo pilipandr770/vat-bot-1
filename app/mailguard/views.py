@@ -242,7 +242,7 @@ def approve_and_send(draft_id):
     # Проверяем, что черновик принадлежит пользователю
     account = MailAccount.query.filter_by(id=draft.account_id, user_id=current_user.id).first()
     if not account:
-        flash('Доступ запрещён', 'error')
+        flash('Zugriff verweigert', 'error')
         return redirect(url_for('mailguard.dashboard'))
 
     try:
@@ -253,10 +253,10 @@ def approve_and_send(draft_id):
         # TODO: Реализовать отправку через соответствующий коннектор
         # send_draft(draft, account)
 
-        flash('Черновик отправлен успешно', 'success')
+        flash('Entwurf erfolgreich gesendet', 'success')
     except Exception as e:
         current_app.logger.error(f"Error sending draft {draft_id}: {e}")
-        flash('Ошибка при отправке черновика', 'error')
+        flash('Fehler beim Senden des Entwurfs', 'error')
 
     return redirect(url_for('mailguard.dashboard'))
 
@@ -269,20 +269,20 @@ def reject_draft(draft_id):
     # Проверяем, что черновик принадлежит пользователю
     account = MailAccount.query.filter_by(id=draft.account_id, user_id=current_user.id).first()
     if not account:
-        flash('Доступ запрещён', 'error')
+        flash('Zugriff verweigert', 'error')
         return redirect(url_for('mailguard.dashboard'))
 
     try:
         db.session.delete(draft)
         db.session.commit()
-        flash('Черновик отклонён', 'info')
+        flash('Entwurf abgelehnt', 'info')
     except Exception as e:
         current_app.logger.error(f"Error rejecting draft {draft_id}: {e}")
-        flash('Ошибка при отклонении черновика', 'error')
+        flash('Fehler beim Ablehnen des Entwurfs', 'error')
 
     return redirect(url_for('mailguard.dashboard'))
 
-# API endpoints для AJAX
+# API endpoints für AJAX
 @mailguard_bp.route('/api/accounts', methods=['GET'])
 @login_required
 def api_accounts():
@@ -373,7 +373,7 @@ def add_imap_account():
 
         # Валидация
         if not email or not password or not imap_host or not smtp_host:
-            flash('Заповніть всі обов\'язкові поля', 'error')
+            flash('Bitte füllen Sie alle Pflichtfelder aus', 'error')
             return redirect(url_for('mailguard.add_imap_account'))
 
         # Проверяем, не существует ли уже такой аккаунт
@@ -384,14 +384,14 @@ def add_imap_account():
         ).first()
 
         if existing:
-            flash(f'IMAP аккаунт {email} уже підключений', 'warning')
+            flash(f'IMAP-Konto {email} ist bereits verbunden', 'warning')
             return redirect(url_for('mailguard.accounts'))
 
         # Создаем аккаунт
         from .oauth import encrypt_token
         import json
         
-        # SMTP налаштування зберігаємо в settings_json
+        # SMTP-Einstellungen werden in settings_json gespeichert
         settings = {
             'smtp_host': smtp_host,
             'smtp_port': smtp_port,
@@ -412,11 +412,11 @@ def add_imap_account():
         db.session.add(account)
         db.session.commit()
 
-        flash(f'IMAP аккаунт {email} успішно підключений! Синхронізація почнеться автоматично.', 'success')
+        flash(f'IMAP-Konto {email} erfolgreich verbunden! Die Synchronisierung startet automatisch.', 'success')
 
     except Exception as e:
         current_app.logger.error(f"IMAP add error: {e}")
-        flash(f'Помилка при додаванні IMAP аккаунту: {str(e)}', 'error')
+        flash(f'Fehler beim Hinzufügen des IMAP-Kontos: {str(e)}', 'error')
 
     return redirect(url_for('mailguard.accounts'))
 
@@ -432,16 +432,16 @@ def sync_account(account_id):
         if account.provider == 'imap':
             processed = sync_imap_account(account)
         else:
-            flash('Провайдер не поддерживает ручную синхронизацию', 'warning')
+            flash('Anbieter unterstützt keine manuelle Synchronisierung', 'warning')
             return redirect(url_for('mailguard.accounts'))
 
         flash(
-            f'Синхронизация {account.email} завершена. Новых писем: {processed}',
+            f'Synchronisierung von {account.email} abgeschlossen. Neue Nachrichten: {processed}',
             'success'
         )
     except Exception as e:
         current_app.logger.error(f"Sync error: {e}")
-        flash('Ошибка синхронизации', 'error')
+        flash('Synchronisierungsfehler', 'error')
     
     return redirect(url_for('mailguard.accounts'))
 
@@ -454,11 +454,11 @@ def toggle_account(account_id):
     try:
         account.is_active = not account.is_active
         db.session.commit()
-        status = 'включен' if account.is_active else 'выключен'
-        flash(f'Аккаунт {account.email} {status}', 'success')
+        status = 'aktiviert' if account.is_active else 'deaktiviert'
+        flash(f'Konto {account.email} {status}', 'success')
     except Exception as e:
         current_app.logger.error(f"Toggle error: {e}")
-        flash('Ошибка изменения статуса', 'error')
+        flash('Fehler beim Ändern des Status', 'error')
     
     return redirect(url_for('mailguard.accounts'))
 
@@ -481,10 +481,10 @@ def delete_account(account_id):
 
         db.session.delete(account)
         db.session.commit()
-        flash(f'Аккаунт {email} удален', 'info')
+        flash(f'Konto {email} gelöscht', 'info')
     except Exception as e:
         current_app.logger.error(f"Delete error: {e}")
-        flash('Ошибка удаления аккаунта', 'error')
+        flash('Fehler beim Löschen des Kontos', 'error')
     
     return redirect(url_for('mailguard.accounts'))
 
@@ -500,10 +500,10 @@ def update_account_instructions(account_id):
         account.reply_instructions = instructions or None
         db.session.commit()
 
-        flash('Инструкции для AI-ответов обновлены', 'success')
+        flash('Anweisungen für KI-Antworten aktualisiert', 'success')
     except Exception as e:
         current_app.logger.error(f"Instruction update error: {e}")
         db.session.rollback()
-        flash('Не удалось сохранить инструкции', 'error')
+        flash('Anweisungen konnten nicht gespeichert werden', 'error')
 
     return redirect(url_for('mailguard.accounts'))
