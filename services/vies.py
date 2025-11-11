@@ -64,18 +64,28 @@ class VIESService:
                 if response.status_code == 200:
                     result = self._parse_vies_response(response.text, response_time)
                     
-                    # Check if we got MS_MAX_CONCURRENT_REQ error
-                    if result.get('status') == 'error' and 'MS_MAX_CONCURRENT_REQ' in str(result.get('error_message', '')):
+                    # Check for retriable errors
+                    error_msg = str(result.get('error_message', ''))
+                    is_retriable_error = any(keyword in error_msg for keyword in [
+                        'MS_MAX_CONCURRENT_REQ',
+                        'MS_UNAVAILABLE', 
+                        'SERVICE_UNAVAILABLE',
+                        'GLOBAL_MAX_CONCURRENT_REQ',
+                        'TIMEOUT'
+                    ])
+                    
+                    if result.get('status') == 'error' and is_retriable_error:
                         last_error = result
                         if attempt < self.max_retries - 1:
                             # Exponential backoff: 2s, 4s, 8s
                             delay = self.retry_delay * (2 ** attempt)
-                            logger.warning(f"VIES rate limit hit, retrying in {delay}s (attempt {attempt + 1}/{self.max_retries})")
+                            logger.warning(f"VIES retriable error, retrying in {delay}s (attempt {attempt + 1}/{self.max_retries}): {error_msg}")
                             time.sleep(delay)
                             continue
                     
-                    # Cache successful results (including errors to avoid hammering VIES)
-                    self._set_cache(cache_key, result)
+                    # Cache successful results (including non-retriable errors to avoid hammering VIES)
+                    if not is_retriable_error:
+                        self._set_cache(cache_key, result)
                     return result
                 else:
                     return self._create_error_response(
@@ -139,7 +149,41 @@ class VIESService:
                 fault_end = response_xml.find('</faultstring>')
                 if fault_start != -1 and fault_end != -1:
                     fault_message = response_xml[fault_start+13:fault_end]
-                    return self._create_error_response(f"VIES fault: {fault_message}", response_time)
+                    
+                    # Check for specific VIES faults
+                    if 'MS_UNAVAILABLE' in fault_message:
+                        # Member State service is temporarily unavailable
+                        return self._create_error_response(
+                            f"VIES fault: Der Validierungsservice für dieses Land ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut. ({fault_message})",
+                            response_time
+                        )
+                    elif 'MS_MAX_CONCURRENT_REQ' in fault_message:
+                        # Rate limit exceeded
+                        return self._create_error_response(
+                            f"VIES fault: Zu viele gleichzeitige Anfragen. Bitte warten Sie einen Moment. ({fault_message})",
+                            response_time
+                        )
+                    elif 'TIMEOUT' in fault_message:
+                        # Service timeout
+                        return self._create_error_response(
+                            f"VIES fault: Service-Zeitüberschreitung. Bitte versuchen Sie es erneut. ({fault_message})",
+                            response_time
+                        )
+                    elif 'INVALID_INPUT' in fault_message:
+                        # Invalid VAT number format
+                        return self._create_error_response(
+                            f"VIES fault: Ungültiges VAT-Nummernformat. ({fault_message})",
+                            response_time
+                        )
+                    elif 'SERVICE_UNAVAILABLE' in fault_message or 'GLOBAL_MAX_CONCURRENT_REQ' in fault_message:
+                        # VIES service overloaded
+                        return self._create_error_response(
+                            f"VIES fault: Der VIES-Service ist überlastet. Bitte versuchen Sie es in wenigen Minuten erneut. ({fault_message})",
+                            response_time
+                        )
+                    else:
+                        # Generic fault
+                        return self._create_error_response(f"VIES fault: {fault_message}", response_time)
             
             # Check if VAT is valid
             valid = '<ns2:valid>true</ns2:valid>' in response_xml
