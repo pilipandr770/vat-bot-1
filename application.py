@@ -14,10 +14,30 @@ from services.business_registry import BusinessRegistryManager
 from services.vat_lookup import VatLookupService
 import asyncio
 from datetime import datetime
+from sqlalchemy import text
 
 # Initialize Flask extensions
 login_manager = LoginManager()
 mail = Mail()
+
+
+def ensure_schema(app):
+    """Create target PostgreSQL schema if missing to avoid runtime failures."""
+    database_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    schema = os.environ.get('DB_SCHEMA')
+
+    if not schema or not database_uri.startswith('postgresql://'):
+        return
+
+    try:
+        with app.app_context():
+            engine = db.engine
+            with engine.connect() as connection:
+                connection.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
+                connection.commit()
+    except Exception as exc:  # pragma: no cover - defensive logging
+        app.logger.error('Failed to ensure schema %s: %s', schema, exc)
+
 
 def create_app(config_name=None):
     """Application factory pattern."""
@@ -34,6 +54,7 @@ def create_app(config_name=None):
     
     # Initialize extensions
     db.init_app(app)
+    ensure_schema(app)
     migrate = Migrate(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
