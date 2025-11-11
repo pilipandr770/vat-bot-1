@@ -53,7 +53,7 @@
     <!-- Список подключенных аккаунтов -->
     <div class="card">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-check-circle"></i> Подключенные аккаунты</h5>
+            <h5 class="mb-0"><i class="bi bi-check-circle"></i> Verbundene Konten</h5>
         </div>
         <div class="card-body">
             {% if accounts %}
@@ -61,11 +61,11 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Провайдер</th>
-                                <th>Email</th>
-                                <th>Статус</th>
-                                <th>Последняя синхронизация</th>
-                                <th>Действия</th>
+                                <th>Anbieter</th>
+                                <th>E-Mail</th>
+                                <th>Status</th>
+                                <th>Letzte Synchronisierung</th>
+                                <th>Aktionen</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,11 +86,11 @@
                                 <td>
                                     {% if account.is_active %}
                                         <span class="badge bg-success">
-                                            <i class="bi bi-check-circle"></i> Активен
+                                            <i class="bi bi-check-circle"></i> Aktiv
                                         </span>
                                     {% else %}
                                         <span class="badge bg-warning">
-                                            <i class="bi bi-exclamation-triangle"></i> Неактивен
+                                            <i class="bi bi-exclamation-triangle"></i> Inaktiv
                                         </span>
                                     {% endif %}
                                 </td>
@@ -98,7 +98,7 @@
                                     {% if account.last_sync_at %}
                                         {{ account.last_sync_at.strftime('%d.%m.%Y %H:%M') }}
                                     {% else %}
-                                        <span class="text-muted">Еще не синхронизирован</span>
+                                        <span class="text-muted">Noch nicht synchronisiert</span>
                                     {% endif %}
                                 </td>
                                 <td>
@@ -114,18 +114,18 @@
                                         </button>
                                         <a href="{{ url_for('mailguard.sync_account', account_id=account.id) }}" 
                                            class="btn btn-outline-primary"
-                                           title="Синхронизировать сейчас">
+                                           title="Jetzt synchronisieren">
                                             <i class="bi bi-arrow-clockwise"></i>
                                         </a>
                                         <a href="{{ url_for('mailguard.toggle_account', account_id=account.id) }}" 
                                            class="btn btn-outline-warning"
-                                           title="Включить/Выключить">
+                                           title="Aktivieren/Deaktivieren">
                                             <i class="bi bi-power"></i>
                                         </a>
                                         <a href="{{ url_for('mailguard.delete_account', account_id=account.id) }}" 
                                            class="btn btn-outline-danger"
-                                           onclick="return confirm('Удалить этот аккаунт? Все связанные письма останутся в базе.');"
-                                           title="Удалить">
+                                           onclick="return confirm('Dieses Konto löschen? Alle verknüpften E-Mails bleiben in der Datenbank.');"
+                                           title="Löschen">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </div>
@@ -167,8 +167,8 @@
             {% else %}
                 <div class="text-center py-5">
                     <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
-                    <p class="text-muted mt-3">Пока нет подключенных аккаунтов</p>
-                    <p class="text-muted">Выберите провайдера выше, чтобы начать</p>
+                    <p class="text-muted mt-3">Noch keine verbundenen Konten</p>
+                    <p class="text-muted">Wählen Sie oben einen Anbieter aus, um zu beginnen</p>
                 </div>
             {% endif %}
         </div>
