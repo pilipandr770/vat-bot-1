@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Підключити Email - MailGuard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-plus"></i> Підключити Email Акаунт
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Выбор провайдера -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-building"></i> Оберіть свого email провайдера:
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-md-2 col-4">
+                                <button type="button" class="btn btn-outline-primary w-100 provider-btn" 
+                                        data-provider="gmail">
+                                    <i class="bi bi-google"></i><br>
+                                    <small>Gmail</small>
+                                </button>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <button type="button" class="btn btn-outline-primary w-100 provider-btn" 
+                                        data-provider="outlook">
+                                    <i class="bi bi-microsoft"></i><br>
+                                    <small>Outlook</small>
+                                </button>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <button type="button" class="btn btn-outline-primary w-100 provider-btn" 
+                                        data-provider="yahoo">
+                                    <i class="bi bi-yahoo"></i><br>
+                                    <small>Yahoo</small>
+                                </button>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <button type="button" class="btn btn-outline-primary w-100 provider-btn" 
+                                        data-provider="mailru">
+                                    <i class="bi bi-envelope"></i><br>
+                                    <small>Mail.ru</small>
+                                </button>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <button type="button" class="btn btn-outline-primary w-100 provider-btn" 
+                                        data-provider="yandex">
+                                    <i class="bi bi-envelope"></i><br>
+                                    <small>Yandex</small>
+                                </button>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <button type="button" class="btn btn-outline-secondary w-100 provider-btn" 
+                                        data-provider="custom">
+                                    <i class="bi bi-gear"></i><br>
+                                    <small>Інший</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Инструкции для выбранного провайдера -->
+                    <div id="provider-instructions" class="alert alert-info" style="display:none;">
+                        <div id="instructions-content"></div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('mailguard.add_imap_account') }}" id="imap-form">
+                        {{ form.hidden_tag() }}
+                        
+                        <input type="hidden" id="provider" name="provider" value="">
+
+                        <!-- Email и пароль -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email адрес *
+                                </label>
+                                <input type="email" 
+                                       class="form-control form-control-lg" 
+                                       id="email" 
+                                       name="email" 
+                                       placeholder="your@email.com"
+                                       required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-key"></i> Пароль додатку *
+                                </label>
+                                <input type="password" 
+                                       class="form-control form-control-lg" 
+                                       id="password" 
+                                       name="password"
+                                       placeholder="••••••••"
+                                       required>
+                                <small class="form-text text-muted">
+                                    ⚠️ Використовуйте "пароль додатку", не основний пароль!
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Расширенные настройки (скрыты по умолчанию) -->
+                        <div class="accordion mb-3" id="advancedSettings">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapseAdvanced">
+                                        <i class="bi bi-gear me-2"></i> Розширені налаштування (опціонально)
+                                    </button>
+                                </h2>
+                                <div id="collapseAdvanced" class="accordion-collapse collapse" 
+                                     data-bs-parent="#advancedSettings">
+                                    <div class="accordion-body">
+                                        <!-- IMAP Settings -->
+                                        <h6 class="mb-3"><i class="bi bi-download"></i> IMAP (входящая почта)</h6>
+                                        <div class="row">
+                                            <div class="col-md-8 mb-3">
+                                                <label for="imap_host" class="form-label">IMAP сервер</label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="imap_host" 
+                                                       name="imap_host"
+                                                       placeholder="imap.example.com"
+                                                       required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="imap_port" class="form-label">Порт</label>
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       id="imap_port" 
+                                                       name="imap_port"
+                                                       value="993"
+                                                       required>
+                                            </div>
+                                        </div>
+
+                                        <hr class="my-3">
+
+                                        <!-- SMTP Settings -->
+                                        <h6 class="mb-3"><i class="bi bi-upload"></i> SMTP (исходящая почта)</h6>
+                                        <div class="row">
+                                            <div class="col-md-8 mb-3">
+                                                <label for="smtp_host" class="form-label">SMTP сервер</label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="smtp_host" 
+                                                       name="smtp_host"
+                                                       placeholder="smtp.example.com"
+                                                       required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="smtp_port" class="form-label">Порт</label>
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       id="smtp_port" 
+                                                       name="smtp_port"
+                                                       value="587"
+                                                       required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Підключити
+                            </button>
+                            <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-circle"></i> Скасувати
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Помощь -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="bi bi-question-circle"></i> Допомога</h6>
+                    <p class="mb-2"><strong>Що таке "пароль додатку"?</strong></p>
+                    <p class="text-muted small">
+                        Це спеціальний пароль, який ви створюєте в налаштуваннях вашої поштової скриньки 
+                        для використання в сторонніх додатках. Він безпечніший за основний пароль і може бути 
+                        видалений в будь-який момент без зміни основного пароля.
+                    </p>
+                    <p class="mb-2"><strong>Чому не можна використати звичайний пароль?</strong></p>
+                    <p class="text-muted small">
+                        Більшість сучасних провайдерів (Gmail, Outlook, Yandex) вимагають використання 
+                        паролів додатків для IMAP/SMTP з метою безпеки. Це захищає ваш основний пароль.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Presets data from backend
+const presets = {{ presets | tojson | safe }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const providerBtns = document.querySelectorAll('.provider-btn');
+    const instructionsDiv = document.getElementById('provider-instructions');
+    const instructionsContent = document.getElementById('instructions-content');
+    const providerInput = document.getElementById('provider');
+    
+    providerBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const providerKey = this.dataset.provider;
+            const preset = presets[providerKey];
+            
+            // Highlight selected button
+            providerBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Set provider value
+            providerInput.value = providerKey;
+            
+            // Fill form with preset values
+            if (preset) {
+                document.getElementById('imap_host').value = preset.imap_host || '';
+                document.getElementById('imap_port').value = preset.imap_port || 993;
+                document.getElementById('smtp_host').value = preset.smtp_host || '';
+                document.getElementById('smtp_port').value = preset.smtp_port || 587;
+                
+                // Show instructions
+                instructionsContent.innerHTML = preset.instructions || '';
+                instructionsDiv.style.display = 'block';
+                
+                // Focus email field
+                document.getElementById('email').focus();
+            }
+        });
+    });
+    
+    // Auto-fill SMTP domain based on email
+    document.getElementById('email').addEventListener('blur', function() {
+        const email = this.value;
+        const providerKey = providerInput.value;
+        
+        // If custom provider and email entered, try to guess SMTP/IMAP
+        if (providerKey === 'custom' && email.includes('@')) {
+            const domain = email.split('@')[1];
+            const imapHost = document.getElementById('imap_host');
+            const smtpHost = document.getElementById('smtp_host');
+            
+            if (!imapHost.value) {
+                imapHost.value = `imap.${domain}`;
+            }
+            if (!smtpHost.value) {
+                smtpHost.value = `smtp.${domain}`;
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.provider-btn {
+    min-height: 80px;
+    transition: all 0.3s;
+}
+.provider-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.provider-btn.active {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+</style>
+{% endblock %}

@@ -60,13 +60,21 @@ def get_smtp_config(account):
             'use_tls': True
         }
     elif account.provider == 'imap':
-        # Для IMAP аккаунтов используем сохраненные настройки
+        # Для IMAP аккаунтов используем настройки из settings_json
+        settings = account.get_settings()
+        smtp_host = settings.get('smtp_host')
+        smtp_port = settings.get('smtp_port', 587)
+        
+        # Fallback: если нет в settings, угадываем по IMAP хосту
+        if not smtp_host and account.host:
+            smtp_host = account.host.replace('imap', 'smtp')
+        
         return {
-            'host': account.host.replace('imap', 'smtp') if account.host else 'localhost',
-            'port': 587,  # По умолчанию
+            'host': smtp_host or 'localhost',
+            'port': smtp_port,
             'username': account.login,
             'password': decrypt_token(account.password) if account.password else None,
-            'use_tls': True
+            'use_tls': settings.get('smtp_ssl', True)
         }
     else:
         # Дефолтные настройки

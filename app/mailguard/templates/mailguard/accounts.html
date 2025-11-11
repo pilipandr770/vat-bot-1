@@ -23,59 +23,29 @@
     <!-- Описание для пользователя -->
     <div class="alert alert-info">
         <i class="bi bi-info-circle"></i> 
-        <strong>Wie verbinde ich E-Mail?</strong><br>
-        Klicken Sie auf "Gmail verbinden" oder "Outlook verbinden" und erlauben Sie den Zugriff im erscheinenden Fenster.
-        Das dauert 30 Sekunden. Ihre Passwörter bleiben bei Ihnen — wir verwenden das sichere OAuth-Protokoll.
+        <strong>Як підключити email?</strong><br>
+        Натисніть "Підключити Email" та оберіть свого провайдера (Gmail, Outlook, Yahoo, Mail.ru тощо).
+        Введіть email та <strong>пароль додатку</strong> (App Password) - це займе 2 хвилини!
     </div>
 
-    <!-- Кнопки подключения новых аккаунтов -->
+    <!-- Кнопка подключения -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Подключить новую почту</h5>
+            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Підключити Email</h5>
         </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <!-- Gmail -->
-                <div class="col-md-4">
-                    <div class="card h-100 text-center">
-                        <div class="card-body">
-                            <i class="bi bi-google" style="font-size: 3rem; color: #DB4437;"></i>
-                            <h5 class="card-title mt-3">Gmail</h5>
-                            <p class="text-muted">Google Workspace, @gmail.com</p>
-                            <a href="{{ url_for('mailguard.auth_gmail') }}" class="btn btn-danger w-100">
-                                <i class="bi bi-box-arrow-in-right"></i> Подключить Gmail
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Microsoft -->
-                <div class="col-md-4">
-                    <div class="card h-100 text-center">
-                        <div class="card-body">
-                            <i class="bi bi-microsoft" style="font-size: 3rem; color: #0078D4;"></i>
-                            <h5 class="card-title mt-3">Outlook / Office 365</h5>
-                            <p class="text-muted">Microsoft 365, @outlook.com</p>
-                            <a href="{{ url_for('mailguard.auth_microsoft') }}" class="btn btn-primary w-100">
-                                <i class="bi bi-box-arrow-in-right"></i> Подключить Microsoft
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- IMAP (любая другая почта) -->
-                <div class="col-md-4">
-                    <div class="card h-100 text-center">
-                        <div class="card-body">
-                            <i class="bi bi-envelope-fill" style="font-size: 3rem; color: #6c757d;"></i>
-                            <h5 class="card-title mt-3">Другая почта</h5>
-                            <p class="text-muted">Любой IMAP/SMTP провайдер</p>
-                            <a href="{{ url_for('mailguard.add_imap_account') }}" class="btn btn-secondary w-100">
-                                <i class="bi bi-gear"></i> Настроить IMAP
-                            </a>
-                        </div>
-                    </div>
-                </div>
+        <div class="card-body text-center">
+            <i class="bi bi-envelope-plus" style="font-size: 4rem; color: #0d6efd;"></i>
+            <h5 class="mt-3">Підключіть будь-який email акаунт</h5>
+            <p class="text-muted mb-4">
+                Gmail, Outlook, Yahoo, Mail.ru, Yandex, UKR.NET або інший IMAP/SMTP провайдер
+            </p>
+            <a href="{{ url_for('mailguard.add_imap_account') }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-envelope-at"></i> Підключити Email Акаунт
+            </a>
+            <div class="mt-3">
+                <small class="text-muted">
+                    <i class="bi bi-shield-check"></i> Безпечно: паролі шифруються та зберігаються локально
+                </small>
             </div>
         </div>
     </div>

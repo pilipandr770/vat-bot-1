@@ -4,7 +4,7 @@
 Multi-module Flask SaaS platform combining:
 1. **Counterparty Verification**: Automated EU business partner verification with VAT validation, sanctions checks, OSINT scans
 2. **Enrichment Orchestrator** 🆕: Intelligent auto-fill system combining VIES + Business Registries + OSINT for form auto-completion
-3. **MailGuard**: Intelligent email processing system with AI-powered responses, security scanning, and multi-provider support (Gmail, Microsoft 365, IMAP)
+3. **MailGuard** ✅: Simple email processing system using IMAP/SMTP with Email Provider Presets - AI-powered responses, security scanning (OAuth removed for simplicity)
 
 ## Architecture & Core Patterns
 
@@ -18,15 +18,15 @@ Multi-module Flask SaaS platform combining:
 │   ├── auth/models.py    # User authentication & subscription models
 │   ├── mailguard/        # MailGuard email intelligence module
 │   │   ├── models.py     # Email models (MailAccount, MailMessage, MailRule, MailDraft)
-│   │   ├── views.py      # Dashboard, account management, approval endpoints
-│   │   ├── oauth.py      # Gmail & Microsoft OAuth 2.0 flows
+│   │   ├── views.py      # Dashboard, account management, IMAP setup endpoints
+│   │   ├── oauth.py      # Token encryption utilities (encrypt_token/decrypt_token)
+│   │   ├── presets.py    # 🆕 Email Provider Presets (Gmail, Outlook, Yahoo, Mail.ru, Yandex, UKR.NET)
 │   │   ├── connectors/   # Email provider integrations
-│   │   │   ├── gmail.py      # Gmail API client
-│   │   │   ├── microsoft.py  # Microsoft Graph API client
-│   │   │   ├── imap.py       # Universal IMAP client
-│   │   │   └── smtp.py       # Universal SMTP sender
+│   │   │   ├── imap.py       # Universal IMAP client (fetch emails)
+│   │   │   └── smtp.py       # Universal SMTP sender (send emails)
 │   │   ├── rules.py      # Priority-based rule engine
 │   │   ├── nlp_reply.py  # OpenAI GPT-4 reply generation
+│   │   ├── tasks.py      # Background sync jobs (APScheduler)
 │   │   └── scanner.py    # Attachment security scanner
 │   └── services/         # External API integrations
 │       ├── enrichment_flow.py # 🆕 EnrichmentOrchestrator (VIES+OSINT+Registries)
@@ -129,19 +129,80 @@ class OsintScanner:
         return results
 ```
 
-#### 4. MailGuard Email Intelligence Pattern (`app/mailguard/`)
+#### 4. MailGuard IMAP/SMTP Pattern 🆕 (Simplified - No OAuth) (`app/mailguard/`)
 ```python
-# OAuth Flow Pattern
-class GmailConnector:
-    def authenticate(self, user_id: str) -> str:
-        flow = OAuth2WebServerFlow(...)
-        auth_url = flow.step1_get_authorize_url()
-        return auth_url  # Redirect user to Google consent
+# Email Provider Presets Pattern (app/mailguard/presets.py)
+EMAIL_PRESETS = {
+    'gmail': {
+        'imap_host': 'imap.gmail.com',
+        'imap_port': 993,
+        'smtp_host': 'smtp.gmail.com',
+        'smtp_port': 587,
+        'imap_ssl': True,
+        'smtp_ssl': False,  # Use STARTTLS
+        'instructions': 'Для Gmail використовуйте App Password...'
+    },
+    'outlook': {...},
+    'yahoo': {...},
+    'mailru': {...},
+    'yandex': {...},
+    'ukrnet': {...},
+    'custom': {...}  # Manual IMAP/SMTP configuration
+}
+
+# Account Creation with Encryption (app/mailguard/views.py)
+@mailguard_bp.route('/accounts/add-imap', methods=['POST'])
+def add_imap_account():
+    email = request.form['email']
+    password = request.form['password']
+    imap_host = request.form['imap_host']
+    imap_port = int(request.form['imap_port'])
     
-    def callback(self, code: str) -> Dict[str, str]:
-        credentials = flow.step2_exchange(code)
-        encrypted_token = encrypt(credentials.to_json())
-        return {'access_token': encrypted_token}
+    # Store SMTP settings in settings_json
+    settings = {
+        'smtp_host': request.form.get('smtp_host'),
+        'smtp_port': int(request.form.get('smtp_port', 587)),
+        'smtp_ssl': request.form.get('smtp_ssl') == 'true'
+    }
+    
+    account = MailAccount(
+        user_id=current_user.id,
+        provider='imap',
+        email=email,
+        host=imap_host,
+        port=imap_port,
+        login=email,
+        password=encrypt_token(password),  # Fernet encryption
+        settings_json=json.dumps(settings),
+        is_active=True
+    )
+    db.session.add(account)
+    db.session.commit()
+
+# IMAP Email Fetching (app/mailguard/connectors/imap.py)
+def fetch_new_imap(account):
+    from imapclient import IMAPClient
+    password = decrypt_token(account.password)
+    
+    client = IMAPClient(account.host, port=account.port, ssl=True)
+    client.login(account.login, password)
+    client.select_folder('INBOX')
+    
+    messages = client.search(['UNSEEN'])
+    for msg_id in messages:
+        # Fetch and parse email...
+        create_mail_message(account, email_data)
+
+# SMTP Email Sending (app/mailguard/connectors/smtp.py)
+def send_smtp_email(account, to_email, subject, body):
+    settings = account.get_settings()
+    smtp_host = settings.get('smtp_host')
+    smtp_port = settings.get('smtp_port', 587)
+    
+    with smtplib.SMTP(smtp_host, smtp_port) as server:
+        server.starttls()
+        server.login(account.login, decrypt_token(account.password))
+        server.send_message(msg)
 
 # Rule Engine Pattern
 class RuleEngine:
@@ -200,10 +261,12 @@ flask run --debug
 ### MailGuard Database Models (`app/mailguard/models.py`)
 ```python
 # Core models with relationships
-MailAccount:     # User email accounts (Gmail, Microsoft, IMAP)
+MailAccount:     # User email accounts (IMAP only)
   - user_id → User
-  - provider (gmail|microsoft|imap)
-  - email, encrypted_access_token, encrypted_refresh_token
+  - provider ('imap')
+  - email, host, port, login
+  - password (encrypted with Fernet)
+  - settings_json (stores SMTP config as JSON: smtp_host, smtp_port, smtp_ssl)
   - is_active, last_sync_at
 
 MailMessage:     # Incoming emails
@@ -364,27 +427,29 @@ print(f"Status: {result['status']}")
 
 ### Current Implementation Status (October 2025)
 
+### Current Implementation Status (October 2025)
+
 **✅ Completed Features:**
 - Database models: 6 tables (MailAccount, MailMessage, MailRule, MailDraft, KnownCounterparty, ScanReport)
-- Blueprint architecture: `app/mailguard/` with views, models, oauth
+- Blueprint architecture: `app/mailguard/` with views, models, oauth (encryption only)
 - Dashboard UI: Stats overview, accounts table, rules management, pending approvals
-- Connector framework: Gmail, Microsoft Graph, IMAP, SMTP clients (implemented but not integrated)
+- **Email Provider Presets** 🆕: 7 pre-configured providers (Gmail, Outlook, Yahoo, Mail.ru, Yandex, UKR.NET, Custom)
+- **IMAP/SMTP Connector** ✅: Universal email+password authentication (no OAuth complexity)
+- **Enhanced IMAP Form** 🆕: Provider buttons with JavaScript auto-fill for IMAP/SMTP settings
 - AI reply generation: OpenAI GPT-4 integration (`nlp_reply.py`)
 - Rule engine: Priority-based matching system (`rules.py`)
 - Security scanner: Attachment analysis framework (`scanner.py`)
+- Token encryption: Fernet-based password encryption (`oauth.py`)
 
 **⚠️ Partially Implemented:**
-- OAuth flows: Code exists but routes are placeholders
-- Email connectors: Classes implemented but not connected to dashboard
-- Background processing: APScheduler configured but no tasks running
+- Background email syncing: APScheduler configured but no tasks running
+- Email connectors: IMAP client implemented but not scheduled for auto-sync
 
 **❌ Not Yet Implemented:**
-- OAuth callback endpoints (Gmail, Microsoft)
-- IMAP account setup form
-- Email fetching/syncing background tasks
+- Email fetching/syncing background tasks (APScheduler job needed)
 - AI reply approval workflow (backend ready, UI needs work)
 - Rule creation/editing forms
-- Attachment security scanning integration
+- Attachment security scanning integration (VirusTotal)
 
 ### MailGuard Routes (`app/mailguard/views.py`)
 
@@ -392,22 +457,17 @@ print(f"Status: {result['status']}")
 ```python
 @mailguard_bp.route('/')                              # Dashboard with stats
 @mailguard_bp.route('/accounts')                      # Account management page
+@mailguard_bp.route('/accounts/add-imap', methods=['GET', 'POST'])  # ✅ IMAP setup form
+@mailguard_bp.route('/accounts/<int:account_id>/sync', methods=['POST', 'GET'])  # Manual sync
 @mailguard_bp.route('/rules')                         # Rules management page
 @mailguard_bp.route('/counterparties')                # Trusted contacts page
 @mailguard_bp.route('/approve/<int:draft_id>')        # Approve draft reply
 @mailguard_bp.route('/reject/<int:draft_id>')         # Reject draft reply
 @mailguard_bp.route('/api/accounts')                  # List accounts (JSON)
 @mailguard_bp.route('/api/drafts/pending')            # Pending approvals (JSON)
-@mailguard_bp.route('/webhook/gmail')                 # Gmail push notifications
-@mailguard_bp.route('/webhook/outlook')               # Outlook push notifications
 ```
 
-**Placeholder Routes (Need Implementation):**
-- `/auth/gmail` - Initiate Gmail OAuth flow
-- `/auth/gmail/callback` - Handle Gmail OAuth callback
-- `/auth/microsoft` - Initiate Microsoft OAuth flow
-- `/auth/microsoft/callback` - Handle Microsoft OAuth callback
-- `/accounts/add-imap` - IMAP account setup form
+**Pending Routes (Need Implementation):**
 - `/accounts/<id>` - Account details and settings
 - `/rules/create` - Rule creation form
 - `/rules/<id>/edit` - Rule editing form
@@ -419,32 +479,17 @@ print(f"Status: {result['status']}")
 **Installed Dependencies:**
 ```
 cryptography==41.0.7              # Token encryption (Fernet)
-google-api-python-client==2.108.0 # Gmail API
-google-auth==2.23.4               # Google OAuth
-google-auth-oauthlib==1.1.0       # OAuth helpers
-google-auth-httplib2==0.1.1       # HTTP transport
-msal==1.25.0                      # Microsoft Authentication Library
 apscheduler==3.10.4               # Background job scheduling
-imapclient==2.3.1                 # IMAP protocol client
+imapclient==2.3.1                 # IMAP protocol client (✅ used)
 openai==1.12.0                    # GPT-4 for AI replies
 ```
 
 **Environment Variables Required:**
 ```bash
-# Gmail OAuth (Google Cloud Console)
-GMAIL_CLIENT_ID=xxx.apps.googleusercontent.com
-GMAIL_CLIENT_SECRET=xxx
-
-# Microsoft OAuth (Azure App Registration)
-MS_CLIENT_ID=xxx
-MS_CLIENT_SECRET=xxx
-MS_TENANT_ID=common  # or specific tenant
-
-# OpenAI API
-OPENAI_API_KEY=sk-xxx
-
-# Token Encryption
+# Token Encryption (REQUIRED for password storage)
 MAILGUARD_ENCRYPTION_KEY=xxx  # 32-byte Fernet key
+# OpenAI API (for AI reply generation)
+OPENAI_API_KEY=sk-xxx
 
 # Optional: External file scanner API
 FILE_SCANNER_URL=https://api.virustotal.com/v3/files
@@ -453,34 +498,67 @@ FILE_SCANNER_API_KEY=xxx
 
 ---
 
+## MailGuard Email Provider Presets 🆕
+
+**Concept:** Simplify email setup by providing pre-configured IMAP/SMTP settings for popular providers. Users only need to enter email + password (or app-specific password).
+
+**File:** `app/mailguard/presets.py`
+
+**Supported Providers:**
+1. **Gmail** - imap.gmail.com:993 / smtp.gmail.com:587
+2. **Outlook/Hotmail** - outlook.office365.com:993 / smtp-mail.outlook.com:587
+3. **Yahoo** - imap.mail.yahoo.com:993 / smtp.mail.yahoo.com:587
+4. **Mail.ru** - imap.mail.ru:993 / smtp.mail.ru:587
+5. **Yandex** - imap.yandex.com:993 / smtp.yandex.com:587
+6. **UKR.NET** - imap.ukr.net:993 / smtp.ukr.net:2525
+7. **Custom** - Manual IMAP/SMTP configuration
+
+**Usage Pattern:**
+```python
+# In views.py
+from .presets import EMAIL_PRESETS
+
+@mailguard_bp.route('/accounts/add-imap', methods=['GET'])
+def add_imap_account():
+    return render_template(
+        'mailguard/add_imap_improved.html',
+        presets=json.dumps(EMAIL_PRESETS)  # Pass to JavaScript
+    )
+```
+
+**Frontend Auto-fill (JavaScript):**
+```javascript
+// When user clicks provider button (e.g., "Gmail")
+function selectProvider(providerId) {
+    const preset = presets[providerId];
+    document.getElementById('imap_host').value = preset.imap_host;
+    document.getElementById('imap_port').value = preset.imap_port;
+    document.getElementById('smtp_host').value = preset.smtp_host;
+    document.getElementById('smtp_port').value = preset.smtp_port;
+    document.getElementById('imap_ssl').checked = preset.imap_ssl;
+    document.getElementById('smtp_ssl').checked = preset.smtp_ssl;
+    document.getElementById('instructions_panel').innerHTML = preset.instructions;
+}
+```
+
+**Security Note:** Gmail and Outlook require App-Specific Passwords (not account passwords). Instructions are shown dynamically per provider.
+
+---
+
 ## Development Roadmap & Paid API Integration Plans
 
-### Phase 1: MailGuard OAuth Integration (Next Priority)
-**Goal:** Enable users to connect Gmail and Microsoft 365 accounts
+### Phase 1: MailGuard IMAP Integration ✅ COMPLETED
+**Goal:** Enable users to connect email accounts with simple email+password
 
-**Tasks:**
-1. Implement Gmail OAuth flow:
-   - Create `/auth/gmail` endpoint to initiate OAuth
-   - Create `/auth/gmail/callback` to handle authorization code
-   - Store encrypted tokens in `MailAccount`
-   - Test Gmail API connection (fetch 1 email)
+**Completed:**
+1. ✅ Implemented Email Provider Presets (7 providers)
+2. ✅ Created IMAP account setup form with auto-fill
+3. ✅ Implemented IMAP connector for email fetching
+4. ✅ Implemented SMTP connector for email sending
+5. ✅ Token encryption with Fernet
+6. ✅ Successfully tested with Gmail IMAP
 
-2. Implement Microsoft OAuth flow:
-   - Create `/auth/microsoft` endpoint with MSAL library
-   - Create `/auth/microsoft/callback` to exchange code
-   - Store encrypted tokens in `MailAccount`
-   - Test Microsoft Graph API (fetch 1 email)
-
-3. Implement IMAP account setup:
-   - Create form at `/accounts/add-imap`
-   - Validate IMAP credentials with test connection
-   - Store encrypted credentials in `MailAccount`
-   - Test IMAP connection with IMAPClient
-
-**Paid APIs Needed:**
-- ✅ OpenAI GPT-4 API (already integrated) - ~$0.03 per AI reply
-- 🆓 Gmail API (free with quotas)
-- 🆓 Microsoft Graph API (free with quotas)
+**No OAuth Complexity:** Users connect via IMAP/SMTP with email+password (or app-specific password for Gmail/Outlook)
 
 ---
 
@@ -506,7 +584,7 @@ FILE_SCANNER_API_KEY=xxx
 
 **Paid APIs Needed:**
 - ✅ OpenAI GPT-4 (already covered)
-- 🆓 Gmail/Microsoft Graph for sending (free)
+- 🆓 IMAP/SMTP (free with existing email accounts)
 
 ---
 
@@ -778,6 +856,6 @@ class Subscription:
 
 ---
 
-*Last Updated: October 27, 2025*
-*MailGuard Status: Dashboard deployed, OAuth integration pending*
+*Last Updated: October 2025*
+*MailGuard Status: IMAP/SMTP integration completed, OAuth removed for simplicity*
 *Premium API Integration: Planning phase*

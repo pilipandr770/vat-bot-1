@@ -24,12 +24,8 @@ from .models import (
     MailDraft,
     ScanReport,
 )
-from .tasks import sync_gmail_account, sync_imap_account
-from .oauth import (
-    get_gmail_auth_url, exchange_gmail_code, 
-    get_ms_auth_url, exchange_ms_code,
-    encrypt_token, get_gmail_email
-)
+from .tasks import sync_imap_account
+from .oauth import encrypt_token
 from .rules import create_default_rules
 import json
 
@@ -337,167 +333,20 @@ def outlook_webhook():
     # TODO: Реализовать обработку Outlook webhook
     return 'OK', 200
 
-# ========== OAuth Routes ==========
-
-@mailguard_bp.route('/auth/gmail')
-@login_required
-def auth_gmail():
-    """Инициировать OAuth для Gmail"""
-    try:
-        auth_url = get_gmail_auth_url()
-        return redirect(auth_url)
-    except Exception as e:
-        current_app.logger.error(f"Gmail OAuth init error: {e}")
-        flash('Ошибка при подключении Gmail. Проверьте настройки API.', 'error')
-        return redirect(url_for('mailguard.accounts'))
-
-@mailguard_bp.route('/auth/gmail/callback')
-@login_required
-def gmail_callback():
-    """Callback после авторизации Gmail"""
-    code = request.args.get('code')
-    error = request.args.get('error')
-
-    if error:
-        flash(f'Ошибка авторизации Gmail: {error}', 'error')
-        return redirect(url_for('mailguard.accounts'))
-
-    if not code:
-        flash('Не получен код авторизации от Google', 'error')
-        return redirect(url_for('mailguard.accounts'))
-
-    try:
-        # Обмениваем код на токены
-        tokens = exchange_gmail_code(code)
-        
-        # Получаем email пользователя
-        email = get_gmail_email(tokens['access_token'])
-
-        # Проверяем, не подключен ли уже этот аккаунт
-        existing = MailAccount.query.filter_by(
-            user_id=current_user.id,
-            provider='gmail',
-            email=email
-        ).first()
-
-        if existing:
-            # Обновляем токены
-            existing.access_token = encrypt_token(tokens['access_token'])
-            existing.refresh_token = encrypt_token(tokens.get('refresh_token', ''))
-            existing.expires_at = datetime.utcnow() + timedelta(seconds=tokens.get('expires_in', 3600))
-            existing.is_active = True
-            db.session.commit()
-            synced = sync_gmail_account(existing)
-            flash(f'Gmail аккаунт {email} успешно переподключен!', 'success')
-            if synced:
-                flash(f'Получено новых писем: {synced}', 'success')
-        else:
-            # Создаем новый аккаунт
-            account = MailAccount(
-                user_id=current_user.id,
-                provider='gmail',
-                email=email,
-                access_token=encrypt_token(tokens['access_token']),
-                refresh_token=encrypt_token(tokens.get('refresh_token', '')),
-                expires_at=datetime.utcnow() + timedelta(seconds=tokens.get('expires_in', 3600)),
-                is_active=True
-            )
-            db.session.add(account)
-            db.session.commit()
-            synced = sync_gmail_account(account)
-            flash(f'Gmail аккаунт {email} успешно подключен!', 'success')
-            if synced:
-                flash(f'Получено новых писем: {synced}', 'success')
-
-    except Exception as e:
-        current_app.logger.error(f"Gmail callback error: {e}")
-        flash('Ошибка при сохранении токенов Gmail. Попробуйте еще раз.', 'error')
-
-    return redirect(url_for('mailguard.accounts'))
-
-@mailguard_bp.route('/auth/microsoft')
-@login_required
-def auth_microsoft():
-    """Инициировать OAuth для Microsoft"""
-    try:
-        auth_url = get_ms_auth_url()
-        return redirect(auth_url)
-    except Exception as e:
-        current_app.logger.error(f"Microsoft OAuth init error: {e}")
-        flash('Ошибка при подключении Microsoft. Проверьте настройки API.', 'error')
-        return redirect(url_for('mailguard.accounts'))
-
-@mailguard_bp.route('/auth/microsoft/callback')
-@login_required
-def microsoft_callback():
-    """Callback после авторизации Microsoft"""
-    code = request.args.get('code')
-    error = request.args.get('error')
-
-    if error:
-        flash(f'Ошибка авторизации Microsoft: {error}', 'error')
-        return redirect(url_for('mailguard.accounts'))
-
-    if not code:
-        flash('Не получен код авторизации от Microsoft', 'error')
-        return redirect(url_for('mailguard.accounts'))
-
-    try:
-        # Обмениваем код на токены
-        result = exchange_ms_code(code)
-        
-        # Получаем email пользователя из Microsoft Graph
-        headers = {'Authorization': f"Bearer {result['access_token']}"}
-        user_info = requests.get('https://graph.microsoft.com/v1.0/me', headers=headers).json()
-        email = user_info.get('mail') or user_info.get('userPrincipalName')
-
-        # Проверяем, не подключен ли уже этот аккаунт
-        existing = MailAccount.query.filter_by(
-            user_id=current_user.id,
-            provider='microsoft',
-            email=email
-        ).first()
-
-        if existing:
-            # Обновляем токены
-            existing.access_token = encrypt_token(result['access_token'])
-            existing.refresh_token = encrypt_token(result.get('refresh_token', ''))
-            existing.expires_at = datetime.utcnow() + timedelta(seconds=result.get('expires_in', 3600))
-            existing.is_active = True
-            db.session.commit()
-            flash(f'Microsoft аккаунт {email} успешно переподключен!', 'success')
-        else:
-            # Создаем новый аккаунт
-            account = MailAccount(
-                user_id=current_user.id,
-                provider='microsoft',
-                email=email,
-                access_token=encrypt_token(result['access_token']),
-                refresh_token=encrypt_token(result.get('refresh_token', '')),
-                expires_at=datetime.utcnow() + timedelta(seconds=result.get('expires_in', 3600)),
-                is_active=True
-            )
-            db.session.add(account)
-            db.session.commit()
-            flash(f'Microsoft аккаунт {email} успешно подключен!', 'success')
-
-    except Exception as e:
-        current_app.logger.error(f"Microsoft callback error: {e}")
-        flash('Ошибка при сохранении токенов Microsoft. Попробуйте еще раз.', 'error')
-
-    return redirect(url_for('mailguard.accounts'))
-
 @mailguard_bp.route('/accounts/add-imap', methods=['GET', 'POST'])
 @login_required
 def add_imap_account():
-    """Добавить IMAP аккаунт вручную"""
+    """Добавить IMAP аккаунт вручную с поддержкой presets"""
     if request.method == 'GET':
         from flask_wtf import FlaskForm
-        from wtforms import StringField, PasswordField, IntegerField, BooleanField
+        from wtforms import StringField, PasswordField, IntegerField, BooleanField, SelectField
         from wtforms.validators import DataRequired, Email
+        from .presets import get_all_presets
         
-        # Создаем простую форму
+        # Создаем форму с выбором провайдера
         class IMAPForm(FlaskForm):
+            provider = SelectField('Провайдер', choices=[('', 'Выберите провайдер...')] + 
+                                 [(p['key'], p['name']) for p in get_all_presets()])
             email = StringField('Email', validators=[DataRequired(), Email()])
             password = PasswordField('Password', validators=[DataRequired()])
             imap_host = StringField('IMAP Host', validators=[DataRequired()])
@@ -508,7 +357,10 @@ def add_imap_account():
             smtp_ssl = BooleanField('Use SSL/TLS', default=True)
         
         form = IMAPForm()
-        return render_template('mailguard/add_imap.html', form=form)
+        
+        # Передаем presets в шаблон
+        from .presets import EMAIL_PRESETS
+        return render_template('mailguard/add_imap_improved.html', form=form, presets=EMAIL_PRESETS)
     
     # POST - сохраняем аккаунт
     try:
@@ -519,11 +371,9 @@ def add_imap_account():
         smtp_host = request.form.get('smtp_host')
         smtp_port = int(request.form.get('smtp_port', 465))
 
-        # Проверяем подключение (быстрый тест)
-        from .connectors.imap import IMAPConnector
-        test_connector = IMAPConnector(imap_host, imap_port, email, password, use_ssl=True)
-        if not test_connector.connect():
-            flash('Не удалось подключиться к IMAP серверу. Проверьте настройки.', 'error')
+        # Валидация
+        if not email or not password or not imap_host or not smtp_host:
+            flash('Заповніть всі обов\'язкові поля', 'error')
             return redirect(url_for('mailguard.add_imap_account'))
 
         # Проверяем, не существует ли уже такой аккаунт
@@ -534,10 +384,20 @@ def add_imap_account():
         ).first()
 
         if existing:
-            flash(f'IMAP аккаунт {email} уже подключен', 'warning')
+            flash(f'IMAP аккаунт {email} уже підключений', 'warning')
             return redirect(url_for('mailguard.accounts'))
 
         # Создаем аккаунт
+        from .oauth import encrypt_token
+        import json
+        
+        # SMTP налаштування зберігаємо в settings_json
+        settings = {
+            'smtp_host': smtp_host,
+            'smtp_port': smtp_port,
+            'smtp_ssl': True
+        }
+        
         account = MailAccount(
             user_id=current_user.id,
             provider='imap',
@@ -546,18 +406,17 @@ def add_imap_account():
             port=imap_port,
             login=email,
             password=encrypt_token(password),
-            smtp_host=smtp_host,
-            smtp_port=smtp_port,
+            settings_json=json.dumps(settings),
             is_active=True
         )
         db.session.add(account)
         db.session.commit()
 
-        flash(f'IMAP аккаунт {email} успешно подключен!', 'success')
+        flash(f'IMAP аккаунт {email} успішно підключений! Синхронізація почнеться автоматично.', 'success')
 
     except Exception as e:
         current_app.logger.error(f"IMAP add error: {e}")
-        flash('Ошибка при добавлении IMAP аккаунта', 'error')
+        flash(f'Помилка при додаванні IMAP аккаунту: {str(e)}', 'error')
 
     return redirect(url_for('mailguard.accounts'))
 
@@ -570,9 +429,7 @@ def sync_account(account_id):
     try:
         processed = 0
 
-        if account.provider == 'gmail':
-            processed = sync_gmail_account(account)
-        elif account.provider == 'imap':
+        if account.provider == 'imap':
             processed = sync_imap_account(account)
         else:
             flash('Провайдер не поддерживает ручную синхронизацию', 'warning')

@@ -106,7 +106,7 @@ MS_SCOPES = [
 def get_ms_auth_url():
     """Получить URL для авторизации Microsoft 365"""
     client_id = current_app.config.get('MS_CLIENT_ID')
-    redirect_uri = url_for('mailguard.ms_callback', _external=True)
+    redirect_uri = url_for('mailguard.microsoft_callback', _external=True)
     tenant = current_app.config.get('MS_TENANT_ID', 'common')
 
     auth_url = (
@@ -124,7 +124,7 @@ def exchange_ms_code(code):
     """Обменять код авторизации Microsoft на токены"""
     client_id = current_app.config.get('MS_CLIENT_ID')
     client_secret = current_app.config.get('MS_CLIENT_SECRET')
-    redirect_uri = url_for('mailguard.ms_callback', _external=True)
+    redirect_uri = url_for('mailguard.microsoft_callback', _external=True)
     tenant = current_app.config.get('MS_TENANT_ID', 'common')
 
     token_url = f'https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token'
