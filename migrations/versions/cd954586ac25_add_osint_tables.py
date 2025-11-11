@@ -35,6 +35,11 @@ def upgrade():
 
     schema_kwargs = {'schema': schema}
 
+    def index_exists(table_name: str, index_name: str) -> bool:
+        current_inspector = inspect(op.get_bind())
+        indexes = {idx['name'] for idx in current_inspector.get_indexes(table_name, schema=schema)}
+        return index_name in indexes
+
     if not table_exists('osint_scans'):
         op.create_table(
             'osint_scans',
@@ -82,9 +87,12 @@ def upgrade():
             batch_op.create_foreign_key('fk_counterparties_user_id', f'{schema}.users', ['user_id'], ['id'])
 
     if column_exists('verification_checks', 'user_id'):
+        index_name = op.f('ix_verification_checks_user_id')
+        needs_index = not index_exists('verification_checks', index_name)
         with op.batch_alter_table('verification_checks', schema=schema) as batch_op:
             batch_op.alter_column('user_id', existing_type=sa.INTEGER(), nullable=False)
-            batch_op.create_index(batch_op.f('ix_verification_checks_user_id'), ['user_id'], unique=False)
+            if needs_index:
+                batch_op.create_index(index_name, ['user_id'], unique=False)
 
     # ### end Alembic commands ###
 
