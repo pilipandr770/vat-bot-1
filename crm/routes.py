@@ -6,6 +6,9 @@ from flask_login import login_required, current_user
 from crm.models import db, Counterparty, VerificationCheck, CheckResult, Alert
 from datetime import datetime
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 crm_bp = Blueprint('crm', __name__, url_prefix='/crm')
 
@@ -13,19 +16,35 @@ crm_bp = Blueprint('crm', __name__, url_prefix='/crm')
 @login_required
 def index():
     """CRM Dashboard - List all counterparties"""
+    logger.info(f"=== CRM INDEX REQUEST ===")
+    logger.info(f"User ID: {current_user.id}")
+    logger.info(f"User email: {current_user.email}")
+    
     counterparties = Counterparty.query.filter_by(user_id=current_user.id)\
         .order_by(Counterparty.created_at.desc()).all()
+    
+    logger.info(f"Found {len(counterparties)} counterparties for user {current_user.id}")
+    
+    # Debug: показать все counterparties в БД (для диагностики)
+    all_counterparties = Counterparty.query.all()
+    logger.debug(f"Total counterparties in DB: {len(all_counterparties)}")
+    for cp in all_counterparties[:5]:  # Показать первые 5
+        logger.debug(f"  - ID: {cp.id}, Name: {cp.company_name}, User ID: {cp.user_id}")
     
     # Get monitoring stats
     total_counterparties = len(counterparties)
     monitored_counterparties = sum(1 for c in counterparties 
                                    if VerificationCheck.query.filter_by(counterparty_id=c.id, is_monitoring_active=True).first())
     
+    logger.info(f"Monitored counterparties: {monitored_counterparties}/{total_counterparties}")
+    
     # Recent alerts
     recent_alerts = Alert.query.join(VerificationCheck)\
         .filter(VerificationCheck.user_id == current_user.id)\
         .order_by(Alert.created_at.desc())\
         .limit(10).all()
+    
+    logger.info(f"Found {len(recent_alerts)} recent alerts")
     
     return render_template('crm/index.html', 
                           counterparties=counterparties,
