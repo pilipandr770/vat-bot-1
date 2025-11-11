@@ -1,19 +1,48 @@
 # VAT Verifizierung - SaaS Platform
 
-## Projektstatus: Free Tier Features Complete (Phase 1-4 abgeschlossen, Phase 5 geplant)
+## Projektstatus: Enrichment Orchestrator Implemented (Phase 1-4 abgeschlossen, Phase 5 in Progress)
 
 ### 🎯 Projektziel
 Multi-Modul SaaS-Plattform kombiniert:
 1. **Counterparty Verification**: Automatisierte EU-Geschäftspartner-Überprüfung mit VAT-Validierung, Sanktionsprüfungen, OSINT-Scans
-2. **MailGuard**: Intelligentes E-Mail-Verarbeitungssystem mit KI-gestützten Antworten, Sicherheitsprüfungen und Multi-Provider-Unterstützung (Gmail, Microsoft 365, IMAP)
-3. **CRM & Monitoring**: Kontrahenten-Management mit täglichen Statusüberwachungen
-4. **Subscription Management**: Stripe-basierte Abonnements mit automatischer Abrechnung
+2. **Enrichment Orchestrator** 🆕: Intelligentes Auto-Fill-System kombiniert VIES + Business Registries + OSINT für automatische Formular-Vervollständigung
+3. **MailGuard**: Intelligentes E-Mail-Verarbeitungssystem mit KI-gestützten Antworten, Sicherheitsprüfungen und Multi-Provider-Unterstützung (Gmail, Microsoft 365, IMAP)
+4. **CRM & Monitoring**: Kontrahenten-Management mit täglichen Statusüberwachungen
+5. **Subscription Management**: Stripe-basierte Abonnements mit automatischer Abrechnung
 
 ---
 
 ## ✅ Was wurde implementiert (FREE TIER KOMPLETT)
 
-### 1. **Authentifizierung & Benutzerverwaltung** ✅
+### 1. **Enrichment Orchestrator** 🆕 ✅ (November 2025)
+- **EnrichmentOrchestrator Class** (`services/enrichment_flow.py`):
+  - Kombiniert 3 Datenquellen: VIES + Business Registries + OSINT
+  - Intelligentes Fallback-System (wenn VAT fehlt → OSINT, wenn Domain fehlt → Registry)
+  - Unterstützt Input: `vat_number`, `email`, `domain`, `company_name`, `country_code_hint`
+- **API Integration** (`application.py`):
+  - Bestehender `/api/vat-lookup` Endpoint modernisiert
+  - Verwendet `EnrichmentOrchestrator` statt nur `VatLookupService`
+  - Backward compatible mit Frontend
+- **Datenquellen** (alle FREE):
+  - **VIES API**: VAT-Validierung mit Firmennamen und Adresse
+  - **OSINT Scanner**: WHOIS (Organisation, Land, Stadt), DNS, SSL, HTTP Headers
+  - **Business Registries**: DE/CZ/PL Handelsregister-Daten
+- **Frontend Integration** (`static/js/app.js`):
+  - VAT-Input blur event → automatischer API-Call
+  - Auto-Fill mit visueller Hervorhebung (3.5s gelber Hintergrund)
+  - `field.dataset.autofilled` tracking für User-Edit-Erkennung
+- **Response Format**:
+  ```json
+  {
+    "success": true,
+    "prefill": { /* 10+ Felder */ },
+    "services": { /* Raw API Responses */ },
+    "messages": [ /* User-friendly Statusmeldungen */ ]
+  }
+  ```
+- **Dokumentation**: `ENRICHMENT_GUIDE.md` (35 Seiten komplett)
+
+### 2. **Authentifizierung & Benutzerverwaltung** ✅
 - **Flask-Login Integration**: Vollständige Session-Verwaltung
 - **User Model** (`auth/models.py`): Email-Bestätigung, Passwort-Hashing, Abonnement-Tracking
 - **Registrierung/Login/Logout**: Deutsche UI mit E-Mail-Validierung

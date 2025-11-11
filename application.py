@@ -96,6 +96,10 @@ def create_app(config_name=None):
     from app.mailguard import mailguard_bp
     app.register_blueprint(mailguard_bp)
     
+    # Register enrichment API blueprint
+    from routes.enrichment import enrichment_bp
+    app.register_blueprint(enrichment_bp)
+    
     # Register CRM blueprint
     from crm.routes import crm_bp
     app.register_blueprint(crm_bp)
@@ -437,7 +441,7 @@ def create_app(config_name=None):
 
     @app.route('/api/vat-lookup', methods=['POST'])
     def api_vat_lookup():
-        """Provide VAT-based prefill data for counterparty forms."""
+        """Provide VAT-based prefill data for counterparty forms using EnrichmentOrchestrator."""
         if not current_user.is_authenticated:
             return jsonify({
                 'success': False,
@@ -449,31 +453,44 @@ def create_app(config_name=None):
         vat_number = payload.get('vat_number', '').strip()
         country_code = payload.get('country_code')
         company_name_hint = payload.get('company_name')
+        email = payload.get('email', '').strip()
+        domain = payload.get('domain', '').strip()
 
-        if not vat_number:
+        if not vat_number and not email and not domain and not company_name_hint:
             return jsonify({
                 'success': False,
-                'error': 'Bitte geben Sie eine VAT-Nummer ein.'
+                'error': 'Bitte geben Sie eine VAT-Nummer, E-Mail, Domain oder Firmennamen ein.'
             }), 400
 
         try:
-            lookup_result = vat_lookup_service.lookup(
-                vat_number,
-                country_code=country_code,
-                company_name_hint=company_name_hint
+            from services.enrichment_flow import EnrichmentOrchestrator
+            orchestrator = EnrichmentOrchestrator()
+            
+            enrichment_result = orchestrator.enrich(
+                vat_number=vat_number or None,
+                email=email or None,
+                domain=domain or None,
+                company_name=company_name_hint or None,
+                country_code_hint=country_code or None
             )
-            status_code = 200 if lookup_result.get('success', False) else 200
-            return jsonify(lookup_result), status_code
+            
+            # Log enrichment for user tracking
+            app.logger.info(f"User {current_user.id} enrichment: VAT={vat_number}, "
+                          f"sources={enrichment_result.get('services', {}).keys()}")
+            
+            status_code = 200 if enrichment_result.get('success', False) else 200
+            return jsonify(enrichment_result), status_code
+            
         except ValueError as exc:
             return jsonify({
                 'success': False,
                 'error': str(exc)
             }), 400
         except Exception as exc:  # pragma: no cover - fall-back
-            app.logger.exception('VAT lookup failed: %s', exc)
+            app.logger.exception('Enrichment failed: %s', exc)
             return jsonify({
                 'success': False,
-                'error': 'Interner Fehler bei der VAT-Suche'
+                'error': 'Interner Fehler bei der Datensuche'
             }), 500
     
     # CLI commands for database management

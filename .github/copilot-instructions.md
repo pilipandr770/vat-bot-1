@@ -1,9 +1,10 @@
-# Counterparty Verification System + MailGuard - AI Development Guide
+# Counterparty Verification System + MailGuard + Enrichment - AI Development Guide
 
 ## Project Overview
 Multi-module Flask SaaS platform combining:
 1. **Counterparty Verification**: Automated EU business partner verification with VAT validation, sanctions checks, OSINT scans
-2. **MailGuard**: Intelligent email processing system with AI-powered responses, security scanning, and multi-provider support (Gmail, Microsoft 365, IMAP)
+2. **Enrichment Orchestrator** 🆕: Intelligent auto-fill system combining VIES + Business Registries + OSINT for form auto-completion
+3. **MailGuard**: Intelligent email processing system with AI-powered responses, security scanning, and multi-provider support (Gmail, Microsoft 365, IMAP)
 
 ## Architecture & Core Patterns
 
@@ -28,10 +29,15 @@ Multi-module Flask SaaS platform combining:
 │   │   ├── nlp_reply.py  # OpenAI GPT-4 reply generation
 │   │   └── scanner.py    # Attachment security scanner
 │   └── services/         # External API integrations
+│       ├── enrichment_flow.py # 🆕 EnrichmentOrchestrator (VIES+OSINT+Registries)
+│       ├── vat_lookup.py      # VAT lookup service (used by enrichment)
+│       ├── business_registry.py # Business registries manager (DE/CZ/PL)
 │       ├── vies.py          # EU VAT validation (SOAP API)
 │       ├── handelsregister.py # German business register
 │       ├── sanctions.py     # EU/OFAC/UK sanctions lists
 │       └── osint/           # Open Source Intelligence scanner
+├── routes/
+│   └── enrichment.py     # 🆕 Enrichment API blueprint (/api/enrichment/enrich)
 └── templates/
     ├── mailguard/        # Email dashboard templates
     └── ...               # Other feature templates
@@ -39,7 +45,53 @@ Multi-module Flask SaaS platform combining:
 
 ### Key Design Patterns
 
-#### 1. Service Integration Pattern (`services/*.py`)
+#### 1. Enrichment Orchestrator Pattern 🆕 (`services/enrichment_flow.py`)
+```python
+class EnrichmentOrchestrator:
+    """
+    Single entry point for counterparty data enrichment.
+    Combines 3 free data sources: VIES + Business Registries + OSINT.
+    """
+    def enrich(
+        self,
+        vat_number: Optional[str] = None,
+        email: Optional[str] = None,
+        domain: Optional[str] = None,
+        company_name: Optional[str] = None,
+        country_code_hint: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        prefills = {}
+        services = {}
+        messages = []
+        
+        # 1. VAT lookup (if provided)
+        if vat_number:
+            vat_result = self.vat_lookup.lookup(vat_number, country_code_hint)
+            services['vat_lookup'] = vat_result
+            prefills.update(vat_result.get('prefill', {}))
+        
+        # 2. OSINT scan (if domain/email provided)
+        if domain or email:
+            target_domain = domain or email.split('@')[1]
+            osint_results = OsintScanner(domain=target_domain).run_all()
+            services['osint'] = osint_results
+            prefills.update(self._extract_from_osint(osint_results))
+        
+        # 3. Business registry lookup
+        if company_name and country_code_hint:
+            registry_result = self.registry_manager.lookup(country_code_hint, company_name)
+            services[f'registry_{country_code_hint.lower()}'] = registry_result
+            prefills.update(registry_result.get('data', {}))
+        
+        return {
+            'success': True,
+            'prefill': prefills,  # Fields for form auto-fill
+            'services': services, # Raw API responses
+            'messages': messages  # User-friendly status messages
+        }
+```
+
+#### 2. Service Integration Pattern (`services/*.py`)
 ```python
 class VIESService:
     def validate_vat(self, country_code: str, vat_number: str) -> Dict:

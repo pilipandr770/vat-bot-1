@@ -51,6 +51,22 @@ class CounterpartyVerification {
                     domain = domain.replace(/^(https?:\/\/)?(www\.)?/, '');
                 }
                 e.target.value = domain;
+                
+                // Trigger enrichment if domain is valid
+                if (domain && domain.includes('.')) {
+                    this.handleDomainPrefill(domain);
+                }
+            });
+        }
+
+        // Email field enrichment trigger
+        const emailInput = document.getElementById('counterparty_email');
+        if (emailInput) {
+            emailInput.addEventListener('blur', (e) => {
+                const email = e.target.value.trim();
+                if (email && email.includes('@')) {
+                    this.handleEmailPrefill(email);
+                }
             });
         }
 
@@ -829,6 +845,22 @@ class CounterpartyVerification {
         const countrySelect = document.getElementById('counterparty_country');
         if (countrySelect && countrySelect.value) {
             payload.country_code = countrySelect.value;
+        }
+
+        // Add email and domain for enrichment
+        const emailInput = document.getElementById('counterparty_email');
+        if (emailInput && emailInput.value) {
+            payload.email = emailInput.value.trim();
+        }
+        
+        const domainInput = document.getElementById('counterparty_domain');
+        if (domainInput && domainInput.value) {
+            payload.domain = domainInput.value.trim();
+        }
+        
+        const companyNameInput = document.getElementById('counterparty_name');
+        if (companyNameInput && companyNameInput.value) {
+            payload.company_name = companyNameInput.value.trim();
         }
 
         this.showVatPrefillMessages('search');
