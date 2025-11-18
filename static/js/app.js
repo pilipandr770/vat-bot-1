@@ -189,15 +189,9 @@ class CounterpartyVerification {
     }
 
     async submitVerification(formData) {
-        // Get CSRF token from the form
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-        
         const response = await fetch('/verify', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': csrfToken || ''
-            }
+            body: formData
         });
 
         if (response.status === 401) {

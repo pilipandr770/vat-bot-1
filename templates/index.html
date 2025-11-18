@@ -76,7 +76,6 @@
                 </div>
                 {% endif %}
                 <form id="verificationForm">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="mb-3">
                         <label for="company_vat" class="form-label">USt-IdNr. <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="company_vat" name="company_vat" 
