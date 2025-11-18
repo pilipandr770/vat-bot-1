@@ -865,8 +865,32 @@ class CounterpartyVerification {
 
         this.showVatPrefillMessages('search');
 
+        // Check if we can do auto-verify (if user has company data filled)
+        const companyVatInput = document.getElementById('company_vat');
+        const userCompanyNameInput = document.getElementById('company_name');
+        const canAutoVerify = companyVatInput && companyVatInput.value.trim() && 
+                             userCompanyNameInput && userCompanyNameInput.value.trim();
+
+        const endpoint = canAutoVerify ? '/api/enrichment/auto-verify' : '/api/vat-lookup';
+
+        // Add company data for auto-verify
+        if (canAutoVerify) {
+            payload.company_vat = companyVatInput.value.trim();
+            payload.company_name = userCompanyNameInput.value.trim();
+            
+            const companyAddressInput = document.getElementById('company_address');
+            if (companyAddressInput && companyAddressInput.value) {
+                payload.company_address = companyAddressInput.value.trim();
+            }
+            
+            const companyEmailInput = document.getElementById('company_email');
+            if (companyEmailInput && companyEmailInput.value) {
+                payload.company_email = companyEmailInput.value.trim();
+            }
+        }
+
         try {
-            const response = await fetch('/api/vat-lookup', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -885,11 +909,17 @@ class CounterpartyVerification {
 
             if (response.ok && data.success) {
                 this.lastPrefillVat = vatRaw;
-                this.applyPrefill(data.prefill || {});
-                this.showVatPrefillMessages(data);
+                this.applyPrefill(data.enrichment?.prefill || data.prefill || {});
+                
+                // Show verification results if auto-verify was used
+                if (data.saved_to_crm && data.verification) {
+                    this.showAutoVerifyResults(data);
+                } else {
+                    this.showVatPrefillMessages(data.enrichment || data);
+                }
             } else {
                 this.lastPrefillVat = null;
-                this.showVatPrefillMessages(data, true);
+                this.showVatPrefillMessages(data.enrichment || data, true);
             }
         } catch (error) {
             if (error.name === 'AbortError') {
@@ -1056,5 +1086,109 @@ class CounterpartyVerification {
 
         resultsPanel.innerHTML = html;
         resultsPanel.classList.add('fade-in');
+    }
+
+    showAutoVerifyResults(data) {
+        const resultsPanel = document.getElementById('resultsPanel');
+        if (!resultsPanel) return;
+
+        const verification = data.verification;
+        const enrichment = data.enrichment;
+        
+        let html = `
+            <div class="alert alert-success mb-4">
+                <h5><i class="bi bi-check-circle-fill"></i> Automatische Überprüfung abgeschlossen!</h5>
+                <p>Die Daten wurden automatisch angereichert und in Ihre CRM-Datenbank gespeichert.</p>
+                <p><strong>Prüfungs-ID:</strong> ${data.check_id}</p>
+            </div>
+        `;
+
+        // Show verification results
+        if (verification) {
+            const overallStatusClass = this.getStatusClass(verification.overall_status);
+            const confidencePercentage = Math.round(verification.confidence_score * 100);
+            
+            html += `
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Gesamtergebnis der automatischen Überprüfung:</h6>
+                        <span class="badge ${overallStatusClass}">${this.getStatusText(verification.overall_status)}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar ${this.getProgressBarClass(verification.confidence_score)}" 
+                             style="width: ${confidencePercentage}%" 
+                             title="Konfidenz: ${confidencePercentage}%">
+                            ${confidencePercentage}%
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Services results
+            if (verification.results && Object.keys(verification.results).length > 0) {
+                html += '<div class="accordion" id="autoVerifyAccordion">';
+                
+                let index = 0;
+                for (const [service, result] of Object.entries(verification.results)) {
+                    html += this.generateServiceResult(service, result, index);
+                    index++;
+                }
+                
+                html += '</div>';
+            }
+        }
+
+        // Show enrichment summary
+        if (enrichment && enrichment.summary) {
+            html += `
+                <div class="mt-4">
+                    <h6>Angereicherte Daten:</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">${enrichment.summary.sources_used.length}</h5>
+                                    <p class="card-text">Quellen verwendet</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">${enrichment.summary.fields_filled}</h5>
+                                    <p class="card-text">Felder ausgefüllt</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">${Math.round(enrichment.summary.confidence * 100)}%</h5>
+                                    <p class="card-text">Konfidenz</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Action buttons
+        html += `
+            <div class="mt-4 text-center">
+                <a href="/crm/" class="btn btn-primary me-2">
+                    <i class="bi bi-eye"></i> In CRM ansehen
+                </a>
+                <button type="button" class="btn btn-secondary" onclick="location.reload()">
+                    <i class="bi bi-arrow-clockwise"></i> Neue Überprüfung
+                </button>
+            </div>
+        `;
+
+        resultsPanel.innerHTML = html;
+        resultsPanel.classList.add('fade-in');
+
+        // Initialize tooltips and other interactive elements
+        this.initializeResultsInteractivity();
     }
 }
