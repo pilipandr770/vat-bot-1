@@ -174,7 +174,10 @@ def auto_verify():
         data = request.get_json() or {}
 
         # Check quota before proceeding
-        if not current_user.can_perform_verification():
+        can_verify = current_user.can_perform_verification()
+        logger.error(f"AUTO-VERIFY QUOTA CHECK: can_perform_verification={can_verify}")
+        
+        if not can_verify:
             return jsonify({
                 'success': False,
                 'error': 'Sie haben Ihr Prüfungslimit erreicht.',

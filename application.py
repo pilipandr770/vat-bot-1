@@ -241,7 +241,10 @@ def create_app(config_name=None):
         # User is authenticated via @login_required decorator
         
         # Check if user can perform verification (quota check)
-        if not current_user.can_perform_verification():
+        can_verify = current_user.can_perform_verification()
+        logger.error(f"QUOTA CHECK: can_perform_verification={can_verify}")
+        
+        if not can_verify:
             # Get current usage info for better error message
             sub = current_user.active_subscription
             if not sub:
