@@ -3,7 +3,8 @@ from flask import Flask, render_template, request, jsonify, flash, redirect, url
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_required, current_user
 from flask_mail import Mail
-from flask_wtf import CSRFProtect, csrf
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import csrf_exempt
 from config import config
 from crm.models import db, Company, Counterparty, VerificationCheck, CheckResult
 from auth.models import User
@@ -209,7 +210,7 @@ def create_app(config_name=None):
         return render_template('test_form.html')
     
     @app.route('/verify', methods=['POST'])
-    @csrf.exempt
+    @csrf_exempt
     def verify_counterparty():
         """Process verification request - requires authentication."""
         import logging
@@ -466,7 +467,7 @@ def create_app(config_name=None):
         return results
 
     @app.route('/api/vat-lookup', methods=['POST'])
-    @csrf.exempt
+    @csrf_exempt
     def api_vat_lookup():
         """Provide VAT-based prefill data for counterparty forms using EnrichmentOrchestrator."""
         if not current_user.is_authenticated:

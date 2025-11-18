@@ -8,7 +8,7 @@ Date: November 2025
 
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from flask_wtf import csrf
+from flask_wtf.csrf import csrf_exempt
 import logging
 
 from services.enrichment_flow import EnrichmentOrchestrator
@@ -28,7 +28,7 @@ enrichment_bp = Blueprint('enrichment', __name__, url_prefix='/api/enrichment')
 
 @enrichment_bp.route('/enrich', methods=['POST'])
 @login_required
-@csrf.exempt
+@csrf_exempt
 def enrich_counterparty():
     """
     POST /api/enrichment/enrich
@@ -141,7 +141,7 @@ def enrich_counterparty():
 
 @enrichment_bp.route('/auto-verify', methods=['POST'])
 @login_required
-@csrf.exempt
+@csrf_exempt
 def auto_verify():
     """
     POST /api/enrichment/auto-verify
