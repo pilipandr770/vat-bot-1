@@ -1,5 +1,7 @@
 import requests
 import time
+import random
+import threading
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 import logging
@@ -7,19 +9,31 @@ import logging
 logger = logging.getLogger(__name__)
 
 class VIESService:
-    """VIES (VAT Information Exchange System) service integration with retry logic and caching."""
+    """VIES (VAT Information Exchange System) service integration with retry logic and caching.
+    
+    Rate Limits & Best Practices:
+    - VIES has concurrent request limits per member state
+    - MS_MAX_CONCURRENT_REQ: Too many concurrent requests to a member state
+    - GLOBAL_MAX_CONCURRENT_REQ: Global rate limit exceeded
+    - Recommended: Max 1-2 concurrent requests per application
+    - Retry with exponential backoff + jitter for rate limit errors
+    """
     
     def __init__(self):
         self.base_url = "http://ec.europa.eu/taxation_customs/vies/services/checkVatService"
         self.soap_action = "checkVat"
-        self.max_retries = 3
-        self.retry_delay = 2  # seconds
+        self.max_retries = 5  # Increased from 3
+        self.retry_delay = 3  # Increased from 2
+        self.rate_limit_delay = 10  # Special delay for rate limit errors
+        self.max_concurrent_requests = 2  # Limit concurrent VIES requests
+        self._active_requests = 0
+        self._request_lock = threading.Lock()
         self._cache = {}  # Simple in-memory cache: {vat_key: (result, expiry_time)}
         self.cache_ttl = 3600  # 1 hour cache
         
     def validate_vat(self, country_code: str, vat_number: str) -> Dict:
         """
-        Validate VAT number through VIES service with retry logic and caching.
+        Validate VAT number through VIES service with retry logic, caching, and throttling.
         
         Args:
             country_code: 2-letter country code (e.g., 'DE', 'AT')
@@ -34,6 +48,21 @@ class VIESService:
         if cached_result:
             logger.info(f"VIES cache hit for {cache_key}")
             return cached_result
+        
+        # Throttle concurrent requests
+        with self._request_lock:
+            while self._active_requests >= self.max_concurrent_requests:
+                logger.warning(f"VIES throttling: {self._active_requests} active requests, waiting...")
+                time.sleep(1)
+            self._active_requests += 1
+        
+        try:
+            return self._validate_vat_internal(country_code, vat_number, cache_key)
+        finally:
+            with self._request_lock:
+                self._active_requests -= 1
+    
+    def _validate_vat_internal(self, country_code: str, vat_number: str, cache_key: str) -> Dict:
         
         start_time = time.time()
         last_error = None
@@ -66,20 +95,32 @@ class VIESService:
                     
                     # Check for retriable errors
                     error_msg = str(result.get('error_message', ''))
-                    is_retriable_error = any(keyword in error_msg for keyword in [
-                        'MS_MAX_CONCURRENT_REQ',
-                        'MS_UNAVAILABLE', 
-                        'SERVICE_UNAVAILABLE',
-                        'GLOBAL_MAX_CONCURRENT_REQ',
-                        'TIMEOUT'
-                    ])
+                    is_rate_limit = 'MS_MAX_CONCURRENT_REQ' in error_msg or 'GLOBAL_MAX_CONCURRENT_REQ' in error_msg
+                    is_service_unavailable = 'MS_UNAVAILABLE' in error_msg or 'SERVICE_UNAVAILABLE' in error_msg
+                    is_timeout = 'TIMEOUT' in error_msg
+                    
+                    is_retriable_error = is_rate_limit or is_service_unavailable or is_timeout
                     
                     if result.get('status') == 'error' and is_retriable_error:
                         last_error = result
                         if attempt < self.max_retries - 1:
-                            # Exponential backoff: 2s, 4s, 8s
-                            delay = self.retry_delay * (2 ** attempt)
-                            logger.warning(f"VIES retriable error, retrying in {delay}s (attempt {attempt + 1}/{self.max_retries}): {error_msg}")
+                            # Different backoff strategies for different error types
+                            if is_rate_limit:
+                                # Longer delay for rate limits: 10s, 20s, 40s, 80s + jitter
+                                base_delay = self.rate_limit_delay * (2 ** attempt)
+                                delay = base_delay + random.uniform(0, base_delay * 0.1)  # Add up to 10% jitter
+                                logger.warning(f"VIES rate limit exceeded, waiting {delay:.1f}s before retry (attempt {attempt + 1}/{self.max_retries})")
+                            elif is_service_unavailable:
+                                # Medium delay for service unavailable: 5s, 10s, 20s + jitter
+                                base_delay = self.retry_delay * (2 ** attempt)
+                                delay = base_delay + random.uniform(0, base_delay * 0.2)  # Add up to 20% jitter
+                                logger.warning(f"VIES service unavailable, waiting {delay:.1f}s before retry (attempt {attempt + 1}/{self.max_retries})")
+                            else:
+                                # Short delay for timeouts: 3s, 6s, 12s + jitter
+                                base_delay = self.retry_delay * (2 ** attempt)
+                                delay = base_delay + random.uniform(0, base_delay * 0.3)  # Add up to 30% jitter
+                                logger.warning(f"VIES timeout, waiting {delay:.1f}s before retry (attempt {attempt + 1}/{self.max_retries})")
+                            
                             time.sleep(delay)
                             continue
                     
@@ -160,7 +201,7 @@ class VIESService:
                     elif 'MS_MAX_CONCURRENT_REQ' in fault_message:
                         # Rate limit exceeded
                         return self._create_error_response(
-                            f"VIES fault: Zu viele gleichzeitige Anfragen. Bitte warten Sie einen Moment. ({fault_message})",
+                            f"VIES Fehler: Zu viele gleichzeitige Anfragen an den Service. Das System wird automatisch erneut versuchen. Bitte warten Sie einen Moment. ({fault_message})",
                             response_time
                         )
                     elif 'TIMEOUT' in fault_message:
