@@ -84,9 +84,16 @@ def create_app(config_name=None):
         """Handle unauthorized access for AJAX requests."""
         import logging
         logger = logging.getLogger(__name__)
-        logger.warning(f"UNAUTHORIZED ACCESS: path={request.path}, method={request.method}, is_json={request.is_json}, content_type={request.headers.get('Content-Type')}")
+        content_type = request.headers.get('Content-Type', '')
+        is_ajax = (
+            request.is_json or 
+            content_type == 'application/json' or 
+            'application/x-www-form-urlencoded' in content_type or
+            request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        )
+        logger.error(f"UNAUTHORIZED: path={request.path}, method={request.method}, is_ajax={is_ajax}, content_type={content_type}, user_agent={request.headers.get('User-Agent', '')}")
         
-        if request.is_json or request.headers.get('Content-Type') == 'application/json' or 'application/x-www-form-urlencoded' in request.headers.get('Content-Type', ''):
+        if is_ajax:
             return jsonify({
                 'success': False,
                 'error': 'Bitte melden Sie sich an, um diese Funktion zu nutzen.',
@@ -223,21 +230,15 @@ def create_app(config_name=None):
         return render_template('test_form.html')
     
     @app.route('/verify', methods=['POST'])
+    @login_required
     def verify_counterparty():
         """Process verification request - requires authentication."""
         import logging
         logger = logging.getLogger(__name__)
         
-        logger.info(f"VERIFY REQUEST: authenticated={current_user.is_authenticated}, user_id={current_user.id if current_user.is_authenticated else 'None'}")
+        logger.error(f"VERIFY REQUEST: authenticated={current_user.is_authenticated}, user_id={current_user.id if current_user.is_authenticated else 'None'}")
         
-        # Check authentication manually for AJAX requests
-        if not current_user.is_authenticated:
-            logger.warning("User not authenticated for verify request")
-            return jsonify({
-                'success': False,
-                'error': 'Bitte melden Sie sich an, um diese Funktion zu nutzen.',
-                'redirect': url_for('auth.login')
-            }), 401
+        # User is authenticated via @login_required decorator
         
         # Check if user can perform verification (quota check)
         if not current_user.can_perform_verification():

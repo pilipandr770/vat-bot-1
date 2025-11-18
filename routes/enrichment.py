@@ -169,7 +169,7 @@ def auto_verify():
     try:
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(f"AUTO-VERIFY REQUEST: authenticated={current_user.is_authenticated}, user_id={current_user.id if current_user.is_authenticated else 'None'}")
+        logger.error(f"AUTO-VERIFY REQUEST: authenticated={current_user.is_authenticated}, user_id={current_user.id if current_user.is_authenticated else 'None'}")
         
         data = request.get_json() or {}
 
