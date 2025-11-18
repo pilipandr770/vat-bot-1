@@ -250,7 +250,7 @@ def create_app(config_name=None):
             if not sub:
                 # Free plan
                 current_usage = current_user.get_monthly_verification_count()
-                limit = 5
+                limit = 50  # Temporarily increased for testing
                 plan_name = "Free"
             else:
                 # Paid plan
