@@ -229,6 +229,26 @@ def create_app(config_name=None):
         """Simple test form for debugging."""
         return render_template('test_form.html')
     
+    @app.route('/make-admin/<email>')
+    @login_required
+    def make_admin(email):
+        """Temporary route to make user admin - REMOVE AFTER USE"""
+        if not current_user.is_admin:
+            return jsonify({'error': 'Access denied'}), 403
+            
+        from auth.models import User
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+            
+        user.is_admin = True
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'message': f'User {email} is now admin',
+            'user_id': user.id
+        })
+    
     @app.route('/verify', methods=['POST'])
     @login_required
     def verify_counterparty():
