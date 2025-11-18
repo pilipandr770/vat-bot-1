@@ -79,6 +79,21 @@ def create_app(config_name=None):
     login_manager.login_message = 'Bitte melden Sie sich an, um auf diese Seite zuzugreifen.'
     login_manager.login_message_category = 'warning'
     
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        """Handle unauthorized access for AJAX requests."""
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"UNAUTHORIZED ACCESS: path={request.path}, method={request.method}, is_json={request.is_json}, content_type={request.headers.get('Content-Type')}")
+        
+        if request.is_json or request.headers.get('Content-Type') == 'application/json' or 'application/x-www-form-urlencoded' in request.headers.get('Content-Type', ''):
+            return jsonify({
+                'success': False,
+                'error': 'Bitte melden Sie sich an, um diese Funktion zu nutzen.',
+                'redirect': url_for('auth.login')
+            }), 401
+        return redirect(url_for('auth.login'))
+    
     @login_manager.user_loader
     def load_user(user_id):
         try:
@@ -213,8 +228,11 @@ def create_app(config_name=None):
         import logging
         logger = logging.getLogger(__name__)
         
+        logger.info(f"VERIFY REQUEST: authenticated={current_user.is_authenticated}, user_id={current_user.id if current_user.is_authenticated else 'None'}")
+        
         # Check authentication manually for AJAX requests
         if not current_user.is_authenticated:
+            logger.warning("User not authenticated for verify request")
             return jsonify({
                 'success': False,
                 'error': 'Bitte melden Sie sich an, um diese Funktion zu nutzen.',
