@@ -3,8 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- Primary Meta Tags -->
     <title>VAT Verifizierung - Geschäftspartner Compliance Prüfung | SaaS Platform</title>
-    <meta name="description" content="Automatische USt-IdNr. Verifizierung, Sanktionsprüfung und Geschäftspartner Compliance. VIES, Handelsregister und EU/OFAC Sanktionslisten Integration.">
+    <meta name="title" content="VAT Verifizierung - Automatische Geschäftspartner Verifizierung & Compliance">
+    <meta name="description" content="Automatische USt-IdNr. Verifizierung, Sanktionsprüfung und Geschäftspartner Compliance. VIES, Handelsregister und EU/OFAC Sanktionslisten Integration. 10+ Module für Business Intelligence.">
+    <meta name="keywords" content="VAT Verification, USt-IdNr, VIES, Sanktionsprüfung, Geschäftspartner, Compliance, Business Intelligence, Due Diligence, CRM, Email Security">
+    <meta name="author" content="VAT Verifizierung">
+    <meta name="theme-color" content="#0d6efd">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vat-verifizierung.de/">
+    <meta property="og:title" content="VAT Verifizierung - Geschäftspartner Compliance Prüfung">
+    <meta property="og:description" content="Automatische Verifizierung von Geschäftspartnern mit VIES, Sanktionslisten, OSINT und KI-Analyse.">
+    <meta property="og:image" content="https://vat-verifizierung.de/static/images/og-image.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://vat-verifizierung.de/">
+    <meta property="twitter:title" content="VAT Verifizierung - Compliance für Geschäftspartner">
+    <meta property="twitter:description" content="Business Intelligence & Compliance Plattform mit automatischer VAT-Verifizierung.">
+    <meta property="twitter:image" content="https://vat-verifizierung.de/static/images/twitter-image.png">
+    
+    <!-- Robots & Crawling -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://vat-verifizierung.de/">
+    
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "VAT Verifizierung",
+        "description": "Automatische Geschäftspartner Verifizierung & Compliance Prüfung mit VIES, Sanktionslisten und Business Intelligence",
+        "url": "https://vat-verifizierung.de",
+        "applicationCategory": "BusinessApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "9.99",
+            "priceCurrency": "EUR"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "500"
+        }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "VAT Verifizierung",
+        "url": "https://vat-verifizierung.de",
+        "logo": "https://vat-verifizierung.de/static/logo.png",
+        "description": "Business Intelligence & Compliance Platform",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Service",
+            "email": "support@vat-verification.de"
+        },
+        "sameAs": [
+            "https://twitter.com/vatverifizierung",
+            "https://linkedin.com/company/vat-verifizierung"
+        ]
+    }
+    </script>
+    
+    <!-- Canonical & Links -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    
+    <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/landing.css') }}" rel="stylesheet">

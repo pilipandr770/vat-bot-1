@@ -580,12 +580,51 @@ def create_app(config_name=None):
         print(f"Sanctions result: {sanctions_result['status']}")
         
         print("All API tests completed!")
-    
+
+    # Sitemap generation route
+    @app.route('/sitemap.xml')
+    def sitemap():
+        """Generate XML sitemap for search engines."""
+        from datetime import datetime
+        
+        urls = [
+            # Main pages
+            ('/', datetime.now(), 'weekly', 1.0),
+            ('/pricing', datetime.now(), 'weekly', 0.9),
+            ('/legal/agb', datetime.now(), 'monthly', 0.5),
+            ('/legal/datenschutz', datetime.now(), 'monthly', 0.5),
+            ('/legal/impressum', datetime.now(), 'monthly', 0.5),
+        ]
+        
+        # Build XML
+        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        
+        for url, lastmod, changefreq, priority in urls:
+            xml += '  <url>\n'
+            xml += f'    <loc>https://vat-verifizierung.de{url}</loc>\n'
+            xml += f'    <lastmod>{lastmod.isoformat()}</lastmod>\n'
+            xml += f'    <changefreq>{changefreq}</changefreq>\n'
+            xml += f'    <priority>{priority}</priority>\n'
+            xml += '  </url>\n'
+        
+        xml += '</urlset>'
+        
+        response = app.make_response(xml)
+        response.headers['Content-Type'] = 'application/xml'
+        return response
+
+    # Robots.txt route
+    @app.route('/robots.txt')
+    def robots():
+        """Serve robots.txt from static folder."""
+        return app.send_static_file('robots.txt')
+
     # Security headers middleware
     @app.after_request
     def add_security_headers(response):
         """Add comprehensive security headers to all responses."""
-        
+
         # Content Security Policy - allow Bootstrap CDN and OAuth providers
         csp_policy = (
             "default-src 'self'; "
