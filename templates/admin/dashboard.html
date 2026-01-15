@@ -205,12 +205,14 @@
                                         </a>
                                     </td>
                                     <td>
-                                        {% if user.subscription_plan == 'free' %}
-                                            <span class="badge bg-secondary">FREE</span>
-                                        {% elif user.subscription_plan == 'pro' %}
-                                            <span class="badge bg-primary">PRO</span>
+                                        {% if user.subscription_plan == 'basic' %}
+                                            <span class="badge bg-info">BASIC</span>
+                                        {% elif user.subscription_plan == 'professional' %}
+                                            <span class="badge bg-primary">PROFESSIONAL</span>
                                         {% elif user.subscription_plan == 'enterprise' %}
                                             <span class="badge bg-success">ENTERPRISE</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">NONE</span>
                                         {% endif %}
                                     </td>
                                     <td>

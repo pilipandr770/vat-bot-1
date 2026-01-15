@@ -47,18 +47,17 @@ def register():
             db.session.add(user)
             db.session.commit()
             
-            # Create free subscription for new user
-            free_subscription = Subscription(
+            # Create basic (trial) subscription for new user
+            # User gets 3-day free trial before being charged
+            trial_subscription = Subscription(
                 user_id=user.id,
-                plan='free',
+                plan='basic',
                 status='active',
-                api_calls_limit=5,
-                monthly_price=0.0
+                api_calls_limit=100,  # Basic plan limit
+                monthly_price=9.99,
+                api_calls_used=0
             )
-            db.session.add(free_subscription)
-            db.session.commit()
-            
-            # TEST MODE: Email confirmation disabled
+            db.session.add(trial_subscription)
             # send_confirmation_email(user)  # Disabled for testing
             
             flash('Registrierung erfolgreich! Sie können sich jetzt anmelden.', 'success')

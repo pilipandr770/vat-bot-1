@@ -87,12 +87,15 @@
                         <div class="card-body">
                             <h6 class="text-muted">Abonnement</h6>
                             <h3>
-                                {% if subscription.plan == 'free' %}
-                                    <span class="badge bg-secondary">KOSTENLOS</span>
-                                {% elif subscription.plan == 'pro' %}
+                                {% if subscription.plan == 'basic' %}
+                                    <span class="badge bg-info">BASIC</span>
+                                {% elif subscription.plan == 'professional' %}
                                     <span class="badge bg-primary">PROFESSIONAL</span>
                                 {% elif subscription.plan == 'enterprise' %}
                                     <span class="badge bg-success">ENTERPRISE</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">NONE</span>
+                                {% endif %}
                                 {% endif %}
                             </h3>
                             <small class="text-muted">

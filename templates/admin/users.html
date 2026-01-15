@@ -36,8 +36,8 @@
                     <label class="form-label fw-bold">Plan</label>
                     <select name="plan" class="form-select">
                         <option value="all" {% if plan_filter == 'all' %}selected{% endif %}>Alle Pläne</option>
-                        <option value="free" {% if plan_filter == 'free' %}selected{% endif %}>Kostenlos</option>
-                        <option value="pro" {% if plan_filter == 'pro' %}selected{% endif %}>Professional</option>
+                        <option value="basic" {% if plan_filter == 'basic' %}selected{% endif %}>Basic</option>
+                        <option value="professional" {% if plan_filter == 'professional' %}selected{% endif %}>Professional</option>
                         <option value="enterprise" {% if plan_filter == 'enterprise' %}selected{% endif %}>Enterprise</option>
                     </select>
                 </div>
@@ -104,12 +104,15 @@
                                 <small>{{ user.company_name or 'N/A' }}</small>
                             </td>
                             <td>
-                                {% if user.subscription_plan == 'free' %}
-                                    <span class="badge bg-secondary">FREE</span>
-                                {% elif user.subscription_plan == 'pro' %}
-                                    <span class="badge bg-primary">PRO</span>
+                                {% if user.subscription_plan == 'basic' %}
+                                    <span class="badge bg-info">BASIC</span>
+                                {% elif user.subscription_plan == 'professional' %}
+                                    <span class="badge bg-primary">PROFESSIONAL</span>
                                 {% elif user.subscription_plan == 'enterprise' %}
                                     <span class="badge bg-success">ENTERPRISE</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">NONE</span>
+                                {% endif %}
                                 {% endif %}
                             </td>
                             <td>

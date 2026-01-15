@@ -206,50 +206,52 @@ def pricing():
     """
     plans = [
         {
-            'name': 'free',
-            'display_name': 'Kostenlos',
-            'price': 0,
-            'period': 'für immer',
-            'api_calls': 5,
+            'name': 'basic',
+            'display_name': 'Базовый',
+            'price': 9.99,
+            'period': 'про Месяц',
+            'api_calls': 100,
             'features': [
-                '5 Prüfungen pro Monat',
+                '100 Prüfungen pro Monat',
                 'VIES VAT-Validierung',
                 'Sanktionslisten-Check',
-                'Email-Support'
+                'Email-Support',
+                '3 Tage kostenlos testen'
             ],
             'cta': 'Jetzt starten',
-            'cta_url': 'auth.register',
+            'cta_url': 'payments.subscribe',
+            'cta_params': {'plan_name': 'basic'},
             'featured': False
         },
         {
-            'name': 'pro',
+            'name': 'professional',
             'display_name': 'Professional',
-            'price': 49,
+            'price': 49.99,
             'period': 'pro Monat',
             'api_calls': 500,
             'features': [
                 '500 Prüfungen pro Monat',
-                'Alle kostenlosen Features',
+                'Alle Basic Features',
                 'Handelsregister-Prüfung',
                 'Insolvenzverfahren-Check',
                 'OpenCorporates-Daten',
                 'PDF-Berichte',
                 'Prioritäts-Support'
             ],
-            'cta': 'Upgrade auf Pro',
+            'cta': 'Upgrade auf Professional',
             'cta_url': 'payments.subscribe',
-            'cta_params': {'plan_name': 'pro'},
+            'cta_params': {'plan_name': 'professional'},
             'featured': True
         },
         {
             'name': 'enterprise',
             'display_name': 'Enterprise',
-            'price': 149,
+            'price': 149.99,
             'period': 'pro Monat',
             'api_calls': 'Unbegrenzt',
             'features': [
                 'Unbegrenzte Prüfungen',
-                'Alle Pro Features',
+                'Alle Professional Features',
                 'API-Zugang',
                 'Batch-Verarbeitung',
                 'Benutzerdefinierte Integrationen',
