@@ -584,22 +584,19 @@ def create_app(config_name=None):
     # Sitemap generation route
     @app.route('/sitemap.xml')
     def sitemap():
-        """Generate XML sitemap for search engines."""
+        """Generate XML sitemap for search engines with W3C Datetime format."""
         from datetime import datetime
-        
+
         urls = [
-            # Main pages
-            ('/', datetime.now(), 'weekly', 1.0),
-            ('/pricing', datetime.now(), 'weekly', 0.9),
-            ('/legal/agb', datetime.now(), 'monthly', 0.5),
-            ('/legal/datenschutz', datetime.now(), 'monthly', 0.5),
-            ('/legal/impressum', datetime.now(), 'monthly', 0.5),
+            # Main pages (format: url, lastmod, changefreq, priority)
+            ('/', datetime.now().date(), 'weekly', 1.0),
+            ('/pricing', datetime.now().date(), 'weekly', 0.9),
+            ('/legal/agb', datetime.now().date(), 'monthly', 0.5),
+            ('/legal/datenschutz', datetime.now().date(), 'monthly', 0.5),
+            ('/legal/impressum', datetime.now().date(), 'monthly', 0.5),
         ]
-        
-        # Build XML
-        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        
+
+        # Build XML with W3C Datetime format (ISO 8601) - date only format
         for url, lastmod, changefreq, priority in urls:
             xml += '  <url>\n'
             xml += f'    <loc>https://vat-verifizierung.de{url}</loc>\n'
