@@ -81,6 +81,11 @@ class Config:
     STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
     STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
     STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
+
+    # Stripe Subscription Price IDs
+    STRIPE_PRICE_BASIC = os.environ.get('STRIPE_PRICE_BASIC')
+    STRIPE_PRICE_PROFESSIONAL = os.environ.get('STRIPE_PRICE_PROFESSIONAL')
+    STRIPE_PRICE_ENTERPRISE = os.environ.get('STRIPE_PRICE_ENTERPRISE')
     
     # MailGuard OAuth Configuration
     GMAIL_CLIENT_ID = os.environ.get('GMAIL_CLIENT_ID')

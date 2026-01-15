@@ -11,6 +11,14 @@ import hashlib
 
 webhooks_bp = Blueprint('webhooks', __name__)
 
+# Plan API limits configuration
+PLAN_LIMITS = {
+    'basic': 100,           # €9.99/month
+    'professional': 500,    # €49.99/month
+    'enterprise': 999999,   # €149.99/month
+    'free': 5               # Free tier
+}
+
 
 @webhooks_bp.route('/stripe', methods=['POST'])
 def stripe_webhook():
@@ -101,42 +109,11 @@ def handle_checkout_completed(session):
         subscription.current_period_start = datetime.utcnow()
         subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
         
-        # Update API limits
-        if plan_name == 'pro':
-            subscription.api_calls_limit = 500
-        elif plan_name == 'enterprise':
-            subscription.api_calls_limit = 999999
-        
+        # Update API limits based on plan
+        subscription.api_calls_limit = PLAN_LIMITS.get(plan_name, PLAN_LIMITS['free'])
         subscription.api_calls_used = 0
     else:
-        api_limit = 500 if plan_name == 'pro' else 999999
-        subscription = Subscription(
-            user_id=user.id,
-            plan=plan_name,
-            status='active',
-            stripe_subscription_id=session.get('subscription'),
-            stripe_customer_id=session.get('customer'),
-            current_period_start=datetime.utcnow(),
-            current_period_end=datetime.utcnow() + timedelta(days=30),
-            api_calls_limit=api_limit,
-            api_calls_used=0
-        )
-        db.session.add(subscription)
-    
-    db.session.commit()
-    
-    current_app.logger.info(f"Checkout completed for user {user_id}, plan: {plan_name}")
-
-
-def handle_subscription_created(subscription_data):
-    """
-    Handle customer.subscription.created event
-    Called when subscription is activated
-    """
-    stripe_subscription_id = subscription_data['id']
-    customer_id = subscription_data['customer']
-    
-    # Find subscription by stripe_subscription_id
+        api_limit = PLAN_LIMITS.get(plan_name, PLAN_LIMITS['free'])
     subscription = Subscription.query.filter_by(
         stripe_subscription_id=stripe_subscription_id
     ).first()
@@ -205,11 +182,7 @@ def handle_subscription_deleted(subscription_data):
         # Downgrade to free plan
         subscription.plan = 'free'
         subscription.status = 'cancelled'
-        subscription.api_calls_limit = 5  # Free plan limit
-        subscription.api_calls_used = 0
-        subscription.stripe_subscription_id = None
-        
-        db.session.commit()
+          subscription.api_calls_limit = PLAN_LIMITS['free']  # Free plan limit from config
         
         current_app.logger.info(f"Subscription {stripe_subscription_id} cancelled, downgraded to free plan")
         

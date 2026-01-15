@@ -18,64 +18,48 @@ def subscribe(plan_name):
     Create Stripe Checkout session for subscription upgrade
     
     Plans:
-    - pro: €49/month, 500 checks/month
-    - enterprise: €149/month, unlimited checks
+    - basic: €9.99/month (price_1SprwrP22GPrmrodey5s2oUm)
+    - professional: €49.99/month (price_1Sps2RP22GPrmrodNyOZk960)
+    - enterprise: €149.99/month (price_1Sps3vP22GPrmrod0QODGqD7)
+    
+    All plans include 3-day free trial
     """
+    # Map plan names to Stripe price IDs
+    stripe_price_ids = {
+        'basic': current_app.config.get('STRIPE_PRICE_BASIC'),
+        'professional': current_app.config.get('STRIPE_PRICE_PROFESSIONAL'),
+        'enterprise': current_app.config.get('STRIPE_PRICE_ENTERPRISE'),
+    }
+    
     # Validate plan
-    if plan_name not in ['pro', 'enterprise']:
+    if plan_name not in stripe_price_ids:
         flash('Ungültiger Abonnementplan.', 'danger')
         return redirect(url_for('index'))
-    
+
     # Check if user already has active subscription
     if current_user.active_subscription:
         if current_user.active_subscription.plan != 'free':
             flash('Sie haben bereits ein aktives Abonnement. Bitte kündigen Sie zuerst Ihr aktuelles Abonnement.', 'warning')
             return redirect(url_for('auth.profile'))
-    
+
     # Configure Stripe
     stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
+
+    # Get price ID for selected plan
+    price_id = stripe_price_ids[plan_name]
     
-    # Plan pricing
-    plan_prices = {
-        'pro': {
-            'price': 4900,  # €49.00 in cents
-            'name': 'Professional Plan',
-            'description': '500 Prüfungen pro Monat',
-            'api_limit': 500
-        },
-        'enterprise': {
-            'price': 14900,  # €149.00 in cents
-            'name': 'Enterprise Plan', 
-            'description': 'Unbegrenzte Prüfungen',
-            'api_limit': 999999
-        }
-    }
-    
-    plan_config = plan_prices[plan_name]
-    
+    if not price_id:
+        current_app.logger.error(f"Stripe price ID not configured for plan: {plan_name}")
+        flash('Fehler beim Konfigurieren des Plans. Bitte kontaktieren Sie den Support.', 'danger')
+        return redirect(url_for('index'))
+
     try:
-        # Create Stripe Checkout Session
+        # Create Stripe Checkout Session with Stripe price IDs
+        # 3-day free trial included automatically in product config
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
-                'price_data': {
-                    'currency': 'eur',
-                    'unit_amount': plan_config['price'],
-                    'recurring': {
-                        'interval': 'month'
-                    },
-                    'product_data': {
-                        'name': plan_config['name'],
-                        'description': plan_config['description'],
-                    },
-                },
-                'quantity': 1,
-            }],
-            mode='subscription',
-            success_url=url_for('payments.success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=url_for('payments.cancel', _external=True),
-            customer_email=current_user.email,
-            client_reference_id=str(current_user.id),
+                'price': price_id,  # Use Stripe-managed price ID
             metadata={
                 'user_id': current_user.id,
                 'plan_name': plan_name
@@ -117,6 +101,13 @@ def success():
         # Get plan details
         plan_name = session.metadata.get('plan_name')
         
+        # Define API limits for each plan
+        plan_limits = {
+            'basic': 100,           # 100 checks/month for €9.99
+            'professional': 500,    # 500 checks/month for €49.99
+            'enterprise': 999999    # Unlimited for €149.99
+        }
+
         # Update or create subscription
         subscription = current_user.active_subscription
         if subscription:
@@ -127,22 +118,16 @@ def success():
             subscription.status = 'active'
             subscription.current_period_start = datetime.utcnow()
             subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
-            
-            # Update API limits
-            if plan_name == 'pro':
-                subscription.api_calls_limit = 500
-            elif plan_name == 'enterprise':
-                subscription.api_calls_limit = 999999
-            
+
+            # Update API limits based on plan
+            subscription.api_calls_limit = plan_limits.get(plan_name, 100)
+
             # Reset monthly usage
             subscription.api_calls_used = 0
-            
+
         else:
             # Create new subscription
-            api_limit = 500 if plan_name == 'pro' else 999999
-            subscription = Subscription(
-                user_id=current_user.id,
-                plan=plan_name,
+            api_limit = plan_limits.get(plan_name, 100)
                 status='active',
                 stripe_subscription_id=session.subscription,
                 stripe_customer_id=session.customer,
