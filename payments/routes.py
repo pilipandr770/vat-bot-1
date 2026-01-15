@@ -60,12 +60,19 @@ def subscribe(plan_name):
             payment_method_types=['card'],
             line_items=[{
                 'price': price_id,  # Use Stripe-managed price ID
+                'quantity': 1,
+            }],
+            mode='subscription',
+            success_url=url_for('payments.success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=url_for('payments.cancel', _external=True),
+            customer_email=current_user.email,
+            client_reference_id=str(current_user.id),
             metadata={
                 'user_id': current_user.id,
                 'plan_name': plan_name
             }
         )
-        
+
         return redirect(checkout_session.url, code=303)
         
     except stripe.error.StripeError as e:
@@ -128,6 +135,9 @@ def success():
         else:
             # Create new subscription
             api_limit = plan_limits.get(plan_name, 100)
+            subscription = Subscription(
+                user_id=current_user.id,
+                plan=plan_name,
                 status='active',
                 stripe_subscription_id=session.subscription,
                 stripe_customer_id=session.customer,

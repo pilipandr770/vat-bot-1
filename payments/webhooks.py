@@ -182,13 +182,11 @@ def handle_subscription_deleted(subscription_data):
         # Downgrade to free plan
         subscription.plan = 'free'
         subscription.status = 'cancelled'
-          subscription.api_calls_limit = PLAN_LIMITS['free']  # Free plan limit from config
-        
-        current_app.logger.info(f"Subscription {stripe_subscription_id} cancelled, downgraded to free plan")
-        
-        # TODO: Send cancellation email to user
-    else:
-        current_app.logger.warning(f"Subscription {stripe_subscription_id} not found for deletion")
+        subscription.api_calls_limit = PLAN_LIMITS['free']  # Free plan limit from config
+        subscription.api_calls_used = 0
+        subscription.stripe_subscription_id = None
+
+        db.session.commit()
 
 
 def handle_payment_succeeded(invoice):
