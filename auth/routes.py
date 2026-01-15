@@ -10,6 +10,8 @@ try:
 except ImportError:
     from urllib.parse import urlparse as url_parse
 from datetime import datetime, timedelta
+from auth.forms import LoginForm, RegistrationForm
+from auth.models import User
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -431,3 +433,4 @@ def send_password_reset_email(user, token):
         text_body=text_body,
         html_body=html_body
     )
+
