@@ -119,83 +119,6 @@
         </div>
     </div>
 
-    <!-- Active Rules -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Processing Rules</h5>
-                    <a href="#" onclick="alert('Rule creation coming soon'); return false;" class="btn btn-sm btn-success">
-                        <i class="fas fa-plus"></i> Create Rule
-                    </a>
-                </div>
-                <div class="card-body">
-                    {% if rules %}
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Trigger</th>
-                                    <th>Action</th>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for rule in rules %}
-                                <tr>
-                                    <td>{{ rule.name }}</td>
-                                    <td>
-                                        {% if rule.trigger_type == 'sender' %}
-                                            <i class="fas fa-user"></i> From: {{ rule.sender_pattern }}
-                                        {% elif rule.trigger_type == 'subject' %}
-                                            <i class="fas fa-heading"></i> Subject: {{ rule.subject_pattern }}
-                                        {% elif rule.trigger_type == 'attachment' %}
-                                            <i class="fas fa-paperclip"></i> Has attachment
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if rule.action == 'auto_reply' %}
-                                            <i class="fas fa-reply"></i> Auto Reply
-                                        {% elif rule.action == 'forward' %}
-                                            <i class="fas fa-share"></i> Forward
-                                        {% elif rule.action == 'approve' %}
-                                            <i class="fas fa-check"></i> Require Approval
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-secondary">{{ rule.priority }}</span>
-                                    </td>
-                                    <td>
-                                        {% if rule.is_enabled %}
-                                            <span class="badge badge-success">Active</span>
-                                        {% else %}
-                                            <span class="badge badge-secondary">Inactive</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="#" onclick="alert('Rule editing coming soon'); return false;" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteRule({{ rule.id }})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> No processing rules configured yet. Create your first rule to automate email handling!
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Pending Approvals -->
     {% if pending_drafts %}
     <div class="row">
@@ -230,17 +153,15 @@
                                 </td>
                                 <td>{{ draft.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                 <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ url_for('mailguard.message_detail', message_id=draft.message_id) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('mailguard.message_detail', message_id=draft.message_id) }}" class="btn btn-sm btn-primary" style="min-width: 90px;"><i class="bi bi-info-circle"></i> Details</a>
                                         <form method="POST" action="{{ url_for('mailguard.approve_and_send', draft_id=draft.id) }}" class="d-inline">
-                                            <button type="submit" class="btn btn-sm btn-success">
+                                            <button type="submit" class="btn btn-sm btn-success" style="min-width: 90px;">
                                                 <i class="fas fa-check"></i> Approve
                                             </button>
                                         </form>
                                         <form method="POST" action="{{ url_for('mailguard.reject_draft', draft_id=draft.id) }}" class="d-inline">
-                                            <button type="submit" class="btn btn-sm btn-danger">
+                                            <button type="submit" class="btn btn-sm btn-danger" style="min-width: 90px;">
                                                 <i class="fas fa-times"></i> Reject
                                             </button>
                                         </form>

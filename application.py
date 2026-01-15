@@ -10,7 +10,7 @@ from auth.models import User
 from services.vies import VIESService
 from services.sanctions import SanctionsService
 from crm.save_results import ResultsSaver
-from file_scanner.routes import file_scanner
+from link_scanner.routes import link_scanner
 from services.business_registry import BusinessRegistryManager
 from services.vat_lookup import VatLookupService
 import asyncio
@@ -133,8 +133,8 @@ def create_app(config_name=None):
     from services.chatbot_routes import chatbot_bp
     app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
     
-    from file_scanner.routes import file_scanner
-    app.register_blueprint(file_scanner, url_prefix='/file-scanner')
+    from link_scanner.routes import link_scanner
+    app.register_blueprint(link_scanner, url_prefix='/link-scanner')
     
     from app.mailguard import mailguard_bp
     app.register_blueprint(mailguard_bp)
@@ -593,7 +593,7 @@ def create_app(config_name=None):
             "style-src 'self' cdn.jsdelivr.net 'unsafe-inline'; "
             "font-src 'self' cdn.jsdelivr.net data:; "
             "img-src 'self' data: https:; "
-            "connect-src 'self' https://accounts.google.com https://login.microsoftonline.com; "
+            "connect-src 'self' https://cdn.jsdelivr.net https://accounts.google.com https://login.microsoftonline.com; "
             "frame-src 'self' https://accounts.google.com https://login.microsoftonline.com; "
             "object-src 'none'; "
             "base-uri 'self'; "
