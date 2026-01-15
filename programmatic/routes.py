@@ -137,20 +137,3 @@ def get_all_pages():
 def get_page(slug):
     """Повертає дані окремої сторінки по slug"""
     return _seo_pages.get(slug)
-
-@programmatic_bp.before_app_serving
-def reload_seo_pages():
-    """
-    Перезавантажує дані на старт додатка
-    Дозволяє оновлювати сторінки без перезапуску
-    """
-    global _seo_pages
-    _seo_pages = load_seo_pages()
-
-def get_all_pages():
-    """Повертає усі сторінки (для Sitemap та індексації)"""
-    return _seo_pages.values()
-
-def get_page(slug):
-    """Повертає одну сторінку за slug"""
-    return _seo_pages.get(slug)
