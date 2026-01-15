@@ -1,0 +1,590 @@
+{% extends "base.html" %}
+
+{% block title %}Link-Scanner - URL-Sicherheitsprüfung{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="bi bi-link-45deg"></i> Link-Scanner</h4>
+                    <small class="text-white-50">Prüfen Sie URLs auf Phishing, Malware und andere Bedrohungen</small>
+                </div>
+                <div class="card-body">
+                    <!-- URL Input Section -->
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="url-input-zone">
+                                <div class="mb-4">
+                                    <label for="urlInput" class="form-label h5">
+                                        <i class="bi bi-globe"></i> URL eingeben
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text"><i class="bi bi-link"></i></span>
+                                        <input type="url" class="form-control" id="urlInput" 
+                                               placeholder="https://example.com oder example.com"
+                                               autofocus>
+                                        <button class="btn btn-primary" type="button" id="scanBtn" onclick="scanUrl()">
+                                            <i class="bi bi-shield-check"></i> Prüfen
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        Geben Sie eine vollständige URL ein (z.B. https://example.com/page)
+                                    </div>
+                                </div>
+
+                                <!-- Batch Scan Toggle -->
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="batchMode" onchange="toggleBatchMode()">
+                                        <label class="form-check-label" for="batchMode">
+                                            <i class="bi bi-collection"></i> Mehrere URLs gleichzeitig prüfen
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Batch Input (hidden by default) -->
+                                <div id="batchSection" style="display: none;">
+                                    <label for="batchUrls" class="form-label">
+                                        <i class="bi bi-list-ul"></i> URLs (eine pro Zeile, max. 20)
+                                    </label>
+                                    <textarea class="form-control" id="batchUrls" rows="6" 
+                                              placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"></textarea>
+                                    <button class="btn btn-primary mt-3" type="button" onclick="scanBatch()">
+                                        <i class="bi bi-shield-check"></i> Alle prüfen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Was wird geprüft?</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> SSL/HTTPS-Verschlüsselung</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Phishing-Erkennung</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> VirusTotal Datenbank</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Google Safe Browsing</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verdächtige Domains</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> URL-Shortener Erkennung</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Weiterleitungs-Analyse</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Recent Scans -->
+                            <div class="card mt-3 border-secondary">
+                                <div class="card-header bg-secondary text-white">
+                                    <h6 class="mb-0"><i class="bi bi-clock-history"></i> Letzte Prüfungen</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush" id="recentScans">
+                                        <li class="list-group-item text-muted text-center small py-3">
+                                            Noch keine Prüfungen durchgeführt
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div id="progressSection" class="mt-4" style="display: none;">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border text-primary me-3" role="status">
+                                <span class="visually-hidden">Lädt...</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">URL wird analysiert...</h6>
+                                <small class="text-muted">Bitte warten Sie einen Moment</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="resultsSection" class="mt-4" style="display: none;">
+                        <h5><i class="bi bi-clipboard-check"></i> Analyse-Ergebnis</h5>
+                        <div id="resultsContainer"></div>
+                    </div>
+
+                    <!-- Batch Results -->
+                    <div id="batchResultsSection" class="mt-4" style="display: none;">
+                        <h5><i class="bi bi-collection"></i> Batch-Ergebnisse</h5>
+                        <div id="batchSummary" class="mb-3"></div>
+                        <div id="batchResultsContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.url-input-zone {
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 255, 255, 0.05) 100%);
+    border-radius: 16px;
+    border: 2px solid rgba(0, 123, 255, 0.2);
+}
+
+.result-card {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.result-card.safe {
+    border-left: 5px solid #28a745;
+}
+
+.result-card.suspicious {
+    border-left: 5px solid #ffc107;
+}
+
+.result-card.malicious {
+    border-left: 5px solid #dc3545;
+}
+
+.verdict-badge {
+    font-size: 1.1rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.verdict-safe { background: #d4edda; color: #155724; }
+.verdict-suspicious { background: #fff3cd; color: #856404; }
+.verdict-malicious { background: #f8d7da; color: #721c24; }
+
+.check-item {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+}
+
+.check-item.safe { border-left: 3px solid #28a745; }
+.check-item.warning { border-left: 3px solid #ffc107; }
+.check-item.danger { border-left: 3px solid #dc3545; }
+.check-item.unavailable { border-left: 3px solid #6c757d; opacity: 0.7; }
+
+.score-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.score-safe { background: linear-gradient(135deg, #28a745, #20c997); }
+.score-suspicious { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+.score-malicious { background: linear-gradient(135deg, #dc3545, #c82333); }
+
+.recent-scan-item {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.recent-scan-item:hover {
+    background: #f8f9fa;
+}
+</style>
+
+<script>
+let recentScans = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Enter key handler
+    document.getElementById('urlInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            scanUrl();
+        }
+    });
+
+    // Load recent scans from localStorage
+    const saved = localStorage.getItem('linkScannerRecent');
+    if (saved) {
+        recentScans = JSON.parse(saved);
+        updateRecentScans();
+    }
+});
+
+function toggleBatchMode() {
+    const batchMode = document.getElementById('batchMode').checked;
+    const singleInput = document.getElementById('urlInput').parentElement.parentElement;
+    const batchSection = document.getElementById('batchSection');
+    const scanBtn = document.getElementById('scanBtn');
+
+    if (batchMode) {
+        singleInput.style.display = 'none';
+        batchSection.style.display = 'block';
+        scanBtn.style.display = 'none';
+    } else {
+        singleInput.style.display = 'block';
+        batchSection.style.display = 'none';
+        scanBtn.style.display = 'block';
+    }
+}
+
+function scanUrl() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) {
+        alert('Bitte geben Sie eine URL ein');
+        return;
+    }
+
+    showProgress();
+
+    fetch('/link-scanner/api/scan', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify({ url: url })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideProgress();
+        if (data.success) {
+            displayResult(data);
+            addToRecent(data);
+        } else {
+            displayError(data.error);
+        }
+    })
+    .catch(error => {
+        hideProgress();
+        displayError('Netzwerkfehler: ' + error.message);
+    });
+}
+
+function scanBatch() {
+    const text = document.getElementById('batchUrls').value.trim();
+    if (!text) {
+        alert('Bitte geben Sie mindestens eine URL ein');
+        return;
+    }
+
+    const urls = text.split('\n').map(u => u.trim()).filter(u => u);
+    if (urls.length === 0) {
+        alert('Keine gültigen URLs gefunden');
+        return;
+    }
+
+    if (urls.length > 20) {
+        alert('Maximal 20 URLs erlaubt');
+        return;
+    }
+
+    showProgress();
+
+    fetch('/link-scanner/api/batch-scan', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify({ urls: urls })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideProgress();
+        if (data.success) {
+            displayBatchResults(data);
+        } else {
+            displayError(data.error);
+        }
+    })
+    .catch(error => {
+        hideProgress();
+        displayError('Netzwerkfehler: ' + error.message);
+    });
+}
+
+function showProgress() {
+    document.getElementById('progressSection').style.display = 'block';
+    document.getElementById('resultsSection').style.display = 'none';
+    document.getElementById('batchResultsSection').style.display = 'none';
+}
+
+function hideProgress() {
+    document.getElementById('progressSection').style.display = 'none';
+}
+
+function displayResult(data) {
+    const container = document.getElementById('resultsContainer');
+    document.getElementById('resultsSection').style.display = 'block';
+    document.getElementById('batchResultsSection').style.display = 'none';
+
+    const verdict = data.verdict;
+    const score = data.score;
+    const checks = data.checks;
+
+    let verdictText, verdictIcon;
+    if (verdict === 'safe') {
+        verdictText = 'Sicher';
+        verdictIcon = 'bi-shield-check';
+    } else if (verdict === 'suspicious') {
+        verdictText = 'Verdächtig';
+        verdictIcon = 'bi-exclamation-triangle';
+    } else {
+        verdictText = 'Gefährlich';
+        verdictIcon = 'bi-shield-x';
+    }
+
+    let checksHtml = '';
+    
+    // SSL Check
+    if (checks.ssl) {
+        checksHtml += renderCheck('SSL/HTTPS', checks.ssl, 'bi-lock');
+    }
+
+    // Heuristics
+    if (checks.heuristics) {
+        const h = checks.heuristics;
+        let heuristicsMsg = h.issues && h.issues.length > 0 ? h.issues.join('; ') : 'Keine verdächtigen Muster gefunden';
+        if (h.trusted_domain) heuristicsMsg = 'Vertrauenswürdige Domain. ' + heuristicsMsg;
+        checksHtml += renderCheck('Heuristische Analyse', {...h, message: heuristicsMsg}, 'bi-cpu');
+    }
+
+    // VirusTotal
+    if (checks.virustotal) {
+        const vt = checks.virustotal;
+        let vtMsg = vt.message || '';
+        if (vt.malicious !== undefined) {
+            vtMsg = `${vt.malicious} von ${vt.total_engines} Engines melden Bedrohung`;
+        }
+        checksHtml += renderCheck('VirusTotal', {...vt, message: vtMsg}, 'bi-shield-exclamation');
+    }
+
+    // Safe Browsing
+    if (checks.safe_browsing) {
+        checksHtml += renderCheck('Google Safe Browsing', checks.safe_browsing, 'bi-google');
+    }
+
+    // Accessibility
+    if (checks.accessibility) {
+        const acc = checks.accessibility;
+        let accMsg = acc.message || `Status: ${acc.status_code || 'OK'}`;
+        if (acc.redirects > 0) {
+            accMsg += ` (${acc.redirects} Weiterleitungen)`;
+        }
+        if (acc.final_url) {
+            accMsg += ` → ${acc.final_url}`;
+        }
+        checksHtml += renderCheck('Erreichbarkeit', {...acc, message: accMsg}, 'bi-globe2');
+    }
+
+    // Recommendations
+    let recsHtml = '';
+    if (data.recommendations && data.recommendations.length > 0) {
+        recsHtml = `
+            <div class="mt-3">
+                <h6><i class="bi bi-lightbulb"></i> Empfehlungen</h6>
+                <ul class="mb-0">
+                    ${data.recommendations.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    // Threats
+    let threatsHtml = '';
+    if (data.threats && data.threats.length > 0) {
+        threatsHtml = `
+            <div class="alert alert-danger mt-3">
+                <h6><i class="bi bi-exclamation-octagon"></i> Erkannte Bedrohungen</h6>
+                <ul class="mb-0">
+                    ${data.threats.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    container.innerHTML = `
+        <div class="result-card card ${verdict}">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <div class="score-circle score-${verdict}">
+                            ${score}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4 class="mb-1">
+                            <span class="verdict-badge verdict-${verdict}">
+                                <i class="bi ${verdictIcon}"></i> ${verdictText}
+                            </span>
+                        </h4>
+                        <p class="mb-0 text-muted">
+                            <i class="bi bi-link-45deg"></i> 
+                            <a href="${data.url}" target="_blank" rel="noopener noreferrer">${data.url}</a>
+                        </p>
+                        <small class="text-muted">
+                            <i class="bi bi-building"></i> Domain: ${data.domain}
+                        </small>
+                    </div>
+                </div>
+
+                ${threatsHtml}
+
+                <hr>
+                <h6><i class="bi bi-list-check"></i> Detaillierte Prüfungen</h6>
+                ${checksHtml}
+
+                ${recsHtml}
+            </div>
+        </div>
+    `;
+}
+
+function renderCheck(name, check, icon) {
+    const status = check.status || 'unavailable';
+    const message = check.message || '-';
+    
+    let statusIcon, statusClass;
+    if (status === 'safe') {
+        statusIcon = 'bi-check-circle-fill text-success';
+        statusClass = 'safe';
+    } else if (status === 'warning' || status === 'suspicious') {
+        statusIcon = 'bi-exclamation-triangle-fill text-warning';
+        statusClass = 'warning';
+    } else if (status === 'danger' || status === 'malicious') {
+        statusIcon = 'bi-x-circle-fill text-danger';
+        statusClass = 'danger';
+    } else {
+        statusIcon = 'bi-dash-circle text-secondary';
+        statusClass = 'unavailable';
+    }
+
+    return `
+        <div class="check-item ${statusClass}">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="bi ${icon} me-2"></i>
+                    <strong>${name}</strong>
+                </div>
+                <i class="bi ${statusIcon}"></i>
+            </div>
+            <small class="text-muted">${message}</small>
+        </div>
+    `;
+}
+
+function displayBatchResults(data) {
+    document.getElementById('batchResultsSection').style.display = 'block';
+    document.getElementById('resultsSection').style.display = 'none';
+
+    const summary = data.summary;
+    document.getElementById('batchSummary').innerHTML = `
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h3>${summary.safe}</h3>
+                        <p class="mb-0">Sicher</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body">
+                        <h3>${summary.suspicious}</h3>
+                        <p class="mb-0">Verdächtig</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h3>${summary.malicious}</h3>
+                        <p class="mb-0">Gefährlich</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    let resultsHtml = '<div class="table-responsive mt-3"><table class="table table-hover"><thead><tr><th>URL</th><th>Status</th><th>Score</th></tr></thead><tbody>';
+    
+    for (const result of data.results) {
+        const verdict = result.verdict || 'unknown';
+        let badgeClass = 'secondary';
+        if (verdict === 'safe') badgeClass = 'success';
+        else if (verdict === 'suspicious') badgeClass = 'warning';
+        else if (verdict === 'malicious') badgeClass = 'danger';
+
+        resultsHtml += `
+            <tr>
+                <td><a href="${result.url}" target="_blank" rel="noopener">${result.url}</a></td>
+                <td><span class="badge bg-${badgeClass}">${verdict}</span></td>
+                <td>${result.score || 0}</td>
+            </tr>
+        `;
+    }
+
+    resultsHtml += '</tbody></table></div>';
+    document.getElementById('batchResultsContainer').innerHTML = resultsHtml;
+}
+
+function displayError(message) {
+    document.getElementById('resultsSection').style.display = 'block';
+    document.getElementById('resultsContainer').innerHTML = `
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> ${message}
+        </div>
+    `;
+}
+
+function addToRecent(data) {
+    const item = {
+        url: data.url,
+        domain: data.domain,
+        verdict: data.verdict,
+        score: data.score,
+        time: new Date().toLocaleTimeString('de-DE')
+    };
+
+    recentScans.unshift(item);
+    if (recentScans.length > 5) recentScans.pop();
+
+    localStorage.setItem('linkScannerRecent', JSON.stringify(recentScans));
+    updateRecentScans();
+}
+
+function updateRecentScans() {
+    const container = document.getElementById('recentScans');
+    
+    if (recentScans.length === 0) {
+        container.innerHTML = '<li class="list-group-item text-muted text-center small py-3">Noch keine Prüfungen durchgeführt</li>';
+        return;
+    }
+
+    container.innerHTML = recentScans.map(scan => {
+        let badgeClass = 'secondary';
+        if (scan.verdict === 'safe') badgeClass = 'success';
+        else if (scan.verdict === 'suspicious') badgeClass = 'warning';
+        else if (scan.verdict === 'malicious') badgeClass = 'danger';
+
+        return `
+            <li class="list-group-item recent-scan-item" onclick="document.getElementById('urlInput').value='${scan.url}'; scanUrl();">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-truncate" style="max-width: 180px;">
+                        <small>${scan.domain}</small>
+                    </div>
+                    <span class="badge bg-${badgeClass}">${scan.score}</span>
+                </div>
+                <small class="text-muted">${scan.time}</small>
+            </li>
+        `;
+    }).join('');
+}
+</script>
+{% endblock %}
