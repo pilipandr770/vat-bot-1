@@ -9,13 +9,7 @@ try:
     from werkzeug.urls import url_parse
 except ImportError:
     from urllib.parse import urlparse as url_parse
-from datetime import datetime
-from auth.models import User, Subscription
-from auth.forms import (RegistrationForm, LoginForm, PasswordResetRequestForm, 
-                        PasswordResetForm, ProfileUpdateForm, ChangePasswordForm, DeleteAccountForm)
-from crm.models import db
-from notifications.alerts import send_email
-import secrets
+from datetime import datetime, timedelta
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -384,10 +378,7 @@ def generate_reset_token(user):
 
 def verify_reset_token(token):
     """Verify password reset token."""
-    from datetime import timedelta
-    
-    user = User.query.filter_by(password_reset_token=token).first()
-    
+
     if user and user.password_reset_expires > datetime.utcnow():
         return user
     
@@ -440,11 +431,3 @@ def send_password_reset_email(user, token):
         text_body=text_body,
         html_body=html_body
     )
-
-
-# Add missing fields to User model for password reset
-from datetime import timedelta
-
-# These will be added to auth/models.py:
-# password_reset_token = db.Column(db.String(100), unique=True)
-# password_reset_expires = db.Column(db.DateTime)
