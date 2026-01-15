@@ -10,7 +10,7 @@ from auth.models import User
 from services.vies import VIESService
 from services.sanctions import SanctionsService
 from crm.save_results import ResultsSaver
-from link_scanner.routes import link_scanner
+# from link_scanner.routes import link_scanner  # Disabled for Render deployment
 from services.business_registry import BusinessRegistryManager
 from services.vat_lookup import VatLookupService
 import asyncio
@@ -133,8 +133,8 @@ def create_app(config_name=None):
     from services.chatbot_routes import chatbot_bp
     app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
     
-    from link_scanner.routes import link_scanner
-    app.register_blueprint(link_scanner, url_prefix='/link-scanner')
+#     from link_scanner.routes import link_scanner
+#     app.register_blueprint(link_scanner, url_prefix='/link-scanner')
     
     from app.mailguard import mailguard_bp
     app.register_blueprint(mailguard_bp)
