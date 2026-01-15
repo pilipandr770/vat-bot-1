@@ -6,6 +6,55 @@
 <meta name="description" content="{% if page == 'germany' %}Як дотримуватись VAT законів у Німеччині. UStIdNr перевірка, VIES база, дипломні документи. Для GmbH, freelancer та SME.{% elif page == 'sme' %}Тисячі німецьких KMU використовують VAT Verifizierung для автоматизації перевірок партнерів. Безпека, швидкість, надійність.{% else %}Розумійте EU VAT правила без юриста. Основні вимоги для бізнесу в Німеччині, Австрії, Швейцарії.{% endif %}">
 <meta name="keywords" content="{% if page == 'germany' %}UStIdNr prüfen, VAT Compliance Deutschland, Steuernummer verifizieren, VIES Abfrage{% elif page == 'sme' %}KMU Compliance, Risikomanagement, Geschäftspartner verifizieren, Betrugsschutz{% else %}EU VAT Regeln, Steuernummern, Compliance, B2B Handel{% endif %}">
 
+<!-- Breadcrumb Schema for better SERP appearance -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://vat-verifizierung.de/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "About",
+      "item": "https://vat-verifizierung.de/about/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{% if page == 'germany' %}Compliance Germany{% elif page == 'sme' %}SME Trust{% else %}EU VAT Rules{% endif %}",
+      "item": "https://vat-verifizierung.de/about/{% if page == 'germany' %}compliance-germany{% elif page == 'sme' %}why-german-smbs-trust-us{% else %}eu-vat-rules{% endif %}"
+    }
+  ]
+}
+</script>
+
+<!-- LocalBusiness Schema for German Market -->
+{% if page == 'germany' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "VAT Verifizierung - VAT Compliance Germany",
+  "url": "https://vat-verifizierung.de/about/compliance-germany",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Germany",
+    "addressRegion": "Berlin",
+    "postalCode": "10115",
+    "addressCountry": "DE"
+  },
+  "areaServed": ["DE", "AT", "CH"],
+  "expertise": ["VAT Compliance", "VIES Database", "UStIdNr Verification", "Sanctions Screening", "EU Regulations"]
+}
+</script>
+{% endif %}
+
 <!-- Schema.org -->
 <script type="application/ld+json">
 {% if page == 'germany' %}
@@ -39,6 +88,20 @@
 
 {% block content %}
 <div class="container">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mt-3 mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('landing') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('about') }}">About</a></li>
+            <li class="breadcrumb-item active">
+                {% if page == 'germany' %}Compliance Germany
+                {% elif page == 'sme' %}SME Trust
+                {% else %}EU VAT Rules
+                {% endif %}
+            </li>
+        </ol>
+    </nav>
+
     <!-- Hero -->
     <div class="row justify-content-center mt-5 mb-5">
         <div class="col-lg-8 text-center">
@@ -158,6 +221,54 @@
                     </div>
                 </section>
             {% endif %}
+
+            <!-- Related Pages & Internal Linking -->
+            <div class="row mt-5 pt-5 border-top">
+                <div class="col-12">
+                    <h3 class="mb-4">Weitere wichtige Ressourcen</h3>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Compliance Deutschland</h5>
+                            <p class="card-text text-muted">Umfassender Leitfaden zu VAT-Anforderungen in Deutschland</p>
+                            <a href="{{ url_for('geo.compliance_germany') }}" class="btn btn-outline-primary btn-sm">Lesen →</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">KMU Vertrauen</h5>
+                            <p class="card-text text-muted">Warum tausende KMUs VAT Verifizierung nutzen</p>
+                            <a href="{{ url_for('geo.sme_trust') }}" class="btn btn-outline-primary btn-sm">Lesen →</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">EU VAT Regeln</h5>
+                            <p class="card-text text-muted">VAT-Anforderungen in allen EU-Ländern erklärt</p>
+                            <a href="{{ url_for('geo.eu_vat_rules') }}" class="btn btn-outline-primary btn-sm">Lesen →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programmatic Pages Links -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h5 class="mb-3 text-muted">Spezifische Leitfäden für verschiedene Geschäftstypen:</h5>
+                    <div class="btn-group btn-group-sm flex-wrap gap-2" role="group">
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='gmbh-berlin') }}" class="btn btn-outline-secondary">GmbH Verify</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='freiberufler-berlin') }}" class="btn btn-outline-secondary">Freiberufler</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='online-shop-berlin') }}" class="btn btn-outline-secondary">Online-Shop</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='startup-berlin') }}" class="btn btn-outline-secondary">Startup</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='kmu-berlin') }}" class="btn btn-outline-secondary">KMU</a>
+                    </div>
+                </div>
+            </div>
 
             <!-- Universal CTA -->
             <div class="mt-5 pt-5 border-top">
