@@ -46,7 +46,7 @@
                     </p>
                     <div class="d-flex gap-3">
                         <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-rocket"></i> Jetzt kostenlos starten
+                            <i class="bi bi-rocket"></i> Jetzt starten (3 Tage gratis)
                         </a>
                         <a href="#features" class="btn btn-outline-secondary btn-lg">
                             <i class="bi bi-stars"></i> Alle Features
@@ -54,8 +54,8 @@
                     </div>
                     <div class="mt-4">
                         <small class="text-muted">
-                            <i class="bi bi-check-circle text-success"></i> Keine Kreditkarte erforderlich 
-                            <i class="bi bi-check-circle text-success ms-3"></i> 5 kostenlose Prüfungen
+                            <i class="bi bi-check-circle text-success"></i> 3 Tage kostenlos testen
+                            <i class="bi bi-check-circle text-success ms-3"></i> Keine Kreditkarte erforderlich
                             <i class="bi bi-check-circle text-success ms-3"></i> 10+ Module
                         </small>
                     </div>
@@ -281,21 +281,21 @@
             </div>
             
             <div class="row g-4 justify-content-center">
-                <!-- Free Plan -->
+                <!-- Basic Plan -->
                 <div class="col-lg-4">
                     <div class="card border-0 shadow">
                         <div class="card-body p-4">
-                            <h3 class="h4 mb-3">Kostenlos</h3>
+                            <h3 class="h4 mb-3">Basierend</h3>
                             <div class="display-4 fw-bold mb-3">
-                                0€<small class="text-muted fs-6">/Monat</small>
+                                9,99€<small class="text-muted fs-6">/Monat</small>
                             </div>
                             <ul class="list-unstyled mb-4">
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 5 Prüfungen pro Monat</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 100 Prüfungen pro Monat</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> VIES Validierung</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Basis Sanktionsprüfung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Sanktionsprüfung</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> OSINT Scanner</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link Scanner (10 URLs/Monat)</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (10 Kontakte)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link Scanner</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM Basis</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> KI-Assistent</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Firmenprofil</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> E-Mail Support</li>
@@ -304,13 +304,13 @@
                                 <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> Handelsregister</li>
                             </ul>
                             <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100">
-                                Kostenlos starten
+                                Kostenlos starten (3 Tage)
                             </a>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Pro Plan -->
+
+                <!-- Professional Plan -->
                 <div class="col-lg-4">
                     <div class="card border-primary border-3 shadow-lg">
                         <div class="card-header bg-primary text-white text-center py-3">
@@ -319,10 +319,10 @@
                         <div class="card-body p-4">
                             <h3 class="h4 mb-3">Professional</h3>
                             <div class="display-4 fw-bold mb-3">
-                                49€<small class="text-muted fs-6">/Monat</small>
+                                49,99€<small class="text-muted fs-6">/Monat</small>
                             </div>
                             <ul class="list-unstyled mb-4">
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 200 Prüfungen pro Monat</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 500 Prüfungen pro Monat</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Validierungsdienste</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Handelsregister Prüfung</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Erweiterte Sanktionslisten</li>
@@ -340,14 +340,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Enterprise Plan -->
                 <div class="col-lg-4">
                     <div class="card border-0 shadow">
                         <div class="card-body p-4">
                             <h3 class="h4 mb-3">Enterprise</h3>
                             <div class="display-4 fw-bold mb-3">
-                                199€<small class="text-muted fs-6">/Monat</small>
+                                149,99€<small class="text-muted fs-6">/Monat</small>
                             </div>
                             <ul class="list-unstyled mb-4">
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Unbegrenzte Prüfungen</li>
@@ -461,9 +461,9 @@
     <section class="py-5 bg-primary text-white">
         <div class="container text-center">
             <h2 class="display-5 fw-bold mb-4">Bereit loszulegen?</h2>
-            <p class="lead mb-4">Starten Sie jetzt mit 5 kostenlosen Prüfungen</p>
+            <p class="lead mb-4">Starten Sie jetzt mit 3 Tagen kostenlosem Test</p>
             <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
-                <i class="bi bi-rocket"></i> Kostenlos registrieren
+                <i class="bi bi-rocket"></i> Jetzt registrieren
             </a>
         </div>
     </section>
