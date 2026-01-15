@@ -27,13 +27,8 @@
                     
                     <!-- Price -->
                     <div class="text-center mb-4">
-                        {% if plan.price == 0 %}
-                        <h2 class="display-4 fw-bold">Kostenlos</h2>
+                        <h2 class="display-4 fw-bold">€{{ "%.2f"|format(plan.price) }}</h2>
                         <p class="text-muted">{{ plan.period }}</p>
-                        {% else %}
-                        <h2 class="display-4 fw-bold">€{{ plan.price }}</h2>
-                        <p class="text-muted">{{ plan.period }}</p>
-                        {% endif %}
                     </div>
                     
                     <!-- API Calls -->
