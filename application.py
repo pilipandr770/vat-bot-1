@@ -146,16 +146,14 @@ def create_app(config_name=None):
     # Register CRM blueprint
     from crm.routes import crm_bp
     app.register_blueprint(crm_bp)
-    
-    # Initialize monitoring services
-    from services.alerts import init_alert_service
-    from services.scheduler import init_scheduler
-    from app.mailguard.tasks import setup_scheduler as setup_mailguard_scheduler
-    from crm.scheduler import init_monitoring_scheduler
-    
-    # Init alert service with mail
-    init_alert_service(mail)
-    
+
+    # Register Programmatic SEO blueprint
+    from programmatic.routes import programmatic_bp
+    app.register_blueprint(programmatic_bp)
+
+    # Register GEO + SME Trust blueprint
+    from routes.geo_sme_routes import geo_bp
+    app.register_blueprint(geo_bp)
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         init_scheduler()

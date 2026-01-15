@@ -10,6 +10,22 @@ Allow: /imprint
 Allow: /datenschutz
 Allow: /agb
 
+# Allow Programmatic SEO pages (VAT Check by business type & city)
+Allow: /vat-check/
+
+# Allow GEO + SME Trust pages
+Allow: /about/compliance-germany
+Allow: /about/why-german-smbs-trust-us
+Allow: /about/eu-vat-rules
+Allow: /about/answers-for-ai
+
+# Allow AI optimization pages
+Allow: /ai.txt
+
+# Allow public use cases and FAQ
+Allow: /use-cases/
+Allow: /faq/
+
 # Disallow admin and sensitive areas
 Disallow: /admin/
 Disallow: /api/
