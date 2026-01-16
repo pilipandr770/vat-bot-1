@@ -229,7 +229,23 @@ def create_app(config_name=None):
     def test_form():
         """Simple test form for debugging."""
         return render_template('test_form.html')
-    
+
+    @app.route('/pentesting-scanner')
+    @login_required
+    def pentesting_scanner():
+        """Display website security scanner."""
+        # Check subscription
+        if not current_user.is_authenticated:
+            return redirect(url_for('auth.login'))
+        
+        sub = current_user.active_subscription
+        if not sub or sub.plan not in ['pro', 'enterprise']:
+            if not current_user.is_admin:
+                flash('Website Security Scanner is only available for PRO and ENTERPRISE users', 'warning')
+                return redirect(url_for('payments.pricing'))
+        
+        return render_template('pentesting/scanner.html')
+
     @app.route('/make-admin/<email>')
     @login_required
     def make_admin(email):
