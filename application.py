@@ -138,7 +138,10 @@ def create_app(config_name=None):
 
     from app.mailguard import mailguard_bp
     app.register_blueprint(mailguard_bp)
-    
+
+    from app.pentesting.routes import pentesting
+    app.register_blueprint(pentesting)
+
     # Register enrichment API blueprint
     from routes.enrichment import enrichment_bp
     app.register_blueprint(enrichment_bp)
