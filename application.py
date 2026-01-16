@@ -1,4 +1,4 @@
-import os
+﻿import os
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_required, current_user
@@ -13,6 +13,8 @@ from crm.save_results import ResultsSaver
 from link_scanner.routes import link_scanner
 from services.business_registry import BusinessRegistryManager
 from services.vat_lookup import VatLookupService
+from services.rate_limiter import rate_limiter
+from services.vat_validator import validate_vat_format, validate_counterparty_data
 import asyncio
 from datetime import datetime
 from sqlalchemy import text
@@ -279,6 +281,18 @@ def create_app(config_name=None):
         
         # User is authenticated via @login_required decorator
         
+        # ==================== RATE LIMITING ====================
+        identifier = f"user_{current_user.id}"
+        allowed_min, info_min = rate_limiter.is_allowed(identifier, 30, 60)
+        if not allowed_min:
+            logger.warning(f"Rate limit exceeded for user {current_user.id}")
+            return jsonify({
+                'success': False,
+                'error': 'Zu viele Anfragen. Bitte versuchen Sie es in einigen Sekunden erneut.',
+                'rate_limit': True,
+                'retry_after': info_min['retry_after']
+            }), 429
+
         # Check if user can perform verification (quota check)
         can_verify = current_user.can_perform_verification()
         logger.error(f"QUOTA CHECK: can_perform_verification={can_verify}")
@@ -299,7 +313,7 @@ def create_app(config_name=None):
             
             return jsonify({
                 'success': False,
-                'error': f'Sie haben Ihr Prüfungslimit erreicht ({current_usage}/{limit}). Bitte upgraden Sie Ihren Plan.',
+                'error': f'Sie haben Ihr PrГјfungslimit erreicht ({current_usage}/{limit}). Bitte upgraden Sie Ihren Plan.',
                 'current_plan': plan_name,
                 'current_usage': current_usage,
                 'limit': limit,
@@ -411,7 +425,19 @@ def create_app(config_name=None):
             print(f"Error in verify_counterparty: {str(e)}")
             print(traceback.format_exc())
             db.session.rollback()
-            return jsonify({'success': False, 'error': str(e)}), 500
+            
+            # Return user-friendly error message
+            error_msg = str(e)
+            if 'VIES' in error_msg or 'vies' in error_msg.lower():
+                error_msg = 'Fehler beim VIES-Service. Das System wird automatisch einen neuen Versuch durchführen. Bitte versuchen Sie es in wenigen Sekunden erneut.'
+            else:
+                error_msg = 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.'
+            
+            return jsonify({
+                'success': False,
+                'error': error_msg,
+                'details': str(e) if app.debug else None
+            }), 500
     
     @app.route('/history')
     def verification_history():
@@ -717,3 +743,5 @@ app = create_app()
 # For development server
 if __name__ == '__main__':
     app.run(debug=True)
+
+

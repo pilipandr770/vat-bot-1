@@ -203,6 +203,33 @@ class CounterpartyVerification {
             }
         }
 
+        // Handle 429 (Rate Limit)
+        if (response.status === 429) {
+            const data = await response.json();
+            return {
+                success: false,
+                error: data.error || 'Zu viele Anfragen. Bitte versuchen Sie es später erneut.',
+                rate_limit: true,
+                retry_after: data.retry_after
+            };
+        }
+
+        // Handle 400 (Validation Error)
+        if (response.status === 400) {
+            const data = await response.json();
+            if (data.field) {
+                const field = document.querySelector(`[name="${data.field}"]`);
+                if (field) {
+                    this.showValidationFeedback(field, false, data.error);
+                }
+            }
+            return {
+                success: false,
+                error: data.error || 'Validierungsfehler in einem Feld',
+                validation_error: true
+            };
+        }
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
@@ -1084,6 +1111,24 @@ class CounterpartyVerification {
             </div>
         `;
 
+        resultsPanel.innerHTML = html;
+        resultsPanel.classList.add('fade-in');
+    }
+
+    displayRateLimitError(response) {
+        const resultsPanel = document.getElementById('resultsPanel');
+        if (!resultsPanel) return;
+
+        const retryAfter = response.retry_after || 60;
+        const html = `
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong><i class="bi bi-exclamation-triangle"></i> Zu viele Anfragen</strong>
+                <p class="mb-0">${response.error}</p>
+                <p class="mb-0 small mt-2">Sie können die nächste Überprüfung in ${retryAfter} Sekunden durchführen.</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
         resultsPanel.innerHTML = html;
         resultsPanel.classList.add('fade-in');
     }
