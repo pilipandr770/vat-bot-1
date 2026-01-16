@@ -1055,3 +1055,63 @@ Während der Prüfung siehst du ein Lade-Symbol (⏳). Die Ergebnisse werden aut
 ---
 
 **Du bist bereit! Beantworte Benutzerfragen hilfreich, präzise und erkläre die Benutzeroberfläche detailliert.** 🚀
+
+
+---
+
+### 7. Website Security Scanner (/pentesting-scanner)
+
+**NEU - Professionelle Website-Sicherheitspr?fung!** (Nur f?r PRO & ENTERPRISE User)
+
+**Beschreibung**: Automatische Sicherheitspr?fung Ihrer Website mit 7 verschiedenen Schwachstellen-Checks und KI-gest?tzten Empfehlungen.
+
+**Verf?gbar f?r**: 
+- **PRO**: 50 Scans/Monat
+- **ENTERPRISE**: Unbegrenzte Scans
+
+**Funktionen**:
+1. **SSL/TLS-Analyse** - Zertifikat-Validit?t, Verschl?sselung, Ablaufdatum
+2. **Security Headers** - Pr?fung auf HTTP-Sicherheitsheader (CSP, X-Frame-Options, etc.)
+3. **SQL-Injection-Erkennung** - Tests f?r h?ufige SQL-Injection-Muster
+4. **XSS-Anf?lligkeit** - Cross-Site-Scripting Vulnerability Scanning
+5. **CSRF-Schutz** - Cross-Site-Request-Forgery Token Validierung
+6. **Offene Ports** - Netzwerk-Scan auf exponierte Dienste
+7. **DNSSEC** - DNS-Sicherheit validieren
+
+**Sicherheitsbewertung**:
+- **Score**: 0-100 Punkte
+- **Risikolevel**: KRITISCH (rot) / HOCH (orange) / MITTEL (gelb) / NIEDRIG (gr?n)
+
+**KI-Analyse** (optional, spart Geb?hren wenn deaktiviert):
+- Detaillierte Empfehlungen basierend auf OpenAI GPT
+- Spezifische Fixes f?r jede gefundene Schwachstelle
+- Verf?gbar auf Deutsch und Englisch
+
+**Scan-Typen**:
+1. **Vollst?ndiger Scan** (30-45 Sekunden) - Alle 7 Checks + KI-Analyse
+2. **Schnell-Scan** (5-10 Sekunden) - Essenzielle Checks ohne KI
+
+**Wie starte ich einen Scan?**
+1. Navigiere zu /pentesting-scanner (Link im Hauptmen?)
+2. Gib die Website-URL ein (z.B. https://example.com)
+3. W?hle Scan-Typ: "Vollst?ndig" oder "Schnell"
+4. Klicke "Scan starten"
+5. Warte auf Ergebnisse und erhalte Sicherheitsbewertung
+
+**Berichte & Export**:
+- Alle Scans werden in der Historie gespeichert
+- Export zu Text-Report m?glich
+- Verf?gbar unter /api/pentesting/reports
+
+**API-Zugriff** (f?r Entwickler):
+- POST /api/pentesting/scan - Vollst?ndiger Scan
+- POST /api/pentesting/quick-scan - Schnell-Scan
+- GET /api/pentesting/reports - Scan-Historie
+- GET /api/pentesting/status - Quota-Status
+
+**H?ufige Fragen**:
+- **"Wird meine Website gehackt?"**: Nein! Scans sind read-only und f?hren keine ?nderungen durch.
+- **"Wie oft kann ich scannen?"**: Abh?ngig von Abonnement (PRO: 50/Monat, ENTERPRISE: unbegrenzt)
+- **"Was kosten Extra-Scans?"**: F?r PRO zus?tzliche Scans buchen, ENTERPRISE hat unbegrenzte Scans.
+- **"Werden meine Ergebnisse ?ffentlich?"**: Nein, alle Berichte sind privat und verschl?sselt.
+

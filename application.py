@@ -608,6 +608,7 @@ def create_app(config_name=None):
             # Main pages (format: url, lastmod, changefreq, priority)
             ('/', datetime.now().date(), 'weekly', 1.0),
             ('/pricing', datetime.now().date(), 'weekly', 0.9),
+            ('/pentesting-scanner', datetime.now().date(), 'weekly', 0.8),
             ('/legal/agb', datetime.now().date(), 'monthly', 0.5),
             ('/legal/datenschutz', datetime.now().date(), 'monthly', 0.5),
             ('/legal/impressum', datetime.now().date(), 'monthly', 0.5),
