@@ -4,6 +4,32 @@
 
 {% block content %}
 <div class="container my-5">
+    <!-- Pricing Offers JSON-LD for rich results -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "VAT Verifizierung - Pläne",
+        "offers": [
+            {% for plan in plans %}
+            {
+                "@type": "Offer",
+                "name": "{{ plan.display_name }}",
+                "price": "{{ "%.2f"|format(plan.price) }}",
+                "priceCurrency": "EUR",
+                "url": "https://vat-verifizierung.de/pricing#{{ plan.name }}",
+                "priceSpecification": {
+                    "@type": "PriceSpecification",
+                    "price": "{{ "%.2f"|format(plan.price) }}",
+                    "priceCurrency": "EUR",
+                    "billingDuration": "P1M",
+                    "billingIncrement": 1
+                }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
     <!-- Header -->
     <div class="text-center mb-5">
         <h1 class="display-4 fw-bold mb-3">Wählen Sie Ihren Plan</h1>

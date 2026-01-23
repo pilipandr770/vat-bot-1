@@ -75,7 +75,7 @@ def generate_sitemap():
     
     # Генеруємо XML
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
     
     for url in urls:
         xml += '  <url>\n'
@@ -83,6 +83,9 @@ def generate_sitemap():
         xml += f'    <lastmod>{url["lastmod"]}</lastmod>\n'
         xml += f'    <changefreq>{url["changefreq"]}</changefreq>\n'
         xml += f'    <priority>{url["priority"]}</priority>\n'
+        # add hreflang alternates (German + default)
+        xml += f'    <xhtml:link rel="alternate" hreflang="de-DE" href="{url["loc"]}"/>\n'
+        xml += f'    <xhtml:link rel="alternate" hreflang="x-default" href="{url["loc"]}"/>\n'
         xml += '  </url>\n'
     
     xml += '</urlset>'
