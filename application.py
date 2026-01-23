@@ -15,6 +15,7 @@ from services.business_registry import BusinessRegistryManager
 from services.vat_lookup import VatLookupService
 from services.rate_limiter import rate_limiter
 from services.vat_validator import validate_vat_format, validate_counterparty_data
+from services.scheduler import init_scheduler
 import asyncio
 from datetime import datetime
 from sqlalchemy import text
@@ -162,9 +163,9 @@ def create_app(config_name=None):
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         init_scheduler()
-        app.mailguard_scheduler = setup_mailguard_scheduler(app)
+        # app.mailguard_scheduler = setup_mailguard_scheduler(app)  # TODO: implement
         # Initialize CRM monitoring scheduler
-        app.crm_monitoring_scheduler = init_monitoring_scheduler(app)
+        # app.crm_monitoring_scheduler = init_monitoring_scheduler(app)  # TODO: implement
     
     # Mailguard models use the same db instance
     

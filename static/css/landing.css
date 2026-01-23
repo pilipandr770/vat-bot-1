@@ -14,7 +14,7 @@
 body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
-    color: #00ff00;
+    color: #2c3e50;
     overflow-x: hidden;
 }
 
@@ -200,7 +200,7 @@ body {
 
 /* Modern Navbar */
 .navbar {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: #343a40 !important;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -212,7 +212,7 @@ body {
 }
 
 .navbar.scrolled {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: #343a40 !important;
     backdrop-filter: blur(20px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -250,7 +250,7 @@ body {
 }
 
 .navbar.scrolled .navbar-nav .nav-link {
-    color: #00ff00 !important;
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .navbar.scrolled .navbar-nav .nav-link::after {
@@ -339,6 +339,27 @@ body {
 .feature-description {
     color: #00ff00;
     line-height: 1.6;
+}
+
+/* Form controls for landing page */
+.form-control,
+input,
+textarea,
+select {
+    color: #00ff00 !important;
+}
+
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: #00ff00 !important;
+    opacity: 0.8;
+}
+
+.form-text,
+.text-muted,
+small {
+    color: #00ff00 !important;
 }
 
 /* Stats Section */

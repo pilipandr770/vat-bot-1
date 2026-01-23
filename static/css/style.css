@@ -13,21 +13,27 @@
     --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.2);
     --border-radius: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --text-color: #00ff00;
+}
+
+/* GLOBAL BRIGHT GREEN TEXT - for readability on any background */
+* {
+    --bs-body-color: #00ff00 !important;
 }
 
 body {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
-    color: #2ecc71;
+    color: #00ff00 !important;
     min-height: 100vh;
 }
 
 .navbar {
-    background: var(--glass-bg) !important;
+    background: #343a40 !important;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: var(--shadow-light);
     transition: var(--transition);
 }
@@ -39,6 +45,11 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
 }
 
 .card {
@@ -73,12 +84,12 @@ textarea.autofill-highlight {
     border-bottom: 1px solid var(--glass-border);
     font-weight: 600;
     padding: 1.5rem;
-    color: #2ecc71;
+    color: #00ff00;
 }
 
 .card-body {
     padding: 1.5rem;
-    color: #2ecc71;
+    color: #00ff00;
 }
 
 /* Modern Button Styles */
@@ -219,34 +230,36 @@ textarea.autofill-highlight {
 .form-control {
     border-radius: 12px;
     border: 2px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
     padding: 0.75rem 1rem;
     transition: var(--transition);
     font-weight: 500;
+    color: #00ff00 !important;
 }
 
 .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    background: rgba(255, 255, 255, 0.15);
+    border-color: #00ff00;
+    box-shadow: 0 0 0 0.2rem rgba(0, 255, 0, 0.25);
+    background: rgba(0, 0, 0, 0.4);
     transform: translateY(-1px);
+    color: #00ff00 !important;
 }
 
 .form-control::placeholder {
-    color: #27ae60;
+    color: #00ff00;
     font-weight: 400;
 }
 
 /* Form labels */
 .form-label {
-    color: #2ecc71;
+    color: #00ff00;
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 label {
-    color: #2ecc71;
+    color: #00ff00;
     font-weight: 600;
 }
 
@@ -408,7 +421,7 @@ label {
     backdrop-filter: blur(10px);
     border-radius: 12px;
     overflow: hidden;
-    color: #2ecc71;
+    color: #00ff00;
 }
 
 .table thead th {
@@ -418,7 +431,7 @@ label {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.875rem;
-    color: #2ecc71;
+    color: #00ff00;
 }
 
 .table-hover tbody tr:hover {
@@ -432,7 +445,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     letter-spacing: -0.025em;
     line-height: 1.2;
-    color: #2ecc71;
+    color: #00ff00;
 }
 
 h1 { font-size: 2.5rem; }
@@ -444,7 +457,7 @@ h6 { font-size: 1.125rem; }
 
 p {
     line-height: 1.7;
-    color: #2ecc71;
+    color: #00ff00;
 }
 
 /* Utility classes */
@@ -574,7 +587,7 @@ p {
 
 .accordion-button:not(.collapsed) {
     background-color: #e7f1ff;
-    color: #27ae60;
+    color: #00ff00;
 }
 
 /* History table */
@@ -602,24 +615,102 @@ p {
 
 /* Utility classes */
 .text-muted-light {
-    color: #27ae60 !important;
+    color: #00ff00 !important;
     opacity: 0.9;
 }
 
 .text-muted {
-    color: #27ae60 !important;
+    color: #00ff00 !important;
     opacity: 0.9;
 }
 
 .form-text {
-    color: #27ae60 !important;
+    color: #00ff00 !important;
     opacity: 0.9;
     font-size: 0.875rem;
 }
 
+.form-text.text-muted {
+    color: #00ff00 !important;
+}
+
+small.form-text,
+small.text-muted,
+.text-muted.small,
+.small.text-muted {
+    color: #00ff00 !important;
+}
+
+/* Force bright green text on all form elements */
+.form-control,
+.form-control:focus,
+input,
+textarea,
+select {
+    color: #00ff00 !important;
+}
+
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: #00ff00 !important;
+    opacity: 0.8;
+}
+
+/* All text elements - bright green */
+.card-body,
+.card-header,
+.list-group-item,
+.modal-body,
+.modal-header,
+.alert,
+.toast-body {
+    color: #00ff00 !important;
+}
+
+/* Ensure text is readable everywhere */
+span, div, p, li, td, th {
+    color: inherit;
+}
+
+a {
+    color: #00ff00;
+}
+
+a:hover {
+    color: #7fff7f;
+}
+
+/* Override Bootstrap text-muted class */
+.text-muted {
+    color: #00ff00 !important;
+}
+
+/* List group items */
+.list-group-item {
+    color: #00ff00 !important;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Form check labels */
+.form-check-label {
+    color: #00ff00 !important;
+}
+
+/* Input group text */
+.input-group-text {
+    color: #00ff00;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body, .container, .container-fluid, .row, .col {
+    color: #00ff00;
+}
+
 /* File scanner info card */
 .card-body ul li {
-    color: #2ecc71 !important;
+    color: #00ff00 !important;
 }
 
 /* MailGuard message detail layout */
