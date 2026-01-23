@@ -10,20 +10,28 @@
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "VAT Verifizierung - Pläne",
+        "description": "Subscription plans for VAT Verifizierung service (Free, Starter, Professional)",
         "offers": [
             {% for plan in plans %}
             {
                 "@type": "Offer",
                 "name": "{{ plan.display_name }}",
+                "sku": "plan-{{ plan.name }}",
                 "price": "{{ "%.2f"|format(plan.price) }}",
                 "priceCurrency": "EUR",
                 "url": "https://vat-verifizierung.de/pricing#{{ plan.name }}",
+                "availability": "https://schema.org/InStock",
+                "priceValidUntil": "2026-12-31",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "VAT Verifizierung Subscription - {{ plan.display_name }}",
+                    "description": "{{ plan.description if plan.description else 'Subscription plan for VAT Verifizierung' }}"
+                },
                 "priceSpecification": {
                     "@type": "PriceSpecification",
                     "price": "{{ "%.2f"|format(plan.price) }}",
                     "priceCurrency": "EUR",
-                    "billingDuration": "P1M",
-                    "billingIncrement": 1
+                    "billingPeriod": "P1M"
                 }
             }{% if not loop.last %},{% endif %}
             {% endfor %}

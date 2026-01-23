@@ -23,19 +23,23 @@ class SchemaValidator:
         self.successes = []
         self.files_checked = 0
         
-    def extract_schemas(self, html_content: str) -> List[Dict]:
-        """Extract all JSON-LD schemas from HTML"""
+    def extract_schemas(self, html_content: str, filepath) -> List[Dict]:
+        """Extract all JSON-LD schemas from HTML. Skip blocks with Jinja template markers."""
         schemas = []
         pattern = r'<script type="application/ld\+json">(.*?)</script>'
         matches = re.findall(pattern, html_content, re.DOTALL)
-        
+
         for match in matches:
+            # Skip server-side template blocks that contain Jinja markers
+            if "{{" in match or "{%" in match:
+                self.warnings.append(f"{filepath.name}: Skipped JSON-LD with template markers (render-time schema)")
+                continue
             try:
                 schema = json.loads(match)
                 schemas.append(schema)
             except json.JSONDecodeError as e:
-                self.errors.append(f"Invalid JSON-LD: {e}")
-        
+                self.errors.append(f"{filepath.name}: Invalid JSON-LD: {e}")
+
         return schemas
     
     def validate_faq_schema(self, schema: Dict) -> Tuple[bool, List[str]]:
@@ -124,7 +128,7 @@ class SchemaValidator:
             self.errors.append(f"Cannot read {filepath}: {e}")
             return
         
-        schemas = self.extract_schemas(content)
+        schemas = self.extract_schemas(content, filepath)
         
         if not schemas:
             self.warnings.append(f"{filepath.name}: No Schema.org markup found")

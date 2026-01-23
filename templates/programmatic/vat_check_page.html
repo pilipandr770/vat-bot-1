@@ -119,6 +119,32 @@
 {% endblock %}
 
 {% block content %}
+<!-- Service Schema: Verification Service for programmatic pages -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "VAT Verifizierung - Business Verification Service",
+    "description": "Automated VAT number verification, sanctions screening and business registry checks for Germany and EU.",
+    "provider": {
+        "@type": "Organization",
+        "name": "VAT Verifizierung",
+        "url": "https://vat-verifizierung.de"
+    },
+    "areaServed": {
+        "@type": "Country",
+        "name": "Germany",
+        "addressCountry": "DE"
+    },
+    "serviceType": "VAT Verification",
+    "url": "https://vat-verifizierung.de{{ page.url }}",
+    "offers": {
+        "@type": "Offer",
+        "url": "https://vat-verifizierung.de/pricing",
+        "priceCurrency": "EUR"
+    }
+}
+</script>
 <div class="container">
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="mt-3 mb-4">
