@@ -11,8 +11,8 @@ except ImportError:
     from urllib.parse import urlparse as url_parse
 from datetime import datetime, timedelta
 from auth.forms import LoginForm, RegistrationForm
-from auth.models import User
-from application import db
+from auth.models import User, Subscription
+from crm.models import db
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -45,16 +45,19 @@ def register():
             db.session.commit()
             
             # Create basic (trial) subscription for new user
-            # User gets 3-day free trial before being charged
+            # User gets 30-day free trial
             trial_subscription = Subscription(
                 user_id=user.id,
                 plan='basic',
                 status='active',
                 api_calls_limit=100,  # Basic plan limit
                 monthly_price=9.99,
-                api_calls_used=0
+                api_calls_used=0,
+                start_date=datetime.utcnow(),
+                end_date=datetime.utcnow() + timedelta(days=30)  # 30-day trial
             )
             db.session.add(trial_subscription)
+            db.session.commit()
             # send_confirmation_email(user)  # Disabled for testing
             
             flash('Registrierung erfolgreich! Sie können sich jetzt anmelden.', 'success')
