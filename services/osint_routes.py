@@ -1,6 +1,5 @@
 # FILE: services/osint_routes.py
 from flask import Blueprint, request, render_template, jsonify
-from flask_login import login_required
 from .osint.scanner import OsintScanner
 from crm.osint_models import db, OsintScan, OsintFinding
 
@@ -8,7 +7,6 @@ osint_bp = Blueprint("osint", __name__, template_folder="../templates")
 
 
 @osint_bp.route("/scan", methods=["GET", "POST"])
-@login_required
 def scan():
     if request.method == "POST":
         try:
