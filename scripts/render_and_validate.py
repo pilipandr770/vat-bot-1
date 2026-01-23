@@ -68,7 +68,27 @@ def render_templates(app, out_dir: Path):
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    with app.app_context():
+    # Register small stub endpoints for templates that reference app routes
+    # (some blueprints are not registered in this render-only context)
+    def _make_stub(name):
+        def _stub(**kwargs):
+            return ''
+        _stub.__name__ = f"stub_{name.replace('.', '_')}"
+        return _stub
+
+    STUB_ENDPOINTS = [
+        'verification.create',
+    ]
+    for ep in STUB_ENDPOINTS:
+        try:
+            rule = '/stub/' + ep.replace('.', '/')
+            app.add_url_rule(rule, endpoint=ep, view_func=_make_stub(ep))
+        except Exception:
+            # ignore if endpoint already exists or invalid
+            pass
+
+    # Use a test request context so url_for() and other request-bound helpers work
+    with app.test_request_context('/', base_url='https://vat-verifizierung.de'):
         for tpl in templates:
             try:
                 html = render_template(tpl, **ctx)
