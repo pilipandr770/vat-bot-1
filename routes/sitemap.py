@@ -59,7 +59,9 @@ def generate_sitemap():
     
     # 3. Programmatic SEO сторінки (з JSON файлу)
     try:
-        json_path = os.path.join(os.path.dirname(__file__), 'programmatic_seo_pages.json')
+        # programmatic_seo_pages.json lives at the project root (same as programmatic/routes.py expects)
+        json_path = os.path.join(os.path.dirname(__file__), '..', 'programmatic_seo_pages.json')
+        json_path = os.path.normpath(json_path)
         if os.path.exists(json_path):
             with open(json_path, 'r', encoding='utf-8') as f:
                 pages = json.load(f)
