@@ -1,0 +1,80 @@
+# English translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 15:52+0100\n"
+"PO-Revision-Date: 2026-01-25 15:51+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:7
+msgid "VAT Verification System"
+msgstr "VAT Verification System"
+
+#: templates/base.html:16
+msgid "VAT Verification"
+msgstr "VAT Verification"
+
+#: templates/base.html:26
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: templates/base.html:43
+msgid "Link Scanner"
+msgstr "Link Scanner"
+
+#: templates/base.html:48
+msgid "MailGuard"
+msgstr "MailGuard"
+
+#: templates/base.html:53
+msgid "Website Scanner"
+msgstr "Website Scanner"
+
+#: templates/base.html:58
+msgid "CRM"
+msgstr "CRM"
+
+#: templates/index.html:75
+msgid "Your Company Data"
+msgstr "Your Company Data"
+
+#: templates/index.html:81
+msgid "VAT Number"
+msgstr "VAT Number"
+
+#: templates/index.html:84
+msgid "Your VAT number for VIES validation"
+msgstr "Your VAT number for VIES validation"
+
+#: templates/index.html:88
+msgid "Company Name"
+msgstr "Company Name"
+
+#: templates/index.html:94
+msgid "Business Address"
+msgstr "Business Address"
+
+#: templates/index.html:100
+msgid "Email"
+msgstr "Email"
+
+#: templates/index.html:105
+msgid "Phone"
+msgstr "Phone"
+
+#: templates/index.html:114
+msgid "Counterparty Data"
+msgstr "Counterparty Data"
+

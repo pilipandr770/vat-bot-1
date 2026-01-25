@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, login_required, current_user
 from flask_mail import Mail
 from flask_wtf import CSRFProtect
+from flask_babel import Babel, gettext as _, lazy_gettext as _l
 from config import config
 from crm.models import db, Company, Counterparty, VerificationCheck, CheckResult
 from auth.models import User
@@ -26,10 +27,9 @@ import psycopg2
 login_manager = LoginManager()
 mail = Mail()
 csrf = CSRFProtect()
-
+babel = Babel()
 
 def is_ssl_error(exception):
-    """Check if exception is SSL-related database error."""
     if isinstance(exception, OperationalError):
         error_msg = str(exception).lower()
         return any(keyword in error_msg for keyword in [
@@ -76,6 +76,39 @@ def create_app(config_name=None):
     migrate = Migrate(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
+    babel.init_app(app)
+    
+    # Configure Babel functions
+    def get_locale():
+        """Determine the best locale for the current request."""
+        # Check if user has a preferred language in session
+        from flask import session
+        user_locale = session.get('language')
+        if user_locale and user_locale in ['de', 'en', 'uk']:
+            return user_locale
+        
+        # Check Accept-Language header
+        from flask import request
+        return request.accept_languages.best_match(['de', 'en', 'uk'], default='de')
+
+    def get_timezone():
+        """Determine the best timezone for the current request."""
+        return 'Europe/Berlin'
+    
+    # Register locale functions
+    app.babel_locale_selector = get_locale
+    app.babel_timezone_selector = get_timezone
+    
+    # Add template context processor for locale functions
+    @app.context_processor
+    def inject_locale():
+        return {
+            'get_locale': get_locale,
+            'get_timezone': get_timezone
+        }
+    
+    # Add to Jinja2 globals for macros
+    app.jinja_env.globals.update(get_locale=get_locale)
     
     # Configure Flask-Login
     login_manager.login_view = 'auth.login'
@@ -235,6 +268,17 @@ def create_app(config_name=None):
             registry_catalog=registry_catalog
         )
     
+    @app.route('/set-language/<lang>')
+    def set_language(lang):
+        """Set user language preference."""
+        from flask import session, request, redirect, url_for
+        
+        if lang in ['de', 'en', 'uk']:
+            session['language'] = lang
+        
+        # Redirect back to the referring page or dashboard
+        return redirect(request.referrer or url_for('dashboard'))
+
     @app.route('/test')
     def test_form():
         """Simple test form for debugging."""

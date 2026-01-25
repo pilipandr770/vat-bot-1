@@ -56,7 +56,7 @@
     <div class="col-lg-4">
         <div class="card">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-building"></i> Ihre Firmendaten</h5>
+                <h5 class="mb-0"><i class="bi bi-building"></i> {{ _('Your Company Data') }}</h5>
                 <a href="{{ url_for('auth.company_profile') }}" class="btn btn-sm btn-light" title="Profil verwalten">
                     <i class="bi bi-gear"></i>
                 </a>
@@ -77,33 +77,33 @@
                 {% endif %}
                 <form id="verificationForm">
                     <div class="mb-3">
-                        <label for="company_vat" class="form-label">USt-IdNr. <span class="text-danger">*</span></label>
+                        <label for="company_vat" class="form-label">{{ _('VAT Number') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="company_vat" name="company_vat" 
                                value="{{ current_user.company_vat_number or '' }}"
                                placeholder="DE123456789" required>
-                        <div class="form-text">Ihre USt-IdNr. für VIES-Prüfung</div>
+                        <div class="form-text">{{ _('Your VAT number for VIES validation') }}</div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="company_name" class="form-label">Firmenname <span class="text-danger">*</span></label>
+                        <label for="company_name" class="form-label">{{ _('Company Name') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="company_name" name="company_name" 
                                value="{{ current_user.company_name or '' }}" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="company_address" class="form-label">Geschäftsadresse <span class="text-danger">*</span></label>
+                        <label for="company_address" class="form-label">{{ _('Business Address') }} <span class="text-danger">*</span></label>
                         <textarea class="form-control" id="company_address" name="company_address" 
                                   rows="3" required>{{ current_user.company_address or '' }}</textarea>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="company_email" class="form-label">E-Mail</label>
+                        <label for="company_email" class="form-label">{{ _('Email') }}</label>
                         <input type="email" class="form-control" id="company_email" name="company_email"
                                value="{{ current_user.company_email or current_user.email }}">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="company_phone" class="form-label">Telefon</label>
+                        <label for="company_phone" class="form-label">{{ _('Phone') }}</label>
                         <input type="tel" class="form-control" id="company_phone" name="company_phone"
                                value="{{ current_user.company_phone or '' }}">
                     </div>
@@ -115,7 +115,7 @@
     <div class="col-lg-4">
         <div class="card">
             <div class="card-header bg-warning text-dark">
-                <h5><i class="bi bi-person-badge"></i> Geschäftspartner Daten</h5>
+                <h5><i class="bi bi-person-badge"></i> {{ _('Counterparty Data') }}</h5>
             </div>
             <div class="card-body">
                 <div class="mb-3">

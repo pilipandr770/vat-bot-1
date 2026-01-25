@@ -1,0 +1,25 @@
+{% macro language_selector() %}
+<div class="dropdown">
+    <button class="btn btn-outline-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown">
+        <i class="bi bi-translate"></i>
+        {% if get_locale() == 'de' %}
+            Deutsch
+        {% elif get_locale() == 'en' %}
+            English
+        {% elif get_locale() == 'uk' %}
+            Українська
+        {% endif %}
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{{ url_for('set_language', lang='de') }}">
+            <span class="flag-icon flag-icon-de"></span> Deutsch
+        </a></li>
+        <li><a class="dropdown-item" href="{{ url_for('set_language', lang='en') }}">
+            <span class="flag-icon flag-icon-gb"></span> English
+        </a></li>
+        <li><a class="dropdown-item" href="{{ url_for('set_language', lang='uk') }}">
+            <span class="flag-icon flag-icon-ua"></span> Українська
+        </a></li>
+    </ul>
+</div>
+{% endmacro %}
