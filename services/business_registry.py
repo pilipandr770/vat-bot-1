@@ -8,7 +8,11 @@ from services.registries import (
     CzechAresAdapter,
     GermanHandelsregisterAdapter,
     PolishWhiteListAdapter,
+    UkrainianEdrAdapter,
+    UkrainianVatAdapter,
+    UkrainianSanctionsAdapter,
 )
+from services.ua_registry_service import UkrainianRegistryService
 
 
 class BusinessRegistryManager:
@@ -19,6 +23,7 @@ class BusinessRegistryManager:
             "DE": GermanHandelsregisterAdapter(),
             "CZ": CzechAresAdapter(),
             "PL": PolishWhiteListAdapter(),
+            "UA": UkrainianRegistryService(),  # Combined Ukrainian registry service
         }
 
         self.catalog: List[Dict] = [
@@ -39,6 +44,12 @@ class BusinessRegistryManager:
                 "label": "Polen",
                 "status": "available",
                 "description": "Ministerstwo Finansów – Biała Lista podatników VAT",
+            },
+            {
+                "code": "UA",
+                "label": "Ukraine",
+                "status": "available",
+                "description": "ЄДР – Єдиний державний реєстр юридичних осіб",
             },
             {
                 "code": "AT",

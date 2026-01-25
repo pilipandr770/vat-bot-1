@@ -193,7 +193,7 @@ class EnrichmentOrchestrator:
         tld_map = {
             'DE': 'de', 'AT': 'at', 'CH': 'ch', 'FR': 'fr', 'IT': 'it',
             'ES': 'es', 'NL': 'nl', 'BE': 'be', 'PL': 'pl', 'CZ': 'cz',
-            'GB': 'uk', 'UK': 'uk', 'US': 'com', 'CA': 'ca'
+            'GB': 'uk', 'UK': 'uk', 'US': 'com', 'CA': 'ca', 'UA': 'ua'
         }
         
         tld = tld_map.get(country_code.upper() if country_code else '', 'com')
