@@ -1651,9 +1651,13 @@ msgstr "Захист від CSRF"
 msgid "Open Ports"
 msgstr "Відкриті порти"
 
-#: templates/pentesting/scanner.html:664
-msgid "DNSSEC"
-msgstr "DNSSEC"
+#: app/pentesting/security_scanner.py:307
+msgid "No CSRF token detected in forms. Implement CSRF protection middleware."
+msgstr "Не виявлено токен CSRF у формах. Реалізуйте middleware для захисту від CSRF."
+
+#: app/pentesting/security_scanner.py:401
+msgid "No DNSKEY records found. DNSSEC is not enabled for this domain."
+msgstr "Не знайдено записів DNSKEY. DNSSEC не увімкнено для цього домену."
 
 #: templates/pentesting/scanner.html:649
 msgid "SAFE"
