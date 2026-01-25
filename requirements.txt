@@ -39,3 +39,4 @@ google-api-python-client==2.108.0
 msal==1.25.0
 apscheduler==3.10.4
 imapclient==2.3.1
+phonenumbers>=8.13.0

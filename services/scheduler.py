@@ -6,6 +6,8 @@ from apscheduler.triggers.cron import CronTrigger
 from services.monitoring import monitoring_service
 from services.alerts import alert_service
 import logging
+import subprocess
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,16 @@ class MonitoringScheduler:
         )
         logger.info("Job 'send_alerts' scheduled for 08:00 AM daily")
         
+        # Update European scam databases weekly on Sunday at 03:00 AM
+        self.scheduler.add_job(
+            func=self.update_european_scam_db_job,
+            trigger=CronTrigger(day_of_week='sun', hour=3, minute=0),
+            id='update_european_scam_db',
+            name='Update European Scam Databases',
+            replace_existing=True
+        )
+        logger.info("Job 'update_european_scam_db' scheduled for Sunday 03:00 AM weekly")
+        
         # Optional: Additional check at 14:00 PM
         self.scheduler.add_job(
             func=self.daily_monitoring_job,
@@ -70,6 +82,33 @@ class MonitoringScheduler:
                 logger.warning("Alert service not initialized, skipping alert sending")
         except Exception as e:
             logger.error(f"Alert sending job failed: {str(e)}", exc_info=True)
+    
+    def update_european_scam_db_job(self):
+        """Update European scam phone databases job"""
+        try:
+            logger.info("Starting European scam database update job...")
+            
+            # Get the directory of the current script
+            script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            script_path = os.path.join(script_dir, 'update_scam_db_eu.py')
+            
+            # Run the update script
+            result = subprocess.run(
+                ['python', script_path],
+                capture_output=True,
+                text=True,
+                cwd=script_dir
+            )
+            
+            if result.returncode == 0:
+                logger.info("European scam database update completed successfully")
+                logger.info(f"Update output: {result.stdout}")
+            else:
+                logger.error(f"European scam database update failed with return code {result.returncode}")
+                logger.error(f"Error output: {result.stderr}")
+                
+        except Exception as e:
+            logger.error(f"European scam database update job failed: {str(e)}", exc_info=True)
     
     def shutdown(self):
         """Shutdown scheduler"""

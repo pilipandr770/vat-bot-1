@@ -31,6 +31,16 @@ Intelligent form auto-fill combining multiple free data sources:
 - ✅ OSINT intelligence
 - **API:** `/api/enrichment/enrich`
 
+### 4. 📞 Phone Intelligence (PRODUCTION)
+Advanced phone number analysis with scam detection for US and European markets:
+- ✅ **Multi-Country Support**: US (937 numbers) + France (16 prefixes) + expanding to more EU countries
+- ✅ **Scam Database Integration**: BlockGuard FTC complaints + community-maintained European lists
+- ✅ **Pattern Matching**: Prefix-based detection for telemarketing numbers (e.g., +33162? for French spam)
+- ✅ **Risk Scoring**: 0-100 scale with automatic high/medium/low classification
+- ✅ **Automated Updates**: Weekly database refresh via APScheduler
+- ✅ **API Endpoint**: `/phoneintel/api/analyze` for programmatic access
+- **Status:** Fully functional with automated European database updates
+
 ---
 
 ## 📧 MailGuard - Complete Feature Set
@@ -667,6 +677,119 @@ function selectProvider(providerId) {
 
 ---
 
+## 📞 Phone Intelligence - Advanced Phone Number Analysis
+
+### Current Implementation Status (January 2026)
+
+**✅ Completed Features:**
+- Multi-country scam database support (US + France)
+- Pattern-based spam detection for European numbers
+- Risk scoring system (0-100 scale)
+- Automated weekly database updates via APScheduler
+- REST API endpoint (`/phoneintel/api/analyze`)
+- Integration with phonenumbers library for validation
+
+**Database Coverage:**
+- **🇺🇸 United States**: 937 individual spam numbers (BlockGuard FTC database)
+- **🇫🇷 France**: 16 telemarketing prefixes (community-maintained)
+- **🔄 Auto-updates**: Weekly refresh from community repositories
+
+**Risk Classification:**
+- **Low Risk (0-29)**: Clean numbers, no suspicious patterns
+- **Medium Risk (30-69)**: Some heuristics triggered
+- **High Risk (70+)**: Confirmed spam numbers or suspicious patterns
+
+### Phone Intelligence API
+
+**Endpoint:** `POST /phoneintel/api/analyze`
+
+**Request:**
+```json
+{
+  "phone_number": "+33162234567",
+  "country_hint": "FR"
+}
+```
+
+**Response:**
+```json
+{
+  "country": "France",
+  "carrier": null,
+  "line_type": "fixed",
+  "disposable": false,
+  "seen_in_scam_db": true,
+  "suspicious_patterns": ["matches-french-spam-pattern"],
+  "risk_score": 80,
+  "verdict": "high"
+}
+```
+
+### Database Update Scripts
+
+**Update US Database:**
+```bash
+python update_scam_db.py  # Downloads from BlockGuard GitHub
+```
+
+**Update European Databases:**
+```bash
+python update_scam_db_eu.py  # Downloads from community repos
+```
+
+**Automated Updates:** Weekly on Sunday 03:00 AM via APScheduler
+
+### Adding New Countries
+
+To add support for additional European countries:
+
+1. **Research Sources**: Find community-maintained spam repositories on GitHub
+2. **Update Service**: Add country code mapping in `PhoneIntelService.analyze()`
+3. **Create Database**: Add download logic to `update_scam_db_eu.py`
+4. **Test Integration**: Verify pattern matching and risk scoring
+
+**Example for Germany:**
+```python
+# In analyze() method
+elif country_code == 49:  # Germany
+    country_key = 'de'
+
+# In update_scam_db_eu.py
+def update_german_scam_database():
+    # Download from German community sources
+    pass
+```
+
+### Technical Architecture
+
+**Pattern Matching Logic:**
+- **US**: Exact E164 number matching against 937 known spam numbers
+- **France**: Prefix pattern matching (e.g., `+33162?` matches `+33162XXXXXXX`)
+
+**Performance:**
+- Fast lookups using Python sets for O(1) complexity
+- Minimal memory footprint (< 1MB for all databases)
+- No external API calls required for analysis
+
+**Data Sources:**
+- **US**: Official FTC Do Not Call complaints via BlockGuard
+- **France**: Community repositories (Esdayl/NoPhoneSpam_FR, gitbra/spam)
+- **Future**: German, UK, Italian telecom authority data
+
+### Security & Privacy
+
+**✅ GDPR Compliant:**
+- No personal data storage or logging
+- Phone numbers processed in-memory only
+- No persistent storage of analyzed numbers
+
+**✅ Privacy-First:**
+- Metadata-only analysis (carrier, country, line type)
+- No reverse lookups or personal identification
+- Community-maintained databases (no user data collection)
+
+---
+
 ## Development Roadmap & Paid API Integration Plans
 
 ### Phase 1: MailGuard IMAP Integration ✅ COMPLETED
@@ -978,6 +1101,37 @@ class Subscription:
 
 ---
 
-*Last Updated: October 2025*
+## ⚠️ Phone Intelligence Disclaimer
+
+**Important Legal Notice:** The Phone Intelligence feature provides spam detection based on publicly available community-maintained databases. This service:
+
+- **Does NOT perform reverse phone lookups** or identify individuals
+- **Only analyzes metadata** (country, carrier, line type, known spam patterns)
+- **Uses community-reported data** that may contain false positives or negatives
+- **Is NOT a substitute for professional due diligence** or legal compliance checks
+- **Should be used as one factor** among multiple verification methods
+
+**Data Sources & Accuracy:**
+- US data: Official FTC Do Not Call complaints (high reliability)
+- European data: Community-maintained repositories (medium reliability)
+- Pattern matching may flag legitimate business numbers as suspicious
+- Databases are updated weekly but may not reflect real-time changes
+
+**Privacy Compliance:**
+- No phone numbers are stored or logged
+- All analysis happens in-memory only
+- GDPR compliant - no personal data processing
+- No external API calls for phone analysis
+
+**Usage Recommendations:**
+- Use as supplementary verification alongside other methods
+- Consider professional services for high-stakes decisions
+- Report suspicious numbers to appropriate authorities
+- Regular updates ensure best available community intelligence
+
+---
+
+*Last Updated: January 2026*
 *MailGuard Status: IMAP/SMTP integration completed, OAuth removed for simplicity*
+*Phone Intelligence Status: Multi-country scam detection fully operational*
 *Premium API Integration: Planning phase*

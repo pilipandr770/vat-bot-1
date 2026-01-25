@@ -11,6 +11,13 @@ Flask SaaS platform for automated business partner verification and intelligent 
 - **CRM Integration**: Збереження контрагентів з історією перевірок
 - **Monitoring System**: Щоденні перевірки з алертами про зміни статусу
 
+### Phone Intelligence (PhoneInfoga Integration)
+- **Risk Assessment**: Carrier, line type (mobile/VoIP/virtual), disposable numbers
+- **Scam Detection**: FTC Do Not Call complaints database (937+ US numbers), suspicious patterns
+- **Privacy-First**: No personal identification, metadata-only analysis
+- **Risk Scoring**: 0-100 score with low/medium/high verdicts
+- **Optional Deep Scan**: PhoneInfoga CLI integration for enhanced signals
+
 ### MailGuard Email Intelligence
 - **Multi-Provider Support**: Gmail (OAuth), Microsoft 365 (OAuth), IMAP
 - **AI Reply Generation**: OpenAI GPT-4 для автоматичних відповідей
@@ -56,7 +63,13 @@ Flask SaaS platform for automated business partner verification and intelligent 
 └── migrations/              # Alembic database migrations (7 versions)
 ```
 
-## 🚀 Швидкий старт
+## � Privacy & Security Notes
+
+- **Phone Intelligence**: The phone analysis feature uses only metadata (carrier, line type, risk patterns) and does not perform personal identification. Raw phone numbers are not stored or logged. Scam detection uses the public BlockGuard database (FTC Do Not Call complaints) with 937+ US phone numbers.
+- **Data Retention**: Verification results are stored for user history but can be deleted on request.
+- **GDPR Compliance**: All user data is encrypted and processed in accordance with EU privacy regulations.
+
+## �🚀 Швидкий старт
 
 ### 1. Встановлення залежностей
 

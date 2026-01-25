@@ -157,6 +157,13 @@ def create_app(config_name=None):
     from programmatic.routes import programmatic_bp
     app.register_blueprint(programmatic_bp)
 
+    # Phone intelligence blueprint (PhoneInfoga integration)
+    try:
+        from routes.phoneintel import phoneintel_bp
+        app.register_blueprint(phoneintel_bp, url_prefix='/phoneintel')
+    except Exception as e:
+        app.logger.warning('PhoneIntel blueprint not registered: %s', e)
+
     # Register GEO + SME Trust blueprint
     from routes.geo_sme_routes import geo_bp
     app.register_blueprint(geo_bp)
