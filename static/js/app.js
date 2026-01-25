@@ -92,7 +92,7 @@ class CounterpartyVerification {
             const vatPattern = this.getVATPattern(country);
             if (vatPattern && !vatPattern.test(value)) {
                 isValid = false;
-                message = `Невірний формат VAT для ${country}`;
+                message = t('messages.invalid_vat_format') + ' ' + country;
             }
         }
 
@@ -180,7 +180,7 @@ class CounterpartyVerification {
         requiredFields.forEach(fieldName => {
             const field = document.querySelector(`[name="${fieldName}"]`);
             if (field && !field.value.trim()) {
-                this.showValidationFeedback(field, false, 'Dieses Feld ist erforderlich');
+                this.showValidationFeedback(field, false, t('messages.field_required'));
                 isValid = false;
             }
         });
@@ -715,7 +715,7 @@ class CounterpartyVerification {
         resultsPanel.innerHTML = `
             <div class="alert alert-danger">
                 <i class="bi bi-exclamation-triangle"></i>
-                <strong>Fehler:</strong> ${message}
+                <strong>${t('labels.error')}:</strong> ${message}
             </div>
         `;
     }
@@ -763,13 +763,14 @@ class CounterpartyVerification {
 
     getStatusText(status) {
         switch(status) {
-            case 'valid': return '✅ Gültig';
-            case 'warning': return '⚠️ Warnung';
-            case 'error': return '❌ Problem';
+            case 'valid': return t('statuses.valid');
+            case 'warning': return t('statuses.warning');
+            case 'error': return t('statuses.error');
             case 'ok': return '✅ OK';
             case 'success': return '✅ Erfolgreich';
-            case 'warn': return '⚠️ Warnung';
-            default: return '⏳ Warten';
+            case 'warn': return t('statuses.warning');
+            case 'pending': return t('statuses.pending');
+            default: return t('statuses.pending');
         }
     }
 
@@ -1085,9 +1086,9 @@ class CounterpartyVerification {
         let html = `
             <div class="alert alert-warning" role="alert">
                 <h5 class="alert-heading">
-                    <i class="bi bi-exclamation-triangle-fill"></i> Prüfungslimit erreicht
+                    <i class="bi bi-exclamation-triangle-fill"></i> ${t('messages.quota_exceeded_title')}
                 </h5>
-                <p>Sie haben Ihr monatliches Prüfungslimit für den ${planName}-Plan erreicht.</p>
+                <p>${t('messages.quota_exceeded_desc')} ${planName}-план.</p>
                 <div class="mb-3">
                     <div class="progress">
                         <div class="progress-bar bg-warning" role="progressbar" 
@@ -1099,13 +1100,13 @@ class CounterpartyVerification {
                         </div>
                     </div>
                 </div>
-                <p class="mb-3">Upgraden Sie Ihren Plan, um weitere Prüfungen durchzuführen:</p>
+                <p class="mb-3">${t('messages.quota_upgrade_desc')}</p>
                 <div class="d-flex gap-2">
                     <a href="/payments" class="btn btn-primary">
-                        <i class="bi bi-credit-card"></i> Plan upgraden
+                        <i class="bi bi-credit-card"></i> ${t('messages.upgrade_plan')}
                     </a>
                     <a href="/dashboard" class="btn btn-outline-secondary">
-                        <i class="bi bi-house"></i> Zum Dashboard
+                        <i class="bi bi-house"></i> ${t('messages.to_dashboard')}
                     </a>
                 </div>
             </div>
@@ -1122,9 +1123,9 @@ class CounterpartyVerification {
         const retryAfter = response.retry_after || 60;
         const html = `
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong><i class="bi bi-exclamation-triangle"></i> Zu viele Anfragen</strong>
+                <strong><i class="bi bi-exclamation-triangle"></i> ${t('messages.rate_limit_title')}</strong>
                 <p class="mb-0">${response.error}</p>
-                <p class="mb-0 small mt-2">Sie können die nächste Überprüfung in ${retryAfter} Sekunden durchführen.</p>
+                <p class="mb-0 small mt-2">${t('messages.rate_limit_desc')} ${retryAfter} ${t('messages.seconds')}.</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         `;
@@ -1142,9 +1143,9 @@ class CounterpartyVerification {
         
         let html = `
             <div class="alert alert-success mb-4">
-                <h5><i class="bi bi-check-circle-fill"></i> Automatische Überprüfung abgeschlossen!</h5>
-                <p>Die Daten wurden automatisch angereichert und in Ihre CRM-Datenbank gespeichert.</p>
-                <p><strong>Prüfungs-ID:</strong> ${data.check_id}</p>
+                <h5><i class="bi bi-check-circle-fill"></i> ${t('messages.auto_verify_completed')}</h5>
+                <p>${t('messages.auto_verify_saved')}</p>
+                <p><strong>${t('messages.auto_verify_id')}</strong> ${data.check_id}</p>
             </div>
         `;
 
@@ -1156,7 +1157,7 @@ class CounterpartyVerification {
             html += `
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Gesamtergebnis der automatischen Überprüfung:</h6>
+                        <h6 class="mb-0">${t('messages.auto_verify_overall')}</h6>
                         <span class="badge ${overallStatusClass}">${this.getStatusText(verification.overall_status)}</span>
                     </div>
                     <div class="progress">
@@ -1187,13 +1188,13 @@ class CounterpartyVerification {
         if (enrichment && enrichment.summary) {
             html += `
                 <div class="mt-4">
-                    <h6>Angereicherte Daten:</h6>
+                    <h6>${t('messages.enriched_data')}</h6>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <h5 class="card-title">${enrichment.summary.sources_used.length}</h5>
-                                    <p class="card-text">Quellen verwendet</p>
+                                    <p class="card-text">${t('messages.sources_used')}</p>
                                 </div>
                             </div>
                         </div>

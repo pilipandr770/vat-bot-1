@@ -224,8 +224,18 @@
 </div>
 
 <script>
+// Admin Users Translations
+const adminUsersTranslations = {
+    confirmChangeUserStatus: "{{ _('Do you really want to change the user status?') }}",
+    errorChangingUserStatus: "{{ _('Error changing user status.') }}",
+    confirmChangeAdminRights: "{{ _('Do you really want to change the admin rights?') }}",
+    errorChangingAdminRights: "{{ _('Error changing admin rights.') }}",
+    active: "{{ _('Active') }}",
+    inactive: "{{ _('Inactive') }}"
+};
+
     function toggleUserStatus(userId) {
-        if (!confirm('Möchten Sie den Benutzerstatus wirklich ändern?')) {
+        if (!confirm(adminUsersTranslations.confirmChangeUserStatus)) {
             return;
         }
         
@@ -242,10 +252,10 @@
                 const badge = document.getElementById(`status-badge-${userId}`);
                 if (data.is_active) {
                     badge.className = 'badge bg-success';
-                    badge.textContent = 'Aktiv';
+                    badge.textContent = adminUsersTranslations.active;
                 } else {
                     badge.className = 'badge bg-danger';
-                    badge.textContent = 'Inaktiv';
+                    badge.textContent = adminUsersTranslations.inactive;
                 }
                 
                 // Show success message
@@ -256,12 +266,12 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Fehler beim Ändern des Benutzerstatus.');
+            alert(adminUsersTranslations.errorChangingUserStatus);
         });
     }
     
     function toggleAdminStatus(userId) {
-        if (!confirm('Möchten Sie die Admin-Rechte wirklich ändern?')) {
+        if (!confirm(adminUsersTranslations.confirmChangeAdminRights)) {
             return;
         }
         
@@ -282,7 +292,7 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Fehler beim Ändern der Admin-Rechte.');
+            alert(adminUsersTranslations.errorChangingAdminRights);
         });
     }
 </script>

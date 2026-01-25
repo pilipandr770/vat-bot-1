@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ counterparty.company_name }} - Details{% endblock %}
+{% block title %}{{ counterparty.company_name }} - {{ _('Details') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
@@ -19,13 +19,13 @@
                 </div>
                 <div>
                     <a href="{{ url_for('crm.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Zurück zur Liste
+                        <i class="fas fa-arrow-left"></i> {{ _('Back to List') }}
                     </a>
                     <button class="btn btn-warning" onclick="editCounterparty()">
-                        <i class="fas fa-edit"></i> Bearbeiten
+                        <i class="fas fa-edit"></i> {{ _('Edit') }}
                     </button>
                     <button class="btn btn-danger" onclick="deleteCounterparty()">
-                        <i class="fas fa-trash"></i> Löschen
+                        <i class="fas fa-trash"></i> {{ _('Delete') }}
                     </button>
                 </div>
             </div>
@@ -37,20 +37,20 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-building"></i> Firmendaten</h5>
+                    <h5><i class="fas fa-building"></i> {{ _('Company Data') }}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless">
                         <tr>
-                            <th width="150">Firmenname:</th>
+                            <th width="150">{{ _('Company Name') }}:</th>
                             <td>{{ counterparty.company_name }}</td>
                         </tr>
                         <tr>
-                            <th>Land:</th>
+                            <th>{{ _('Country') }}:</th>
                             <td>{{ counterparty.country }}</td>
                         </tr>
                         <tr>
-                            <th>USt-IdNr.:</th>
+                            <th>{{ _('VAT Number') }}:</th>
                             <td>
                                 {% if counterparty.vat_number %}
                                     <code>{{ counterparty.vat_number }}</code>
@@ -60,7 +60,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>E-Mail:</th>
+                            <th>{{ _('Email') }}:</th>
                             <td>
                                 {% if counterparty.email %}
                                     <a href="mailto:{{ counterparty.email }}">{{ counterparty.email }}</a>
@@ -70,7 +70,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Domain:</th>
+                            <th>{{ _('Domain') }}:</th>
                             <td>
                                 {% if counterparty.domain %}
                                     <a href="http://{{ counterparty.domain }}" target="_blank">{{ counterparty.domain }}</a>
@@ -80,15 +80,15 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Adresse:</th>
+                            <th>{{ _('Address') }}:</th>
                             <td>{{ counterparty.address or '-' }}</td>
                         </tr>
                         <tr>
-                            <th>Kontaktperson:</th>
+                            <th>{{ _('Contact Person') }}:</th>
                             <td>{{ counterparty.contact_person or '-' }}</td>
                         </tr>
                         <tr>
-                            <th>Erstellt:</th>
+                            <th>{{ _('Created') }}:</th>
                             <td>{{ counterparty.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
                         </tr>
                     </table>
@@ -100,7 +100,7 @@
             <!-- Monitoring Status -->
             <div class="card mb-3">
                 <div class="card-header">
-                    <h5><i class="fas fa-radar"></i> Monitoring Status</h5>
+                    <h5><i class="fas fa-radar"></i> {{ _('Monitoring Status') }}</h5>
                 </div>
                 <div class="card-body">
                     {% set latest_check = counterparty.verification_checks|sort(attribute='check_date', reverse=True)|first %}
@@ -109,22 +109,22 @@
                             <div>
                                 {% if latest_check.is_monitoring_active %}
                                     <span class="badge bg-success fs-6">
-                                        <i class="fas fa-check-circle"></i> Monitoring Aktiv
+                                        <i class="fas fa-check-circle"></i> {{ _('Monitoring Active') }}
                                     </span>
                                 {% else %}
                                     <span class="badge bg-secondary fs-6">
-                                        <i class="fas fa-pause-circle"></i> Monitoring Inaktiv
+                                        <i class="fas fa-pause-circle"></i> {{ _('Monitoring Inactive') }}
                                     </span>
                                 {% endif %}
                             </div>
                             <div>
                                 {% if latest_check.is_monitoring_active %}
                                     <button class="btn btn-sm btn-secondary" onclick="toggleMonitoring(false)">
-                                        <i class="fas fa-pause"></i> Deaktivieren
+                                        <i class="fas fa-pause"></i> {{ _('Deactivate') }}
                                     </button>
                                 {% else %}
                                     <button class="btn btn-sm btn-success" onclick="toggleMonitoring(true)">
-                                        <i class="fas fa-play"></i> Aktivieren
+                                        <i class="fas fa-play"></i> {{ _('Activate') }}
                                     </button>
                                 {% endif %}
                             </div>
@@ -135,35 +135,35 @@
                         <div class="row text-center">
                             <div class="col-4">
                                 <h4>{{ counterparty.verification_checks|length }}</h4>
-                                <small>Gesamte Checks</small>
+                                <small>{{ _('Total Checks') }}</small>
                             </div>
                             <div class="col-4">
                                 <h4>{{ counterparty.verification_checks|selectattr('overall_status', 'equalto', 'valid')|list|length }}</h4>
-                                <small class="text-success">Erfolgreich</small>
+                                <small class="text-success">{{ _('Successful') }}</small>
                             </div>
                             <div class="col-4">
                                 <h4>{{ alerts|length }}</h4>
-                                <small class="text-warning">Alerts</small>
+                                <small class="text-warning">{{ _('Alerts') }}</small>
                             </div>
                         </div>
                         
                         <hr>
                         
-                        <p class="mb-1"><strong>Letzter Check:</strong> {{ latest_check.check_date.strftime('%d.%m.%Y %H:%M') }}</p>
-                        <p class="mb-0"><strong>Gesamtstatus:</strong>
+                        <p class="mb-1"><strong>{{ _('Last Check') }}:</strong> {{ latest_check.check_date.strftime('%d.%m.%Y %H:%M') }}</p>
+                        <p class="mb-0"><strong>{{ _('Overall Status') }}:</strong>
                             {% if latest_check.overall_status == 'valid' %}
-                                <span class="badge bg-success">Valid</span>
+                                <span class="badge bg-success">{{ _('Valid') }}</span>
                             {% elif latest_check.overall_status == 'warning' %}
-                                <span class="badge bg-warning">Warnung</span>
+                                <span class="badge bg-warning">{{ _('Warning') }}</span>
                             {% else %}
-                                <span class="badge bg-danger">Problem</span>
+                                <span class="badge bg-danger">{{ _('Problem') }}</span>
                             {% endif %}
                         </p>
                     {% else %}
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Dieser Kontrahent wurde noch nicht geprüft.
+                            <i class="fas fa-info-circle"></i> {{ _('This counterparty has not been checked yet') }}.
                             <button class="btn btn-sm btn-primary ms-2" onclick="runCheck()">
-                                Jetzt prüfen
+                                {{ _('Check Now') }}
                             </button>
                         </div>
                     {% endif %}
@@ -173,18 +173,18 @@
             <!-- Quick Actions -->
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-bolt"></i> Schnellaktionen</h5>
+                    <h5><i class="fas fa-bolt"></i> {{ _('Quick Actions') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" onclick="runCheck()">
-                            <i class="fas fa-sync"></i> Neue Prüfung starten
+                            <i class="fas fa-sync"></i> {{ _('Start New Check') }}
                         </button>
                         <button class="btn btn-outline-primary" onclick="exportData()">
-                            <i class="fas fa-download"></i> Daten exportieren
+                            <i class="fas fa-download"></i> {{ _('Export Data') }}
                         </button>
                         <button class="btn btn-outline-info" onclick="viewTimeline()">
-                            <i class="fas fa-chart-line"></i> Zeitverlauf anzeigen
+                            <i class="fas fa-chart-line"></i> {{ _('View Timeline') }}
                         </button>
                     </div>
                 </div>
@@ -198,18 +198,18 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-exclamation-triangle"></i> Alerts ({{ alerts|length }})</h5>
+                    <h5><i class="fas fa-exclamation-triangle"></i> {{ _('Alerts') }} ({{ alerts|length }})</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Priorität</th>
-                                    <th>Typ</th>
-                                    <th>Nachricht</th>
-                                    <th>Datum</th>
-                                    <th>Status</th>
+                                    <th>{{ _('Priority') }}</th>
+                                    <th>{{ _('Type') }}</th>
+                                    <th>{{ _('Message') }}</th>
+                                    <th>{{ _('Date') }}</th>
+                                    <th>{{ _('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -217,13 +217,13 @@
                                 <tr>
                                     <td>
                                         {% if alert.severity == 'critical' %}
-                                            <span class="badge bg-danger">Kritisch</span>
+                                            <span class="badge bg-danger">{{ _('Critical') }}</span>
                                         {% elif alert.severity == 'high' %}
-                                            <span class="badge bg-warning">Hoch</span>
+                                            <span class="badge bg-warning">{{ _('High') }}</span>
                                         {% elif alert.severity == 'medium' %}
-                                            <span class="badge bg-info">Mittel</span>
+                                            <span class="badge bg-info">{{ _('Medium') }}</span>
                                         {% else %}
-                                            <span class="badge bg-success">Niedrig</span>
+                                            <span class="badge bg-success">{{ _('Low') }}</span>
                                         {% endif %}
                                     </td>
                                     <td><code>{{ alert.alert_type }}</code></td>
@@ -232,11 +232,11 @@
                                     <td>
                                         {% if alert.is_sent %}
                                             <span class="badge bg-success">
-                                                <i class="fas fa-check"></i> Gesendet
+                                                <i class="fas fa-check"></i> {{ _('Sent') }}
                                             </span>
                                         {% else %}
                                             <span class="badge bg-secondary">
-                                                <i class="fas fa-clock"></i> Ausstehend
+                                                <i class="fas fa-clock"></i> {{ _('Pending') }}
                                             </span>
                                         {% endif %}
                                     </td>
@@ -256,7 +256,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-history"></i> Prüfungshistorie ({{ counterparty.verification_checks|length }})</h5>
+                    <h5><i class="fas fa-history"></i> {{ _('Verification History') }} ({{ counterparty.verification_checks|length }})</h5>
                 </div>
                 <div class="card-body">
                     {% if counterparty.verification_checks %}
@@ -271,16 +271,16 @@
                                             <span>
                                                 <strong>{{ check.check_date.strftime('%d.%m.%Y %H:%M') }}</strong>
                                                 {% if check.is_monitoring_active %}
-                                                    <span class="badge bg-success ms-2">Monitoring</span>
+                                                    <span class="badge bg-success ms-2">{{ _('Monitoring') }}</span>
                                                 {% endif %}
                                             </span>
                                             <span>
                                                 {% if check.overall_status == 'valid' %}
-                                                    <span class="badge bg-success">✓ Valid</span>
+                                                    <span class="badge bg-success">✓ {{ _('Valid') }}</span>
                                                 {% elif check.overall_status == 'warning' %}
-                                                    <span class="badge bg-warning">⚠ Warnung</span>
+                                                    <span class="badge bg-warning">⚠ {{ _('Warning') }}</span>
                                                 {% else %}
-                                                    <span class="badge bg-danger">✗ Problem</span>
+                                                    <span class="badge bg-danger">✗ {{ _('Problem') }}</span>
                                                 {% endif %}
                                             </span>
                                         </div>
@@ -328,7 +328,7 @@
                         </div>
                     {% else %}
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Keine Prüfungshistorie vorhanden.
+                            <i class="fas fa-info-circle"></i> {{ _('No verification history available') }}.
                         </div>
                     {% endif %}
                 </div>
@@ -347,23 +347,23 @@ function toggleMonitoring(enable) {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            alert(enable ? 'Monitoring aktiviert!' : 'Monitoring deaktiviert!');
+            alert(enable ? '{{ _('Monitoring activated!') }}' : '{{ _('Monitoring deactivated!') }}');
             location.reload();
         } else {
-            alert('Fehler: ' + result.error);
+            alert('{{ _('Error') }}: ' + result.error);
         }
     });
 }
 
 function runCheck() {
-    if (confirm('Möchten Sie eine neue Prüfung starten? Dies kann einige Minuten dauern.')) {
-        alert('Prüfung wird gestartet... (Diese Funktion muss noch mit dem Verification-System verbunden werden)');
+    if (confirm('{{ _('Do you want to start a new check? This may take several minutes.') }}')) {
+        alert('{{ _('Check is starting... (This function must still be connected to the verification system)') }}');
         // TODO: Implement connection to verification system
     }
 }
 
 function editCounterparty() {
-    alert('Edit-Funktion coming soon...');
+    alert('{{ _('Edit function coming soon...') }}');
     // TODO: Show edit modal with current data
 }
 
@@ -372,16 +372,16 @@ function deleteCounterparty() {
     const checksCount = {{ counterparty.verification_checks|length }};
     const alertsCount = {{ alerts|length }};
     
-    const confirmMessage = `⚠️⚠️ WARNUNG: DAUERHAFTES LÖSCHEN ⚠️⚠️\n\n` +
-                          `Kontrahent: "${companyName}"\n` +
-                          `USt-IdNr: {{ counterparty.vat_number or 'N/A' }}\n` +
-                          `Land: {{ counterparty.country }}\n\n` +
-                          `Dies wird DAUERHAFT löschen:\n` +
-                          `• ${checksCount} Prüfungshistorie(n)\n` +
-                          `• Alle zugehörigen Prüfungsergebnisse\n` +
-                          `• ${alertsCount} Alert(s) und Benachrichtigungen\n\n` +
-                          `Diese Aktion kann NICHT rückgängig gemacht werden!\n\n` +
-                          `Sind Sie ABSOLUT SICHER?`;
+    const confirmMessage = `⚠️⚠️ {{ _('WARNING: PERMANENT DELETION') }} ⚠️⚠️\n\n` +
+                          `{{ _('Counterparty') }}: "${companyName}"\n` +
+                          `{{ _('VAT Number') }}: {{ counterparty.vat_number or 'N/A' }}\n` +
+                          `{{ _('Country') }}: {{ counterparty.country }}\n\n` +
+                          `{{ _('This will permanently delete') }}:\n` +
+                          `• ${checksCount} {{ _('verification history entries') }}\n` +
+                          `• {{ _('All associated check results') }}\n` +
+                          `• ${alertsCount} {{ _('alert(s) and notifications') }}\n\n` +
+                          `{{ _('This action CANNOT be undone!') }}\n\n` +
+                          `{{ _('Are you ABSOLUTELY sure?') }}`;
     
     if (!confirm(confirmMessage)) {
         return;
@@ -389,14 +389,14 @@ function deleteCounterparty() {
     
     // Second confirmation with company name verification
     const verification = prompt(
-        `Letzte Bestätigung!\n\n` +
-        `Geben Sie den Firmennamen exakt ein um zu bestätigen:\n\n` +
+        `{{ _('Final confirmation!') }}\n\n` +
+        `{{ _('Enter the company name exactly to confirm') }}:\n\n` +
         `"${companyName}"`,
         ''
     );
     
     if (verification !== companyName) {
-        alert('❌ Aktion abgebrochen. Firmenname stimmt nicht überein.\n\nDer Kontrahent wurde NICHT gelöscht.');
+        alert('❌ {{ _('Action cancelled. Company name does not match.') }}\n\n{{ _('The counterparty was NOT deleted.') }}');
         return;
     }
     
@@ -404,7 +404,7 @@ function deleteCounterparty() {
     const deleteBtn = document.querySelector('.btn-danger');
     if (deleteBtn) {
         deleteBtn.disabled = true;
-        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lösche...';
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {{ _('Deleting...') }}';
     }
     
     fetch(`/crm/api/counterparties/{{ counterparty.id }}`, {
@@ -414,32 +414,32 @@ function deleteCounterparty() {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            alert('✅ Kontrahent "' + companyName + '" wurde erfolgreich gelöscht!');
+            alert('✅ {{ _('Counterparty') }} "' + companyName + '" {{ _('was successfully deleted!') }}');
             window.location.href = '/crm/';
         } else {
-            alert('❌ Fehler beim Löschen: ' + result.error);
+            alert('❌ {{ _('Error deleting') }}: ' + result.error);
             if (deleteBtn) {
                 deleteBtn.disabled = false;
-                deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Löschen';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i> {{ _('Delete') }}';
             }
         }
     })
     .catch(error => {
-        alert('❌ Netzwerkfehler: ' + error.message);
+        alert('❌ {{ _('Network error') }}: ' + error.message);
         if (deleteBtn) {
             deleteBtn.disabled = false;
-            deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Löschen';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i> {{ _('Delete') }}';
         }
     });
 }
 
 function exportData() {
-    alert('Export-Funktion coming soon...');
+    alert('{{ _('Export function coming soon...') }}');
     // TODO: Export to PDF/CSV
 }
 
 function viewTimeline() {
-    alert('Timeline-Ansicht coming soon...');
+    alert('{{ _('Timeline view coming soon...') }}');
     // TODO: Show interactive timeline chart
 }
 </script>

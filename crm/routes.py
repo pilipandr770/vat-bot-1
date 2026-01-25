@@ -72,6 +72,19 @@ def counterparty_details(counterparty_id):
                           checks=checks,
                           alerts=alerts)
 
+@crm_bp.route('/add', methods=['GET'])
+@crm_bp.route('/edit/<int:counterparty_id>', methods=['GET'])
+@login_required
+def add_edit_counterparty(counterparty_id=None):
+    """Add new counterparty or edit existing one with AI assistance"""
+    counterparty = None
+    if counterparty_id:
+        counterparty = Counterparty.query.filter_by(id=counterparty_id, user_id=current_user.id).first_or_404()
+    
+    return render_template('crm/add_edit_counterparty.html',
+                          counterparty=counterparty,
+                          is_edit=bool(counterparty_id))
+
 # ===========================
 # API ENDPOINTS
 # ===========================

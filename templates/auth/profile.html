@@ -129,7 +129,7 @@
                                 <span class="badge bg-success">Bestätigt</span>
                             {% else %}
                                 <span class="badge bg-warning">Nicht bestätigt</span>
-                                <a href="{{ url_for('auth.resend_confirmation') }}" class="small">E-Mail erneut senden</a>
+                                <a href="{{ url_for('auth.resend_confirmation') }}" class="small">{{ _('Resend email') }}</a>
                             {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Geschäftspartner Prüfung{% endblock %}
+{% block title %}{{ _('Counterparty Verification') }}{% endblock %}
 
 {% block content %}
 <!-- CRM Alerts Section -->
@@ -9,9 +9,9 @@
     <div class="col-md-12">
         <div class="card border-warning">
             <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Neue CRM Alerts ({{ recent_alerts|length }})</h5>
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> {{ _('New CRM Alerts') }} ({{ recent_alerts|length }})</h5>
                 <a href="/crm/" class="btn btn-sm btn-dark">
-                    <i class="bi bi-arrow-right-circle"></i> Zum CRM
+                    <i class="bi bi-arrow-right-circle"></i> {{ _('Go to CRM') }}
                 </a>
             </div>
             <div class="card-body">
@@ -21,13 +21,13 @@
                         <div>
                             <div class="d-flex align-items-center">
                                 {% if alert.severity == 'critical' %}
-                                    <span class="badge bg-danger me-2">Kritisch</span>
+                                    <span class="badge bg-danger me-2">{{ _('Critical') }}</span>
                                 {% elif alert.severity == 'high' %}
-                                    <span class="badge bg-warning text-dark me-2">Hoch</span>
+                                    <span class="badge bg-warning text-dark me-2">{{ _('High') }}</span>
                                 {% elif alert.severity == 'medium' %}
-                                    <span class="badge bg-info me-2">Mittel</span>
+                                    <span class="badge bg-info me-2">{{ _('Medium') }}</span>
                                 {% else %}
-                                    <span class="badge bg-success me-2">Niedrig</span>
+                                    <span class="badge bg-success me-2">{{ _('Low') }}</span>
                                 {% endif %}
                                 <strong>{{ alert.verification_check.counterparty.company_name }}</strong>
                             </div>
@@ -40,7 +40,7 @@
                         </div>
                         <a href="/crm/counterparty/{{ alert.verification_check.counterparty_id }}" 
                            class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-eye"></i> Details
+                            <i class="bi bi-eye"></i> {{ _('Details') }}
                         </a>
                     </div>
                     {% endfor %}
@@ -57,21 +57,21 @@
         <div class="card">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-building"></i> {{ _('Your Company Data') }}</h5>
-                <a href="{{ url_for('auth.company_profile') }}" class="btn btn-sm btn-light" title="Profil verwalten">
+                <a href="{{ url_for('auth.company_profile') }}" class="btn btn-sm btn-light" title="{{ _('Manage Profile') }}">
                     <i class="bi bi-gear"></i>
                 </a>
             </div>
             <div class="card-body">
                 {% if current_user.company_vat_number %}
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i> <strong>Automatisch ausgefüllt</strong> aus Ihrem Profil
+                    <i class="bi bi-check-circle"></i> <strong>{{ _('Automatically filled from your profile') }}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 {% else %}
                 <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <i class="bi bi-lightbulb"></i> <strong>Tipp:</strong> 
-                    <a href="{{ url_for('auth.company_profile') }}" class="alert-link">Speichern Sie Ihre Firmendaten</a>, 
-                    damit sie automatisch ausgefüllt werden!
+                    <i class="bi bi-lightbulb"></i> <strong>{{ _('Tip') }}:</strong>
+                    <a href="{{ url_for('auth.company_profile') }}" class="alert-link">{{ _('Save your company data') }}</a>,
+                    {{ _('so that they are automatically filled in') }}!
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 {% endif %}
@@ -119,71 +119,71 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label for="counterparty_vat" class="form-label">USt-IdNr.</label>
+                    <label for="counterparty_vat" class="form-label">{{ _('VAT Number') }}</label>
                     <input type="text" class="form-control" id="counterparty_vat" name="counterparty_vat" 
                            placeholder="DE987654321" data-prefill-watch="true">
-                    <div class="form-text">USt-IdNr. des Geschäftspartners (falls bekannt)</div>
+                    <div class="form-text">{{ _('VAT number of the business partner (if known)') }}</div>
                     <div id="vatPrefillHint" class="form-text text-muted small"></div>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="counterparty_name" class="form-label">Firmenname <span class="text-danger">*</span></label>
+                    <label for="counterparty_name" class="form-label">{{ _('Company Name') }} <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="counterparty_name" name="counterparty_name" required data-prefill-watch="true">
                 </div>
                 
                 <div class="mb-3">
-                    <label for="counterparty_country" class="form-label">Land <span class="text-danger">*</span></label>
+                    <label for="counterparty_country" class="form-label">{{ _('Country') }} <span class="text-danger">*</span></label>
                     <select class="form-select" id="counterparty_country" name="counterparty_country" required data-prefill-watch="true">
-                        <option value="">Land auswählen</option>
+                        <option value="">{{ _('Select country') }}</option>
                         {% if registry_catalog.available %}
-                        <optgroup label="Kostenlos verfügbar (inkl. Handelsregister)">
+                        <optgroup label="{{ _('Free available (incl. business register)') }}">
                             {% for entry in registry_catalog.available %}
                                 <option value="{{ entry.code }}">{{ entry.label }}</option>
                             {% endfor %}
                         </optgroup>
                         {% endif %}
                         {% if registry_catalog.planned %}
-                        <optgroup label="In Arbeit / Premium">
+                        <optgroup label="{{ _('In progress / Premium') }}">
                             {% for entry in registry_catalog.planned %}
                                 <option value="{{ entry.code }}" data-premium="true">
-                                    {{ entry.label }} {% if 'premium' in entry.description|lower or 'kostenpflichtig' in entry.description|lower %}(Premium) {% else %}(In Entwicklung){% endif %}
+                                    {{ entry.label }} {% if 'premium' in entry.description|lower or 'kostenpflichtig' in entry.description|lower %}({{ _('Premium') }}) {% else %}({{ _('In development') }}){% endif %}
                                 </option>
                             {% endfor %}
                         </optgroup>
                         {% endif %}
                     </select>
                     <div class="form-text">
-                        <strong>Verfügbar:</strong>
+                        <strong>{{ _('Available') }}:</strong>
                         {% for entry in registry_catalog.available %}
                             {{ entry.label }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
-                        . Ukraine wird über das ЄДР (Einheitliches Staatsregister) geprüft.
+                        . {{ _('Ukraine is checked via the EDR (Unified State Register)') }}.
                     </div>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="counterparty_address" class="form-label">Adresse aus Impressum</label>
+                    <label for="counterparty_address" class="form-label">{{ _('Address from Impressum') }}</label>
                     <textarea class="form-control" id="counterparty_address" name="counterparty_address" rows="3" data-prefill-watch="true"></textarea>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="counterparty_email" class="form-label">E-Mail</label>
+                    <label for="counterparty_email" class="form-label">{{ _('Email') }}</label>
                     <input type="email" class="form-control" id="counterparty_email" name="counterparty_email">
                 </div>
                 
                 <div class="mb-3">
-                    <label for="counterparty_domain" class="form-label">Webseiten-Domain</label>
+                    <label for="counterparty_domain" class="form-label">{{ _('Website Domain') }}</label>
                     <input type="text" class="form-control" id="counterparty_domain" name="counterparty_domain" 
                            placeholder="beispiel.de" data-prefill-watch="true">
                 </div>
                 
                 <div class="mb-3">
-                    <label for="counterparty_contact" class="form-label">Ansprechpartner</label>
+                    <label for="counterparty_contact" class="form-label">{{ _('Contact Person') }}</label>
                     <input type="text" class="form-control" id="counterparty_contact" name="counterparty_contact">
                 </div>
                 
                 <button type="submit" class="btn btn-success w-100">
-                    <i class="bi bi-search"></i> Prüfung starten
+                    <i class="bi bi-search"></i> {{ _('Start Verification') }}
                 </button>
                 </form>
             </div>
@@ -194,21 +194,20 @@
     <div class="col-lg-4">
         <div class="card">
             <div class="card-header bg-info text-white">
-                <h5><i class="bi bi-clipboard-check"></i> Prüfungsergebnisse</h5>
+                <h5><i class="bi bi-clipboard-check"></i> {{ _('Verification Results') }}</h5>
             </div>
             <div class="card-body" id="resultsPanel">
                 <div class="text-center text-muted py-4">
                     <i class="bi bi-arrow-left-circle fs-1"></i>
-                    <p class="mt-2">Füllen Sie die Formulare aus und klicken Sie auf "Prüfung starten"</p>
+                    <p class="mt-2">{{ _('Fill out the forms and click on "Start Verification"') }}</p>
                 </div>
             </div>
         </div>
         
-        <!-- Loading indicator -->
         <div class="card mt-3" id="loadingPanel" style="display: none;">
             <div class="card-body text-center">
                 <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2">Prüfung läuft...</p>
+                <p class="mt-2">{{ _('Verification in progress...') }}</p>
                 <div id="loadingProgress"></div>
             </div>
         </div>
@@ -217,6 +216,8 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 <script>
 // Initialize CounterpartyVerification class when document is ready
 document.addEventListener('DOMContentLoaded', function() {

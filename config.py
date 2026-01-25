@@ -53,9 +53,10 @@ class Config:
     BABEL_DEFAULT_LOCALE = 'de'  # German as default
     BABEL_DEFAULT_TIMEZONE = 'Europe/Berlin'
     BABEL_SUPPORTED_LOCALES = ['de', 'en', 'uk']  # German, English, Ukrainian
+    BABEL_DOMAIN = 'messages'
     
     # Translation paths
-    BABEL_TRANSLATION_DIRECTORIES = 'translations'
+    BABEL_TRANSLATION_DIRECTORIES = './translations'
     OPENCORPORATES_API_KEY = os.environ.get('OPENCORPORATES_API_KEY')
     SANCTIONS_API_KEY = os.environ.get('SANCTIONS_API_KEY')
     VIRUSTOTAL_API_KEY = os.environ.get('VIRUSTOTAL_API_KEY')

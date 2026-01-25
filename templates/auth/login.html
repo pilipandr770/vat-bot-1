@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Anmelden - VAT Verifizierung{% endblock %}
+{% block title %}{{ _('Login') }} - {{ _('VAT Verification System') }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,7 +8,7 @@
         <div class="col-md-5">
             <div class="card shadow">
                 <div class="card-header bg-dark text-white">
-                    <h3 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Anmelden</h3>
+                    <h3 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> {{ _('Login') }}</h3>
                 </div>
                 <div class="card-body p-4">
                     <form method="POST" action="{{ url_for('auth.login') }}">
@@ -18,7 +18,7 @@
                         <div class="mb-3">
                             {{ form.email.label(class="form-label") }}
                             {{ form.email(class="form-control form-control-lg " + ("is-invalid" if form.email.errors else ""), 
-                                          placeholder="ihre@email.de", autofocus=true) }}
+                                          placeholder="{{ _('your@email.com') }}", autofocus=true) }}
                             {% if form.email.errors %}
                                 <div class="invalid-feedback">
                                     {{ form.email.errors[0] }}
@@ -31,7 +31,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 {{ form.password.label(class="form-label mb-0") }}
                                 <a href="{{ url_for('auth.reset_password_request') }}" class="small text-muted">
-                                    Passwort vergessen?
+                                    {{ _('Forgot password?') }}
                                 </a>
                             </div>
                             {{ form.password(class="form-control form-control-lg " + ("is-invalid" if form.password.errors else "")) }}

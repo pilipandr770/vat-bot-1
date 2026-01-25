@@ -130,8 +130,8 @@
                     <!-- Login Link -->
                     <div class="text-center mt-4">
                         <p class="text-muted">
-                            Haben Sie bereits ein Konto? 
-                            <a href="{{ url_for('auth.login') }}">Jetzt anmelden</a>
+                            {{ _('Already have an account?') }} 
+                            <a href="{{ url_for('auth.login') }}">{{ _('Sign in now') }}</a>
                         </p>
                     </div>
                 </div>

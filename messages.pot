@@ -1,19 +1,17 @@
-# Ukrainian translations for PROJECT.
-# Copyright (C) 2026 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# Translations template for VAT Bot.
+# Copyright (C) 2026 VAT Bot Team
+# This file is distributed under the same license as the VAT Bot project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: VAT Bot 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-01-25 18:47+0100\n"
-"PO-Revision-Date: 2026-01-25 18:30+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: uk\n"
-"Language-Team: uk <LL@li.org>\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,233 +19,141 @@ msgstr ""
 
 #: application.py:347 templates/auth/login.html:3 templates/base.html:7
 msgid "VAT Verification System"
-msgstr "Система перевірки ПДВ"
-
-#: templates/base.html:25
-msgid "Dashboard"
-msgstr "Панель управління"
-
-#: templates/base.html:15
-msgid "VAT Verification"
-msgstr "Перевірка ПДВ"
-
-#: templates/base.html:33
-msgid "OSINT Scanner"
-msgstr "OSINT Сканер"
-
-#: templates/base.html:39
-msgid "Phone Intelligence"
-msgstr "Інтелект телефону"
-
-#: templates/auth/login.html:4
-msgid "Login"
-msgstr "Вхід"
-
-#: templates/auth/login.html:35
-msgid "Forgot password?"
-msgstr "Забули пароль?"
-
-#: templates/admin/osint_scan.html:7
-msgid "Passive data collection about the counterparty's domain, website, or email."
-msgstr "Пасивний збір даних про домен, веб-сайт або електронну пошту контрагента."
-
-#: templates/admin/osint_scan.html:10
-msgid "URL (optional)"
-msgstr "URL (необов'язково)"
-
-#: templates/admin/osint_scan.html:12
-msgid "https://example.com"
-msgstr "https://example.com"
-
-#: templates/admin/osint_scan.html:13
-msgid "Complete website URL for header and social media analysis."
-msgstr "Повна URL-адреса веб-сайту для аналізу заголовків та соціальних мереж."
-
-#: templates/admin/osint_scan.html:16
-msgid "Domain"
-msgstr "Домен"
-
-#: templates/admin/osint_scan.html:18
-msgid "example.com"
-msgstr "example.com"
-
-#: templates/admin/osint_scan.html:19
-msgid "Primary company domain for WHOIS, DNS, and SSL checks."
-msgstr "Основний домен компанії для перевірок WHOIS, DNS та SSL."
-
-#: templates/admin/osint_scan.html:22
-msgid "Email (optional)"
-msgstr "Електронна пошта (необов'язково)"
-
-#: templates/admin/osint_scan.html:24
-msgid "info@example.com"
-msgstr "info@example.com"
-
-#: templates/admin/osint_scan.html:25
-msgid "Email for basic format validation."
-msgstr "Електронна пошта для базової перевірки формату."
-
-#: templates/admin/osint_scan.html:30
-msgid "Start Scan"
-msgstr "Почати сканування"
-
-#: templates/admin/osint_scan.html:42
-msgid "Scanning..."
-msgstr "Сканування..."
-
-#: templates/admin/osint_scan.html:43
-msgid "Server returned invalid response. Please try again later."
-msgstr "Сервер повернув недійсну відповідь. Спробуйте пізніше."
-
-#: templates/admin/osint_scan.html:44
-msgid "Scan completed"
-msgstr "Сканування завершено"
-
-#: templates/admin/osint_scan.html:45
-msgid "Results"
-msgstr "Результати"
-
-#: templates/admin/osint_scan.html:46
-msgid "View full results"
-msgstr "Переглянути повні результати"
-
-#: templates/admin/osint_scan.html:47
-msgid "Scan error"
-msgstr "Помилка сканування"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:3
 msgid "Link Scanner - URL Security Check"
-msgstr "Сканер посилань - перевірка безпеки URL"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:11 templates/base.html:43
 msgid "Link Scanner"
-msgstr "Сканер посилань"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:12
 msgid "Check URLs for phishing, malware and other threats"
-msgstr "Перевіряйте URL на фішинг, шкідливе ПЗ та інші загрози"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:21
 msgid "Enter URL"
-msgstr "Введіть URL"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:26
 msgid "or"
-msgstr "або"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:29
 msgid "Check"
-msgstr "Перевірити"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:33
 msgid "Enter a complete URL (e.g. https://example.com/page)"
-msgstr "Введіть повну URL-адресу (наприклад, https://example.com/page)"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:42
 msgid "Check multiple URLs simultaneously"
-msgstr "Перевірити кілька URL-адрес одночасно"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:50
 msgid "URLs (one per line, max. 20)"
-msgstr "URL-адреси (по одній на рядок, макс. 20)"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:55
 msgid "Check All"
-msgstr "Перевірити всі"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:64
 msgid "What is being checked?"
-msgstr "Що перевіряється?"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:68
 #: link_scanner/templates/link_scanner/scan.html:213
 msgid "SSL/HTTPS encryption"
-msgstr "Шифрування SSL/HTTPS"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:69
 #: link_scanner/templates/link_scanner/scan.html:214
 msgid "Phishing detection"
-msgstr "Виявлення фішингу"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:70
 #: link_scanner/templates/link_scanner/scan.html:215
 msgid "VirusTotal database"
-msgstr "База даних VirusTotal"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:71
 #: link_scanner/templates/link_scanner/scan.html:216
 msgid "Google Safe Browsing"
-msgstr "Google Safe Browsing"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:72
 #: link_scanner/templates/link_scanner/scan.html:217
 msgid "Suspicious domains"
-msgstr "Підозрілі домени"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:73
 #: link_scanner/templates/link_scanner/scan.html:218
 msgid "URL shortener detection"
-msgstr "Виявлення скорочувачів URL"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:74
 #: link_scanner/templates/link_scanner/scan.html:219
 msgid "Redirect analysis"
-msgstr "Аналіз перенаправлень"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:82
 msgid "Recent Checks"
-msgstr "Недавні перевірки"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:87
 msgid "No checks performed yet"
-msgstr "Перевірок ще не виконувалось"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:99
 #: link_scanner/templates/link_scanner/scan.html:209
 msgid "Loading..."
-msgstr "Завантаження..."
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:204
 #: templates/pentesting/scanner.html:523
 msgid "Please enter a URL"
-msgstr "Будь ласка, введіть URL"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:205
 #: templates/crm/counterparty_details.html:428 templates/crm/index.html:306
 msgid "Network error"
-msgstr "Помилка мережі"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:206
 msgid "Please enter at least one URL"
-msgstr "Будь ласка, введіть принаймні одну URL-адресу"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:207
 msgid "No valid URLs found"
-msgstr "Не знайдено дійсних URL-адрес"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:208
 msgid "Maximum 20 URLs allowed"
-msgstr "Максимум дозволено 20 URL-адрес"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:210
 msgid "Safe"
-msgstr "Безпечний"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:211
 msgid "Suspicious"
-msgstr "Підозрілий"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:212
 msgid "Malicious"
-msgstr "Шкідливий"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:220
 msgid "Accessibility"
-msgstr "Доступність"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:221
 msgid "Heuristic analysis"
-msgstr "Евристичний аналіз"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:222
 msgid "No suspicious patterns found"
@@ -290,7 +196,7 @@ msgstr ""
 #: templates/crm/add_edit_counterparty.html:105
 #: templates/crm/counterparty_details.html:73
 msgid "Domain"
-msgstr "Домен"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:231
 msgid "Scanning"
@@ -299,7 +205,7 @@ msgstr ""
 #: link_scanner/templates/link_scanner/scan.html:232
 #: templates/admin/osint_scan.html:47
 msgid "Scan completed"
-msgstr "Сканування завершено"
+msgstr ""
 
 #: link_scanner/templates/link_scanner/scan.html:233
 #: templates/chatbot/chat.html:134 templates/crm/add_edit_counterparty.html:260
@@ -332,25 +238,25 @@ msgstr ""
 
 #: templates/base.html:16
 msgid "VAT Verification"
-msgstr "Перевірка ПДВ"
+msgstr ""
 
 #: templates/base.html:26
 msgid "Dashboard"
-msgstr "Панель управління"
+msgstr ""
 
 #: templates/admin/osint_scan.html:4 templates/admin/osint_scan.html:11
 #: templates/base.html:33
 msgid "OSINT Scanner"
-msgstr "OSINT Сканер"
+msgstr ""
 
 #: templates/base.html:38 templates/phoneintel/analyze.html:3
 #: templates/phoneintel/analyze.html:11
 msgid "Phone Intelligence"
-msgstr "Інтелект телефону"
+msgstr ""
 
 #: templates/base.html:48
 msgid "MailGuard"
-msgstr "MailGuard"
+msgstr ""
 
 #: templates/base.html:53
 msgid "Website Scanner"
@@ -378,35 +284,35 @@ msgstr ""
 
 #: templates/base.html:158
 msgid "Rechtliches"
-msgstr "Правові питання"
+msgstr ""
 
 #: templates/base.html:162
 msgid "Impressum"
-msgstr "Імпресум"
+msgstr ""
 
 #: templates/base.html:167
 msgid "Datenschutz"
-msgstr "Захист даних"
+msgstr ""
 
 #: templates/base.html:172
 msgid "AGB"
-msgstr "Умови використання"
+msgstr ""
 
 #: templates/base.html:177
 msgid "DSGVO-Anfrage"
-msgstr "Запит DSGVO"
+msgstr ""
 
 #: templates/base.html:183
 msgid "Kontakt"
-msgstr "Контакт"
+msgstr ""
 
 #: templates/base.html:212
 msgid "Alle Rechte vorbehalten"
-msgstr "Всі права захищені"
+msgstr ""
 
 #: templates/base.html:217
 msgid "DSGVO-konform"
-msgstr "Відповідно до DSGVO"
+msgstr ""
 
 #: templates/check_details.html:8
 msgid "Check Details"
@@ -715,67 +621,67 @@ msgstr ""
 msgid ""
 "Passive data collection about the counterparty's domain, website, or "
 "email."
-msgstr "Пасивний збір даних про домен, веб-сайт або електронну пошту контрагента."
+msgstr ""
 
 #: templates/admin/osint_scan.html:16
 msgid "URL (optional)"
-msgstr "URL (необов'язково)"
+msgstr ""
 
 #: templates/admin/osint_scan.html:17
 msgid "https://example.com"
-msgstr "https://example.com"
+msgstr ""
 
 #: templates/admin/osint_scan.html:18
 msgid "Complete website URL for header and social media analysis."
-msgstr "Повна URL-адреса веб-сайту для аналізу заголовків та соціальних мереж."
+msgstr ""
 
 #: templates/admin/osint_scan.html:22
 msgid "example.com"
-msgstr "example.com"
+msgstr ""
 
 #: templates/admin/osint_scan.html:23
 msgid "Primary company domain for WHOIS, DNS, and SSL checks."
-msgstr "Основний домен компанії для перевірок WHOIS, DNS та SSL."
+msgstr ""
 
 #: templates/admin/osint_scan.html:26
 msgid "Email (optional)"
-msgstr "Електронна пошта (необов'язково)"
+msgstr ""
 
 #: templates/admin/osint_scan.html:27
 msgid "info@example.com"
-msgstr "info@example.com"
+msgstr ""
 
 #: templates/admin/osint_scan.html:28
 msgid "Email for basic format validation."
-msgstr "Електронна пошта для базової перевірки формату."
+msgstr ""
 
 #: templates/admin/osint_scan.html:33 templates/pentesting/scanner.html:33
 msgid "Start Scan"
-msgstr "Почати сканування"
+msgstr ""
 
 #: templates/admin/osint_scan.html:45 templates/pentesting/scanner.html:524
 msgid "Scanning..."
-msgstr "Сканування..."
+msgstr ""
 
 #: templates/admin/osint_scan.html:46
 msgid "Server returned invalid response. Please try again later."
-msgstr "Сервер повернув недійсну відповідь. Спробуйте пізніше."
+msgstr ""
 
 #: templates/admin/osint_scan.html:48
 msgid "Results"
-msgstr "Результати"
+msgstr ""
 
 #: templates/admin/osint_scan.html:49
 msgid "View full results"
-msgstr "Переглянути повні результати"
+msgstr ""
 
 #: templates/admin/osint_scan.html:50
 msgid "Scan error"
-msgstr "Помилка сканування"
+msgstr ""
 
 #: templates/admin/osint_scan.html:51
 msgid "If the error persists, please contact support."
-msgstr "Якщо помилка не зникає, зверніться до служби підтримки."
+msgstr ""
 
 #: templates/auth/login.html:3 templates/auth/login.html:11
 msgid "Login"
@@ -1243,31 +1149,31 @@ msgstr ""
 
 #: templates/crm/index.html:10
 msgid "CRM - Counterparty Management"
-msgstr "CRM - Управління контрагентами"
+msgstr ""
 
 #: templates/crm/index.html:11
 msgid "Manage your counterparties and automatically monitor their status"
-msgstr "Керуйте своїми контрагентами та автоматично моніторьте їх статус"
+msgstr ""
 
 #: templates/crm/index.html:21
 msgid "Total Counterparties"
-msgstr "Всього контрагентів"
+msgstr ""
 
 #: templates/crm/index.html:29
 msgid "Actively Monitored"
-msgstr "Активно моніториться"
+msgstr ""
 
 #: templates/crm/index.html:37
 msgid "New Alerts"
-msgstr "Нові сповіщення"
+msgstr ""
 
 #: templates/crm/index.html:45
 msgid "Add New"
-msgstr "Додати новий"
+msgstr ""
 
 #: templates/crm/index.html:48
 msgid "Find Duplicates"
-msgstr "Знайти дублікати"
+msgstr ""
 
 #: templates/crm/index.html:293
 msgid "Counterparty successfully added!"
@@ -1585,491 +1491,23 @@ msgstr ""
 
 #: templates/pentesting/scanner.html:10
 msgid "Website Security Scanner"
-msgstr "Сканер безпеки веб-сайтів"
+msgstr ""
 
 #: templates/pentesting/scanner.html:12
 msgid "Comprehensive website vulnerability assessment with AI-powered insights"
-msgstr "Комплексна оцінка вразливостей веб-сайтів з AI-підтримуваними інсайтами"
+msgstr ""
 
 #: templates/pentesting/scanner.html:16
 msgid "⚠️ This feature is only available for PRO and ENTERPRISE users"
-msgstr "⚠️ Ця функція доступна тільки для користувачів PRO та ENTERPRISE"
+msgstr ""
 
-#: templates/pentesting/scanner.html:55
-msgid "Analyzing website security..."
-msgstr "Аналіз безпеки веб-сайту..."
-
-#: templates/pentesting/scanner.html:62
-msgid "Security Score"
-msgstr "Оцінка безпеки"
-
-#: templates/pentesting/scanner.html:69
-msgid "AI-Powered Analysis"
-msgstr "AI-підтримуваний аналіз"
-
-#: templates/pentesting/scanner.html:77
-msgid "Back"
-msgstr "Назад"
-
-#: templates/pentesting/scanner.html:679
-msgid "Low Risk"
-msgstr "Низький ризик"
-
-#: templates/pentesting/scanner.html:680
-msgid "Medium Risk"
-msgstr "Середній ризик"
-
-#: templates/pentesting/scanner.html:681
-msgid "High Risk"
-msgstr "Високий ризик"
-
-#: templates/pentesting/scanner.html:682
-msgid "Critical Risk"
-msgstr "Критичний ризик"
-
-#: templates/pentesting/scanner.html:658
-msgid "SSL/TLS Check"
-msgstr "Перевірка SSL/TLS"
-
-#: templates/pentesting/scanner.html:659
-msgid "Security Headers"
-msgstr "Заголовки безпеки"
-
-#: templates/pentesting/scanner.html:660
-msgid "SQL Injection Test"
-msgstr "Тест на SQL-ін'єкцію"
-
-#: templates/pentesting/scanner.html:661
-msgid "XSS Vulnerability"
-msgstr "Вразливість XSS"
-
-#: templates/pentesting/scanner.html:662
-msgid "CSRF Protection"
-msgstr "Захист від CSRF"
-
-#: templates/pentesting/scanner.html:663
-msgid "Open Ports"
-msgstr "Відкриті порти"
-
-#: templates/pentesting/scanner.html:664
-msgid "DNSSEC"
-msgstr "DNSSEC"
-
-#: templates/pentesting/scanner.html:649
-msgid "SAFE"
-msgstr "БЕЗПЕЧНО"
-
-#: templates/pentesting/scanner.html:649
-msgid "WARNING"
-msgstr "ПОПЕРЕДЖЕННЯ"
-
-#: templates/pentesting/scanner.html:649
-msgid "CRITICAL"
-msgstr "КРИТИЧНО"
+#: templates/pentesting/scanner.html:17
+msgid "Upgrade now to protect your website"
+msgstr ""
 
 #: templates/pentesting/scanner.html:18
 msgid "Upgrade Now"
-msgstr "Оновити зараз"
-
-#: templates/base.html:49
-msgid "AI Assistant"
-msgstr "ШІ Асистент"
-
-#: templates/base.html:55
-msgid "Admin"
-msgstr "Адмін"
-
-#: templates/base.html:64
-msgid "Profile"
-msgstr "Профіль"
-
-#: templates/base.html:67
-msgid "Company Profile"
-msgstr "Профіль компанії"
-
-#: templates/base.html:70
-msgid "Subscription"
-msgstr "Підписка"
-
-#: templates/base.html:73
-msgid "Manage Payments"
-msgstr "Керувати платежами"
-
-#: templates/base.html:76
-msgid "Logout"
-msgstr "Вийти"
-
-#: templates/auth/login.html:20
-msgid "your@email.com"
-msgstr "your@email.com"
-
-#: templates/phoneintel/analyze.html:15
-msgid "Analyze phone numbers for carrier information, line type, and risk assessment. No personal data is stored."
-msgstr "Аналіз номерів телефонів для інформації про оператора, типу лінії та оцінки ризику. Особисті дані не зберігаються."
-
-#: templates/phoneintel/analyze.html:18
-msgid "Phone Number"
-msgstr "Номер телефону"
-
-#: templates/phoneintel/analyze.html:20
-msgid "+491512345678"
-msgstr "+380501234567"
-
-#: templates/phoneintel/analyze.html:23
-msgid "Country Hint (ISO2)"
-msgstr "Підказка країни (ISO2)"
-
-#: templates/phoneintel/analyze.html:25
-msgid "DE"
-msgstr "UA"
-
-#: templates/phoneintel/analyze.html:29
-msgid "Analyze"
-msgstr "Аналізувати"
-
-#: templates/phoneintel/analyze.html:35
-msgid "Analysis Results"
-msgstr "Результати аналізу"
-
-#: templates/phoneintel/analyze.html:42
-msgid "Analyzing..."
-msgstr "Аналіз..."
-
-#: templates/phoneintel/analyze.html:43
-msgid "Basic Information"
-msgstr "Основна інформація"
-
-#: templates/phoneintel/analyze.html:44
-msgid "Country"
-msgstr "Країна"
-
-#: templates/phoneintel/analyze.html:45
-msgid "Carrier"
-msgstr "Оператор"
-
-#: templates/phoneintel/analyze.html:46
-msgid "Line Type"
-msgstr "Тип лінії"
-
-#: templates/phoneintel/analyze.html:47
-msgid "Risk Assessment"
-msgstr "Оцінка ризику"
-
-#: templates/phoneintel/analyze.html:48
-msgid "Risk Score"
-msgstr "Оцінка ризику"
-
-#: link_scanner/templates/link_scanner/scan.html:25
-msgid "https://example.com or example.com"
-msgstr "https://example.com або example.com"
-
-#: link_scanner/templates/link_scanner/scan.html:42
-msgid "https://example1.com\nhttps://example2.com\nhttps://example3.com"
-msgstr "https://example1.com\nhttps://example2.com\nhttps://example3.com"
-
-#: link_scanner/templates/link_scanner/scan.html:55
-msgid "What is being checked?"
-msgstr "Що перевіряється?"
-
-#: link_scanner/templates/link_scanner/scan.html:58
-msgid "SSL/HTTPS encryption"
-msgstr "SSL/HTTPS шифрування"
-
-#: link_scanner/templates/link_scanner/scan.html:59
-msgid "Phishing detection"
-msgstr "Виявлення фішингу"
-
-#: link_scanner/templates/link_scanner/scan.html:60
-msgid "VirusTotal database"
-msgstr "База даних VirusTotal"
-
-#: link_scanner/templates/link_scanner/scan.html:61
-msgid "Google Safe Browsing"
-msgstr "Google Safe Browsing"
-
-#: link_scanner/templates/link_scanner/scan.html:62
-msgid "Suspicious domains"
-msgstr "Підозрілі домени"
-
-#: link_scanner/templates/link_scanner/scan.html:63
-msgid "URL shortener detection"
-msgstr "Виявлення скорочувачів URL"
-
-#: link_scanner/templates/link_scanner/scan.html:64
-msgid "Redirect analysis"
-msgstr "Аналіз перенаправлень"
-
-#: link_scanner/templates/link_scanner/scan.html:72
-msgid "Recent Checks"
-msgstr "Недавні перевірки"
-
-#: link_scanner/templates/link_scanner/scan.html:76
-msgid "No checks performed yet"
-msgstr "Ще не виконано жодної перевірки"
-
-#: link_scanner/templates/link_scanner/scan.html:84
-msgid "Loading..."
-msgstr "Завантаження..."
-
-#: link_scanner/templates/link_scanner/scan.html:87
-msgid "Scanning URL..."
-msgstr "Сканування URL..."
-
-#: link_scanner/templates/link_scanner/scan.html:88
-msgid "Checking security..."
-msgstr "Перевірка безпеки..."
-
-#: link_scanner/templates/link_scanner/scan.html:89
-msgid "Analyzing results..."
-msgstr "Аналіз результатів..."
-
-#: link_scanner/templates/link_scanner/scan.html:90
-msgid "Scan completed!"
-msgstr "Сканування завершено!"
-
-#: link_scanner/templates/link_scanner/scan.html:93
-msgid "Safe"
-msgstr "Безпечний"
-
-#: link_scanner/templates/link_scanner/scan.html:94
-msgid "Suspicious"
-msgstr "Підозрілий"
-
-#: link_scanner/templates/link_scanner/scan.html:95
-msgid "Malicious"
-msgstr "Шкідливий"
-
-#: link_scanner/templates/link_scanner/scan.html:98
-msgid "Security Analysis Results"
-msgstr "Результати аналізу безпеки"
-
-#: link_scanner/templates/link_scanner/scan.html:101
-msgid "URL Status"
-msgstr "Статус URL"
-
-#: link_scanner/templates/link_scanner/scan.html:104
-msgid "Risk Level"
-msgstr "Рівень ризику"
-
-#: link_scanner/templates/link_scanner/scan.html:107
-msgid "Details"
-msgstr "Деталі"
-
-#: link_scanner/templates/link_scanner/scan.html:110
-msgid "Recommendations"
-msgstr "Рекомендації"
-
-#: link_scanner/templates/link_scanner/scan.html:113
-msgid "This URL appears to be safe based on current security checks."
-msgstr "Цей URL здається безпечним на основі поточних перевірок безпеки."
-
-#: link_scanner/templates/link_scanner/scan.html:116
-msgid "This URL shows some suspicious characteristics. Exercise caution."
-msgstr "Цей URL показує деякі підозрілі характеристики. Будьте обережні."
-
-#: link_scanner/templates/link_scanner/scan.html:119
-msgid "This URL has been flagged as potentially malicious. Do not visit!"
-msgstr "Цей URL позначений як потенційно шкідливий. Не відвідуйте!"
-
-#: link_scanner/templates/link_scanner/scan.html:122
-msgid "Visit this URL only if you trust the source."
-msgstr "Відвідуйте цей URL тільки якщо ви довіряєте джерелу."
-
-#: link_scanner/templates/link_scanner/scan.html:125
-msgid "Do not visit this URL. It may contain malware or phishing attempts."
-msgstr "Не відвідуйте цей URL. Він може містити шкідливе ПЗ або спроби фішингу."
-
-#: link_scanner/templates/link_scanner/scan.html:128
-msgid "Error scanning URL. Please try again."
-msgstr "Помилка сканування URL. Спробуйте ще раз."
-
-#: link_scanner/templates/link_scanner/scan.html:131
-msgid "Invalid URL format. Please enter a valid URL."
-msgstr "Недійсний формат URL. Введіть дійсний URL."
-
-#: link_scanner/templates/link_scanner/scan.html:134
-msgid "Batch scan completed!"
-msgstr "Пакетне сканування завершено!"
-
-#: link_scanner/templates/link_scanner/scan.html:137
-msgid "Batch scan failed. Please check your URLs and try again."
-msgstr "Пакетне сканування не вдалося. Перевірте ваші URL та спробуйте ще раз."
-
-#: templates/crm/index.html:5
-msgid "CRM - Counterparty Monitoring"
-msgstr "CRM - Моніторинг контрагентів"
-
-#: templates/crm/index.html:9
-msgid "CRM - Counterparty Management"
-msgstr "CRM - Управління контрагентами"
-
-#: templates/crm/index.html:10
-msgid "Manage your counterparties and automatically monitor their status"
-msgstr "Керуйте своїми контрагентами та автоматично моніторте їх статус"
-
-#: templates/crm/index.html:18
-msgid "Total Counterparties"
-msgstr "Всього контрагентів"
-
-#: templates/crm/index.html:23
-msgid "Actively Monitored"
-msgstr "Активно моніториться"
-
-#: templates/crm/index.html:28
-msgid "New Alerts"
-msgstr "Нові сповіщення"
-
-#: templates/crm/index.html:35
-msgid "Add New"
-msgstr "Додати новий"
-
-#: templates/crm/index.html:38
-msgid "Find Duplicates"
-msgstr "Знайти дублікати"
-
-#: templates/base.html:49
-msgid "Website Scanner"
-msgstr "Сканер веб-сайтів"
-
-#: templates/pentesting/scanner.html:5
-msgid "Website Security Scanner"
-msgstr "Сканер безпеки веб-сайтів"
-
-#: templates/pentesting/scanner.html:11
-msgid "Comprehensive website vulnerability assessment with AI-powered insights"
-msgstr "Комплексна оцінка вразливостей веб-сайтів з інтелектуальними висновками на основі ШІ"
-
-#: templates/pentesting/scanner.html:15
-msgid "⚠️ This feature is only available for PRO and ENTERPRISE users"
-msgstr "⚠️ Ця функція доступна тільки для користувачів PRO та ENTERPRISE"
-
-#: templates/pentesting/scanner.html:16
-msgid "Upgrade now to protect your website"
-msgstr "Оновіть зараз, щоб захистити свій веб-сайт"
-
-#: templates/pentesting/scanner.html:17
-msgid "Upgrade Now"
-msgstr "Оновити зараз"
-
-#: templates/pentesting/scanner.html:4
-msgid "Website Security Scanner - Pentesting"
-msgstr "Сканер безпеки веб-сайтів - Пентестинг"
-
-#: templates/pentesting/scanner.html:22
-msgid "Enter Website URL:"
-msgstr "Введіть URL веб-сайту:"
-
-#: templates/pentesting/scanner.html:26
-msgid "e.g. example.com or https://example.com"
-msgstr "наприклад, example.com або https://example.com"
-
-#: templates/pentesting/scanner.html:32
-msgid "AI-Powered Analysis with Recommendations"
-msgstr "Аналіз на основі ШІ з рекомендаціями"
-
-#: templates/pentesting/scanner.html:42
-msgid "Scanning in progress..."
-msgstr "Сканування триває..."
-
-#: templates/pentesting/scanner.html:45
-msgid "Scan Results"
-msgstr "Результати сканування"
-
-#: templates/pentesting/scanner.html:48
-msgid "Vulnerability Summary"
-msgstr "Зведення вразливостей"
-
-#: templates/pentesting/scanner.html:51
-msgid "Critical"
-msgstr "Критичні"
-
-#: templates/pentesting/scanner.html:54
-msgid "High"
-msgstr "Високі"
-
-#: templates/pentesting/scanner.html:57
-msgid "Medium"
-msgstr "Середні"
-
-#: templates/pentesting/scanner.html:60
-msgid "Low"
-msgstr "Низькі"
-
-#: templates/pentesting/scanner.html:63
-msgid "Info"
-msgstr "Інформація"
-
-#: templates/pentesting/scanner.html:66
-msgid "Detailed Findings"
-msgstr "Детальні висновки"
-
-#: templates/pentesting/scanner.html:69
-msgid "Severity"
-msgstr "Серйозність"
-
-#: templates/pentesting/scanner.html:72
-msgid "Vulnerability"
-msgstr "Вразливість"
-
-#: templates/pentesting/scanner.html:75
-msgid "Description"
-msgstr "Опис"
-
-#: templates/pentesting/scanner.html:78
-msgid "Impact"
-msgstr "Вплив"
-
-#: templates/pentesting/scanner.html:81
-msgid "Solution"
-msgstr "Рішення"
-
-#: templates/pentesting/scanner.html:84
-msgid "AI Recommendations"
-msgstr "Рекомендації ШІ"
-
-#: templates/pentesting/scanner.html:87
-msgid "Generating AI analysis..."
-msgstr "Генерація аналізу ШІ..."
-
-#: templates/pentesting/scanner.html:90
-msgid "Export Report"
-msgstr "Експортувати звіт"
-
-#: templates/pentesting/scanner.html:93
-msgid "New Scan"
-msgstr "Нове сканування"
-
-#: templates/pentesting/scanner.html:96
-msgid "Error occurred during scan. Please try again."
-msgstr "Під час сканування сталася помилка. Спробуйте ще раз."
-
-#: templates/pentesting/scanner.html:99
-msgid "Invalid URL. Please enter a valid website URL."
-msgstr "Недійсний URL. Введіть дійсний URL веб-сайту."
-
-#: templates/pentesting/scanner.html:102
-msgid "Scan completed successfully!"
-msgstr "Сканування завершено успішно!"
-
-#: templates/pentesting/scanner.html:105
-msgid "No vulnerabilities found. Your website appears to be secure."
-msgstr "Вразливостей не знайдено. Ваш веб-сайт здається безпечним."
-
-#: templates/pentesting/scanner.html:108
-msgid "Vulnerabilities detected. Review the findings below."
-msgstr "Виявлено вразливості. Перегляньте висновки нижче."
-
-#: templates/base.html:51
-msgid "Website Scanner"
-msgstr "Сканер веб-сайтів"
-
-#: templates/base.html:49
-msgid "AI Assistant"
-msgstr "ШІ Асистент"
-
-#: templates/phoneintel/analyze.html:44
-msgid "Country"
-msgstr "Країна"
+msgstr ""
 
 #: templates/pentesting/scanner.html:24
 msgid "Enter Website URL:"
@@ -2147,301 +1585,17 @@ msgstr ""
 
 #: templates/phoneintel/analyze.html:54
 msgid "Suspicious Patterns"
-msgstr "Підозрілі шаблони"
+msgstr ""
 
 #: templates/phoneintel/analyze.html:57
 msgid "Unknown"
-msgstr "Невідомо"
+msgstr ""
 
 #: templates/phoneintel/analyze.html:58
 msgid "Yes"
-msgstr "Так"
+msgstr ""
 
 #: templates/phoneintel/analyze.html:59
 msgid "No"
-msgstr "Ні"
-
-#: templates/base.html:51
-msgid "Website Scanner"
-msgstr "Сканер веб-сайтів"
-
-#: templates/base.html:49
-msgid "AI Assistant"
-msgstr "ШІ Асистент"
-
-#: templates/phoneintel/analyze.html:44
-msgid "Country"
-msgstr "Країна"
-
-#: templates/index.html:7
-msgid "Automatically filled from your profile"
-msgstr "Автоматично заповнено з вашого профілю"
-
-#: templates/index.html:12
-msgid "Tip"
-msgstr "Порада"
-
-#: templates/index.html:13
-msgid "Save your company data"
-msgstr "Збережіть дані вашої компанії"
-
-#: templates/index.html:14
-msgid "so that they are automatically filled in"
-msgstr "щоб вони автоматично заповнювалися"
-
-#: templates/index.html:22
-msgid "New CRM Alerts"
-msgstr "Нові сповіщення CRM"
-
-#: templates/index.html:25
-msgid "Go to CRM"
-msgstr "Перейти до CRM"
-
-#: templates/index.html:32
-msgid "Critical"
-msgstr "Критичний"
-
-#: templates/index.html:34
-msgid "High"
-msgstr "Високий"
-
-#: templates/index.html:36
-msgid "Medium"
-msgstr "Середній"
-
-#: templates/index.html:38
-msgid "Low"
-msgstr "Низький"
-
-#: templates/index.html:44
-msgid "Details"
-msgstr "Деталі"
-
-#: templates/index.html:58
-msgid "Your Company Data"
-msgstr "Дані вашої компанії"
-
-#: templates/index.html:61
-msgid "Manage Profile"
-msgstr "Керувати профілем"
-
-#: templates/index.html:75
-msgid "VAT Number"
-msgstr "Номер ПДВ"
-
-#: templates/index.html:78
-msgid "Your VAT number for VIES validation"
-msgstr "Ваш номер ПДВ для перевірки VIES"
-
-#: templates/index.html:82
-msgid "Company Name"
-msgstr "Назва компанії"
-
-#: templates/index.html:87
-msgid "Business Address"
-msgstr "Адреса бізнесу"
-
-#: templates/index.html:93
-msgid "Email"
-msgstr "Електронна пошта"
-
-#: templates/index.html:98
-msgid "Phone"
-msgstr "Телефон"
-
-#: templates/index.html:106
-msgid "Counterparty Data"
-msgstr "Дані контрагента"
-
-#: templates/index.html:110
-msgid "VAT number of the business partner (if known)"
-msgstr "Номер ПДВ бізнес-партнера (якщо відомий)"
-
-#: templates/index.html:118
-msgid "Country"
-msgstr "Країна"
-
-#: templates/index.html:120
-msgid "Select country"
-msgstr "Виберіть країну"
-
-#: templates/index.html:122
-msgid "Free available (incl. business register)"
-msgstr "Безкоштовно доступно (вкл. реєстр бізнесу)"
-
-#: templates/index.html:127
-msgid "In progress / Premium"
-msgstr "В розробці / Преміум"
-
-#: templates/index.html:130
-msgid "Premium"
-msgstr "Преміум"
-
-#: templates/index.html:131
-msgid "In development"
-msgstr "В розробці"
-
-#: templates/index.html:137
-msgid "Available"
-msgstr "Доступно"
-
-#: templates/index.html:143
-msgid "Ukraine is checked via the EDR (Unified State Register)"
-msgstr "Україна перевіряється через ЄДР (Єдиний державний реєстр)"
-
-#: templates/index.html:147
-msgid "Address from Impressum"
-msgstr "Адреса з Impressum"
-
-#: templates/index.html:152
-msgid "Website Domain"
-msgstr "Домен веб-сайту"
-
-#: templates/index.html:158
-msgid "Contact Person"
-msgstr "Контактна особа"
-
-#: templates/index.html:163
-msgid "Start Verification"
-msgstr "Почати перевірку"
-
-#: templates/index.html:170
-msgid "Verification Results"
-msgstr "Результати перевірки"
-
-#: templates/index.html:174
-msgid "Fill out the forms and click on \"Start Verification\""
-msgstr "Заповніть форми та натисніть \"Почати перевірку\""
-
-#: templates/index.html:181
-msgid "Verification in progress..."
-msgstr "Перевірка триває..."
-
-#: templates/crm/index.html:3
-msgid "CRM - Counterparty Monitoring"
-msgstr "CRM - Моніторинг контрагентів"
-
-#: templates/crm/index.html:61
-msgid "Neueste Alerts"
-msgstr "Найновітніші сповіщення"
-
-#: templates/crm/index.html:64
-msgid "Alle anzeigen"
-msgstr "Показати всі"
-
-#: templates/crm/index.html:70
-msgid "Priorität"
-msgstr "Пріоритет"
-
-#: templates/crm/index.html:71
-msgid "Kontrahent"
-msgstr "Контрагент"
-
-#: templates/crm/index.html:72
-msgid "Nachricht"
-msgstr "Повідомлення"
-
-#: templates/crm/index.html:73
-msgid "Datum"
-msgstr "Дата"
-
-#: templates/crm/index.html:74
-msgid "Status"
-msgstr "Статус"
-
-#: templates/crm/index.html:81
-msgid "Kritisch"
-msgstr "Критичний"
-
-#: templates/crm/index.html:83
-msgid "Hoch"
-msgstr "Високий"
-
-#: templates/crm/index.html:85
-msgid "Mittel"
-msgstr "Середній"
-
-#: templates/crm/index.html:87
-msgid "Niedrig"
-msgstr "Низький"
-
-#: templates/crm/index.html:95
-msgid "Gesendet"
-msgstr "Надіслано"
-
-#: templates/crm/index.html:97
-msgid "Ausstehend"
-msgstr "Очікує"
-
-#: templates/crm/index.html:113
-msgid "Kontrahenten Liste"
-msgstr "Список контрагентів"
-
-#: templates/crm/index.html:116
-msgid "Ausgewählte löschen"
-msgstr "Видалити вибрані"
-
-#: templates/crm/index.html:119
-msgid "Suchen..."
-msgstr "Пошук..."
-
-#: templates/crm/index.html:122
-msgid "Alle Länder"
-msgstr "Всі країни"
-
-#: templates/crm/index.html:135
-msgid "Filter"
-msgstr "Фільтр"
-
-#: templates/crm/index.html:141
-msgid "USt-IdNr."
-msgstr "ПДВ №"
-
-#: templates/crm/index.html:142
-msgid "Firmenname"
-msgstr "Назва компанії"
-
-#: templates/crm/index.html:143
-msgid "Land"
-msgstr "Країна"
-
-#: templates/crm/index.html:144
-msgid "Adresse"
-msgstr "Адреса"
-
-#: templates/crm/index.html:145
-msgid "Monitoring"
-msgstr "Моніторинг"
-
-#: templates/crm/index.html:146
-msgid "Letzter Check"
-msgstr "Останній чек"
-
-#: templates/crm/index.html:147
-msgid "Aktionen"
-msgstr "Дії"
-
-#: templates/crm/index.html:165
-msgid "Aktiv"
-msgstr "Активний"
-
-#: templates/crm/index.html:169
-msgid "Inaktiv"
-msgstr "Неактивний"
-
-#: templates/crm/index.html:177
-msgid "Valid"
-msgstr "Дійсний"
-
-#: templates/crm/index.html:179
-msgid "Warnung"
-msgstr "Попередження"
-
-#: templates/crm/index.html:181
-msgid "Problem"
-msgstr "Проблема"
-
-#: templates/crm/index.html:184
-msgid "Noch nicht geprüft"
-msgstr "Ще не перевірено"
+msgstr ""
 

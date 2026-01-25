@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - VAT Verification System{% endblock %}
+{% block title %}{{ _('Admin Dashboard - VAT Verification System') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid my-4">
@@ -8,13 +8,13 @@
     <div class="row mb-4">
         <div class="col">
             <h1 class="h3 mb-2">
-                <i class="bi bi-speedometer2"></i> Admin Dashboard
+                <i class="bi bi-speedometer2"></i> {{ _('Admin Dashboard') }}
             </h1>
-            <p class="text-muted">Überblick über Benutzer, Abonnements und API-Nutzung</p>
+            <p class="text-muted">{{ _('Overview of users, subscriptions and API usage') }}</p>
         </div>
         <div class="col-auto">
             <span class="badge bg-success fs-6">
-                <i class="bi bi-shield-check"></i> Administrator
+                <i class="bi bi-shield-check"></i> {{ _('Administrator') }}
             </span>
         </div>
     </div>
@@ -27,10 +27,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-2">Gesamte Benutzer</h6>
+                            <h6 class="text-muted mb-2">{{ _('Total Users') }}</h6>
                             <h2 class="mb-0">{{ total_users }}</h2>
                             <small class="text-success">
-                                <i class="bi bi-arrow-up"></i> +{{ new_users_this_month }} diesen Monat
+                                <i class="bi bi-arrow-up"></i> +{{ new_users_this_month }} {{ _('this month') }}
                             </small>
                         </div>
                         <div class="text-primary" style="font-size: 2.5rem;">
@@ -47,10 +47,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-2">MRR</h6>
+                            <h6 class="text-muted mb-2">{{ _('MRR') }}</h6>
                             <h2 class="mb-0">€{{ "{:,.2f}".format(total_mrr) }}</h2>
                             <small class="text-muted">
-                                Pro: €{{ "{:,.0f}".format(pro_mrr) }} | Enterprise: €{{ "{:,.0f}".format(enterprise_mrr) }}
+                                {{ _('Pro') }}: €{{ "{:,.0f}".format(pro_mrr) }} | {{ _('Enterprise') }}: €{{ "{:,.0f}".format(enterprise_mrr) }}
                             </small>
                         </div>
                         <div class="text-success" style="font-size: 2.5rem;">
@@ -67,10 +67,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-2">Gesamtumsatz</h6>
+                            <h6 class="text-muted mb-2">{{ _('Total Revenue') }}</h6>
                             <h2 class="mb-0">€{{ "{:,.2f}".format(total_revenue) }}</h2>
                             <small class="text-info">
-                                <i class="bi bi-calendar-month"></i> €{{ "{:,.2f}".format(revenue_this_month) }} diesen Monat
+                                <i class="bi bi-calendar-month"></i> €{{ "{:,.2f}".format(revenue_this_month) }} {{ _('this month') }}
                             </small>
                         </div>
                         <div class="text-info" style="font-size: 2.5rem;">
@@ -87,10 +87,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-2">API-Prüfungen</h6>
+                            <h6 class="text-muted mb-2">{{ _('API Verifications') }}</h6>
                             <h2 class="mb-0">{{ total_verifications }}</h2>
                             <small class="text-warning">
-                                <i class="bi bi-calendar-day"></i> {{ verifications_today }} heute
+                                <i class="bi bi-calendar-day"></i> {{ verifications_today }} {{ _('today') }}
                             </small>
                         </div>
                         <div class="text-warning" style="font-size: 2.5rem;">
@@ -108,17 +108,17 @@
             <div class="card">
                 <div class="card-header bg-white">
                     <h5 class="mb-0">
-                        <i class="bi bi-bar-chart-fill"></i> Abonnement-Verteilung
+                        <i class="bi bi-bar-chart-fill"></i> {{ _('Subscription Distribution') }}
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-md-4">
                             <div class="p-3">
-                                <h6 class="text-muted">Kostenlos</h6>
+                                <h6 class="text-muted">{{ _('Free') }}</h6>
                                 <h2 class="text-secondary">{{ free_users }}</h2>
                                 <div class="progress" style="height: 10px;">
-                                    <div class="progress-bar bg-secondary" role="progressbar" 
+                                    <div class="progress-bar bg-secondary" role="progressbar"
                                          style="width: {{ (free_users / total_users * 100) if total_users > 0 else 0 }}%"></div>
                                 </div>
                                 <small class="text-muted">{{ "{:.1f}".format((free_users / total_users * 100) if total_users > 0 else 0) }}%</small>
@@ -126,10 +126,10 @@
                         </div>
                         <div class="col-md-4">
                             <div class="p-3 border-start">
-                                <h6 class="text-muted">Professional</h6>
+                                <h6 class="text-muted">{{ _('Professional') }}</h6>
                                 <h2 class="text-primary">{{ pro_users }}</h2>
                                 <div class="progress" style="height: 10px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                    <div class="progress-bar bg-primary" role="progressbar"
                                          style="width: {{ (pro_users / total_users * 100) if total_users > 0 else 0 }}%"></div>
                                 </div>
                                 <small class="text-muted">{{ "{:.1f}".format((pro_users / total_users * 100) if total_users > 0 else 0) }}%</small>
@@ -137,10 +137,10 @@
                         </div>
                         <div class="col-md-4">
                             <div class="p-3 border-start">
-                                <h6 class="text-muted">Enterprise</h6>
+                                <h6 class="text-muted">{{ _('Enterprise') }}</h6>
                                 <h2 class="text-success">{{ enterprise_users }}</h2>
                                 <div class="progress" style="height: 10px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
+                                    <div class="progress-bar bg-success" role="progressbar"
                                          style="width: {{ (enterprise_users / total_users * 100) if total_users > 0 else 0 }}%"></div>
                                 </div>
                                 <small class="text-muted">{{ "{:.1f}".format((enterprise_users / total_users * 100) if total_users > 0 else 0) }}%</small>
@@ -154,18 +154,18 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header bg-white">
-                    <h5 class="mb-0">Schnellzugriff</h5>
+                    <h5 class="mb-0">{{ _('Quick Access') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
                         <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-people"></i> Benutzerverwaltung
+                            <i class="bi bi-people"></i> {{ _('User Management') }}
                         </a>
                         <a href="{{ url_for('admin.verifications') }}" class="btn btn-outline-info">
-                            <i class="bi bi-clipboard-data"></i> Alle Prüfungen
+                            <i class="bi bi-clipboard-data"></i> {{ _('All Verifications') }}
                         </a>
                         <a href="{{ url_for('admin.logs') }}" class="btn btn-outline-warning">
-                            <i class="bi bi-file-text"></i> System-Logs
+                            <i class="bi bi-file-text"></i> {{ _('System Logs') }}
                         </a>
                     </div>
                 </div>
@@ -180,19 +180,19 @@
             <div class="card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
-                        <i class="bi bi-person-plus-fill"></i> Neueste Registrierungen
+                        <i class="bi bi-person-plus-fill"></i> {{ _('Recent Registrations') }}
                     </h5>
-                    <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-primary">Alle anzeigen</a>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-primary">{{ _('View All') }}</a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Benutzer</th>
-                                    <th>Plan</th>
-                                    <th>Registriert</th>
-                                    <th>Status</th>
+                                    <th>{{ _('User') }}</th>
+                                    <th>{{ _('Plan') }}</th>
+                                    <th>{{ _('Registered') }}</th>
+                                    <th>{{ _('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -206,13 +206,13 @@
                                     </td>
                                     <td>
                                         {% if user.subscription_plan == 'basic' %}
-                                            <span class="badge bg-info">BASIC</span>
+                                            <span class="badge bg-info">{{ _('BASIC') }}</span>
                                         {% elif user.subscription_plan == 'professional' %}
-                                            <span class="badge bg-primary">PROFESSIONAL</span>
+                                            <span class="badge bg-primary">{{ _('PROFESSIONAL') }}</span>
                                         {% elif user.subscription_plan == 'enterprise' %}
-                                            <span class="badge bg-success">ENTERPRISE</span>
+                                            <span class="badge bg-success">{{ _('ENTERPRISE') }}</span>
                                         {% else %}
-                                            <span class="badge bg-secondary">NONE</span>
+                                            <span class="badge bg-secondary">{{ _('NONE') }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -220,9 +220,9 @@
                                     </td>
                                     <td>
                                         {% if user.is_active %}
-                                            <span class="badge bg-success">Aktiv</span>
+                                            <span class="badge bg-success">{{ _('Active') }}</span>
                                         {% else %}
-                                            <span class="badge bg-danger">Inaktiv</span>
+                                            <span class="badge bg-danger">{{ _('Inactive') }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -239,19 +239,19 @@
             <div class="card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
-                        <i class="bi bi-shield-check"></i> Neueste Prüfungen
+                        <i class="bi bi-shield-check"></i> {{ _('Recent Verifications') }}
                     </h5>
-                    <a href="{{ url_for('admin.verifications') }}" class="btn btn-sm btn-outline-primary">Alle anzeigen</a>
+                    <a href="{{ url_for('admin.verifications') }}" class="btn btn-sm btn-outline-primary">{{ _('View All') }}</a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Benutzer</th>
-                                    <th>Firma</th>
-                                    <th>Datum</th>
-                                    <th>Status</th>
+                                    <th>{{ _('User') }}</th>
+                                    <th>{{ _('Company') }}</th>
+                                    <th>{{ _('Date') }}</th>
+                                    <th>{{ _('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

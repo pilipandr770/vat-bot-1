@@ -30,12 +30,12 @@
                         {# removed verification history link (duplicate of CRM) #}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('osint.scan') }}">
-                            <i class="bi bi-search"></i> OSINT Scanner
+                            <i class="bi bi-search"></i> {{ _('OSINT Scanner') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('phoneintel.phoneintel_ui') }}">
-                            <i class="bi bi-telephone"></i> Phone Intelligence
+                            <i class="bi bi-telephone"></i> {{ _('Phone Intelligence') }}
                         </a>
                     </li>
                     <li class="nav-item">
@@ -60,13 +60,13 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('chatbot.chat_page') }}">
-                            <i class="bi bi-robot"></i> AI Assistent
+                            <i class="bi bi-robot"></i> {{ _('AI Assistant') }}
                         </a>
                     </li>
                     {% if current_user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link text-warning" href="{{ url_for('admin.dashboard') }}">
-                            <i class="bi bi-shield-lock"></i> Admin
+                            <i class="bi bi-shield-lock"></i> {{ _('Admin') }}
                         </a>
                     </li>
                     {% endif %}
@@ -82,20 +82,20 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
-                                <i class="bi bi-person"></i> Profil
+                                <i class="bi bi-person"></i> {{ _('Profile') }}
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('auth.company_profile') }}">
-                                <i class="bi bi-building"></i> Firmenprofil
+                                <i class="bi bi-building"></i> {{ _('Company Profile') }}
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('payments.pricing') }}">
-                                <i class="bi bi-credit-card"></i> Abonnement
+                                <i class="bi bi-credit-card"></i> {{ _('Subscription') }}
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('payments.customer_portal') }}">
-                                <i class="bi bi-gear"></i> Zahlungen verwalten
+                                <i class="bi bi-gear"></i> {{ _('Manage Payments') }}
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
-                                <i class="bi bi-box-arrow-right"></i> Abmelden
+                                <i class="bi bi-box-arrow-right"></i> {{ _('Logout') }}
                             </a></li>
                         </ul>
                     </li>
@@ -103,10 +103,10 @@
                 {% else %}
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('landing') }}#features">Funktionen</a>
+                        <a class="nav-link" href="{{ url_for('landing') }}#features">{{ _('Features') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('payments.pricing') }}">Preise</a>
+                        <a class="nav-link" href="{{ url_for('payments.pricing') }}">{{ _('Pricing') }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="https://www.linkedin.com/company/111149982/page-posts/published/" target="_blank">
@@ -114,11 +114,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">Anmelden</a>
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Sign In') }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="btn btn-primary ms-2" href="{{ url_for('auth.register') }}">
-                            Kostenlos Starten
+                            {{ _('Start Free') }}
                         </a>
                     </li>
                 </ul>
@@ -155,32 +155,32 @@
                     </p>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <h6 class="text-uppercase fw-bold mb-3">Rechtliches</h6>
+                    <h6 class="text-uppercase fw-bold mb-3">{{ _('Rechtliches') }}</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2">
                             <a href="{{ url_for('legal.impressum') }}" class="text-muted text-decoration-none">
-                                <i class="bi bi-file-text"></i> Impressum
+                                <i class="bi bi-file-text"></i> {{ _('Impressum') }}
                             </a>
                         </li>
                         <li class="mb-2">
                             <a href="{{ url_for('legal.datenschutz') }}" class="text-muted text-decoration-none">
-                                <i class="bi bi-shield-lock"></i> Datenschutz
+                                <i class="bi bi-shield-lock"></i> {{ _('Datenschutz') }}
                             </a>
                         </li>
                         <li class="mb-2">
                             <a href="{{ url_for('legal.agb') }}" class="text-muted text-decoration-none">
-                                <i class="bi bi-file-earmark-text"></i> AGB
+                                <i class="bi bi-file-earmark-text"></i> {{ _('AGB') }}
                             </a>
                         </li>
                         <li class="mb-2">
                             <a href="{{ url_for('legal.gdpr_request') }}" class="text-muted text-decoration-none">
-                                <i class="bi bi-shield-check"></i> DSGVO-Anfrage
+                                <i class="bi bi-shield-check"></i> {{ _('DSGVO-Anfrage') }}
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <h6 class="text-uppercase fw-bold mb-3">Kontakt</h6>
+                    <h6 class="text-uppercase fw-bold mb-3">{{ _('Kontakt') }}</h6>
                     <p class="text-muted small mb-1">
                         <i class="bi bi-envelope"></i> 
                         <a href="mailto:andrii.it.info@gmail.com" class="text-muted text-decoration-none">
@@ -209,12 +209,12 @@
             <div class="row">
                 <div class="col-md-8 text-center text-md-start">
                     <p class="text-muted small mb-0">
-                        © {{ current_date.year if current_date else 2025 }} AndriiIT. Alle Rechte vorbehalten. | USt-IdNr: DE456902445
+                        © {{ current_date.year if current_date else 2025 }} AndriiIT. {{ _('Alle Rechte vorbehalten') }}. | USt-IdNr: DE456902445
                     </p>
                 </div>
                 <div class="col-md-4 text-center text-md-end">
                     <p class="text-muted small mb-0">
-                        <i class="bi bi-shield-check text-success"></i> DSGVO-konform
+                        <i class="bi bi-shield-check text-success"></i> {{ _('DSGVO-konform') }}
                     </p>
                 </div>
             </div>

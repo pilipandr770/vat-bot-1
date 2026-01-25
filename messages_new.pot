@@ -1,0 +1,131 @@
+# Translations template for VAT Bot.
+# Copyright (C) 2026 VAT Bot Team
+# This file is distributed under the same license as the VAT Bot project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: VAT Bot 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 18:58+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:7
+msgid "VAT Verification System"
+msgstr ""
+
+#: templates/base.html:16
+msgid "VAT Verification"
+msgstr ""
+
+#: templates/base.html:26
+msgid "Dashboard"
+msgstr ""
+
+#: templates/base.html:33
+msgid "OSINT Scanner"
+msgstr ""
+
+#: templates/base.html:38
+msgid "Phone Intelligence"
+msgstr ""
+
+#: templates/base.html:43
+msgid "Link Scanner"
+msgstr ""
+
+#: templates/base.html:48
+msgid "MailGuard"
+msgstr ""
+
+#: templates/base.html:53
+msgid "Website Scanner"
+msgstr ""
+
+#: templates/base.html:58
+msgid "CRM"
+msgstr ""
+
+#: templates/base.html:63
+msgid "AI Assistant"
+msgstr ""
+
+#: templates/base.html:69
+msgid "Admin"
+msgstr ""
+
+#: templates/base.html:85
+msgid "Profile"
+msgstr ""
+
+#: templates/base.html:88
+msgid "Company Profile"
+msgstr ""
+
+#: templates/base.html:91
+msgid "Subscription"
+msgstr ""
+
+#: templates/base.html:94
+msgid "Manage Payments"
+msgstr ""
+
+#: templates/base.html:98
+msgid "Logout"
+msgstr ""
+
+#: templates/base.html:106
+msgid "Features"
+msgstr ""
+
+#: templates/base.html:109
+msgid "Pricing"
+msgstr ""
+
+#: templates/base.html:117
+msgid "Sign In"
+msgstr ""
+
+#: templates/base.html:121
+msgid "Start Free"
+msgstr ""
+
+#: templates/base.html:158
+msgid "Rechtliches"
+msgstr ""
+
+#: templates/base.html:162
+msgid "Impressum"
+msgstr ""
+
+#: templates/base.html:167
+msgid "Datenschutz"
+msgstr ""
+
+#: templates/base.html:172
+msgid "AGB"
+msgstr ""
+
+#: templates/base.html:177
+msgid "DSGVO-Anfrage"
+msgstr ""
+
+#: templates/base.html:183
+msgid "Kontakt"
+msgstr ""
+
+#: templates/base.html:212
+msgid "Alle Rechte vorbehalten"
+msgstr ""
+
+#: templates/base.html:217
+msgid "DSGVO-konform"
+msgstr ""
+

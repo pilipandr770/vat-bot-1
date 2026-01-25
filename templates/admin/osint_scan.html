@@ -1,36 +1,36 @@
 <!-- FILE: templates/admin/osint_scan.html -->
 {% extends "base.html" %}
 
-{% block title %}OSINT Scanner{% endblock %}
+{% block title %}{{ _('OSINT Scanner') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <h2 class="mb-4">
-                <i class="bi bi-shield-check"></i> OSINT Scanner
+                <i class="bi bi-shield-check"></i> {{ _('OSINT Scanner') }}
             </h2>
-            <p class="text-muted">Passive Datensammlung über Domain, Website oder E-Mail des Kontrahenten.</p>
+            <p class="text-muted">{{ _('Passive data collection about the counterparty\'s domain, website, or email.') }}</p>
             <form method="post" class="card p-4 shadow-sm">
                 <div class="mb-3">
-                    <label class="form-label fw-bold">URL (optional)</label>
-                    <input class="form-control" type="url" name="url" placeholder="https://example.com" />
-                    <small class="form-text text-muted">Vollständige URL der Website für die Analyse von Headers und sozialen Medien.</small>
+                    <label class="form-label fw-bold">{{ _('URL (optional)') }}</label>
+                    <input class="form-control" type="url" name="url" placeholder="{{ _('https://example.com') }}" />
+                    <small class="form-text text-muted">{{ _('Complete website URL for header and social media analysis.') }}</small>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Domain <span class="text-danger">*</span></label>
-                    <input class="form-control" type="text" name="domain" placeholder="example.com" required />
-                    <small class="form-text text-muted">Primäre Domain des Unternehmens für WHOIS-, DNS- und SSL-Überprüfungen.</small>
+                    <label class="form-label fw-bold">{{ _('Domain') }} <span class="text-danger">*</span></label>
+                    <input class="form-control" type="text" name="domain" placeholder="{{ _('example.com') }}" required />
+                    <small class="form-text text-muted">{{ _('Primary company domain for WHOIS, DNS, and SSL checks.') }}</small>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">E-Mail (optional)</label>
-                    <input class="form-control" type="email" name="email" placeholder="info@example.com" />
-                    <small class="form-text text-muted">E-Mail für grundlegende Format-Validierung.</small>
+                    <label class="form-label fw-bold">{{ _('Email (optional)') }}</label>
+                    <input class="form-control" type="email" name="email" placeholder="{{ _('info@example.com') }}" />
+                    <small class="form-text text-muted">{{ _('Email for basic format validation.') }}</small>
                 </div>
 
                 <div class="d-grid gap-2">
                     <button class="btn btn-primary btn-lg" type="submit">
-                        <i class="bi bi-search"></i> Scan starten
+                        <i class="bi bi-search"></i> {{ _('Start Scan') }}
                     </button>
                 </div>
             </form>
@@ -41,12 +41,22 @@
 </div>
 
 <script>
+const osintTranslations = {
+  scanning: "{{ _('Scanning...') }}",
+  invalidResponse: "{{ _('Server returned invalid response. Please try again later.') }}",
+  scanCompleted: "{{ _('Scan completed') }}",
+  results: "{{ _('Results') }}",
+  viewFullResults: "{{ _('View full results') }}",
+  scanError: "{{ _('Scan error') }}",
+  contactSupport: "{{ _('If the error persists, please contact support.') }}"
+};
+
 document.querySelector('form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = e.target.querySelector('button[type="submit"]');
   const originalText = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Wird gescannt...';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' + osintTranslations.scanning;
   try {
     const fd = new FormData(e.target);
     const res = await fetch("", { method: "POST", body: fd });
@@ -54,7 +64,7 @@ document.querySelector('form').addEventListener('submit', async (e) => {
     // Überprüfung auf JSON
     const contentType = res.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      throw new Error("Server hat ungültige Antwort zurückgegeben. Versuchen Sie es später.");
+      throw new Error(osintTranslations.invalidResponse);
     }
 
     const data = await res.json();
@@ -65,9 +75,9 @@ document.querySelector('form').addEventListener('submit', async (e) => {
     }
 
     let html = '<div class="card shadow-sm"><div class="card-body">';
-    html += '<h5 class="card-title text-success"><i class="bi bi-check-circle"></i> Scan abgeschlossen</h5>';
+    html += '<h5 class="card-title text-success"><i class="bi bi-check-circle"></i> ' + osintTranslations.scanCompleted + '</h5>';
     html += '<div class="alert alert-info mt-3">';
-    html += '<strong>Ergebnisse:</strong>';
+    html += '<strong>' + osintTranslations.results + ':</strong>';
     html += '<ul class="mb-0 mt-2">';
 
     data.results.forEach(r => {
@@ -79,7 +89,7 @@ document.querySelector('form').addEventListener('submit', async (e) => {
 
     html += '</ul></div>';
     html += `<a class="btn btn-primary mt-3" href="/osint/scan/${data.scan_id}">`;
-    html += '<i class="bi bi-eye"></i> Vollständige Ergebnisse anzeigen</a>';
+    html += '<i class="bi bi-eye"></i> ' + osintTranslations.viewFullResults + '</a>';
     html += '</div></div>';
 
     document.getElementById('result').innerHTML = html;
@@ -88,8 +98,8 @@ document.querySelector('form').addEventListener('submit', async (e) => {
     document.getElementById('result').innerHTML =
       `<div class="alert alert-danger">
         <i class="bi bi-exclamation-triangle"></i>
-        <strong>Scan-Fehler:</strong> ${error.message}
-        <br><small>Falls der Fehler weiterhin besteht, kontaktieren Sie den Support.</small>
+        <strong>${osintTranslations.scanError}:</strong> ${error.message}
+        <br><small>${osintTranslations.contactSupport}</small>
       </div>`;
   } finally {
     btn.disabled = false;

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Phone Intelligence{% endblock %}
+{% block title %}{{ _('Phone Intelligence') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -8,29 +8,29 @@
     <div class="col-md-8 offset-md-2">
       <div class="card">
         <div class="card-header">
-          <h2 class="mb-0"><i class="bi bi-telephone"></i> Phone Intelligence</h2>
+          <h2 class="mb-0"><i class="bi bi-telephone"></i> {{ _('Phone Intelligence') }}</h2>
         </div>
         <div class="card-body">
-          <p class="text-muted">Analyze phone numbers for carrier information, line type, and risk assessment. No personal data is stored.</p>
+          <p class="text-muted">{{ _('Analyze phone numbers for carrier information, line type, and risk assessment. No personal data is stored.') }}</p>
           
           <form id="phone-form" class="mb-4">
             <div class="row">
               <div class="col-md-8">
-                <label for="phone" class="form-label">Phone Number</label>
-                <input id="phone" name="phone" class="form-control" placeholder="+491512345678" required />
+                <label for="phone" class="form-label">{{ _('Phone Number') }}</label>
+                <input id="phone" name="phone" class="form-control" placeholder="{{ _('+491512345678') }}" required />
               </div>
               <div class="col-md-4">
-                <label for="country" class="form-label">Country Hint (ISO2)</label>
-                <input id="country" name="country" class="form-control" placeholder="DE" />
+                <label for="country" class="form-label">{{ _('Country Hint (ISO2)') }}</label>
+                <input id="country" name="country" class="form-control" placeholder="{{ _('DE') }}" />
               </div>
             </div>
             <button type="submit" class="btn btn-primary mt-3" id="analyze-btn">
-              <i class="bi bi-search"></i> Analyze
+              <i class="bi bi-search"></i> {{ _('Analyze') }}
             </button>
           </form>
 
           <div id="result" class="mt-4" style="display: none;">
-            <h5>Analysis Results</h5>
+            <h5>{{ _('Analysis Results') }}</h5>
             <div id="result-content"></div>
           </div>
         </div>
@@ -40,11 +40,30 @@
 </div>
 
 <script>
+const translations = {
+  analyzing: "{{ _('Analyzing...') }}",
+  basicInformation: "{{ _('Basic Information') }}",
+  country: "{{ _('Country') }}",
+  carrier: "{{ _('Carrier') }}",
+  lineType: "{{ _('Line Type') }}",
+  riskAssessment: "{{ _('Risk Assessment') }}",
+  riskScore: "{{ _('Risk Score') }}",
+  verdict: "{{ _('Verdict') }}",
+  disposable: "{{ _('Disposable') }}",
+  seenInScamDb: "{{ _('Seen in Scam DB') }}",
+  suspiciousPatterns: "{{ _('Suspicious Patterns') }}",
+  analysisFailed: "{{ _('Analysis failed') }}",
+  networkError: "{{ _('Network error occurred') }}",
+  unknown: "{{ _('Unknown') }}",
+  yes: "{{ _('Yes') }}",
+  no: "{{ _('No') }}"
+};
+
 document.getElementById('phone-form').addEventListener('submit', async function(e){
   e.preventDefault();
   const btn = document.getElementById('analyze-btn');
   const originalText = btn.innerHTML;
-  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Analyzing...';
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> ' + translations.analyzing;
   btn.disabled = true;
 
   const phone = document.getElementById('phone').value;
@@ -65,24 +84,24 @@ document.getElementById('phone-form').addEventListener('submit', async function(
       let html = '<div class="row">';
       
       // Basic info
-      html += '<div class="col-md-6"><h6>Basic Information</h6><ul class="list-group">';
-      html += `<li class="list-group-item"><strong>Country:</strong> ${data.country || 'Unknown'}</li>`;
-      html += `<li class="list-group-item"><strong>Carrier:</strong> ${data.carrier || 'Unknown'}</li>`;
-      html += `<li class="list-group-item"><strong>Line Type:</strong> ${data.line_type}</li>`;
+      html += '<div class="col-md-6"><h6>' + translations.basicInformation + '</h6><ul class="list-group">';
+      html += `<li class="list-group-item"><strong>${translations.country}:</strong> ${data.country || translations.unknown}</li>`;
+      html += `<li class="list-group-item"><strong>${translations.carrier}:</strong> ${data.carrier || translations.unknown}</li>`;
+      html += `<li class="list-group-item"><strong>${translations.lineType}:</strong> ${data.line_type}</li>`;
       html += '</ul></div>';
       
       // Risk assessment
-      html += '<div class="col-md-6"><h6>Risk Assessment</h6><ul class="list-group">';
-      html += `<li class="list-group-item"><strong>Risk Score:</strong> ${data.risk_score}/100</li>`;
-      html += `<li class="list-group-item"><strong>Verdict:</strong> <span class="badge bg-${data.verdict === 'high' ? 'danger' : data.verdict === 'medium' ? 'warning' : 'success'}">${data.verdict}</span></li>`;
-      html += `<li class="list-group-item"><strong>Disposable:</strong> ${data.disposable ? 'Yes' : 'No'}</li>`;
-      html += `<li class="list-group-item"><strong>Seen in Scam DB:</strong> ${data.seen_in_scam_db ? 'Yes' : 'No'}</li>`;
+      html += '<div class="col-md-6"><h6>' + translations.riskAssessment + '</h6><ul class="list-group">';
+      html += `<li class="list-group-item"><strong>${translations.riskScore}:</strong> ${data.risk_score}/100</li>`;
+      html += `<li class="list-group-item"><strong>${translations.verdict}:</strong> <span class="badge bg-${data.verdict === 'high' ? 'danger' : data.verdict === 'medium' ? 'warning' : 'success'}">${data.verdict}</span></li>`;
+      html += `<li class="list-group-item"><strong>${translations.disposable}:</strong> ${data.disposable ? translations.yes : translations.no}</li>`;
+      html += `<li class="list-group-item"><strong>${translations.seenInScamDb}:</strong> ${data.seen_in_scam_db ? translations.yes : translations.no}</li>`;
       html += '</ul></div>';
       
       html += '</div>';
       
       if (data.suspicious_patterns && data.suspicious_patterns.length > 0) {
-        html += '<div class="mt-3"><h6>Suspicious Patterns</h6><ul class="list-group">';
+        html += '<div class="mt-3"><h6>' + translations.suspiciousPatterns + '</h6><ul class="list-group">';
         data.suspicious_patterns.forEach(pattern => {
           html += `<li class="list-group-item list-group-item-warning">${pattern}</li>`;
         });
@@ -92,11 +111,11 @@ document.getElementById('phone-form').addEventListener('submit', async function(
       resultContent.innerHTML = html;
       resultDiv.style.display = 'block';
     } else {
-      resultContent.innerHTML = `<div class="alert alert-danger">${json.error || 'Analysis failed'}</div>`;
+      resultContent.innerHTML = `<div class="alert alert-danger">${json.error || translations.analysisFailed}</div>`;
       resultDiv.style.display = 'block';
     }
   } catch (error) {
-    resultContent.innerHTML = '<div class="alert alert-danger">Network error occurred</div>';
+    resultContent.innerHTML = '<div class="alert alert-danger">' + translations.networkError + '</div>';
     resultDiv.style.display = 'block';
   } finally {
     btn.innerHTML = originalText;

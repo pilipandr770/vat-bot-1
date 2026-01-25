@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Preise - VAT Verification System{% endblock %}
+{% block title %}{{ _('Pricing - VAT Verification System') }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -40,8 +40,8 @@
     </script>
     <!-- Header -->
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold mb-3">Wählen Sie Ihren Plan</h1>
-        <p class="lead text-muted">Transparente Preise. Keine versteckten Gebühren. Jederzeit kündbar.</p>
+        <h1 class="display-4 fw-bold mb-3">{{ _('Choose Your Plan') }}</h1>
+        <p class="lead text-muted">{{ _('Transparent pricing. No hidden fees. Cancel anytime.') }}</p>
     </div>
 
     <!-- Pricing Cards -->
@@ -51,7 +51,7 @@
             <div class="card h-100 {% if plan.featured %}border-primary shadow-lg{% else %}shadow-sm{% endif %}">
                 {% if plan.featured %}
                 <div class="card-header bg-primary text-white text-center py-2">
-                    <strong>⭐ Am beliebtesten</strong>
+                    <strong>⭐ {{ _('Most Popular') }}</strong>
                 </div>
                 {% endif %}
                 
@@ -69,9 +69,9 @@
                     <div class="text-center mb-4">
                         <span class="badge bg-secondary fs-6 px-3 py-2">
                             {% if plan.api_calls == 'Unbegrenzt' %}
-                            {{ plan.api_calls }} Prüfungen
+                            {{ plan.api_calls }} {{ _('verifications') }}
                             {% else %}
-                            {{ plan.api_calls }} Prüfungen/Monat
+                            {{ plan.api_calls }} {{ _('verifications/month') }}
                             {% endif %}
                         </span>
                     </div>
@@ -91,7 +91,7 @@
                         {% if current_user.is_authenticated %}
                             {% if current_user.subscription_plan == plan.name %}
                             <button class="btn btn-outline-secondary w-100" disabled>
-                                Aktueller Plan
+                                {{ _('Current Plan') }}
                             </button>
                             {% else %}
                                 {% if plan.cta_params %}
@@ -121,7 +121,7 @@
 
     <!-- FAQ Section -->
     <div class="mt-5 pt-5 border-top">
-        <h2 class="text-center mb-4">Häufig gestellte Fragen</h2>
+        <h2 class="text-center mb-4">{{ _('Frequently Asked Questions') }}</h2>
         
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -130,13 +130,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                Kann ich jederzeit kündigen?
+                                {{ _('Can I cancel anytime?') }}
                             </button>
                         </h2>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#pricingFAQ">
                             <div class="accordion-body">
-                                Ja, Sie können Ihr Abonnement jederzeit ohne Kündigungsfrist beenden. 
-                                Es gibt keine langfristigen Verpflichtungen.
+                                {{ _('Yes, you can cancel your subscription at any time without notice. There are no long-term commitments.') }}
                             </div>
                         </div>
                     </div>
@@ -145,13 +144,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                Was passiert, wenn ich mein Limit überschreite?
+                                {{ _('What happens if I exceed my limit?') }}
                             </button>
                         </h2>
                         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
                             <div class="accordion-body">
-                                Beim kostenlosen Plan werden keine weiteren Prüfungen möglich sein, bis der nächste Monat beginnt.
-                                Bei bezahlten Plänen können Sie jederzeit upgraden, um mehr Prüfungen durchzuführen.
+                                {{ _('With the free plan, no further verifications will be possible until the next month begins. With paid plans, you can upgrade at any time to perform more verifications.') }}
                             </div>
                         </div>
                     </div>
@@ -160,13 +158,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                Welche Zahlungsmethoden akzeptieren Sie?
+                                {{ _('What payment methods do you accept?') }}
                             </button>
                         </h2>
                         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
                             <div class="accordion-body">
-                                Wir akzeptieren alle gängigen Kreditkarten (Visa, Mastercard, American Express) 
-                                sowie SEPA-Lastschrift über unseren sicheren Zahlungsanbieter Stripe.
+                                {{ _('We accept all major credit cards (Visa, Mastercard, American Express) as well as SEPA direct debit through our secure payment provider Stripe.') }}
                             </div>
                         </div>
                     </div>
@@ -175,14 +172,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                Kann ich zwischen Plänen wechseln?
+                                {{ _('Can I switch between plans?') }}
                             </button>
                         </h2>
                         <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
                             <div class="accordion-body">
-                                Ja, Sie können jederzeit upgraden oder downgraden. 
-                                Bei einem Upgrade erhalten Sie sofort Zugriff auf die zusätzlichen Features. 
-                                Bei einem Downgrade werden die Änderungen am Ende des aktuellen Abrechnungszeitraums wirksam.
+                                {{ _('Yes, you can upgrade or downgrade at any time. When upgrading, you get immediate access to additional features. When downgrading, changes take effect at the end of the current billing period.') }}
                             </div>
                         </div>
                     </div>
@@ -191,13 +186,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                                Gibt es eine Geld-zurück-Garantie?
+                                {{ _('Is there a money-back guarantee?') }}
                             </button>
                         </h2>
                         <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
                             <div class="accordion-body">
-                                Ja, wir bieten eine 14-tägige Geld-zurück-Garantie für alle bezahlten Pläne. 
-                                Wenn Sie nicht zufrieden sind, erstatten wir Ihnen den vollen Betrag zurück.
+                                {{ _('Yes, we offer a 14-day money-back guarantee for all paid plans. If you are not satisfied, we will refund you the full amount.') }}
                             </div>
                         </div>
                     </div>
@@ -206,14 +200,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
-                                Benötigen Sie eine individuelle Lösung?
+                                {{ _('Do you need a custom solution?') }}
                             </button>
                         </h2>
                         <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
                             <div class="accordion-body">
-                                Für Unternehmen mit speziellen Anforderungen bieten wir maßgeschneiderte Enterprise-Lösungen an. 
-                                Kontaktieren Sie uns unter <a href="mailto:enterprise@vat-verification.de">enterprise@vat-verification.de</a> 
-                                für ein individuelles Angebot.
+                                {{ _('For companies with special requirements, we offer customized Enterprise solutions. Contact us at') }} <a href="mailto:enterprise@vat-verification.de">enterprise@vat-verification.de</a> {{ _('for a custom quote.') }}
                             </div>
                         </div>
                     </div>
@@ -226,16 +218,16 @@
     <div class="mt-5 pt-4 text-center">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <p class="text-muted mb-3">Vertraut von über 500 Unternehmen in Europa</p>
+                <p class="text-muted mb-3">{{ _('Trusted by over 500 companies in Europe') }}</p>
                 <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
                     <span class="badge bg-light text-dark p-3">
-                        <i class="bi bi-shield-check me-2"></i>SSL verschlüsselt
+                        <i class="bi bi-shield-check me-2"></i>{{ _('SSL encrypted') }}
                     </span>
                     <span class="badge bg-light text-dark p-3">
-                        <i class="bi bi-check-circle me-2"></i>GDPR konform
+                        <i class="bi bi-check-circle me-2"></i>{{ _('GDPR compliant') }}
                     </span>
                     <span class="badge bg-light text-dark p-3">
-                        <i class="bi bi-credit-card me-2"></i>Stripe-gesichert
+                        <i class="bi bi-credit-card me-2"></i>{{ _('Stripe secured') }}
                     </span>
                 </div>
             </div>
@@ -244,10 +236,10 @@
 
     <!-- CTA Section -->
     <div class="mt-5 pt-5 text-center">
-        <h3 class="mb-3">Noch Fragen?</h3>
-        <p class="text-muted mb-4">Unser Support-Team hilft Ihnen gerne weiter.</p>
+        <h3 class="mb-3">{{ _('Still have questions?') }}</h3>
+        <p class="text-muted mb-4">{{ _('Our support team is here to help.') }}</p>
         <a href="mailto:support@vat-verification.de" class="btn btn-outline-primary btn-lg">
-            <i class="bi bi-envelope me-2"></i>Kontaktieren Sie uns
+            <i class="bi bi-envelope me-2"></i>{{ _('Contact us') }}
         </a>
     </div>
 </div>

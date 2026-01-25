@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Link-Scanner - URL-Sicherheitsprüfung{% endblock %}
+{% block title %}{{ _('Link Scanner - URL Security Check') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
@@ -8,8 +8,8 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h4><i class="bi bi-link-45deg"></i> Link-Scanner</h4>
-                    <small class="text-white-50">Prüfen Sie URLs auf Phishing, Malware und andere Bedrohungen</small>
+                    <h4><i class="bi bi-link-45deg"></i> {{ _('Link Scanner') }}</h4>
+                    <small class="text-white-50">{{ _('Check URLs for phishing, malware and other threats') }}</small>
                 </div>
                 <div class="card-body">
                     <!-- URL Input Section -->
@@ -18,19 +18,19 @@
                             <div class="url-input-zone">
                                 <div class="mb-4">
                                     <label for="urlInput" class="form-label h5">
-                                        <i class="bi bi-globe"></i> URL eingeben
+                                        <i class="bi bi-globe"></i> {{ _('Enter URL') }}
                                     </label>
                                     <div class="input-group input-group-lg">
                                         <span class="input-group-text"><i class="bi bi-link"></i></span>
                                         <input type="url" class="form-control" id="urlInput" 
-                                               placeholder="https://example.com oder example.com"
+                                               placeholder="{{ _('https://example.com or example.com') }}"
                                                autofocus>
                                         <button class="btn btn-primary" type="button" id="scanBtn" onclick="scanUrl()">
-                                            <i class="bi bi-shield-check"></i> Prüfen
+                                            <i class="bi bi-shield-check"></i> {{ _('Check') }}
                                         </button>
                                     </div>
                                     <div class="form-text" style="color: #00ff00 !important;">
-                                        Geben Sie eine vollständige URL ein (z.B. https://example.com/page)
+                                        {{ _('Enter a complete URL (e.g. https://example.com/page)') }}
                                     </div>
                                 </div>
 
@@ -39,7 +39,7 @@
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="batchMode" onchange="toggleBatchMode()">
                                         <label class="form-check-label" for="batchMode" style="color: #00ff00;">
-                                            <i class="bi bi-collection"></i> Mehrere URLs gleichzeitig prüfen
+                                            <i class="bi bi-collection"></i> {{ _('Check multiple URLs simultaneously') }}
                                         </label>
                                     </div>
                                 </div>
@@ -47,12 +47,12 @@
                                 <!-- Batch Input (hidden by default) -->
                                 <div id="batchSection" style="display: none;">
                                     <label for="batchUrls" class="form-label">
-                                        <i class="bi bi-list-ul"></i> URLs (eine pro Zeile, max. 20)
+                                        <i class="bi bi-list-ul"></i> {{ _('URLs (one per line, max. 20)') }}
                                     </label>
                                     <textarea class="form-control" id="batchUrls" rows="6" 
-                                              placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"></textarea>
+                                              placeholder="{{ _('https://example1.com\nhttps://example2.com\nhttps://example3.com') }}"></textarea>
                                     <button class="btn btn-primary mt-3" type="button" onclick="scanBatch()">
-                                        <i class="bi bi-shield-check"></i> Alle prüfen
+                                        <i class="bi bi-shield-check"></i> {{ _('Check All') }}
                                     </button>
                                 </div>
                             </div>
@@ -61,17 +61,17 @@
                         <div class="col-lg-4">
                             <div class="card border-info">
                                 <div class="card-header bg-info text-white">
-                                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Was wird geprüft?</h6>
+                                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> {{ _('What is being checked?') }}</h6>
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-unstyled mb-0" style="color: #00ff00;">
-                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> SSL/HTTPS-Verschlüsselung</li>
-                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> Phishing-Erkennung</li>
-                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> VirusTotal Datenbank</li>
-                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> Google Safe Browsing</li>
-                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> Verdächtige Domains</li>
-                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> URL-Shortener Erkennung</li>
-                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> Weiterleitungs-Analyse</li>
+                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> {{ _('SSL/HTTPS encryption') }}</li>
+                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> {{ _('Phishing detection') }}</li>
+                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> {{ _('VirusTotal database') }}</li>
+                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> {{ _('Google Safe Browsing') }}</li>
+                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> {{ _('Suspicious domains') }}</li>
+                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> {{ _('URL shortener detection') }}</li>
+                                        <li class="mb-2" style="color: #00ff00;"><i class="bi bi-check-circle text-success"></i> {{ _('Redirect analysis') }}</li>
                                     </ul>
                                 </div>
                             </div>
@@ -79,12 +79,12 @@
                             <!-- Recent Scans -->
                             <div class="card mt-3 border-secondary">
                                 <div class="card-header bg-secondary text-white">
-                                    <h6 class="mb-0"><i class="bi bi-clock-history"></i> Letzte Prüfungen</h6>
+                                    <h6 class="mb-0"><i class="bi bi-clock-history"></i> {{ _('Recent Checks') }}</h6>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush" id="recentScans">
                                         <li class="list-group-item text-center small py-3" style="color: #00ff00;">
-                                            Noch keine Prüfungen durchgeführt
+                                            {{ _('No checks performed yet') }}
                                         </li>
                                     </ul>
                                 </div>
@@ -96,7 +96,7 @@
                     <div id="progressSection" class="mt-4" style="display: none;">
                         <div class="d-flex align-items-center">
                             <div class="spinner-border text-primary me-3" role="status">
-                                <span class="visually-hidden">Lädt...</span>
+                                <span class="visually-hidden">{{ _('Loading...') }}</span>
                             </div>
                             <div>
                                 <h6 class="mb-0">URL wird analysiert...</h6>
@@ -199,6 +199,45 @@
 <script>
 let recentScans = [];
 
+// Translation object for JavaScript strings
+const linkScannerTranslations = {
+    pleaseEnterUrl: "{{ _('Please enter a URL') }}",
+    networkError: "{{ _('Network error') }}",
+    pleaseEnterAtLeastOneUrl: "{{ _('Please enter at least one URL') }}",
+    noValidUrlsFound: "{{ _('No valid URLs found') }}",
+    maximum20UrlsAllowed: "{{ _('Maximum 20 URLs allowed') }}",
+    loading: "{{ _('Loading...') }}",
+    safe: "{{ _('Safe') }}",
+    suspicious: "{{ _('Suspicious') }}",
+    malicious: "{{ _('Malicious') }}",
+    sslHttpsEncryption: "{{ _('SSL/HTTPS encryption') }}",
+    phishingDetection: "{{ _('Phishing detection') }}",
+    virusTotalDatabase: "{{ _('VirusTotal database') }}",
+    googleSafeBrowsing: "{{ _('Google Safe Browsing') }}",
+    suspiciousDomains: "{{ _('Suspicious domains') }}",
+    urlShortenerDetection: "{{ _('URL shortener detection') }}",
+    redirectAnalysis: "{{ _('Redirect analysis') }}",
+    accessibility: "{{ _('Accessibility') }}",
+    heuristicAnalysis: "{{ _('Heuristic analysis') }}",
+    noSuspiciousPatternsFound: "{{ _('No suspicious patterns found') }}",
+    trustedDomain: "{{ _('Trusted domain') }}",
+    enginesReportThreat: "{{ _('engines report threat') }}",
+    status: "{{ _('Status') }}",
+    redirects: "{{ _('redirects') }}",
+    recommendations: "{{ _('Recommendations') }}",
+    detectedThreats: "{{ _('Detected threats') }}",
+    detailedChecks: "{{ _('Detailed checks') }}",
+    domain: "{{ _('Domain') }}",
+    scanning: "{{ _('Scanning') }}",
+    scanCompleted: "{{ _('Scan completed') }}",
+    error: "{{ _('Error') }}",
+    batchScanResults: "{{ _('Batch scan results') }}",
+    url: "{{ _('URL') }}",
+    verdict: "{{ _('Verdict') }}",
+    score: "{{ _('Score') }}",
+    time: "{{ _('Time') }}"
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Enter key handler
     document.getElementById('urlInput').addEventListener('keypress', function(e) {
@@ -235,7 +274,7 @@ function toggleBatchMode() {
 function scanUrl() {
     const url = document.getElementById('urlInput').value.trim();
     if (!url) {
-        alert('Bitte geben Sie eine URL ein');
+        alert(linkScannerTranslations.pleaseEnterUrl);
         return;
     }
 
@@ -261,25 +300,25 @@ function scanUrl() {
     })
     .catch(error => {
         hideProgress();
-        displayError('Netzwerkfehler: ' + error.message);
+        displayError(linkScannerTranslations.networkError + ': ' + error.message);
     });
 }
 
 function scanBatch() {
     const text = document.getElementById('batchUrls').value.trim();
     if (!text) {
-        alert('Bitte geben Sie mindestens eine URL ein');
+        alert(linkScannerTranslations.pleaseEnterAtLeastOneUrl);
         return;
     }
 
     const urls = text.split('\n').map(u => u.trim()).filter(u => u);
     if (urls.length === 0) {
-        alert('Keine gültigen URLs gefunden');
+        alert(linkScannerTranslations.noValidUrlsFound);
         return;
     }
 
     if (urls.length > 20) {
-        alert('Maximal 20 URLs erlaubt');
+        alert(linkScannerTranslations.maximum20UrlsAllowed);
         return;
     }
 
@@ -329,13 +368,13 @@ function displayResult(data) {
 
     let verdictText, verdictIcon;
     if (verdict === 'safe') {
-        verdictText = 'Sicher';
+        verdictText = linkScannerTranslations.safe;
         verdictIcon = 'bi-shield-check';
     } else if (verdict === 'suspicious') {
-        verdictText = 'Verdächtig';
+        verdictText = linkScannerTranslations.suspicious;
         verdictIcon = 'bi-exclamation-triangle';
     } else {
-        verdictText = 'Gefährlich';
+        verdictText = linkScannerTranslations.malicious;
         verdictIcon = 'bi-shield-x';
     }
 
@@ -343,15 +382,15 @@ function displayResult(data) {
     
     // SSL Check
     if (checks.ssl) {
-        checksHtml += renderCheck('SSL/HTTPS', checks.ssl, 'bi-lock');
+        checksHtml += renderCheck(linkScannerTranslations.sslHttpsEncryption, checks.ssl, 'bi-lock');
     }
 
     // Heuristics
     if (checks.heuristics) {
         const h = checks.heuristics;
-        let heuristicsMsg = h.issues && h.issues.length > 0 ? h.issues.join('; ') : 'Keine verdächtigen Muster gefunden';
-        if (h.trusted_domain) heuristicsMsg = 'Vertrauenswürdige Domain. ' + heuristicsMsg;
-        checksHtml += renderCheck('Heuristische Analyse', {...h, message: heuristicsMsg}, 'bi-cpu');
+        let heuristicsMsg = h.issues && h.issues.length > 0 ? h.issues.join('; ') : linkScannerTranslations.noSuspiciousPatternsFound;
+        if (h.trusted_domain) heuristicsMsg = linkScannerTranslations.trustedDomain + '. ' + heuristicsMsg;
+        checksHtml += renderCheck(linkScannerTranslations.heuristicAnalysis, {...h, message: heuristicsMsg}, 'bi-cpu');
     }
 
     // VirusTotal
@@ -359,27 +398,27 @@ function displayResult(data) {
         const vt = checks.virustotal;
         let vtMsg = vt.message || '';
         if (vt.malicious !== undefined) {
-            vtMsg = `${vt.malicious} von ${vt.total_engines} Engines melden Bedrohung`;
+            vtMsg = `${vt.malicious} ${linkScannerTranslations.enginesReportThreat}`;
         }
-        checksHtml += renderCheck('VirusTotal', {...vt, message: vtMsg}, 'bi-shield-exclamation');
+        checksHtml += renderCheck(linkScannerTranslations.virusTotalDatabase, {...vt, message: vtMsg}, 'bi-shield-exclamation');
     }
 
     // Safe Browsing
     if (checks.safe_browsing) {
-        checksHtml += renderCheck('Google Safe Browsing', checks.safe_browsing, 'bi-google');
+        checksHtml += renderCheck(linkScannerTranslations.googleSafeBrowsing, checks.safe_browsing, 'bi-google');
     }
 
     // Accessibility
     if (checks.accessibility) {
         const acc = checks.accessibility;
-        let accMsg = acc.message || `Status: ${acc.status_code || 'OK'}`;
+        let accMsg = acc.message || `${linkScannerTranslations.status}: ${acc.status_code || 'OK'}`;
         if (acc.redirects > 0) {
-            accMsg += ` (${acc.redirects} Weiterleitungen)`;
+            accMsg += ` (${acc.redirects} ${linkScannerTranslations.redirects})`;
         }
         if (acc.final_url) {
             accMsg += ` → ${acc.final_url}`;
         }
-        checksHtml += renderCheck('Erreichbarkeit', {...acc, message: accMsg}, 'bi-globe2');
+        checksHtml += renderCheck(linkScannerTranslations.accessibility, {...acc, message: accMsg}, 'bi-globe2');
     }
 
     // Recommendations
@@ -387,7 +426,7 @@ function displayResult(data) {
     if (data.recommendations && data.recommendations.length > 0) {
         recsHtml = `
             <div class="mt-3">
-                <h6><i class="bi bi-lightbulb"></i> Empfehlungen</h6>
+                <h6><i class="bi bi-lightbulb"></i> ${linkScannerTranslations.recommendations}</h6>
                 <ul class="mb-0">
                     ${data.recommendations.map(r => `<li>${r}</li>`).join('')}
                 </ul>
@@ -400,7 +439,7 @@ function displayResult(data) {
     if (data.threats && data.threats.length > 0) {
         threatsHtml = `
             <div class="alert alert-danger mt-3">
-                <h6><i class="bi bi-exclamation-octagon"></i> Erkannte Bedrohungen</h6>
+                <h6><i class="bi bi-exclamation-octagon"></i> ${linkScannerTranslations.detectedThreats}</h6>
                 <ul class="mb-0">
                     ${data.threats.map(t => `<li>${t}</li>`).join('')}
                 </ul>
@@ -428,7 +467,7 @@ function displayResult(data) {
                             <a href="${data.url}" target="_blank" rel="noopener noreferrer">${data.url}</a>
                         </p>
                         <small class="text-muted">
-                            <i class="bi bi-building"></i> Domain: ${data.domain}
+                            <i class="bi bi-building"></i> ${linkScannerTranslations.domain}: ${data.domain}
                         </small>
                     </div>
                 </div>
@@ -436,7 +475,7 @@ function displayResult(data) {
                 ${threatsHtml}
 
                 <hr>
-                <h6><i class="bi bi-list-check"></i> Detaillierte Prüfungen</h6>
+                <h6><i class="bi bi-list-check"></i> ${linkScannerTranslations.detailedChecks}</h6>
                 ${checksHtml}
 
                 ${recsHtml}
@@ -489,7 +528,7 @@ function displayBatchResults(data) {
                 <div class="card bg-success text-white">
                     <div class="card-body">
                         <h3>${summary.safe}</h3>
-                        <p class="mb-0">Sicher</p>
+                        <p class="mb-0">${linkScannerTranslations.safe}</p>
                     </div>
                 </div>
             </div>
@@ -497,7 +536,7 @@ function displayBatchResults(data) {
                 <div class="card bg-warning text-dark">
                     <div class="card-body">
                         <h3>${summary.suspicious}</h3>
-                        <p class="mb-0">Verdächtig</p>
+                        <p class="mb-0">${linkScannerTranslations.suspicious}</p>
                     </div>
                 </div>
             </div>
@@ -505,14 +544,14 @@ function displayBatchResults(data) {
                 <div class="card bg-danger text-white">
                     <div class="card-body">
                         <h3>${summary.malicious}</h3>
-                        <p class="mb-0">Gefährlich</p>
+                        <p class="mb-0">${linkScannerTranslations.malicious}</p>
                     </div>
                 </div>
             </div>
         </div>
     `;
 
-    let resultsHtml = '<div class="table-responsive mt-3"><table class="table table-hover"><thead><tr><th>URL</th><th>Status</th><th>Score</th></tr></thead><tbody>';
+    let resultsHtml = `<div class="table-responsive mt-3"><table class="table table-hover"><thead><tr><th>${linkScannerTranslations.url}</th><th>${linkScannerTranslations.verdict}</th><th>${linkScannerTranslations.score}</th></tr></thead><tbody>`;
     
     for (const result of data.results) {
         const verdict = result.verdict || 'unknown';

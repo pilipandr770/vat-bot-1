@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}CRM - Kontrahenten Monitoring{% endblock %}
+{% block title %}{{ _('CRM - Counterparty Monitoring') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <h1 class="display-4">📊 CRM - Kontrahenten Management</h1>
-            <p class="lead">Verwalten Sie Ihre Kontrahenten und überwachen Sie automatisch deren Status</p>
+            <h1 class="display-4">📊 {{ _('CRM - Counterparty Management') }}</h1>
+            <p class="lead">{{ _('Manage your counterparties and automatically monitor their status') }}</p>
         </div>
     </div>
     
@@ -18,7 +18,7 @@
             <div class="card">
                 <div class="card-body text-center">
                     <h3>{{ total_counterparties }}</h3>
-                    <p class="mb-0">Gesamt Kontrahenten</p>
+                    <p class="mb-0">{{ _('Total Counterparties') }}</p>
                 </div>
             </div>
         </div>
@@ -26,7 +26,7 @@
             <div class="card">
                 <div class="card-body text-center">
                     <h3 class="text-success">{{ monitored_counterparties }}</h3>
-                    <p class="mb-0">Aktiv Überwacht</p>
+                    <p class="mb-0">{{ _('Actively Monitored') }}</p>
                 </div>
             </div>
         </div>
@@ -34,7 +34,7 @@
             <div class="card">
                 <div class="card-body text-center">
                     <h3 class="text-warning">{{ recent_alerts|length }}</h3>
-                    <p class="mb-0">Neue Alerts</p>
+                    <p class="mb-0">{{ _('New Alerts') }}</p>
                 </div>
             </div>
         </div>
@@ -42,10 +42,10 @@
             <div class="card">
                 <div class="card-body text-center">
                     <button class="btn btn-success mb-2 w-100" onclick="showAddCounterpartyModal()">
-                        <i class="fas fa-plus"></i> Neu Hinzufügen
+                        <i class="fas fa-plus"></i> {{ _('Add New') }}
                     </button>
                     <button class="btn btn-outline-warning w-100" onclick="findDuplicates()">
-                        <i class="fas fa-copy"></i> Duplikate finden
+                        <i class="fas fa-copy"></i> {{ _('Find Duplicates') }}
                     </button>
                 </div>
             </div>
@@ -58,9 +58,9 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">🚨 Neueste Alerts</h5>
+                    <h5 class="mb-0">🚨 {{ _('Neueste Alerts') }}</h5>
                     <a href="{{ url_for('crm.index') }}#alerts" class="btn btn-sm btn-outline-primary">
-                        Alle anzeigen
+                        {{ _('Alle anzeigen') }}
                     </a>
                 </div>
                 <div class="card-body">
@@ -68,11 +68,11 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Priorität</th>
-                                    <th>Kontrahent</th>
-                                    <th>Nachricht</th>
-                                    <th>Datum</th>
-                                    <th>Status</th>
+                                    <th>{{ _('Priorität') }}</th>
+                                    <th>{{ _('Kontrahent') }}</th>
+                                    <th>{{ _('Nachricht') }}</th>
+                                    <th>{{ _('Datum') }}</th>
+                                    <th>{{ _('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -80,13 +80,13 @@
                                 <tr>
                                     <td>
                                         {% if alert.severity == 'critical' %}
-                                            <span class="badge bg-danger">Kritisch</span>
+                                            <span class="badge bg-danger">{{ _('Kritisch') }}</span>
                                         {% elif alert.severity == 'high' %}
-                                            <span class="badge bg-warning">Hoch</span>
+                                            <span class="badge bg-warning">{{ _('Hoch') }}</span>
                                         {% elif alert.severity == 'medium' %}
-                                            <span class="badge bg-info">Mittel</span>
+                                            <span class="badge bg-info">{{ _('Mittel') }}</span>
                                         {% else %}
-                                            <span class="badge bg-success">Niedrig</span>
+                                            <span class="badge bg-success">{{ _('Niedrig') }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -97,9 +97,9 @@
                                     <td>{{ alert.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
                                     <td>
                                         {% if alert.is_sent %}
-                                            <span class="badge bg-success">Gesendet</span>
+                                            <span class="badge bg-success">{{ _('Gesendet') }}</span>
                                         {% else %}
-                                            <span class="badge bg-secondary">Ausstehend</span>
+                                            <span class="badge bg-secondary">{{ _('Ausstehend') }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -118,16 +118,16 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Kontrahenten Liste</h5>
+                    <h5 class="mb-0">{{ _('Kontrahenten Liste') }}</h5>
                     <div class="btn-group">
                         <button class="btn btn-sm btn-danger me-2" id="deleteSelectedBtn" 
                                 onclick="deleteSelected()" style="display: none;">
-                            <i class="fas fa-trash-alt"></i> Ausgewählte löschen (<span id="selectedCount">0</span>)
+                            <i class="fas fa-trash-alt"></i> {{ _('Ausgewählte löschen') }} (<span id="selectedCount">0</span>)
                         </button>
                         <input type="text" class="form-control form-control-sm" id="searchInput" 
-                               placeholder="Suchen..." style="width: 200px;">
+                               placeholder="{{ _('Suchen...') }}" style="width: 200px;">
                         <select class="form-select form-select-sm ms-2" id="countryFilter" style="width: 150px;">
-                            <option value="">Alle Länder</option>
+                            <option value="">{{ _('Alle Länder') }}</option>
                             <option value="DE">Deutschland</option>
                             <option value="AT">Österreich</option>
                             <option value="FR">Frankreich</option>
@@ -136,7 +136,7 @@
                             <option value="NL">Niederlande</option>
                         </select>
                         <button class="btn btn-sm btn-outline-primary ms-2" onclick="filterCounterparties()">
-                            <i class="fas fa-filter"></i> Filter
+                            <i class="fas fa-filter"></i> {{ _('Filter') }}
                         </button>
                     </div>
                 </div>
@@ -148,13 +148,13 @@
                                     <th style="width: 40px;">
                                         <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
                                     </th>
-                                    <th>USt-IdNr.</th>
-                                    <th>Firmenname</th>
-                                    <th>Land</th>
-                                    <th>Adresse</th>
-                                    <th>Monitoring</th>
-                                    <th>Letzter Check</th>
-                                    <th>Aktionen</th>
+                                    <th>{{ _('USt-IdNr.') }}</th>
+                                    <th>{{ _('Firmenname') }}</th>
+                                    <th>{{ _('Land') }}</th>
+                                    <th>{{ _('Adresse') }}</th>
+                                    <th>{{ _('Monitoring') }}</th>
+                                    <th>{{ _('Letzter Check') }}</th>
+                                    <th>{{ _('Aktionen') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -172,11 +172,11 @@
                                         {% set latest_check = cp.verification_checks|sort(attribute='check_date', reverse=True)|first %}
                                         {% if latest_check and latest_check.is_monitoring_active %}
                                             <span class="badge bg-success">
-                                                <i class="fas fa-check-circle"></i> Aktiv
+                                                <i class="fas fa-check-circle"></i> {{ _('Aktiv') }}
                                             </span>
                                         {% else %}
                                             <span class="badge bg-secondary">
-                                                <i class="fas fa-pause-circle"></i> Inaktiv
+                                                <i class="fas fa-pause-circle"></i> {{ _('Inaktiv') }}
                                             </span>
                                         {% endif %}
                                     </td>
@@ -185,14 +185,14 @@
                                             {{ latest_check.check_date.strftime('%d.%m.%Y') }}
                                             <br>
                                             {% if latest_check.overall_status == 'valid' %}
-                                                <span class="badge bg-success">Valid</span>
+                                                <span class="badge bg-success">{{ _('Valid') }}</span>
                                             {% elif latest_check.overall_status == 'warning' %}
-                                                <span class="badge bg-warning">Warnung</span>
+                                                <span class="badge bg-warning">{{ _('Warnung') }}</span>
                                             {% else %}
-                                                <span class="badge bg-danger">Problem</span>
+                                                <span class="badge bg-danger">{{ _('Problem') }}</span>
                                             {% endif %}
                                         {% else %}
-                                            <small class="text-muted">Noch nicht geprüft</small>
+                                            <small class="text-muted">{{ _('Noch nicht geprüft') }}</small>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -288,6 +288,31 @@
 </div>
 
 <script>
+// CRM Index Translations
+const crmIndexTranslations = {
+    counterpartyAdded: "{{ _('Counterparty successfully added!') }}",
+    error: "{{ _('Error') }}",
+    editFunctionComingSoon: "{{ _('Edit function coming soon...') }}",
+    warningPermanentDeletion: "{{ _('WARNING: PERMANENT DELETION') }}",
+    doYouWantToDelete: "{{ _('Do you want to delete') }}",
+    permanently: "{{ _('permanently?') }}",
+    thisWillAlsoDelete: "{{ _('This will also delete:') }}",
+    allVerificationHistories: "{{ _('• All verification histories') }}",
+    allVerificationResults: "{{ _('• All verification results') }}",
+    allAlertsAndNotifications: "{{ _('• All alerts and notifications') }}",
+    thisActionCannotBeUndone: "{{ _('This action CANNOT be undone!') }}",
+    counterpartyDeleted: "{{ _('Counterparty successfully deleted!') }}",
+    errorDeleting: "{{ _('Error deleting') }}",
+    networkError: "{{ _('Network error') }}",
+    thisCounterparty: "{{ _('this counterparty') }}",
+    reallyWantToDelete: "{{ _('Do you really want to delete') }}",
+    thisWillDelete: "{{ _('This will delete:') }}",
+    verificationHistories: "{{ _('• Verification histories') }}",
+    verificationResults: "{{ _('• Verification results') }}",
+    alertsAndNotifications: "{{ _('• Alerts and notifications') }}",
+    actionCannotBeUndone: "{{ _('This action cannot be undone!') }}"
+};
+
 function showAddCounterpartyModal() {
     new bootstrap.Modal(document.getElementById('addCounterpartyModal')).show();
 }
@@ -311,10 +336,10 @@ function saveCounterparty() {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            alert('Kontrahent erfolgreich hinzugefügt!');
+            alert(crmIndexTranslations.counterpartyAdded);
             location.reload();
         } else {
-            alert('Fehler: ' + result.error);
+            alert(crmIndexTranslations.error + ': ' + result.error);
         }
     });
 }
@@ -324,20 +349,20 @@ function viewCounterparty(id) {
 }
 
 function editCounterparty(id) {
-    alert('Edit-Funktion coming soon...');
+    alert(crmIndexTranslations.editFunctionComingSoon);
 }
 
 function deleteCounterparty(id) {
     // Get company name from table for better UX
     const row = document.querySelector(`tr[data-counterparty-id="${id}"]`);
-    const companyName = row?.querySelector('strong')?.textContent || 'diesen Kontrahenten';
+    const companyName = row?.querySelector('strong')?.textContent || crmIndexTranslations.thisCounterparty;
     
-    const confirmMessage = `⚠️ WARNUNG: Möchten Sie "${companyName}" wirklich DAUERHAFT löschen?\n\n` +
-                          `Dies wird auch löschen:\n` +
-                          `• Alle Prüfungshistorien\n` +
-                          `• Alle Prüfungsergebnisse\n` +
-                          `• Alle Alerts und Benachrichtigungen\n\n` +
-                          `Diese Aktion kann NICHT rückgängig gemacht werden!`;
+    const confirmMessage = `⚠️ ${crmIndexTranslations.warningPermanentDeletion}: ${crmIndexTranslations.reallyWantToDelete} "${companyName}" ${crmIndexTranslations.permanently}?\n\n` +
+                          `${crmIndexTranslations.thisWillDelete}\n` +
+                          `${crmIndexTranslations.verificationHistories}\n` +
+                          `${crmIndexTranslations.verificationResults}\n` +
+                          `${crmIndexTranslations.alertsAndNotifications}\n\n` +
+                          `${crmIndexTranslations.actionCannotBeUndone}`;
     
     if (confirm(confirmMessage)) {
         // Show loading indicator
@@ -365,11 +390,11 @@ function deleteCounterparty(id) {
                         setTimeout(() => location.reload(), 500);
                     }, 300);
                 } else {
-                    alert('✅ Kontrahent erfolgreich gelöscht!');
+                    alert('✅ ' + crmIndexTranslations.counterpartyDeleted);
                     location.reload();
                 }
             } else {
-                alert('❌ Fehler beim Löschen: ' + result.error);
+                alert('❌ ' + crmIndexTranslations.errorDeleting + ': ' + result.error);
                 if (deleteBtn) {
                     deleteBtn.disabled = false;
                     deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
@@ -377,7 +402,7 @@ function deleteCounterparty(id) {
             }
         })
         .catch(error => {
-            alert('❌ Netzwerkfehler: ' + error.message);
+            alert('❌ ' + crmIndexTranslations.networkError + ': ' + error.message);
             if (deleteBtn) {
                 deleteBtn.disabled = false;
                 deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';

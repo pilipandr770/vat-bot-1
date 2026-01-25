@@ -5,14 +5,14 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2><i class="bi bi-clipboard-data"></i> Деталі перевірки #{{ check.id }}</h2>
+        <h2><i class="bi bi-clipboard-data"></i> {{ _('Check Details') }} #{{ check.id }}</h2>
         <p class="text-muted mb-0">
-            Перевірено {{ check.check_date.strftime('%d.%m.%Y о %H:%M') }}
+            {{ _('Checked on') }} {{ check.check_date.strftime('%d.%m.%Y о %H:%M') }}
         </p>
     </div>
     <div>
         <a href="{{ url_for('verification_history') }}" class="btn btn-outline-secondary me-2">
-            <i class="bi bi-arrow-left"></i> Назад до історії
+            <i class="bi bi-arrow-left"></i> {{ _('Back to History') }}
         </a>
         <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Нова перевірка
@@ -278,7 +278,7 @@
                     <p class="mb-1">{{ alert.message }}</p>
                     <small class="text-muted">
                         {{ alert.created_at.strftime('%d.%m.%Y %H:%M') }}
-                        {% if alert.is_sent %} • Відправлено {% if alert.sent_at %}{{ alert.sent_at.strftime('%H:%M') }}{% endif %}{% endif %}
+                        {% if alert.is_sent %} • {{ _('Sent') }} {% if alert.sent_at %}{{ alert.sent_at.strftime('%H:%M') }}{% endif %}{% endif %}
                     </small>
                 </div>
                 <span class="badge 

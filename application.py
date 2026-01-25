@@ -76,28 +76,87 @@ def create_app(config_name=None):
     migrate = Migrate(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
-    babel.init_app(app)
     
     # Configure Babel functions
     def get_locale():
         """Determine the best locale for the current request."""
-        # Check if user has a preferred language in session
-        from flask import session
-        user_locale = session.get('language')
-        if user_locale and user_locale in ['de', 'en', 'uk']:
-            return user_locale
+        try:
+            # Check if user has a preferred language in session
+            from flask import session, request, has_request_context
+            if has_request_context():
+                # Check query parameter first (highest priority)
+                lang_param = request.args.get('lang')
+                if lang_param and lang_param in ['de', 'en', 'uk']:
+                    return lang_param
+                
+                # Check if user has a preferred language in session
+                user_locale = session.get('language')
+                if user_locale and user_locale in ['de', 'en', 'uk']:
+                    return user_locale
+                
+                # Check Accept-Language header
+                return request.accept_languages.best_match(['de', 'en', 'uk'], default='de')
+        except RuntimeError:
+            # Outside of request context, return default
+            pass
         
-        # Check Accept-Language header
-        from flask import request
-        return request.accept_languages.best_match(['de', 'en', 'uk'], default='de')
+        return 'de'  # Default locale
 
     def get_timezone():
         """Determine the best timezone for the current request."""
         return 'Europe/Berlin'
     
-    # Register locale functions
+    babel.init_app(app, 
+                   locale_selector=get_locale,
+                   timezone_selector=get_timezone,
+                   default_locale='de',
+                   default_timezone='Europe/Berlin',
+                   default_domain='messages')
+    
+    # Set translation directory explicitly
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(app.root_path, 'translations')
+    
+    # Set selectors on app for template access
     app.babel_locale_selector = get_locale
     app.babel_timezone_selector = get_timezone
+    
+    # Create custom gettext function that respects session locale
+    def session_gettext(message):
+        """Gettext function that uses session locale."""
+        from flask import session, has_request_context, request
+        import gettext
+        import os
+        
+        if has_request_context():
+            # Check query parameter first (highest priority)
+            lang_param = request.args.get('lang')
+            if lang_param and lang_param in ['de', 'en', 'uk']:
+                user_locale = lang_param
+            else:
+                # Check if user has a preferred language in session
+                user_locale = session.get('language', 'de')
+        else:
+            user_locale = 'de'
+        
+        try:
+            trans = gettext.translation('messages', 
+                                      localedir=os.path.join(app.root_path, 'translations'),
+                                      languages=[user_locale])
+            return trans.gettext(message)
+        except Exception:
+            # Fallback to default
+            return message
+    
+    # Override babel's gettext with our session-aware version
+    babel.gettext = session_gettext
+    babel.ngettext = lambda singular, plural, n: session_gettext(singular) if n == 1 else session_gettext(plural)
+    
+    # Add template context processor for session-aware gettext
+    @app.context_processor
+    def inject_gettext():
+        def gettext_func(message):
+            return session_gettext(message)
+        return {'_': gettext_func}
     
     # Add template context processor for locale functions
     @app.context_processor
@@ -279,10 +338,37 @@ def create_app(config_name=None):
         # Redirect back to the referring page or dashboard
         return redirect(request.referrer or url_for('dashboard'))
 
-    @app.route('/test')
-    def test_form():
-        """Simple test form for debugging."""
-        return render_template('test_form.html')
+    @app.route('/test-translations')
+    def test_translations():
+        """Test translations."""
+        from flask_babel import gettext as _
+        from flask import current_app, session
+        try:
+            test_text = _('VAT Verification System')
+        except Exception as e:
+            test_text = f"Error: {e}"
+        
+        # Test different locales
+        old_locale = get_locale()
+        results = []
+        
+        # Test current session locale
+        current_session_locale = session.get('language', 'none')
+        results.append(f"Session language: {current_session_locale}")
+        results.append(f"get_locale() result: {old_locale}")
+        
+        return f"""
+        <h1>{test_text}</h1>
+        <p>Current locale: {old_locale}</p>
+        <p>Test results:</p>
+        <ul>
+        {"".join(f"<li>{result}</li>" for result in results)}
+        </ul>
+        <p>Available locales: {current_app.config.get('BABEL_SUPPORTED_LOCALES')}</p>
+        <p>Translation dir: {current_app.config.get('BABEL_TRANSLATION_DIRECTORIES')}</p>
+        <p>Root path: {current_app.root_path}</p>
+        <p><a href="/set-language/de">Set German</a> | <a href="/set-language/en">Set English</a> | <a href="/set-language/uk">Set Ukrainian</a></p>
+        """
 
     @app.route('/pentesting-scanner')
     @login_required

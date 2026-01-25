@@ -128,6 +128,13 @@
 </style>
 
 <script>
+// Chatbot Translations
+const chatbotTranslations = {
+    connectionError: "{{ _('Connection error. Please try again.') }}",
+    error: "{{ _('Error') }}",
+    unknownError: "{{ _('Unknown error') }}"
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     const chatMessages = document.getElementById('chatMessages');
     const chatForm = document.getElementById('chatForm');
@@ -229,11 +236,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 addBotMessage(data.response);
             } else {
-                addBotMessage(`❌ Fehler: ${data.error || 'Unbekannter Fehler'}`);
+                addBotMessage(`❌ ${chatbotTranslations.error}: ${data.error || chatbotTranslations.unknownError}`);
             }
         } catch (error) {
             removeTypingIndicator();
-            addBotMessage('❌ Verbindungsfehler. Bitte versuche es erneut.');
+            addBotMessage('❌ ' + chatbotTranslations.connectionError);
             console.error('Chat error:', error);
         } finally {
             sendBtn.disabled = false;
