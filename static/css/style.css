@@ -773,6 +773,66 @@ body, .container, .container-fluid, .row, .col {
     font-size: 0.85rem;
 }
 
+/* Legal Pages - Light Theme */
+.legal-page {
+    background: var(--primary-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.legal-page .card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-color) !important;
+    box-shadow: var(--shadow-light) !important;
+}
+
+.legal-page .card .card-body {
+    color: var(--text-color) !important;
+}
+
+.legal-page h1,
+.legal-page h2,
+.legal-page h3,
+.legal-page h4,
+.legal-page h5,
+.legal-page h6 {
+    color: var(--text-color) !important;
+}
+
+.legal-page .text-muted {
+    color: #6c757d !important;
+}
+
+.legal-page .alert {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-color) !important;
+}
+
+.legal-page .alert-info {
+    background: rgba(13, 110, 253, 0.1) !important;
+    border-color: var(--info-color) !important;
+    color: var(--info-color) !important;
+}
+
+.legal-page .alert-success {
+    background: rgba(25, 135, 84, 0.1) !important;
+    border-color: var(--success-color) !important;
+    color: var(--success-color) !important;
+}
+
+.legal-page .alert-warning {
+    background: rgba(255, 193, 7, 0.1) !important;
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color) !important;
+}
+
+.legal-page .alert-danger {
+    background: rgba(220, 53, 69, 0.1) !important;
+    border-color: var(--error-color) !important;
+    color: var(--error-color) !important;
+}
+
 .border-start-success {
     border-left: 4px solid #198754 !important;
 }
