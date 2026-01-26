@@ -10,7 +10,7 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('landing' if not current_user.is_authenticated else 'dashboard') }}">
                 <i class="bi bi-shield-check"></i> {{ _('VAT Verification') }}
