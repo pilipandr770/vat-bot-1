@@ -20,153 +20,153 @@ msgstr ""
 
 #: application.py:341 templates/base.html:7
 msgid "VAT Verification System"
-msgstr ""
+msgstr "VAT-Verifizierungssystem"
 
 #: link_scanner/templates/link_scanner/scan.html:3
 msgid "Link Scanner - URL Security Check"
-msgstr ""
+msgstr "Link-Scanner – URL-Sicherheitsprüfung"
 
 #: link_scanner/templates/link_scanner/scan.html:11 templates/base.html:43
 msgid "Link Scanner"
-msgstr ""
+msgstr "Link-Scanner"
 
 #: link_scanner/templates/link_scanner/scan.html:12
 msgid "Check URLs for phishing, malware and other threats"
-msgstr ""
+msgstr "Überprüft URLs auf Phishing, Malware und andere Bedrohungen"
 
 #: link_scanner/templates/link_scanner/scan.html:21
 msgid "Enter URL"
-msgstr ""
+msgstr "URL eingeben"
 
 #: link_scanner/templates/link_scanner/scan.html:26
 msgid "or"
-msgstr ""
+msgstr "oder"
 
 #: link_scanner/templates/link_scanner/scan.html:29
 msgid "Check"
-msgstr ""
+msgstr "Prüfen"
 
 #: link_scanner/templates/link_scanner/scan.html:33
 msgid "Enter a complete URL (e.g. https://example.com/page)"
-msgstr ""
+msgstr "Geben Sie eine vollständige URL ein (z. B. https://example.com/page)"
 
 #: link_scanner/templates/link_scanner/scan.html:42
 msgid "Check multiple URLs simultaneously"
-msgstr ""
+msgstr "Mehrere URLs gleichzeitig prüfen"
 
 #: link_scanner/templates/link_scanner/scan.html:50
 msgid "URLs (one per line, max. 20)"
-msgstr ""
+msgstr "URLs (jeweils eine pro Zeile, max. 20)"
 
 #: link_scanner/templates/link_scanner/scan.html:55
 msgid "Check All"
-msgstr ""
+msgstr "Alle prüfen"
 
 #: link_scanner/templates/link_scanner/scan.html:64
 msgid "What is being checked?"
-msgstr ""
+msgstr "Was wird geprüft?"
 
 #: link_scanner/templates/link_scanner/scan.html:68
 #: link_scanner/templates/link_scanner/scan.html:213
 msgid "SSL/HTTPS encryption"
-msgstr ""
+msgstr "SSL/HTTPS-Verschlüsselung"
 
 #: link_scanner/templates/link_scanner/scan.html:69
 #: link_scanner/templates/link_scanner/scan.html:214
 msgid "Phishing detection"
-msgstr ""
+msgstr "Phishing-Erkennung"
 
 #: link_scanner/templates/link_scanner/scan.html:70
 #: link_scanner/templates/link_scanner/scan.html:215
 msgid "VirusTotal database"
-msgstr ""
+msgstr "VirusTotal-Datenbank"
 
 #: link_scanner/templates/link_scanner/scan.html:71
 #: link_scanner/templates/link_scanner/scan.html:216
 msgid "Google Safe Browsing"
-msgstr ""
+msgstr "Google Safe Browsing"
 
 #: link_scanner/templates/link_scanner/scan.html:72
 #: link_scanner/templates/link_scanner/scan.html:217
 msgid "Suspicious domains"
-msgstr ""
+msgstr "Verdächtige Domains"
 
 #: link_scanner/templates/link_scanner/scan.html:73
 #: link_scanner/templates/link_scanner/scan.html:218
 msgid "URL shortener detection"
-msgstr ""
+msgstr "Erkennung von URL-Verkürzern"
 
 #: link_scanner/templates/link_scanner/scan.html:74
 #: link_scanner/templates/link_scanner/scan.html:219
 msgid "Redirect analysis"
-msgstr ""
+msgstr "Umleitungsanalyse"
 
 #: link_scanner/templates/link_scanner/scan.html:82
 msgid "Recent Checks"
-msgstr ""
+msgstr "Letzte Prüfungen"
 
 #: link_scanner/templates/link_scanner/scan.html:87
 msgid "No checks performed yet"
-msgstr ""
+msgstr "Noch keine Prüfungen durchgeführt"
 
 #: link_scanner/templates/link_scanner/scan.html:99
 #: link_scanner/templates/link_scanner/scan.html:209
 msgid "Loading..."
-msgstr ""
+msgstr "Wird geladen..."
 
 #: link_scanner/templates/link_scanner/scan.html:204
 #: templates/pentesting/scanner.html:523
 msgid "Please enter a URL"
-msgstr ""
+msgstr "Bitte geben Sie eine URL ein"
 
 #: link_scanner/templates/link_scanner/scan.html:205
 #: templates/crm/counterparty_details.html:428 templates/crm/index.html:306
 msgid "Network error"
-msgstr ""
+msgstr "Netzwerkfehler"
 
 #: link_scanner/templates/link_scanner/scan.html:206
 msgid "Please enter at least one URL"
-msgstr ""
+msgstr "Bitte geben Sie mindestens eine URL ein"
 
 #: link_scanner/templates/link_scanner/scan.html:207
 msgid "No valid URLs found"
-msgstr ""
+msgstr "Keine gültigen URLs gefunden"
 
 #: link_scanner/templates/link_scanner/scan.html:208
 msgid "Maximum 20 URLs allowed"
-msgstr ""
+msgstr "Maximal 20 URLs erlaubt"
 
 #: link_scanner/templates/link_scanner/scan.html:210
 msgid "Safe"
-msgstr ""
+msgstr "Sicher"
 
 #: link_scanner/templates/link_scanner/scan.html:211
 msgid "Suspicious"
-msgstr ""
+msgstr "Verdächtig"
 
 #: link_scanner/templates/link_scanner/scan.html:212
 msgid "Malicious"
-msgstr ""
+msgstr "Schädlich"
 
 #: link_scanner/templates/link_scanner/scan.html:220
 msgid "Accessibility"
-msgstr ""
+msgstr "Barrierefreiheit"
 
 #: link_scanner/templates/link_scanner/scan.html:221
 msgid "Heuristic analysis"
-msgstr ""
+msgstr "Heuristische Analyse"
 
 #: link_scanner/templates/link_scanner/scan.html:222
 msgid "No suspicious patterns found"
-msgstr ""
+msgstr "Keine verdächtigen Muster gefunden"
 
 #: link_scanner/templates/link_scanner/scan.html:223
 msgid "Trusted domain"
-msgstr ""
+msgstr "Vertrauenswürdige Domain"
 
 #: link_scanner/templates/link_scanner/scan.html:224
 msgid "engines report threat"
-msgstr ""
+msgstr "Scan-Engines melden eine Bedrohung"
 
 #: link_scanner/templates/link_scanner/scan.html:225
 #: templates/admin/dashboard.html:195 templates/admin/dashboard.html:254
@@ -174,1421 +174,1431 @@ msgstr ""
 #: templates/crm/counterparty_details.html:212
 #: templates/mailguard/dashboard.html:72
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: link_scanner/templates/link_scanner/scan.html:226
 msgid "redirects"
-msgstr ""
+msgstr "Weiterleitungen"
 
 #: link_scanner/templates/link_scanner/scan.html:227
 msgid "Recommendations"
-msgstr ""
+msgstr "Empfehlungen"
 
 #: link_scanner/templates/link_scanner/scan.html:228
 msgid "Detected threats"
-msgstr ""
+msgstr "Erkannte Bedrohungen"
 
 #: link_scanner/templates/link_scanner/scan.html:229
 msgid "Detailed checks"
-msgstr ""
+msgstr "Detaillierte Prüfungen"
 
 #: link_scanner/templates/link_scanner/scan.html:230
 #: templates/admin/osint_results.html:20 templates/admin/osint_scan.html:21
 #: templates/crm/add_edit_counterparty.html:105
 #: templates/crm/counterparty_details.html:73
 msgid "Domain"
-msgstr ""
+msgstr "Domain"
 
 #: link_scanner/templates/link_scanner/scan.html:231
 msgid "Scanning"
-msgstr ""
+msgstr "Scan läuft"
 
 #: link_scanner/templates/link_scanner/scan.html:232
 #: templates/admin/osint_scan.html:47
 msgid "Scan completed"
-msgstr ""
+msgstr "Scan abgeschlossen"
 
 #: link_scanner/templates/link_scanner/scan.html:233
 #: templates/chatbot/chat.html:134 templates/crm/add_edit_counterparty.html:260
 #: templates/crm/counterparty_details.html:353 templates/crm/index.html:294
 #: templates/pentesting/scanner.html:526
 msgid "Error"
-msgstr ""
+msgstr "Fehler"
 
 #: link_scanner/templates/link_scanner/scan.html:234
 msgid "Batch scan results"
-msgstr ""
+msgstr "Ergebnisse der Stapelprüfung"
 
 #: link_scanner/templates/link_scanner/scan.html:235
 #: templates/admin/osint_results.html:26
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: link_scanner/templates/link_scanner/scan.html:236
 #: templates/phoneintel/analyze.html:51
 msgid "Verdict"
-msgstr ""
+msgstr "Ergebnis"
 
 #: link_scanner/templates/link_scanner/scan.html:237
 msgid "Score"
-msgstr ""
+msgstr "Bewertung"
 
 #: link_scanner/templates/link_scanner/scan.html:238
 msgid "Time"
-msgstr ""
+msgstr "Zeit"
 
 #: templates/base.html:16
 msgid "VAT Verification"
-msgstr ""
+msgstr "VAT-Verifizierung"
 
 #: templates/base.html:26
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: templates/admin/osint_scan.html:4 templates/admin/osint_scan.html:11
 #: templates/base.html:33
 msgid "OSINT Scanner"
-msgstr ""
+msgstr "OSINT-Scanner"
 
 #: templates/base.html:38 templates/phoneintel/analyze.html:3
 #: templates/phoneintel/analyze.html:11
 msgid "Phone Intelligence"
-msgstr ""
+msgstr "Telefon-Analyse"
 
 #: templates/base.html:48
 msgid "MailGuard"
-msgstr ""
+msgstr "MailGuard"
 
 #: templates/base.html:53
 msgid "Website Scanner"
-msgstr ""
+msgstr "Website-Scanner"
 
 #: templates/base.html:58 templates/crm/add_edit_counterparty.html:12
 msgid "CRM"
-msgstr ""
+msgstr "CRM"
 
 #: templates/base.html:106
 msgid "Features"
-msgstr ""
+msgstr "Funktionen"
 
 #: templates/base.html:109
 msgid "Pricing"
-msgstr ""
+msgstr "Preise"
 
 #: templates/base.html:117 templates/landing.html:128
 msgid "Sign In"
-msgstr ""
+msgstr "Anmelden"
 
 #: templates/base.html:121 templates/landing.html:129
 msgid "Start Free"
-msgstr ""
+msgstr "Kostenlos starten"
 
 #: templates/base.html:158
 msgid "Rechtliches"
-msgstr ""
+msgstr "Rechtliches"
 
 #: templates/base.html:162
 msgid "Impressum"
-msgstr ""
+msgstr "Impressum"
 
 #: templates/base.html:167
 msgid "Datenschutz"
-msgstr ""
+msgstr "Datenschutz"
 
 #: templates/base.html:172
 msgid "AGB"
-msgstr ""
+msgstr "AGB"
 
 #: templates/base.html:177
 msgid "DSGVO-Anfrage"
-msgstr ""
+msgstr "DSGVO-Anfrage"
 
 #: templates/base.html:183
 msgid "Kontakt"
-msgstr ""
+msgstr "Kontakt"
 
 #: templates/base.html:212
 msgid "Alle Rechte vorbehalten"
-msgstr ""
+msgstr "Alle Rechte vorbehalten"
 
 #: templates/base.html:217
 msgid "DSGVO-konform"
-msgstr ""
+msgstr "DSGVO-konform"
 
 #: templates/check_details.html:8
 msgid "Check Details"
-msgstr ""
+msgstr "Prüfdetails"
 
 #: templates/check_details.html:10
 msgid "Checked on"
-msgstr ""
+msgstr "Geprüft am"
 
 #: templates/check_details.html:15
 msgid "Back to History"
-msgstr ""
+msgstr "Zurück zur Historie"
 
 #: templates/check_details.html:281 templates/crm/counterparty_details.html:235
 msgid "Sent"
-msgstr ""
+msgstr "Gesendet"
 
 #: templates/index.html:59
 msgid "Your Company Data"
-msgstr ""
+msgstr "Ihre Firmendaten"
 
 #: templates/index.html:60
 msgid "Manage Profile"
-msgstr ""
+msgstr "Profil verwalten"
 
 #: templates/index.html:72
 msgid "Tip"
-msgstr ""
+msgstr "Tipp"
 
 #: templates/index.html:73
 msgid "Save your company data"
-msgstr ""
+msgstr "Speichern Sie Ihre Firmendaten"
 
 #: templates/index.html:74
 msgid "so that they are automatically filled in"
-msgstr ""
+msgstr "damit diese automatisch ausgefüllt werden"
 
 #: templates/crm/add_edit_counterparty.html:68
 #: templates/crm/counterparty_details.html:53
 #: templates/crm/counterparty_details.html:377 templates/index.html:80
 #: templates/index.html:122
 msgid "VAT Number"
-msgstr ""
+msgstr "Umsatzsteuer-Identifikationsnummer (USt-IdNr.)"
 
 #: templates/index.html:84
 msgid "Your VAT number for VIES validation"
-msgstr ""
+msgstr "Ihre USt-IdNr. für die VIES-Überprüfung"
 
 #: templates/crm/add_edit_counterparty.html:42
 #: templates/crm/counterparty_details.html:45 templates/index.html:88
 #: templates/index.html:130
 msgid "Company Name"
-msgstr ""
+msgstr "Firmenname"
 
 #: templates/index.html:94
 msgid "Business Address"
-msgstr ""
+msgstr "Geschäftsadresse"
 
 #: templates/admin/osint_results.html:23
 #: templates/crm/add_edit_counterparty.html:84
 #: templates/crm/counterparty_details.html:63 templates/index.html:100
 #: templates/mailguard/dashboard.html:70
 msgid "Email"
-msgstr ""
+msgstr "E-Mail"
 
 #: templates/index.html:106
 msgid "Phone"
-msgstr ""
+msgstr "Telefon"
 
 #: templates/index.html:118
 msgid "Counterparty Data"
-msgstr ""
+msgstr "Daten der Gegenpartei"
 
 #: templates/index.html:125
 msgid "VAT number of the business partner (if known)"
-msgstr ""
+msgstr "USt-IdNr. des Geschäftspartners (falls bekannt)"
 
 #: templates/crm/add_edit_counterparty.html:48
 #: templates/crm/counterparty_details.html:49
 #: templates/crm/counterparty_details.html:378 templates/index.html:135
 #: templates/phoneintel/analyze.html:46
 msgid "Country"
-msgstr ""
+msgstr "Land"
 
 #: templates/crm/add_edit_counterparty.html:50 templates/index.html:137
 msgid "Select country"
-msgstr ""
+msgstr "Land auswählen"
 
 #: templates/index.html:139
 msgid "Free available (incl. business register)"
-msgstr ""
+msgstr "Kostenlos verfügbar (inkl. Handelsregister)"
 
 #: templates/index.html:146
 msgid "In progress / Premium"
-msgstr ""
+msgstr "In Arbeit / Premium"
 
 #: templates/index.html:149
 msgid "Premium"
-msgstr ""
+msgstr "Premium"
 
 #: templates/index.html:149
 msgid "In development"
-msgstr ""
+msgstr "In Entwicklung"
 
 #: templates/index.html:156
 msgid "Available"
-msgstr ""
+msgstr "Verfügbar"
 
 #: templates/index.html:160
 msgid "Ukraine is checked via the EDR (Unified State Register)"
-msgstr ""
+msgstr "Die Ukraine wird über das EDR (Einheitliches Staatsregister) geprüft"
 
 #: templates/crm/add_edit_counterparty.html:90
 #: templates/crm/counterparty_details.html:87 templates/index.html:181
 msgid "Contact Person"
-msgstr ""
+msgstr "Ansprechpartner"
 
 #: templates/index.html:186
 msgid "Start Verification"
-msgstr ""
+msgstr "Prüfung starten"
 
 #: templates/admin/dashboard.html:3
 msgid "Admin Dashboard - VAT Verification System"
-msgstr ""
+msgstr "Admin-Dashboard - VAT-Verifizierungssystem"
 
 #: templates/admin/dashboard.html:11
 msgid "Admin Dashboard"
-msgstr ""
+msgstr "Admin-Dashboard"
 
 #: templates/admin/dashboard.html:13
 msgid "Overview of users, subscriptions and API usage"
-msgstr ""
+msgstr "Übersicht über Benutzer, Abonnements und API-Nutzung"
 
 #: templates/admin/dashboard.html:17
 msgid "Administrator"
-msgstr ""
+msgstr "Administrator"
 
 #: templates/admin/dashboard.html:30
 msgid "Total Users"
-msgstr ""
+msgstr "Gesamtanzahl Benutzer"
 
 #: templates/admin/dashboard.html:33 templates/admin/dashboard.html:73
 msgid "this month"
-msgstr ""
+msgstr "dieser Monat"
 
 #: templates/admin/dashboard.html:50
 msgid "MRR"
-msgstr ""
+msgstr "MRR"
 
 #: templates/admin/dashboard.html:53
 msgid "Pro"
-msgstr ""
+msgstr "Pro"
 
 #: templates/admin/dashboard.html:53 templates/admin/dashboard.html:140
 msgid "Enterprise"
-msgstr ""
+msgstr "Enterprise"
 
 #: templates/admin/dashboard.html:70
 msgid "Total Revenue"
-msgstr ""
+msgstr "Gesamterlös"
 
 #: templates/admin/dashboard.html:90
 msgid "API Verifications"
-msgstr ""
+msgstr "API-Prüfungen"
 
 #: templates/admin/dashboard.html:93
 msgid "today"
-msgstr ""
+msgstr "heute"
 
 #: templates/admin/dashboard.html:111
 msgid "Subscription Distribution"
-msgstr ""
+msgstr "Verteilung der Abonnements"
 
 #: templates/admin/dashboard.html:118
 msgid "Free"
-msgstr ""
+msgstr "Kostenlos"
 
 #: templates/admin/dashboard.html:129
 msgid "Professional"
-msgstr ""
+msgstr "Professional"
 
 #: templates/admin/dashboard.html:157
 msgid "Quick Access"
-msgstr ""
+msgstr "Schnellzugriff"
 
 #: templates/admin/dashboard.html:162
 msgid "User Management"
-msgstr ""
+msgstr "Benutzerverwaltung"
 
 #: templates/admin/dashboard.html:165
 msgid "All Verifications"
-msgstr ""
+msgstr "Alle Prüfungen"
 
 #: templates/admin/dashboard.html:168
 msgid "System Logs"
-msgstr ""
+msgstr "Systemprotokolle"
 
 #: templates/admin/dashboard.html:183
 msgid "Recent Registrations"
-msgstr ""
+msgstr "Neueste Registrierungen"
 
 #: templates/admin/dashboard.html:185 templates/admin/dashboard.html:244
 msgid "View All"
-msgstr ""
+msgstr "Alle ansehen"
 
 #: templates/admin/dashboard.html:192 templates/admin/dashboard.html:251
 msgid "User"
-msgstr ""
+msgstr "Benutzer"
 
 #: templates/admin/dashboard.html:193
 msgid "Plan"
-msgstr ""
+msgstr "Plan"
 
 #: templates/admin/dashboard.html:194
 msgid "Registered"
-msgstr ""
+msgstr "Registriert"
 
 #: templates/admin/dashboard.html:209
 msgid "BASIC"
-msgstr ""
+msgstr "BASIC"
 
 #: templates/admin/dashboard.html:211
 msgid "PROFESSIONAL"
-msgstr ""
+msgstr "PROFESSIONAL"
 
 #: templates/admin/dashboard.html:213
 msgid "ENTERPRISE"
-msgstr ""
+msgstr "ENTERPRISE"
 
 #: templates/admin/dashboard.html:215
 msgid "NONE"
-msgstr ""
+msgstr "KEINE"
 
 #: templates/admin/dashboard.html:223 templates/mailguard/dashboard.html:94
 msgid "Active"
-msgstr ""
+msgstr "Aktiv"
 
 #: templates/admin/dashboard.html:225 templates/mailguard/dashboard.html:96
 msgid "Inactive"
-msgstr ""
+msgstr "Inaktiv"
 
 #: templates/admin/dashboard.html:242
 msgid "Recent Verifications"
-msgstr ""
+msgstr "Neueste Prüfungen"
 
 #: templates/admin/dashboard.html:252
 msgid "Company"
-msgstr ""
+msgstr "Firma"
 
 #: templates/admin/dashboard.html:253
 #: templates/crm/counterparty_details.html:211
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: templates/admin/osint_results.html:4 templates/admin/osint_results.html:11
 msgid "OSINT Scan Results"
-msgstr ""
+msgstr "OSINT-Scan-Ergebnisse"
 
 #: templates/admin/osint_results.html:18
 msgid "Scan Information"
-msgstr ""
+msgstr "Scan-Informationen"
 
 #: templates/admin/osint_results.html:30
 #: templates/crm/counterparty_details.html:91
 #: templates/mailguard/dashboard.html:137
 msgid "Created"
-msgstr ""
+msgstr "Erstellt"
 
 #: templates/admin/osint_results.html:41
 msgid "Detailed Results"
-msgstr ""
+msgstr "Detaillierte Ergebnisse"
 
 #: templates/admin/osint_results.html:46
 msgid "Service"
-msgstr ""
+msgstr "Dienst"
 
 #: templates/admin/osint_results.html:48
 msgid "Notes"
-msgstr ""
+msgstr "Notizen"
 
 #: templates/admin/osint_results.html:49
 msgid "Data"
-msgstr ""
+msgstr "Daten"
 
 #: templates/admin/osint_results.html:58
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: templates/admin/osint_results.html:60
 msgid "WARNING"
-msgstr ""
+msgstr "WARNUNG"
 
 #: templates/admin/osint_results.html:62
 msgid "ERROR"
-msgstr ""
+msgstr "FEHLER"
 
 #: templates/admin/osint_results.html:70
 msgid "View Data"
-msgstr ""
+msgstr "Daten ansehen"
 
 #: templates/admin/osint_results.html:90
 msgid "Back to Scanner"
-msgstr ""
+msgstr "Zurück zum Scanner"
 
 #: templates/admin/osint_scan.html:13
 msgid ""
+msgid ""
 "Passive data collection about the counterparty's domain, website, or "
 "email."
-msgstr ""
+msgstr "Passive Datensammlung über die Domain, Website oder E-Mail der Gegenpartei."
 
 #: templates/admin/osint_scan.html:16
 msgid "URL (optional)"
-msgstr ""
+msgstr "URL (optional)"
 
 #: templates/admin/osint_scan.html:17
 msgid "https://example.com"
-msgstr ""
+msgstr "https://example.com"
 
 #: templates/admin/osint_scan.html:18
 msgid "Complete website URL for header and social media analysis."
-msgstr ""
+msgstr "Vollständige Website-URL für Header- und Social-Media-Analysen."
 
 #: templates/admin/osint_scan.html:22
 msgid "example.com"
-msgstr ""
+msgstr "example.com"
 
 #: templates/admin/osint_scan.html:23
 msgid "Primary company domain for WHOIS, DNS, and SSL checks."
-msgstr ""
+msgstr "Primäre Unternehmensdomain für WHOIS-, DNS- und SSL-Prüfungen."
 
 #: templates/admin/osint_scan.html:26
 msgid "Email (optional)"
-msgstr ""
+msgstr "E-Mail (optional)"
 
 #: templates/admin/osint_scan.html:27
 msgid "info@example.com"
-msgstr ""
+msgstr "info@example.com"
 
 #: templates/admin/osint_scan.html:28
 msgid "Email for basic format validation."
-msgstr ""
+msgstr "E-Mail für grundlegende Formatvalidierung."
 
 #: templates/admin/osint_scan.html:33 templates/pentesting/scanner.html:33
 msgid "Start Scan"
-msgstr ""
+msgstr "Scan starten"
 
 #: templates/admin/osint_scan.html:45 templates/pentesting/scanner.html:524
 msgid "Scanning..."
-msgstr ""
+msgstr "Scan läuft..."
 
 #: templates/admin/osint_scan.html:46
 msgid "Server returned invalid response. Please try again later."
-msgstr ""
+msgstr "Der Server lieferte eine ungültige Antwort. Bitte versuchen Sie es später erneut."
 
 #: templates/admin/osint_scan.html:48
 msgid "Results"
-msgstr ""
+msgstr "Ergebnisse"
 
 #: templates/admin/osint_scan.html:49
 msgid "View full results"
-msgstr ""
+msgstr "Vollständige Ergebnisse anzeigen"
 
 #: templates/admin/osint_scan.html:50
 msgid "Scan error"
-msgstr ""
+msgstr "Scan-Fehler"
 
 #: templates/admin/osint_scan.html:51
 msgid "If the error persists, please contact support."
-msgstr ""
+msgstr "Wenn der Fehler weiterhin besteht, kontaktieren Sie bitte den Support."
 
 #: templates/auth/register.html:133
 msgid "Already have an account?"
-msgstr ""
+msgstr "Sie haben bereits ein Konto?"
 
 #: templates/auth/register.html:134
 msgid "Sign in now"
-msgstr ""
+msgstr "Jetzt anmelden"
 
 #: templates/chatbot/chat.html:133
 msgid "Connection error. Please try again."
-msgstr ""
+msgstr "Verbindungsfehler. Bitte versuchen Sie es erneut."
 
 #: templates/chatbot/chat.html:135
 msgid "Unknown error"
-msgstr ""
+msgstr "Unbekannter Fehler"
 
 #: templates/crm/add_edit_counterparty.html:3
 #: templates/crm/add_edit_counterparty.html:14
 msgid "Add Counterparty"
-msgstr ""
+msgstr "Gegenpartei hinzufügen"
 
 #: templates/crm/add_edit_counterparty.html:3
 #: templates/crm/add_edit_counterparty.html:14
 #: templates/crm/add_edit_counterparty.html:20
 msgid "Edit Counterparty"
-msgstr ""
+msgstr "Gegenpartei bearbeiten"
 
 #: templates/crm/add_edit_counterparty.html:20
 msgid "Add New Counterparty"
-msgstr ""
+msgstr "Neue Gegenpartei hinzufügen"
 
 #: templates/crm/add_edit_counterparty.html:22
 msgid "Enter company information with AI assistance"
-msgstr ""
+msgstr "Geben Sie Unternehmensinformationen mit KI-Unterstützung ein"
 
 #: templates/crm/add_edit_counterparty.html:31
 msgid "Company Information"
-msgstr ""
+msgstr "Unternehmensinformationen"
 
 #: templates/crm/add_edit_counterparty.html:45
 msgid "Full legal company name"
-msgstr ""
+msgstr "Vollständiger rechtlicher Firmenname"
 
 #: templates/crm/add_edit_counterparty.html:51
 msgid "Germany"
-msgstr ""
+msgstr "Deutschland"
 
 #: templates/crm/add_edit_counterparty.html:52
 msgid "Austria"
-msgstr ""
+msgstr "Österreich"
 
 #: templates/crm/add_edit_counterparty.html:53
 msgid "Switzerland"
-msgstr ""
+msgstr "Schweiz"
 
 #: templates/crm/add_edit_counterparty.html:54
 msgid "France"
-msgstr ""
+msgstr "Frankreich"
 
 #: templates/crm/add_edit_counterparty.html:55
 msgid "Italy"
-msgstr ""
+msgstr "Italien"
 
 #: templates/crm/add_edit_counterparty.html:56
 msgid "Spain"
-msgstr ""
+msgstr "Spanien"
 
 #: templates/crm/add_edit_counterparty.html:57
 msgid "Netherlands"
-msgstr ""
+msgstr "Niederlande"
 
 #: templates/crm/add_edit_counterparty.html:58
 msgid "Belgium"
-msgstr ""
+msgstr "Belgien"
 
 #: templates/crm/add_edit_counterparty.html:59
 msgid "Poland"
-msgstr ""
+msgstr "Polen"
 
 #: templates/crm/add_edit_counterparty.html:60
 msgid "Czech Republic"
-msgstr ""
+msgstr "Tschechien"
 
 #: templates/crm/add_edit_counterparty.html:61
 msgid "Ukraine"
-msgstr ""
+msgstr "Ukraine"
 
 #: templates/crm/add_edit_counterparty.html:74
 msgid "Validate"
-msgstr ""
+msgstr "Validieren"
 
 #: templates/crm/add_edit_counterparty.html:77
 msgid "VAT number for EU companies (optional)"
-msgstr ""
+msgstr "USt-IdNr. für EU-Unternehmen (optional)"
 
 #: templates/crm/add_edit_counterparty.html:98
 #: templates/crm/counterparty_details.html:83
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 #: templates/crm/add_edit_counterparty.html:100
 msgid "Street, City, Postal Code, Country"
-msgstr ""
+msgstr "Straße, Stadt, Postleitzahl, Land"
 
 #: templates/crm/add_edit_counterparty.html:112
 msgid "Company website domain for additional verification"
-msgstr ""
+msgstr "Firmenwebseite/Domain für zusätzliche Verifikation"
 
 #: templates/crm/add_edit_counterparty.html:118
 msgid "AI Enrichment"
-msgstr ""
+msgstr "KI-Anreicherung"
 
 #: templates/crm/add_edit_counterparty.html:120
 msgid "Use AI to automatically fill missing information"
-msgstr ""
+msgstr "KI verwenden, um fehlende Informationen automatisch auszufüllen"
 
 #: templates/crm/add_edit_counterparty.html:128
 msgid "Save Counterparty"
-msgstr ""
+msgstr "Gegenpartei speichern"
 
 #: templates/crm/add_edit_counterparty.html:128
 msgid "Update Counterparty"
-msgstr ""
+msgstr "Gegenpartei aktualisieren"
 
 #: templates/crm/add_edit_counterparty.html:131
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: templates/crm/add_edit_counterparty.html:143
 #: templates/crm/add_edit_counterparty.html:264
 msgid "AI Assistant"
-msgstr ""
+msgstr "KI-Assistent"
 
 #: templates/crm/add_edit_counterparty.html:153
 msgid ""
+msgid ""
 "Hello! I can help you fill out the company information. What would you "
 "like to know?"
-msgstr ""
+msgstr "Hallo! Ich kann Ihnen helfen, die Unternehmensdaten auszufüllen. Was möchten Sie wissen?"
 
 #: templates/crm/add_edit_counterparty.html:159
 msgid "Ask me about company data..."
-msgstr ""
+msgstr "Fragen Sie mich zu Firmendaten..."
 
 #: templates/crm/add_edit_counterparty.html:168
 msgid "Quick Help"
-msgstr ""
+msgstr "Schnelle Hilfe"
 
 #: templates/crm/add_edit_counterparty.html:170
 msgid "What information do I need to provide?"
-msgstr ""
+msgstr "Welche Informationen muss ich angeben?"
 
 #: templates/crm/add_edit_counterparty.html:171
 msgid "What information do I need?"
-msgstr ""
+msgstr "Welche Informationen benötige ich?"
 
 #: templates/crm/add_edit_counterparty.html:173
 #: templates/crm/add_edit_counterparty.html:174
 msgid "How to find VAT number?"
-msgstr ""
+msgstr "Wie finde ich die USt-IdNr.?"
 
 #: templates/crm/add_edit_counterparty.html:176
 #: templates/crm/add_edit_counterparty.html:177
 msgid "What is domain used for?"
-msgstr ""
+msgstr "Wofür wird die Domain verwendet?"
 
 #: templates/crm/add_edit_counterparty.html:253
 msgid "Validating..."
-msgstr ""
+msgstr "Validiere..."
 
 #: templates/crm/add_edit_counterparty.html:254
 #: templates/crm/counterparty_details.html:155
 #: templates/crm/counterparty_details.html:279
 msgid "Valid"
-msgstr ""
+msgstr "Gültig"
 
 #: templates/crm/add_edit_counterparty.html:255
 msgid "Invalid"
-msgstr ""
+msgstr "Ungültig"
 
 #: templates/crm/add_edit_counterparty.html:256
 msgid "Enriching data..."
-msgstr ""
+msgstr "Daten werden angereichert..."
 
 #: templates/crm/add_edit_counterparty.html:257
 msgid "Enrichment complete!"
-msgstr ""
+msgstr "Anreicherung abgeschlossen!"
 
 #: templates/crm/add_edit_counterparty.html:258
 msgid "Saving..."
-msgstr ""
+msgstr "Speichere..."
 
 #: templates/crm/add_edit_counterparty.html:259
 msgid "Updating..."
-msgstr ""
+msgstr "Aktualisiere..."
 
 #: templates/crm/add_edit_counterparty.html:261
 #: templates/pentesting/scanner.html:527 templates/phoneintel/analyze.html:56
 msgid "Network error occurred"
-msgstr ""
+msgstr "Netzwerkfehler aufgetreten"
 
 #: templates/crm/add_edit_counterparty.html:262
 msgid "Ask me anything about company data!"
-msgstr ""
+msgstr "Fragen Sie mich alles zu Firmendaten!"
 
 #: templates/crm/add_edit_counterparty.html:263
 msgid "Thinking..."
-msgstr ""
+msgstr "Denke..."
 
 #: templates/crm/add_edit_counterparty.html:273
 msgid "Please enter both VAT number and country"
-msgstr ""
+msgstr "Bitte geben Sie sowohl USt-IdNr. als auch Land ein"
 
 #: templates/crm/add_edit_counterparty.html:305
 msgid "Could not validate VAT number"
-msgstr ""
+msgstr "Konnte USt-IdNr. nicht validieren"
 
 #: templates/crm/add_edit_counterparty.html:360
 msgid "No additional data found"
-msgstr ""
+msgstr "Keine zusätzlichen Daten gefunden"
 
 #: templates/crm/counterparty_details.html:3
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: templates/crm/counterparty_details.html:22
 msgid "Back to List"
-msgstr ""
+msgstr "Zurück zur Liste"
 
 #: templates/crm/counterparty_details.html:25
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: templates/crm/counterparty_details.html:28
 #: templates/crm/counterparty_details.html:423
 #: templates/crm/counterparty_details.html:431
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: templates/crm/counterparty_details.html:40
 msgid "Company Data"
-msgstr ""
+msgstr "Firmendaten"
 
 #: templates/crm/counterparty_details.html:103
 msgid "Monitoring Status"
-msgstr ""
+msgstr "Überwachungsstatus"
 
 #: templates/crm/counterparty_details.html:112
 msgid "Monitoring Active"
-msgstr ""
+msgstr "Überwachung aktiv"
 
 #: templates/crm/counterparty_details.html:116
 msgid "Monitoring Inactive"
-msgstr ""
+msgstr "Überwachung inaktiv"
 
 #: templates/crm/counterparty_details.html:123
 msgid "Deactivate"
-msgstr ""
+msgstr "Deaktivieren"
 
 #: templates/crm/counterparty_details.html:127
 msgid "Activate"
-msgstr ""
+msgstr "Aktivieren"
 
 #: templates/crm/counterparty_details.html:138
 msgid "Total Checks"
-msgstr ""
+msgstr "Gesamtanzahl Prüfungen"
 
 #: templates/crm/counterparty_details.html:142
 msgid "Successful"
-msgstr ""
+msgstr "Erfolgreich"
 
 #: templates/crm/counterparty_details.html:146
 #: templates/crm/counterparty_details.html:201
 msgid "Alerts"
-msgstr ""
+msgstr "Alarme"
 
 #: templates/crm/counterparty_details.html:152
 msgid "Last Check"
-msgstr ""
+msgstr "Letzte Prüfung"
 
 #: templates/crm/counterparty_details.html:153
 msgid "Overall Status"
-msgstr ""
+msgstr "Gesamtstatus"
 
 #: templates/crm/counterparty_details.html:157
 #: templates/crm/counterparty_details.html:281
 msgid "Warning"
-msgstr ""
+msgstr "Warnung"
 
 #: templates/crm/counterparty_details.html:159
 #: templates/crm/counterparty_details.html:283
 msgid "Problem"
-msgstr ""
+msgstr "Problem"
 
 #: templates/crm/counterparty_details.html:164
 msgid "This counterparty has not been checked yet"
-msgstr ""
+msgstr "Diese Gegenpartei wurde noch nicht geprüft"
 
 #: templates/crm/counterparty_details.html:166
 msgid "Check Now"
-msgstr ""
+msgstr "Jetzt prüfen"
 
 #: templates/crm/counterparty_details.html:176
 msgid "Quick Actions"
-msgstr ""
+msgstr "Schnellaktionen"
 
 #: templates/crm/counterparty_details.html:181
 msgid "Start New Check"
-msgstr ""
+msgstr "Neue Prüfung starten"
 
 #: templates/crm/counterparty_details.html:184
 msgid "Export Data"
-msgstr ""
+msgstr "Daten exportieren"
 
 #: templates/crm/counterparty_details.html:187
 msgid "View Timeline"
-msgstr ""
+msgstr "Chronologie anzeigen"
 
 #: templates/crm/counterparty_details.html:208
 msgid "Priority"
-msgstr ""
+msgstr "Priorität"
 
 #: templates/crm/counterparty_details.html:209
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: templates/crm/counterparty_details.html:210
 msgid "Message"
-msgstr ""
+msgstr "Nachricht"
 
 #: templates/crm/counterparty_details.html:220
 msgid "Critical"
-msgstr ""
+msgstr "Kritisch"
 
 #: templates/crm/counterparty_details.html:222
 msgid "High"
-msgstr ""
+msgstr "Hoch"
 
 #: templates/crm/counterparty_details.html:224
 msgid "Medium"
-msgstr ""
+msgstr "Mittel"
 
 #: templates/crm/counterparty_details.html:226
 msgid "Low"
-msgstr ""
+msgstr "Niedrig"
 
 #: templates/crm/counterparty_details.html:239
 msgid "Pending"
-msgstr ""
+msgstr "Ausstehend"
 
 #: templates/crm/counterparty_details.html:259
 msgid "Verification History"
-msgstr ""
+msgstr "Prüfverlauf"
 
 #: templates/crm/counterparty_details.html:274
 msgid "Monitoring"
-msgstr ""
+msgstr "Überwachung"
 
 #: templates/crm/counterparty_details.html:331
 msgid "No verification history available"
-msgstr ""
+msgstr "Kein Prüfverlauf verfügbar"
 
 #: templates/crm/counterparty_details.html:350
 msgid "Monitoring activated!"
-msgstr ""
+msgstr "Überwachung aktiviert!"
 
 #: templates/crm/counterparty_details.html:350
 msgid "Monitoring deactivated!"
-msgstr ""
+msgstr "Überwachung deaktiviert!"
 
 #: templates/crm/counterparty_details.html:359
 msgid "Do you want to start a new check? This may take several minutes."
-msgstr ""
+msgstr "Möchten Sie eine neue Prüfung starten? Dies kann mehrere Minuten dauern."
 
 #: templates/crm/counterparty_details.html:360
 msgid ""
+msgid ""
 "Check is starting... (This function must still be connected to the "
 "verification system)"
-msgstr ""
+msgstr "Prüfung wird gestartet... (Diese Funktion muss noch mit dem Verifizierungssystem verbunden werden)"
 
 #: templates/crm/counterparty_details.html:366 templates/crm/index.html:295
 msgid "Edit function coming soon..."
-msgstr ""
+msgstr "Bearbeiten-Funktion kommt bald..."
 
 #: templates/crm/counterparty_details.html:375 templates/crm/index.html:296
 msgid "WARNING: PERMANENT DELETION"
-msgstr ""
+msgstr "WARNUNG: DAUERHAFTE LÖSCHUNG"
 
 #: templates/crm/counterparty_details.html:376
 #: templates/crm/counterparty_details.html:417
 msgid "Counterparty"
-msgstr ""
+msgstr "Gegenpartei"
 
 #: templates/crm/counterparty_details.html:379
 msgid "This will permanently delete"
-msgstr ""
+msgstr "Dies wird dauerhaft löschen"
 
 #: templates/crm/counterparty_details.html:380
 msgid "verification history entries"
-msgstr ""
+msgstr "Einträge des Prüfverlaufs"
 
 #: templates/crm/counterparty_details.html:381
 msgid "All associated check results"
-msgstr ""
+msgstr "Alle zugehörigen Prüfergebnisse"
 
 #: templates/crm/counterparty_details.html:382
 msgid "alert(s) and notifications"
-msgstr ""
+msgstr "Alarme und Benachrichtigungen"
 
 #: templates/crm/counterparty_details.html:383 templates/crm/index.html:303
 msgid "This action CANNOT be undone!"
-msgstr ""
+msgstr "Diese Aktion KANN NICHT rückgängig gemacht werden!"
 
 #: templates/crm/counterparty_details.html:384
 msgid "Are you ABSOLUTELY sure?"
-msgstr ""
+msgstr "Sind Sie SICHER?"
 
 #: templates/crm/counterparty_details.html:392
 msgid "Final confirmation!"
-msgstr ""
+msgstr "Endgültige Bestätigung!"
 
 #: templates/crm/counterparty_details.html:393
 msgid "Enter the company name exactly to confirm"
-msgstr ""
+msgstr "Geben Sie zur Bestätigung den Firmennamen genau ein"
 
 #: templates/crm/counterparty_details.html:399
 msgid "Action cancelled. Company name does not match."
-msgstr ""
+msgstr "Aktion abgebrochen. Firmenname stimmt nicht überein."
 
 #: templates/crm/counterparty_details.html:399
 msgid "The counterparty was NOT deleted."
-msgstr ""
+msgstr "Die Gegenpartei wurde NICHT gelöscht."
 
 #: templates/crm/counterparty_details.html:407
 msgid "Deleting..."
-msgstr ""
+msgstr "Lösche..."
 
 #: templates/crm/counterparty_details.html:417
 msgid "was successfully deleted!"
-msgstr ""
+msgstr "wurde erfolgreich gelöscht!"
 
 #: templates/crm/counterparty_details.html:420 templates/crm/index.html:305
 msgid "Error deleting"
-msgstr ""
+msgstr "Fehler beim Löschen"
 
 #: templates/crm/counterparty_details.html:437
 msgid "Export function coming soon..."
-msgstr ""
+msgstr "Export-Funktion kommt bald..."
 
 #: templates/crm/counterparty_details.html:442
 msgid "Timeline view coming soon..."
-msgstr ""
+msgstr "Chronologie-Ansicht kommt bald..."
 
 #: templates/crm/index.html:3
 msgid "CRM - Counterparty Monitoring"
-msgstr ""
+msgstr "CRM - Gegenpartei-Überwachung"
 
 #: templates/crm/index.html:10
 msgid "CRM - Counterparty Management"
-msgstr ""
+msgstr "CRM - Gegenpartei-Verwaltung"
 
 #: templates/crm/index.html:11
 msgid "Manage your counterparties and automatically monitor their status"
-msgstr ""
+msgstr "Verwalten Sie Ihre Gegenparteien und überwachen Sie automatisch deren Status"
 
 #: templates/crm/index.html:21
 msgid "Total Counterparties"
-msgstr ""
+msgstr "Gesamtanzahl Gegenparteien"
 
 #: templates/crm/index.html:29
 msgid "Actively Monitored"
-msgstr ""
+msgstr "Aktiv überwacht"
 
 #: templates/crm/index.html:37
 msgid "New Alerts"
-msgstr ""
+msgstr "Neue Alarme"
 
 #: templates/crm/index.html:45
 msgid "Add New"
-msgstr ""
+msgstr "Neu hinzufügen"
 
 #: templates/crm/index.html:48
 msgid "Find Duplicates"
-msgstr ""
+msgstr "Duplikate finden"
 
 #: templates/crm/index.html:293
 msgid "Counterparty successfully added!"
-msgstr ""
+msgstr "Gegenpartei erfolgreich hinzugefügt!"
 
 #: templates/crm/index.html:297
 msgid "Do you want to delete"
-msgstr ""
+msgstr "Möchten Sie löschen"
 
 #: templates/crm/index.html:298
 msgid "permanently?"
-msgstr ""
+msgstr "dauerhaft?"
 
 #: templates/crm/index.html:299
 msgid "This will also delete:"
-msgstr ""
+msgstr "Dies löscht außerdem:"
 
 #: templates/crm/index.html:300
 msgid "• All verification histories"
-msgstr ""
+msgstr "• Alle Prüfverläufe"
 
 #: templates/crm/index.html:301
 msgid "• All verification results"
-msgstr ""
+msgstr "• Alle Prüfergebnisse"
 
 #: templates/crm/index.html:302
 msgid "• All alerts and notifications"
-msgstr ""
+msgstr "• Alle Alarme und Benachrichtigungen"
 
 #: templates/crm/index.html:304
 msgid "Counterparty successfully deleted!"
-msgstr ""
+msgstr "Gegenpartei erfolgreich gelöscht!"
 
 #: templates/crm/index.html:307
 msgid "this counterparty"
-msgstr ""
+msgstr "diese Gegenpartei"
 
 #: templates/crm/index.html:308
 msgid "Do you really want to delete"
-msgstr ""
+msgstr "Möchten Sie wirklich löschen"
 
 #: templates/crm/index.html:309
 msgid "This will delete:"
-msgstr ""
+msgstr "Dies wird löschen:"
 
 #: templates/crm/index.html:310
 msgid "• Verification histories"
-msgstr ""
+msgstr "• Prüfverläufe"
 
 #: templates/crm/index.html:311
 msgid "• Verification results"
-msgstr ""
+msgstr "• Prüfergebnisse"
 
 #: templates/crm/index.html:312
 msgid "• Alerts and notifications"
-msgstr ""
+msgstr "• Alarme und Benachrichtigungen"
 
 #: templates/crm/index.html:313
 msgid "This action cannot be undone!"
-msgstr ""
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden!"
 
 #: templates/legal/agb.html:249
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Datenschutzrichtlinie"
 
 #: templates/legal/datenschutz.html:176
 msgid "GDPR Request Form"
-msgstr ""
+msgstr "DSGVO-Anfrageformular"
 
 #: templates/legal/delete_account.html:170
 msgid "Are you ABSOLUTELY sure? This action cannot be undone!"
-msgstr ""
+msgstr "Sind Sie SICHER? Diese Aktion kann nicht rückgängig gemacht werden!"
 
 #: templates/mailguard/dashboard.html:3
 msgid "MailGuard Dashboard - Email Intelligence"
-msgstr ""
+msgstr "MailGuard-Dashboard - E-Mail-Intelligenz"
 
 #: templates/mailguard/dashboard.html:10
 msgid "MailGuard Dashboard"
-msgstr ""
+msgstr "MailGuard-Dashboard"
 
 #: templates/mailguard/dashboard.html:11
 msgid "Email Intelligence & Security"
-msgstr ""
+msgstr "E-Mail-Intelligenz & Sicherheit"
 
 #: templates/mailguard/dashboard.html:22
 msgid "Connected Accounts"
-msgstr ""
+msgstr "Verbundene Konten"
 
 #: templates/mailguard/dashboard.html:30
 msgid "Active Rules"
-msgstr ""
+msgstr "Aktive Regeln"
 
 #: templates/mailguard/dashboard.html:38
 msgid "Messages Today"
-msgstr ""
+msgstr "Nachrichten heute"
 
 #: templates/mailguard/dashboard.html:46 templates/mailguard/dashboard.html:128
 msgid "Pending Approvals"
-msgstr ""
+msgstr "Ausstehende Genehmigungen"
 
 #: templates/mailguard/dashboard.html:58
 msgid "Email Accounts"
-msgstr ""
+msgstr "E-Mail-Konten"
 
 #: templates/mailguard/dashboard.html:61
 msgid "Add Email Account"
-msgstr ""
+msgstr "E-Mail-Konto hinzufügen"
 
 #: templates/mailguard/dashboard.html:71
 msgid "Provider"
-msgstr ""
+msgstr "Anbieter"
 
 #: templates/mailguard/dashboard.html:73
 msgid "Last Sync"
-msgstr ""
+msgstr "Letzte Synchronisierung"
 
 #: templates/mailguard/dashboard.html:74 templates/mailguard/dashboard.html:138
 msgid "Actions"
-msgstr ""
+msgstr "Aktionen"
 
 #: templates/mailguard/dashboard.html:85
 msgid "Gmail"
-msgstr ""
+msgstr "Gmail"
 
 #: templates/mailguard/dashboard.html:87
 msgid "Microsoft 365"
-msgstr ""
+msgstr "Microsoft 365"
 
 #: templates/mailguard/dashboard.html:89
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: templates/mailguard/dashboard.html:99
 msgid "Never"
-msgstr ""
+msgstr "Nie"
 
 #: templates/mailguard/dashboard.html:114
 msgid "No email accounts configured yet."
-msgstr ""
+msgstr "Noch keine E-Mail-Konten konfiguriert."
 
 #: templates/mailguard/dashboard.html:114
 msgid "Add your first email account to get started."
-msgstr ""
+msgstr "Fügen Sie Ihr erstes E-Mail-Konto hinzu, um zu starten."
 
 #: templates/mailguard/dashboard.html:134
 msgid "From"
-msgstr ""
+msgstr "Von"
 
 #: templates/mailguard/dashboard.html:135
 msgid "Subject"
-msgstr ""
+msgstr "Betreff"
 
 #: templates/mailguard/dashboard.html:136
 msgid "Draft Reply"
-msgstr ""
+msgstr "Entwurf-Antwort"
 
 #: templates/mailguard/dashboard.html:157
 msgid "View Details"
-msgstr ""
+msgstr "Details ansehen"
 
 #: templates/mailguard/dashboard.html:160
 msgid "Approve"
-msgstr ""
+msgstr "Genehmigen"
 
 #: templates/mailguard/dashboard.html:165
 msgid "Reject"
-msgstr ""
+msgstr "Ablehnen"
 
 #: templates/mailguard/dashboard.html:184
 msgid "Are you sure you want to disconnect this email account?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie dieses E-Mail-Konto trennen möchten?"
 
 #: templates/mailguard/dashboard.html:185
 msgid "Are you sure you want to delete this rule?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie diese Regel löschen möchten?"
 
 #: templates/mailguard/dashboard.html:186
 msgid "Reject this draft reply?"
-msgstr ""
+msgstr "Diesen Entwurf ablehnen?"
 
 #: templates/mailguard/dashboard.html:187
 msgid "Account details coming soon"
-msgstr ""
+msgstr "Kontodetails folgen in Kürze"
 
 #: templates/payments/pricing.html:3
 msgid "Pricing - VAT Verification System"
-msgstr ""
+msgstr "Preise - VAT-Verifizierungssystem"
 
 #: templates/payments/pricing.html:43
 msgid "Choose Your Plan"
-msgstr ""
+msgstr "Wählen Sie Ihren Plan"
 
 #: templates/payments/pricing.html:44
 msgid "Transparent pricing. No hidden fees. Cancel anytime."
-msgstr ""
+msgstr "Transparente Preise. Keine versteckten Gebühren. Jederzeit kündbar."
 
 #: templates/payments/pricing.html:54
 msgid "Most Popular"
-msgstr ""
+msgstr "Beliebt"
 
 #: templates/payments/pricing.html:72
 msgid "verifications"
-msgstr ""
+msgstr "Prüfungen"
 
 #: templates/payments/pricing.html:74
 msgid "verifications/month"
-msgstr ""
+msgstr "Prüfungen/Monat"
 
 #: templates/payments/pricing.html:94
 msgid "Current Plan"
-msgstr ""
+msgstr "Aktueller Plan"
 
 #: templates/payments/pricing.html:124
 msgid "Frequently Asked Questions"
-msgstr ""
+msgstr "Häufig gestellte Fragen"
 
 #: templates/payments/pricing.html:133
 msgid "Can I cancel anytime?"
-msgstr ""
+msgstr "Kann ich jederzeit kündigen?"
 
 #: templates/payments/pricing.html:138
 msgid ""
+msgid ""
 "Yes, you can cancel your subscription at any time without notice. There "
 "are no long-term commitments."
-msgstr ""
+msgstr "Ja, Sie können Ihr Abonnement jederzeit ohne Vorankündigung kündigen. Es gibt keine langfristigen Verpflichtungen."
 
 #: templates/payments/pricing.html:147
 msgid "What happens if I exceed my limit?"
-msgstr ""
+msgstr "Was passiert, wenn ich mein Limit überschreite?"
 
 #: templates/payments/pricing.html:152
+msgid ""
 msgid ""
 "With the free plan, no further verifications will be possible until the "
 "next month begins. With paid plans, you can upgrade at any time to "
 "perform more verifications."
-msgstr ""
+msgstr "Beim kostenlosen Plan sind keine weiteren Prüfungen möglich, bis der nächste Monat beginnt. Bei kostenpflichtigen Plänen können Sie jederzeit upgraden, um mehr Prüfungen durchzuführen."
 
 #: templates/payments/pricing.html:161
 msgid "What payment methods do you accept?"
-msgstr ""
+msgstr "Welche Zahlungsmethoden akzeptieren Sie?"
 
 #: templates/payments/pricing.html:166
 msgid ""
+msgid ""
 "We accept all major credit cards (Visa, Mastercard, American Express) as "
 "well as SEPA direct debit through our secure payment provider Stripe."
-msgstr ""
+msgstr "Wir akzeptieren alle gängigen Kreditkarten (Visa, Mastercard, American Express) sowie SEPA-Lastschrift über unseren sicheren Zahlungsanbieter Stripe."
 
 #: templates/payments/pricing.html:175
 msgid "Can I switch between plans?"
-msgstr ""
+msgstr "Kann ich zwischen den Plänen wechseln?"
 
 #: templates/payments/pricing.html:180
+msgid ""
 msgid ""
 "Yes, you can upgrade or downgrade at any time. When upgrading, you get "
 "immediate access to additional features. When downgrading, changes take "
 "effect at the end of the current billing period."
-msgstr ""
+msgstr "Ja, Sie können jederzeit upgraden oder downgraden. Beim Upgrade erhalten Sie sofortigen Zugriff auf zusätzliche Funktionen. Beim Downgrade treten Änderungen zum Ende des aktuellen Abrechnungszeitraums in Kraft."
 
 #: templates/payments/pricing.html:189
 msgid "Is there a money-back guarantee?"
-msgstr ""
+msgstr "Gibt es eine Geld-zurück-Garantie?"
 
 #: templates/payments/pricing.html:194
 msgid ""
+msgid ""
 "Yes, we offer a 14-day money-back guarantee for all paid plans. If you "
 "are not satisfied, we will refund you the full amount."
-msgstr ""
+msgstr "Ja, wir bieten eine 14-tägige Geld-zurück-Garantie für alle kostenpflichtigen Pläne. Wenn Sie nicht zufrieden sind, erstatten wir Ihnen den vollen Betrag."
 
 #: templates/payments/pricing.html:203
 msgid "Do you need a custom solution?"
-msgstr ""
+msgstr "Benötigen Sie eine maßgeschneiderte Lösung?"
 
 #: templates/payments/pricing.html:208
+msgid ""
 msgid ""
 "For companies with special requirements, we offer customized Enterprise "
 "solutions. Contact us at"
-msgstr ""
+msgstr "Für Unternehmen mit speziellen Anforderungen bieten wir maßgeschneiderte Enterprise-Lösungen. Kontaktieren Sie uns unter"
 
 #: templates/payments/pricing.html:208
 msgid "for a custom quote."
-msgstr ""
+msgstr "für ein individuelles Angebot."
 
 #: templates/payments/pricing.html:221
 msgid "Trusted by over 500 companies in Europe"
-msgstr ""
+msgstr "Vertrauen von über 500 Unternehmen in Europa"
 
 #: templates/payments/pricing.html:224
 msgid "SSL encrypted"
-msgstr ""
+msgstr "SSL-verschlüsselt"
 
 #: templates/payments/pricing.html:227
 msgid "GDPR compliant"
-msgstr ""
+msgstr "DSGVO-konform"
 
 #: templates/payments/pricing.html:230
 msgid "Stripe secured"
-msgstr ""
+msgstr "Durch Stripe gesichert"
 
 #: templates/payments/pricing.html:239
 msgid "Still have questions?"
-msgstr ""
+msgstr "Haben Sie noch Fragen?"
 
 #: templates/payments/pricing.html:240
 msgid "Our support team is here to help."
-msgstr ""
+msgstr "Unser Support-Team hilft Ihnen gerne."
 
 #: templates/payments/pricing.html:242
 msgid "Contact us"
-msgstr ""
+msgstr "Kontaktieren Sie uns"
 
 #: templates/pentesting/scanner.html:3
 msgid "Website Security Scanner - Pentesting"
-msgstr ""
+msgstr "Website-Sicherheits-Scanner - Pentesting"
 
 #: templates/pentesting/scanner.html:10
 msgid "Website Security Scanner"
-msgstr ""
+msgstr "Website-Sicherheits-Scanner"
 
 #: templates/pentesting/scanner.html:12
 msgid "Comprehensive website vulnerability assessment with AI-powered insights"
-msgstr ""
+msgstr "Umfassende Bewertung von Website-Schwachstellen mit KI-gestützten Erkenntnissen"
 
 #: templates/pentesting/scanner.html:16
 msgid "⚠️ This feature is only available for PRO and ENTERPRISE users"
-msgstr ""
+msgstr "⚠️ Diese Funktion ist nur für PRO- und ENTERPRISE-Benutzer verfügbar"
 
 #: templates/pentesting/scanner.html:17
 msgid "Upgrade now to protect your website"
-msgstr ""
+msgstr "Jetzt upgraden, um Ihre Website zu schützen"
 
 #: templates/pentesting/scanner.html:18
 msgid "Upgrade Now"
-msgstr ""
+msgstr "Jetzt upgraden"
 
 #: templates/pentesting/scanner.html:24
 msgid "Enter Website URL:"
-msgstr ""
+msgstr "Website-URL eingeben:"
 
 #: templates/pentesting/scanner.html:29
 msgid "e.g. example.com or https://example.com"
-msgstr ""
+msgstr "z. B. example.com oder https://example.com"
 
 #: templates/pentesting/scanner.html:46
 msgid "AI-Powered Analysis with Recommendations"
-msgstr ""
+msgstr "KI-gestützte Analyse mit Empfehlungen"
 
 #: templates/pentesting/scanner.html:525
 msgid "Scan Complete"
-msgstr ""
+msgstr "Scan abgeschlossen"
 
 #: templates/pentesting/scanner.html:528 templates/phoneintel/analyze.html:55
 msgid "Analysis failed"
-msgstr ""
+msgstr "Analyse fehlgeschlagen"
 
 #: templates/phoneintel/analyze.html:14
 msgid ""
+msgid ""
 "Analyze phone numbers for carrier information, line type, and risk "
 "assessment. No personal data is stored."
-msgstr ""
+msgstr "Analysieren Sie Telefonnummern auf Netzbetreiberinformationen, Leitungstyp und Risikobewertung. Es werden keine personenbezogenen Daten gespeichert."
 
 #: templates/phoneintel/analyze.html:19
 msgid "Phone Number"
-msgstr ""
+msgstr "Rufnummer"
 
 #: templates/phoneintel/analyze.html:23
 msgid "Country Hint (ISO2)"
-msgstr ""
+msgstr "Land-Hinweis (ISO2)"
 
 #: templates/phoneintel/analyze.html:28
 msgid "Analyze"
-msgstr ""
+msgstr "Analysieren"
 
 #: templates/phoneintel/analyze.html:33
 msgid "Analysis Results"
-msgstr ""
+msgstr "Analyseergebnisse"
 
 #: templates/phoneintel/analyze.html:44
 msgid "Analyzing..."
-msgstr ""
+msgstr "Analysiere..."
 
 #: templates/phoneintel/analyze.html:45
 msgid "Basic Information"
-msgstr ""
+msgstr "Basisinformationen"
 
 #: templates/phoneintel/analyze.html:47
 msgid "Carrier"
-msgstr ""
+msgstr "Netzbetreiber"
 
 #: templates/phoneintel/analyze.html:48
 msgid "Line Type"
-msgstr ""
+msgstr "Leitungstyp"
 
 #: templates/phoneintel/analyze.html:49
 msgid "Risk Assessment"
-msgstr ""
+msgstr "Risikobewertung"
 
 #: templates/phoneintel/analyze.html:50
 msgid "Risk Score"
-msgstr ""
+msgstr "Risikoscore"
 
 #: templates/phoneintel/analyze.html:52
 msgid "Disposable"
-msgstr ""
+msgstr "Einweg"
 
 #: templates/phoneintel/analyze.html:53
 msgid "Seen in Scam DB"
-msgstr ""
+msgstr "In Scam-DB gefunden"
 
 #: templates/phoneintel/analyze.html:54
 msgid "Suspicious Patterns"
-msgstr ""
+msgstr "Verdächtige Muster"
 
 #: templates/phoneintel/analyze.html:57
 msgid "Unknown"
-msgstr ""
+msgstr "Unbekannt"
 
 #: templates/phoneintel/analyze.html:58
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: templates/phoneintel/analyze.html:59
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
