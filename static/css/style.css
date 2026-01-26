@@ -863,3 +863,79 @@ body, .container, .container-fluid, .row, .col {
     from { transform: translateX(-20px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+
+/* Override Bootstrap dark backgrounds for light theme */
+.bg-primary {
+    background-color: var(--info-color) !important;
+    color: white !important;
+}
+
+.bg-success {
+    background-color: var(--success-color) !important;
+    color: white !important;
+}
+
+.bg-danger {
+    background-color: var(--error-color) !important;
+    color: white !important;
+}
+
+.bg-warning {
+    background-color: var(--warning-color) !important;
+    color: #000000 !important;
+}
+
+.bg-info {
+    background-color: var(--info-color) !important;
+    color: white !important;
+}
+
+.bg-dark {
+    background-color: #f8f9fa !important;
+    color: var(--text-color) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.bg-secondary {
+    background-color: #e9ecef !important;
+    color: var(--text-color) !important;
+}
+
+.text-white {
+    color: white !important;
+}
+
+.text-dark {
+    color: var(--text-color) !important;
+}
+
+/* Ensure all cards have light background */
+.card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-color) !important;
+}
+
+.card .card-body {
+    color: var(--text-color) !important;
+}
+
+.card .card-header {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-color) !important;
+}
+
+/* Ensure all text is readable on light background */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color) !important;
+}
+
+p, span, div {
+    color: var(--text-color) !important;
+}
+
+/* Override any remaining dark text */
+.text-muted {
+    color: #6c757d !important;
+}
