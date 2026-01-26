@@ -14,13 +14,13 @@
 body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
-    color: #2c3e50;
+    color: #000000;
     overflow-x: hidden;
 }
 
 /* Enhanced Hero Section */
 .hero-section {
-    background: var(--hero-gradient);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     min-height: 100vh;
     position: relative;
     overflow: hidden;
@@ -45,7 +45,7 @@ body {
     position: relative;
     z-index: 2;
     text-align: center;
-    color: white;
+    color: #000000;
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
@@ -333,11 +333,11 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #00ff00;
+    color: #000000;
 }
 
 .feature-description {
-    color: #00ff00;
+    color: #000000;
     line-height: 1.6;
 }
 
@@ -346,20 +346,20 @@ body {
 input,
 textarea,
 select {
-    color: #00ff00 !important;
+    color: #000000 !important;
 }
 
 .form-control::placeholder,
 input::placeholder,
 textarea::placeholder {
-    color: #00ff00 !important;
+    color: #6c757d !important;
     opacity: 0.8;
 }
 
 .form-text,
 .text-muted,
 small {
-    color: #00ff00 !important;
+    color: #000000 !important;
 }
 
 /* Stats Section */

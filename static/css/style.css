@@ -1,43 +1,76 @@
 /* Custom styles for Counterparty Verification System */
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --shadow-light: 0 8px 32px rgba(0, 0, 0, 0.1);
-    --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.15);
-    --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.2);
-    --border-radius: 16px;
+    --primary-bg: #f8f9fa; /* Light beige background */
+    --secondary-bg: #e9ecef; /* Slightly darker light background */
+    --text-color: #000000; /* Black text */
+    --success-color: #28a745; /* Green for success */
+    --error-color: #dc3545; /* Red for errors */
+    --warning-color: #fd7e14; /* Orange for warnings */
+    --info-color: #007bff; /* Blue for info */
+    --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-heavy: 0 8px 16px rgba(0, 0, 0, 0.2);
+    --border-radius: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --text-color-light: #006400; /* Dark green for light backgrounds */
-    --text-color-dark: #00ff00;  /* Bright green for dark backgrounds */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(0, 0, 0, 0.1);
 }
 
-/* GLOBAL DARK GREEN TEXT - for readability on light backgrounds */
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Enhanced shadows and effects */
+.shadow-soft {
+    box-shadow: var(--shadow-light) !important;
+}
+
+.shadow-medium {
+    box-shadow: var(--shadow-medium) !important;
+}
+
+.shadow-strong {
+    box-shadow: var(--shadow-heavy) !important;
+}
+
+/* GLOBAL STYLES - Light theme with black text */
 * {
-    --bs-body-color: var(--text-color-light) !important;
+    --bs-body-color: var(--text-color) !important;
 }
 
 body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--primary-bg);
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
-    color: var(--text-color-light) !important;
+    color: var(--text-color) !important;
     min-height: 100vh;
 }
 
 .navbar {
-    background: #343a40 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: var(--shadow-light);
     transition: var(--transition);
-    color: var(--text-color-dark) !important;
+    color: var(--text-color) !important;
 }
 
 .navbar-brand {
@@ -86,12 +119,12 @@ textarea.autofill-highlight {
     border-bottom: 1px solid var(--glass-border);
     font-weight: 600;
     padding: 1.5rem;
-    color: var(--text-color-light);
+    color: var(--text-color);
 }
 
 .card-body {
     padding: 1.5rem;
-    color: var(--text-color-light);
+    color: var(--text-color);
 }
 
 /* Modern Button Styles */
@@ -214,54 +247,54 @@ textarea.autofill-highlight {
 
 /* Status indicators with modern design */
 .status-valid {
-    color: #00d4aa;
+    color: var(--success-color);
     font-weight: 600;
 }
 
 .status-warning {
-    color: #ffa726;
+    color: var(--warning-color);
     font-weight: 600;
 }
 
 .status-error {
-    color: #ff6b6b;
+    color: var(--error-color);
     font-weight: 600;
 }
 
 /* Enhanced form controls */
 .form-control {
-    border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--border-radius);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     padding: 0.75rem 1rem;
     transition: var(--transition);
     font-weight: 500;
-    color: #00ff00 !important;
+    color: var(--text-color) !important;
 }
 
 .form-control:focus {
-    border-color: #00ff00;
-    box-shadow: 0 0 0 0.2rem rgba(0, 255, 0, 0.25);
-    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--info-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    background: rgba(255, 255, 255, 1);
     transform: translateY(-1px);
-    color: #00ff00 !important;
+    color: var(--text-color) !important;
 }
 
 .form-control::placeholder {
-    color: #00ff00;
+    color: #6c757d;
     font-weight: 400;
 }
 
 /* Form labels */
 .form-label {
-    color: var(--text-color-light);
+    color: var(--text-color);
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 label {
-    color: var(--text-color-light);
+    color: var(--text-color);
     font-weight: 600;
 }
 
@@ -459,7 +492,7 @@ h6 { font-size: 1.125rem; }
 
 p {
     line-height: 1.7;
-    color: var(--text-color-light);
+    color: var(--text-color);
 }
 
 /* Utility classes */
@@ -690,13 +723,13 @@ a:hover {
 
 /* List group items */
 .list-group-item {
-    color: #00ff00 !important;
-    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--text-color) !important;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 /* Form check labels */
 .form-check-label {
-    color: var(--text-color-light) !important;
+    color: var(--text-color) !important;
 }
 
 /* Input group text */
