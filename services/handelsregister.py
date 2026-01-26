@@ -76,12 +76,12 @@ class HandelsregisterService:
                     'data': {
                         'company_name': company_name,
                         'search_results': [],
-                        'message': 'No matches found in Handelsregister'
+                        'message': 'Keine Übereinstimmungen im Handelsregister gefunden'
                     },
                     'last_checked': datetime.utcnow().isoformat(),
                     'confidence': 0.3,
                     'response_time_ms': response_time,
-                    'error_message': 'Company not found in German commercial register'
+                    'error_message': 'Firma nicht im deutschen Handelsregister gefunden'
                 }
                 
         except Exception as e:

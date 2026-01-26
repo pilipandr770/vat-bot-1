@@ -336,14 +336,14 @@ class VIESService:
         if not pattern:
             return {
                 'valid': False,
-                'message': f'VAT format validation not supported for country: {country_code}'
+                'message': f'VAT-Format-Validierung nicht unterstützt für Land: {country_code}'
             }
         
         is_valid = bool(re.match(pattern, full_vat))
         
         return {
             'valid': is_valid,
-            'message': 'Valid format' if is_valid else f'Invalid VAT format for {country_code}',
+            'message': 'Gültiges Format' if is_valid else f'Ungültiges VAT-Format für {country_code}',
             'pattern': pattern,
             'formatted_vat': full_vat
         }

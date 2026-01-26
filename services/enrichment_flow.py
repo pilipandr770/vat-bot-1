@@ -10,11 +10,11 @@ from services.osint.scanner import OsintScanner
 
 class EnrichmentOrchestrator:
     """
-    Єдина точка входу для автодоповнення даних контрагента.
-    Працює з безкоштовними джерелами:
+    Single entry point for counterparty data enrichment.
+    Works with free sources:
     - VIES
-    - Бізнес-реєстри (DE/CZ/PL)
-    - OSINT по домену/e-mail (Whois, DNS, SSL, headers, соцмережі)
+    - Business registries (DE/CZ/PL)
+    - OSINT by domain/email (Whois, DNS, SSL, headers, social networks)
     """
 
     def __init__(self) -> None:
@@ -32,12 +32,12 @@ class EnrichmentOrchestrator:
         country_code_hint: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Приймає будь-яку комбінацію вхідних даних і повертає:
+        Takes any combination of input data and returns:
         {
             "success": bool,
-            "prefill": {...},      # що можна одразу підставити у форму
-            "services": {...},     # сирі відповіді сервісів
-            "messages": [...],     # пояснення для UI
+            "prefill": {...},      # what can be immediately filled in the form
+            "services": {...},     # raw service responses
+            "messages": [...],     # explanations for UI
         }
         """
 
@@ -51,32 +51,41 @@ class EnrichmentOrchestrator:
         company_name = (company_name or "").strip()
         address = (address or "").strip()
 
-        # 1) Якщо є VAT — це головний ключ
+        # 1) If VAT is provided — this is the main key
         if vat_number:
-            vat_result = self.vat_lookup.lookup(
-                vat_number=vat_number,
-                country_code=country_code_hint,
-                company_name_hint=company_name or None,
-            )
-            services["vat_lookup"] = vat_result
+            try:
+                vat_result = self.vat_lookup.lookup(
+                    vat_number=vat_number,
+                    country_code=country_code_hint,
+                    company_name_hint=company_name or None,
+                )
+                services["vat_lookup"] = vat_result
 
-            pre = vat_result.get("prefill") or {}
-            prefills.update({k: v for k, v in pre.items() if v})
+                pre = vat_result.get("prefill") or {}
+                prefills.update({k: v for k, v in pre.items() if v})
 
-            if vat_result.get("messages"):
-                messages.extend(vat_result["messages"])
+                if vat_result.get("messages"):
+                    messages.extend(vat_result["messages"])
+            except ValueError as e:
+                messages.append({"level": "danger", "text": str(e)})
+                return {
+                    "success": False,
+                    "prefill": {},
+                    "services": {},
+                    "messages": messages,
+                }
 
-        # 2) Якщо є домен або email — підключаємо OSINT-сканер
+        # 2) If domain or email is provided — connect OSINT scanner
         target_domain = None
         if domain:
             target_domain = domain
         elif email and "@" in email:
             target_domain = email.split("@", 1)[1]
         else:
-            # Використовуємо назву компанії з VAT lookup або з параметра
+            # Use company name from VAT lookup or from parameter
             company_for_domain = prefills.get("counterparty_name") or company_name
             if company_for_domain and company_for_domain not in ['---', 'N/A', 'Unknown', '']:
-                # Спроба витягти домен з назви компанії (наприклад, "Google GmbH" -> "google.de")
+                # Try to extract domain from company name (e.g., "Google GmbH" -> "google.de")
                 target_domain = self._guess_domain_from_company_name(
                     company_for_domain, 
                     prefills.get("counterparty_country") or country_code_hint
@@ -88,18 +97,18 @@ class EnrichmentOrchestrator:
                 osint_results = osint.run_all()
                 services["osint"] = osint_results
 
-                # Витягуємо можливі імена компанії/країну/місто з Whois/SSL (як підказки)
+                # Extract possible company names/country/city from Whois/SSL (as hints)
                 extracted = self._extract_from_osint(osint_results)
                 for key, value in extracted.items():
                     prefills.setdefault(key, value)
 
-                messages.append(f"OSINT-аналіз для {target_domain} виконано (Whois/DNS/SSL/Headers).")
+                messages.append(f"OSINT-Analyse für {target_domain} durchgeführt (Whois/DNS/SSL/Headers).")
             except Exception as e:
-                # Не блокуємо весь процес, якщо OSINT не спрацював
-                messages.append(f"OSINT-сканування не вдалося: {str(e)}")
+                # Don't block the whole process if OSINT fails
+                messages.append(f"OSINT-Scan fehlgeschlagen: {str(e)}")
 
-        # 3) Якщо є company_name / address / country_code_hint — пробуємо реєстри напряму
-        #    (без платних API, тільки ті, що вже реалізовані)
+        # 3) If company_name / address / country_code_hint is provided — try registries directly
+        #    (without paid APIs, only those already implemented)
         if company_name and (country_code_hint or vat_number or address):
             cc = (country_code_hint or prefills.get("counterparty_country") or "").upper()
             if cc:
@@ -117,15 +126,15 @@ class EnrichmentOrchestrator:
                     }.items():
                         if value and not prefills.get(field):
                             prefills[field] = value
-                    messages.append(f"Знайдено запис у державному реєстрі ({cc}).")
+                    messages.append(f"Eintrag im Handelsregister gefunden ({cc}).")
 
-        # 4) Фінальна відповідь
+        # 4) Final response
         if not prefills and not services:
             return {
                 "success": False,
                 "prefill": {},
                 "services": {},
-                "messages": ["За наданими даними нічого не знайдено в безкоштовних джерелах."],
+                "messages": ["Keine Daten in kostenlosen Quellen gefunden."],
             }
 
         return {
@@ -135,11 +144,11 @@ class EnrichmentOrchestrator:
             "messages": messages,
         }
 
-    # ------------------ ВНУТРІШНІ МЕТОДИ ------------------
+    # ------------------ INTERNAL METHODS ------------------
     def _extract_from_osint(self, results: Any) -> Dict[str, str]:
         """
-        Дуже обережно дістаємо підказки з OSINT-результатів:
-        назву компанії, країну, місто.
+        Very carefully extract hints from OSINT results:
+        company name, country, city.
         """
         extracted: Dict[str, str] = {}
 

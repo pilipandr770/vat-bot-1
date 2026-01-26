@@ -1,6 +1,6 @@
 """
-Enrichment API Routes - Автоматичне збагачення даних контрагента
-Надає endpoint для frontend для автозаповнення форми верифікації.
+Enrichment API Routes - Automatic counterparty data enrichment
+Provides endpoint for frontend to auto-fill verification form.
 
 Author: AI Assistant
 Date: November 2025
@@ -35,11 +35,11 @@ def enrich_counterparty():
     
     Request JSON:
     {
-        "vat_number": "DE123456789",  // опціонально
-        "email": "info@company.de",   // опціонально
-        "domain": "company.de",        // опціонально
-        "company_name": "Company GmbH", // опціонально
-        "country_code": "DE"           // опціонально (для підказки)
+        "vat_number": "DE123456789",  // optional
+        "email": "info@company.de",   // optional
+        "domain": "company.de",        // optional
+        "company_name": "Company GmbH", // optional
+        "country_code": "DE"           // optional (hint for lookup)
     }
     
     Response JSON:
@@ -63,9 +63,9 @@ def enrich_counterparty():
             "registry_de": {...}
         },
         "messages": [
-            "VIES validation successful",
-            "Business registry data found",
-            "OSINT scan completed"
+            "VIES-Validierung erfolgreich",
+            "Handelsregister-Daten gefunden",
+            "OSINT-Scan abgeschlossen"
         ],
         "summary": {
             "sources_used": ["vies", "handelsregister", "osint"],
@@ -87,7 +87,7 @@ def enrich_counterparty():
         if not any([vat_number, email, domain, company_name]):
             return jsonify({
                 'success': False,
-                'error': 'At least one of: vat_number, email, domain, or company_name is required'
+                'error': 'Mindestens eines der folgenden Felder ist erforderlich: vat_number, email, domain oder company_name'
             }), 400
         
         # Log request for debugging
@@ -133,7 +133,7 @@ def enrich_counterparty():
         logger.error(f"Enrichment API error: {str(e)}", exc_info=True)
         return jsonify({
             'success': False,
-            'error': f'Enrichment failed: {str(e)}'
+            'error': f'Anreicherung fehlgeschlagen: {str(e)}'
         }), 500
 
 
