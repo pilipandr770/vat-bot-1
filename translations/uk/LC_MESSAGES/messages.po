@@ -251,15 +251,15 @@ msgstr "Евристичний аналіз"
 
 #: link_scanner/templates/link_scanner/scan.html:222
 msgid "No suspicious patterns found"
-msgstr ""
+msgstr "Підозрілих шаблонів не виявлено"
 
 #: link_scanner/templates/link_scanner/scan.html:223
 msgid "Trusted domain"
-msgstr ""
+msgstr "Довірений домен"
 
 #: link_scanner/templates/link_scanner/scan.html:224
 msgid "engines report threat"
-msgstr ""
+msgstr "сканери повідомляють про загрозу"
 
 #: link_scanner/templates/link_scanner/scan.html:225
 #: templates/admin/dashboard.html:195 templates/admin/dashboard.html:254
@@ -267,23 +267,23 @@ msgstr ""
 #: templates/crm/counterparty_details.html:212
 #: templates/mailguard/dashboard.html:72
 msgid "Status"
-msgstr ""
+msgstr "Статус"
 
 #: link_scanner/templates/link_scanner/scan.html:226
 msgid "redirects"
-msgstr ""
+msgstr "перенаправлення"
 
 #: link_scanner/templates/link_scanner/scan.html:227
 msgid "Recommendations"
-msgstr ""
+msgstr "Рекомендації"
 
 #: link_scanner/templates/link_scanner/scan.html:228
 msgid "Detected threats"
-msgstr ""
+msgstr "Виявлені загрози"
 
 #: link_scanner/templates/link_scanner/scan.html:229
 msgid "Detailed checks"
-msgstr ""
+msgstr "Детальні перевірки"
 
 #: link_scanner/templates/link_scanner/scan.html:230
 #: templates/admin/osint_results.html:20 templates/admin/osint_scan.html:21
@@ -294,7 +294,7 @@ msgstr "Домен"
 
 #: link_scanner/templates/link_scanner/scan.html:231
 msgid "Scanning"
-msgstr ""
+msgstr "Сканування"
 
 #: link_scanner/templates/link_scanner/scan.html:232
 #: templates/admin/osint_scan.html:47
@@ -306,29 +306,29 @@ msgstr "Сканування завершено"
 #: templates/crm/counterparty_details.html:353 templates/crm/index.html:294
 #: templates/pentesting/scanner.html:526
 msgid "Error"
-msgstr ""
+msgstr "Помилка"
 
 #: link_scanner/templates/link_scanner/scan.html:234
 msgid "Batch scan results"
-msgstr ""
+msgstr "Результати пакетного сканування"
 
 #: link_scanner/templates/link_scanner/scan.html:235
 #: templates/admin/osint_results.html:26
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: link_scanner/templates/link_scanner/scan.html:236
 #: templates/phoneintel/analyze.html:51
 msgid "Verdict"
-msgstr ""
+msgstr "Вердикт"
 
 #: link_scanner/templates/link_scanner/scan.html:237
 msgid "Score"
-msgstr ""
+msgstr "Оцінка"
 
 #: link_scanner/templates/link_scanner/scan.html:238
 msgid "Time"
-msgstr ""
+msgstr "Час"
 
 #: templates/base.html:16
 msgid "VAT Verification"
@@ -354,27 +354,27 @@ msgstr "MailGuard"
 
 #: templates/base.html:53
 msgid "Website Scanner"
-msgstr ""
+msgstr "Сканер веб-сайту"
 
 #: templates/base.html:58 templates/crm/add_edit_counterparty.html:12
 msgid "CRM"
-msgstr ""
+msgstr "CRM"
 
 #: templates/base.html:106
 msgid "Features"
-msgstr ""
+msgstr "Функції"
 
 #: templates/base.html:109
 msgid "Pricing"
-msgstr ""
+msgstr "Ціни"
 
 #: templates/base.html:117 templates/landing.html:128
 msgid "Sign In"
-msgstr ""
+msgstr "Увійти"
 
 #: templates/base.html:121 templates/landing.html:129
 msgid "Start Free"
-msgstr ""
+msgstr "Почати безкоштовно"
 
 #: templates/base.html:158
 msgid "Rechtliches"
