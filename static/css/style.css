@@ -13,19 +13,20 @@
     --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.2);
     --border-radius: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --text-color: #00ff00;
+    --text-color-light: #006400; /* Dark green for light backgrounds */
+    --text-color-dark: #00ff00;  /* Bright green for dark backgrounds */
 }
 
-/* GLOBAL BRIGHT GREEN TEXT - for readability on any background */
+/* GLOBAL DARK GREEN TEXT - for readability on light backgrounds */
 * {
-    --bs-body-color: #00ff00 !important;
+    --bs-body-color: var(--text-color-light) !important;
 }
 
 body {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
     min-height: 100vh;
 }
 
@@ -36,6 +37,7 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: var(--shadow-light);
     transition: var(--transition);
+    color: var(--text-color-dark) !important;
 }
 
 .navbar-brand {
@@ -84,12 +86,12 @@ textarea.autofill-highlight {
     border-bottom: 1px solid var(--glass-border);
     font-weight: 600;
     padding: 1.5rem;
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 .card-body {
     padding: 1.5rem;
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 /* Modern Button Styles */
@@ -253,13 +255,13 @@ textarea.autofill-highlight {
 
 /* Form labels */
 .form-label {
-    color: #00ff00;
+    color: var(--text-color-light);
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 label {
-    color: #00ff00;
+    color: var(--text-color-light);
     font-weight: 600;
 }
 
@@ -421,7 +423,7 @@ label {
     backdrop-filter: blur(10px);
     border-radius: 12px;
     overflow: hidden;
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 .table thead th {
@@ -431,7 +433,7 @@ label {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.875rem;
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 .table-hover tbody tr:hover {
@@ -445,7 +447,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     letter-spacing: -0.025em;
     line-height: 1.2;
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 h1 { font-size: 2.5rem; }
@@ -457,7 +459,7 @@ h6 { font-size: 1.125rem; }
 
 p {
     line-height: 1.7;
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 /* Utility classes */
@@ -587,7 +589,7 @@ p {
 
 .accordion-button:not(.collapsed) {
     background-color: #e7f1ff;
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 /* History table */
@@ -615,49 +617,49 @@ p {
 
 /* Utility classes */
 .text-muted-light {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
     opacity: 0.9;
 }
 
 .text-muted {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
     opacity: 0.9;
 }
 
 .form-text {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
     opacity: 0.9;
     font-size: 0.875rem;
 }
 
 .form-text.text-muted {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
 }
 
 small.form-text,
 small.text-muted,
 .text-muted.small,
 .small.text-muted {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
 }
 
-/* Force bright green text on all form elements */
+/* Force dark green text on light backgrounds */
 .form-control,
 .form-control:focus,
 input,
 textarea,
 select {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
 }
 
 .form-control::placeholder,
 input::placeholder,
 textarea::placeholder {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
     opacity: 0.8;
 }
 
-/* All text elements - bright green */
+/* All text elements - dark green for light backgrounds */
 .card-body,
 .card-header,
 .list-group-item,
@@ -665,7 +667,7 @@ textarea::placeholder {
 .modal-header,
 .alert,
 .toast-body {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
 }
 
 /* Ensure text is readable everywhere */
@@ -674,16 +676,16 @@ span, div, p, li, td, th {
 }
 
 a {
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 a:hover {
-    color: #7fff7f;
+    color: #004d00; /* Even darker green for hover */
 }
 
 /* Override Bootstrap text-muted class */
 .text-muted {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
 }
 
 /* List group items */
@@ -694,23 +696,23 @@ a:hover {
 
 /* Form check labels */
 .form-check-label {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
 }
 
 /* Input group text */
 .input-group-text {
-    color: #00ff00;
+    color: var(--text-color-light);
     background-color: rgba(0, 0, 0, 0.3);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
 body, .container, .container-fluid, .row, .col {
-    color: #00ff00;
+    color: var(--text-color-light);
 }
 
 /* File scanner info card */
 .card-body ul li {
-    color: #00ff00 !important;
+    color: var(--text-color-light) !important;
 }
 
 /* MailGuard message detail layout */
