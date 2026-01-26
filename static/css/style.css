@@ -1,8 +1,8 @@
 /* Custom styles for Counterparty Verification System */
 
 :root {
-    --primary-bg: #f8f9fa; /* Light beige background */
-    --secondary-bg: #e9ecef; /* Slightly darker light background */
+    --primary-bg: #ffffff; /* Pure white background */
+    --secondary-bg: #f8f9fa; /* Light gray for secondary elements */
     --text-color: #000000; /* Black text */
     --success-color: #28a745; /* Green for success */
     --error-color: #dc3545; /* Red for errors */
@@ -925,13 +925,13 @@ body, .container, .container-fluid, .row, .col {
 }
 
 .bg-dark {
-    background-color: #f8f9fa !important;
+    background-color: #ffffff !important;
     color: var(--text-color) !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
 
 .bg-secondary {
-    background-color: #e9ecef !important;
+    background-color: #ffffff !important;
     color: var(--text-color) !important;
 }
 
