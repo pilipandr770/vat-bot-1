@@ -75,7 +75,7 @@
                                         {% else %}
                                             <span class="badge bg-success">Sauber</span>
                                         {% endif %}
-                                        <span class="badge bg-dark text-white">Score: {{ report.score }}</span>
+                                        <span class="badge bg-secondary text-white">Score: {{ report.score }}</span>
                                     </div>
                                     <div class="text-muted small">
                                         {{ report.created_at.strftime('%d.%m.%Y %H:%M') if report.created_at else '' }}

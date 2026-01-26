@@ -324,6 +324,14 @@ body {
     transition: var(--transition-smooth);
 }
 
+/* Specific feature gradients centralized to avoid inline styles */
+.feature-gradient-purple { background-color: #6f42c1 !important; }
+.feature-gradient-a { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.feature-gradient-b { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.feature-gradient-c { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.feature-gradient-d { background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%); }
+.feature-gradient-e { background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%); }
+
 .feature-card:hover .feature-icon {
     transform: scale(1.1) rotate(5deg);
     box-shadow: var(--shadow-glow);
