@@ -644,13 +644,14 @@ p {
 /* Dark mode support (future enhancement) */
 @media (prefers-color-scheme: dark) {
     body {
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        color: #e2e8f0;
+        /* keep a readable light-gray background even if user prefers dark scheme */
+        background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%);
+        color: #222;
     }
 
     .card {
-        background: rgba(45, 55, 72, 0.8);
-        border-color: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(0, 0, 0, 0.04);
     }
 }
 

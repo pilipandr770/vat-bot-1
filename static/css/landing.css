@@ -200,7 +200,7 @@ body {
 
 /* Modern Navbar */
 .navbar {
-    background: #343a40 !important;
+    background: rgba(245, 247, 250, 0.95) !important; /* light gray */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -212,7 +212,7 @@ body {
 }
 
 .navbar.scrolled {
-    background: #343a40 !important;
+    background: rgba(245, 247, 250, 0.98) !important;
     backdrop-filter: blur(20px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -228,7 +228,7 @@ body {
 
 .navbar-nav .nav-link {
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: var(--text-color) !important;
     transition: var(--transition-smooth);
     position: relative;
 }
@@ -240,7 +240,7 @@ body {
     left: 50%;
     width: 0;
     height: 2px;
-    background: white;
+    background: var(--info-color);
     transition: var(--transition-smooth);
     transform: translateX(-50%);
 }
@@ -250,11 +250,11 @@ body {
 }
 
 .navbar.scrolled .navbar-nav .nav-link {
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: var(--text-color) !important;
 }
 
 .navbar.scrolled .navbar-nav .nav-link::after {
-    background: #667eea;
+    background: var(--info-color);
 }
 
 /* Features Section */
@@ -404,8 +404,8 @@ small {
 /* CTA Section */
 .cta-section {
     padding: 5rem 0;
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-    color: white;
+    background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%);
+    color: var(--text-color) !important;
     text-align: center;
 }
 
@@ -477,9 +477,10 @@ small {
 
 /* Footer */
 .footer {
-    background: #1a202c;
-    color: rgba(255, 255, 255, 0.8);
+    background: #f5f7fa;
+    color: var(--text-color);
     padding: 3rem 0 1rem;
+    border-top: 1px solid rgba(0,0,0,0.04);
 }
 
 .footer h5 {
@@ -641,14 +642,15 @@ html {
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
+    /* Keep readable light-gray backgrounds even if user prefers dark scheme */
     .features-section {
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        color: #e2e8f0;
+        background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%);
+        color: var(--text-color);
     }
 
     .feature-card {
-        background: rgba(45, 55, 72, 0.8);
-        border-color: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(0, 0, 0, 0.04);
     }
 
     .feature-title {
