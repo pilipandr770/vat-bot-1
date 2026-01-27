@@ -1477,13 +1477,13 @@ msgstr "перевірок"
 msgid "verifications/month"
 msgstr "перевірок/місяць"
 
-#: templates/payments/pricing.html:94
+: #: templates/payments/pricing.html:94
 msgid "Current Plan"
-msgstr ""
+msgstr "Поточний план"
 
-#: templates/payments/pricing.html:124
+: #: templates/payments/pricing.html:124
 msgid "Frequently Asked Questions"
-msgstr ""
+msgstr "Часті питання"
 
 : #: templates/payments/pricing.html:133
 msgid "Can I cancel anytime?"
@@ -2075,9 +2075,9 @@ msgstr "ШІ Асистент"
 msgid "Country"
 msgstr "Країна"
 
-#: templates/pentesting/scanner.html:24
+: #: templates/pentesting/scanner.html:24
 msgid "Enter Website URL:"
-msgstr ""
+msgstr "Введіть URL сайту:"
 
 : #: templates/pentesting/scanner.html:29
 msgid "e.g. example.com or https://example.com"
