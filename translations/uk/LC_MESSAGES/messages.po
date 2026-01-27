@@ -1162,84 +1162,84 @@ msgstr "Бажаєте почати нову перевірку? Це може �
 msgid ""
 "Check is starting... (This function must still be connected to the "
 "verification system)"
-msgstr ""
+msgstr "Починається перевірка... (Цю функцію ще потрібно підключити до системи перевірки)"
 
 #: templates/crm/counterparty_details.html:366 templates/crm/index.html:295
 msgid "Edit function coming soon..."
-msgstr ""
+msgstr "Функція редагування буде доступна скоро..."
 
 #: templates/crm/counterparty_details.html:375 templates/crm/index.html:296
 msgid "WARNING: PERMANENT DELETION"
-msgstr ""
+msgstr "УВАГА: НЕПОВЕРНЕНЕ ВИДАЛЕННЯ"
 
 #: templates/crm/counterparty_details.html:376
 #: templates/crm/counterparty_details.html:417
 msgid "Counterparty"
-msgstr ""
+msgstr "Контрагент"
 
 #: templates/crm/counterparty_details.html:379
 msgid "This will permanently delete"
-msgstr ""
+msgstr "Це назавжди видалить"
 
 #: templates/crm/counterparty_details.html:380
 msgid "verification history entries"
-msgstr ""
+msgstr "записи історії перевірок"
 
 #: templates/crm/counterparty_details.html:381
 msgid "All associated check results"
-msgstr ""
+msgstr "Всі пов'язані результати перевірок"
 
 #: templates/crm/counterparty_details.html:382
 msgid "alert(s) and notifications"
-msgstr ""
+msgstr "сповіщення та повідомлення"
 
 #: templates/crm/counterparty_details.html:383 templates/crm/index.html:303
 msgid "This action CANNOT be undone!"
-msgstr ""
+msgstr "Цю дію НЕ МОЖНА скасувати!"
 
 #: templates/crm/counterparty_details.html:384
 msgid "Are you ABSOLUTELY sure?"
-msgstr ""
+msgstr "Ви АБСОЛЮТНО впевнені?"
 
 #: templates/crm/counterparty_details.html:392
 msgid "Final confirmation!"
-msgstr ""
+msgstr "Остаточне підтвердження!"
 
 #: templates/crm/counterparty_details.html:393
 msgid "Enter the company name exactly to confirm"
-msgstr ""
+msgstr "Введіть точну назву компанії для підтвердження"
 
 #: templates/crm/counterparty_details.html:399
 msgid "Action cancelled. Company name does not match."
-msgstr ""
+msgstr "Дію скасовано. Назва компанії не збігається."
 
 #: templates/crm/counterparty_details.html:399
 msgid "The counterparty was NOT deleted."
-msgstr ""
+msgstr "Контрагент НЕ був видалений."
 
 #: templates/crm/counterparty_details.html:407
 msgid "Deleting..."
-msgstr ""
+msgstr "Видалення..."
 
 #: templates/crm/counterparty_details.html:417
 msgid "was successfully deleted!"
-msgstr ""
+msgstr "успішно видалено!"
 
 #: templates/crm/counterparty_details.html:420 templates/crm/index.html:305
 msgid "Error deleting"
-msgstr ""
+msgstr "Помилка при видаленні"
 
 #: templates/crm/counterparty_details.html:437
 msgid "Export function coming soon..."
-msgstr ""
+msgstr "Функція експорту буде доступна скоро..."
 
 #: templates/crm/counterparty_details.html:442
 msgid "Timeline view coming soon..."
-msgstr ""
+msgstr "Перегляд хронології буде доступний скоро..."
 
 #: templates/crm/index.html:3
 msgid "CRM - Counterparty Monitoring"
-msgstr ""
+msgstr "CRM - Моніторинг контрагентів"
 
 #: templates/crm/index.html:10
 msgid "CRM - Counterparty Management"
