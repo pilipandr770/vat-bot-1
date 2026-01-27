@@ -1579,9 +1579,9 @@ msgstr "Наша служба підтримки готова допомогти
 msgid "Contact us"
 msgstr "Зв'яжіться з нами"
 
-#: templates/pentesting/scanner.html:3
+: #: templates/pentesting/scanner.html:3
 msgid "Website Security Scanner - Pentesting"
-msgstr ""
+msgstr "Сканер безпеки веб-сайту — пентестування"
 
 #: templates/pentesting/scanner.html:10
 msgid "Website Security Scanner"
