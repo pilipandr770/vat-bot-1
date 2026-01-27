@@ -351,6 +351,10 @@ msgstr "Speichern Sie Ihre Firmendaten"
 msgid "so that they are automatically filled in"
 msgstr "damit diese automatisch ausgefüllt werden"
 
+#: templates/index.html:7
+msgid "Automatically filled from your profile"
+msgstr "Automatisch aus Ihrem Profil ausgefüllt"
+
 #: templates/crm/add_edit_counterparty.html:68
 #: templates/crm/counterparty_details.html:53
 #: templates/crm/counterparty_details.html:377 templates/index.html:80
