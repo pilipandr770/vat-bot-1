@@ -1485,99 +1485,99 @@ msgstr ""
 msgid "Frequently Asked Questions"
 msgstr ""
 
-#: templates/payments/pricing.html:133
+: #: templates/payments/pricing.html:133
 msgid "Can I cancel anytime?"
-msgstr ""
+msgstr "Чи можу я скасувати в будь-який момент?"
 
-#: templates/payments/pricing.html:138
+: #: templates/payments/pricing.html:138
 msgid ""
 "Yes, you can cancel your subscription at any time without notice. There "
 "are no long-term commitments."
-msgstr ""
+msgstr "Так, ви можете скасувати підписку в будь-який момент без попередження. Немає довгострокових зобов'язань."
 
-#: templates/payments/pricing.html:147
+: #: templates/payments/pricing.html:147
 msgid "What happens if I exceed my limit?"
-msgstr ""
+msgstr "Що трапиться, якщо я перевищу ліміт?"
 
-#: templates/payments/pricing.html:152
+: #: templates/payments/pricing.html:152
 msgid ""
 "With the free plan, no further verifications will be possible until the "
 "next month begins. With paid plans, you can upgrade at any time to "
 "perform more verifications."
-msgstr ""
+msgstr "У безкоштовному плані подальші перевірки будуть недоступні до початку наступного місяця. У платних планах ви можете оновити підписку у будь-який час для виконання додаткових перевірок."
 
-#: templates/payments/pricing.html:161
+: #: templates/payments/pricing.html:161
 msgid "What payment methods do you accept?"
-msgstr ""
+msgstr "Які методи оплати ви приймаєте?"
 
-#: templates/payments/pricing.html:166
+: #: templates/payments/pricing.html:166
 msgid ""
 "We accept all major credit cards (Visa, Mastercard, American Express) as "
 "well as SEPA direct debit through our secure payment provider Stripe."
-msgstr ""
+msgstr "Ми приймаємо всі основні кредитні картки (Visa, Mastercard, American Express), а також SEPA-рефірахування через нашого безпечного постачальника платежів Stripe."
 
-#: templates/payments/pricing.html:175
+: #: templates/payments/pricing.html:175
 msgid "Can I switch between plans?"
-msgstr ""
+msgstr "Чи можу я переходити між планами?"
 
-#: templates/payments/pricing.html:180
+: #: templates/payments/pricing.html:180
 msgid ""
 "Yes, you can upgrade or downgrade at any time. When upgrading, you get "
 "immediate access to additional features. When downgrading, changes take "
 "effect at the end of the current billing period."
-msgstr ""
+msgstr "Так, ви можете підвищити або знизити план у будь-який час. При підвищенні ви отримаєте миттєвий доступ до додаткових функцій. При пониженні зміни набирають чинності в кінці поточного платіжного періоду."
 
-#: templates/payments/pricing.html:189
+: #: templates/payments/pricing.html:189
 msgid "Is there a money-back guarantee?"
-msgstr ""
+msgstr "Чи є гарантія повернення коштів?"
 
-#: templates/payments/pricing.html:194
+: #: templates/payments/pricing.html:194
 msgid ""
 "Yes, we offer a 14-day money-back guarantee for all paid plans. If you "
 "are not satisfied, we will refund you the full amount."
-msgstr ""
+msgstr "Так, ми пропонуємо 14-денну гарантію повернення коштів для всіх платних планів. Якщо ви не задоволені, ми повернемо повну суму."
 
-#: templates/payments/pricing.html:203
+: #: templates/payments/pricing.html:203
 msgid "Do you need a custom solution?"
-msgstr ""
+msgstr "Потрібно індивідуальне рішення?"
 
-#: templates/payments/pricing.html:208
+: #: templates/payments/pricing.html:208
 msgid ""
 "For companies with special requirements, we offer customized Enterprise "
 "solutions. Contact us at"
-msgstr ""
+msgstr "Для компаній з особливими вимогами ми пропонуємо індивідуальні Enterprise-рішення. Зв'яжіться з нами за"
 
-#: templates/payments/pricing.html:208
+: #: templates/payments/pricing.html:208
 msgid "for a custom quote."
-msgstr ""
+msgstr "щоб отримати індивідуальну пропозицію."
 
-#: templates/payments/pricing.html:221
+: #: templates/payments/pricing.html:221
 msgid "Trusted by over 500 companies in Europe"
-msgstr ""
+msgstr "Довіряють понад 500 компаній у Європі"
 
-#: templates/payments/pricing.html:224
+: #: templates/payments/pricing.html:224
 msgid "SSL encrypted"
-msgstr ""
+msgstr "SSL-шифрування"
 
-#: templates/payments/pricing.html:227
+: #: templates/payments/pricing.html:227
 msgid "GDPR compliant"
-msgstr ""
+msgstr "Відповідає GDPR"
 
-#: templates/payments/pricing.html:230
+: #: templates/payments/pricing.html:230
 msgid "Stripe secured"
-msgstr ""
+msgstr "Захищено Stripe"
 
-#: templates/payments/pricing.html:239
+: #: templates/payments/pricing.html:239
 msgid "Still have questions?"
-msgstr ""
+msgstr "Є ще питання?"
 
-#: templates/payments/pricing.html:240
+: #: templates/payments/pricing.html:240
 msgid "Our support team is here to help."
-msgstr ""
+msgstr "Наша служба підтримки готова допомогти."
 
-#: templates/payments/pricing.html:242
+: #: templates/payments/pricing.html:242
 msgid "Contact us"
-msgstr ""
+msgstr "Зв'яжіться з нами"
 
 #: templates/pentesting/scanner.html:3
 msgid "Website Security Scanner - Pentesting"
