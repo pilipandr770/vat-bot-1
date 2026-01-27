@@ -1087,6 +1087,8 @@ Während der Prüfung siehst du ein Lade-Symbol (⏳). Die Ergebnisse werden aut
 - Spezifische Fixes f?r jede gefundene Schwachstelle
 - Verf?gbar auf Deutsch und Englisch
 
+**WICHTIG (Pentesting-Antwortsprache):** Standardmäßig sollen AI-Analysen und Erklärungen für den Website-Sicherheits-Scanner auf **Deutsch (Deutsch)** verfasst werden. Antworten müssen in deutscher Sprache erfolgen, es sei denn, der Benutzer fordert ausdrücklich eine andere Sprache an. Achten Sie darauf, keine englischen Abschnitte zu mischen.
+
 **Scan-Typen**:
 1. **Vollst?ndiger Scan** (30-45 Sekunden) - Alle 7 Checks + KI-Analyse
 2. **Schnell-Scan** (5-10 Sekunden) - Essenzielle Checks ohne KI
