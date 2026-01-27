@@ -822,163 +822,163 @@ msgstr "Введіть інформацію про компанію з допо�
 
 #: templates/crm/add_edit_counterparty.html:31
 msgid "Company Information"
-msgstr ""
+msgstr "Інформація про компанію"
 
 #: templates/crm/add_edit_counterparty.html:45
 msgid "Full legal company name"
-msgstr ""
+msgstr "Повна юридична назва компанії"
 
 #: templates/crm/add_edit_counterparty.html:51
 msgid "Germany"
-msgstr ""
+msgstr "Німеччина"
 
 #: templates/crm/add_edit_counterparty.html:52
 msgid "Austria"
-msgstr ""
+msgstr "Австрія"
 
 #: templates/crm/add_edit_counterparty.html:53
 msgid "Switzerland"
-msgstr ""
+msgstr "Швейцарія"
 
 #: templates/crm/add_edit_counterparty.html:54
 msgid "France"
-msgstr ""
+msgstr "Франція"
 
 #: templates/crm/add_edit_counterparty.html:55
 msgid "Italy"
-msgstr ""
+msgstr "Італія"
 
 #: templates/crm/add_edit_counterparty.html:56
 msgid "Spain"
-msgstr ""
+msgstr "Іспанія"
 
 #: templates/crm/add_edit_counterparty.html:57
 msgid "Netherlands"
-msgstr ""
+msgstr "Нідерланди"
 
 #: templates/crm/add_edit_counterparty.html:58
 msgid "Belgium"
-msgstr ""
+msgstr "Бельгія"
 
 #: templates/crm/add_edit_counterparty.html:59
 msgid "Poland"
-msgstr ""
+msgstr "Польща"
 
 #: templates/crm/add_edit_counterparty.html:60
 msgid "Czech Republic"
-msgstr ""
+msgstr "Чехія"
 
 #: templates/crm/add_edit_counterparty.html:61
 msgid "Ukraine"
-msgstr ""
+msgstr "Україна"
 
 #: templates/crm/add_edit_counterparty.html:74
 msgid "Validate"
-msgstr ""
+msgstr "Перевірити"
 
 #: templates/crm/add_edit_counterparty.html:77
 msgid "VAT number for EU companies (optional)"
-msgstr ""
+msgstr "Номер ПДВ для компаній ЄС (необов'язково)"
 
 #: templates/crm/add_edit_counterparty.html:98
 #: templates/crm/counterparty_details.html:83
 msgid "Address"
-msgstr ""
+msgstr "Адреса"
 
 #: templates/crm/add_edit_counterparty.html:100
 msgid "Street, City, Postal Code, Country"
-msgstr ""
+msgstr "Вулиця, місто, поштовий індекс, країна"
 
 #: templates/crm/add_edit_counterparty.html:112
 msgid "Company website domain for additional verification"
-msgstr ""
+msgstr "Домен веб-сайту компанії для додаткової перевірки"
 
 #: templates/crm/add_edit_counterparty.html:118
 msgid "AI Enrichment"
-msgstr ""
+msgstr "Збагачення ШІ"
 
 #: templates/crm/add_edit_counterparty.html:120
 msgid "Use AI to automatically fill missing information"
-msgstr ""
+msgstr "Використовуйте ШІ для автоматичного заповнення відсутньої інформації"
 
 #: templates/crm/add_edit_counterparty.html:128
 msgid "Save Counterparty"
-msgstr ""
+msgstr "Зберегти контрагента"
 
 #: templates/crm/add_edit_counterparty.html:128
 msgid "Update Counterparty"
-msgstr ""
+msgstr "Оновити контрагента"
 
 #: templates/crm/add_edit_counterparty.html:131
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: templates/crm/add_edit_counterparty.html:143
 #: templates/crm/add_edit_counterparty.html:264
 msgid "AI Assistant"
-msgstr ""
+msgstr "Помічник ШІ"
 
 #: templates/crm/add_edit_counterparty.html:153
 msgid ""
 "Hello! I can help you fill out the company information. What would you "
 "like to know?"
-msgstr ""
+msgstr "Привіт! Я можу допомогти вам заповнити інформацію про компанію. Що ви хочете дізнатися?"
 
 #: templates/crm/add_edit_counterparty.html:159
 msgid "Ask me about company data..."
-msgstr ""
+msgstr "Запитайте мене про дані компанії..."
 
 #: templates/crm/add_edit_counterparty.html:168
 msgid "Quick Help"
-msgstr ""
+msgstr "Швидка допомога"
 
 #: templates/crm/add_edit_counterparty.html:170
 msgid "What information do I need to provide?"
-msgstr ""
+msgstr "Яку інформацію мені потрібно надати?"
 
 #: templates/crm/add_edit_counterparty.html:171
 msgid "What information do I need?"
-msgstr ""
+msgstr "Яка інформація потрібна?"
 
 #: templates/crm/add_edit_counterparty.html:173
 #: templates/crm/add_edit_counterparty.html:174
 msgid "How to find VAT number?"
-msgstr ""
+msgstr "Як знайти номер ПДВ?"
 
 #: templates/crm/add_edit_counterparty.html:176
 #: templates/crm/add_edit_counterparty.html:177
 msgid "What is domain used for?"
-msgstr ""
+msgstr "Для чого використовується домен?"
 
 #: templates/crm/add_edit_counterparty.html:253
 msgid "Validating..."
-msgstr ""
+msgstr "Перевірка..."
 
 #: templates/crm/add_edit_counterparty.html:254
 #: templates/crm/counterparty_details.html:155
 #: templates/crm/counterparty_details.html:279
 msgid "Valid"
-msgstr ""
+msgstr "Дійсний"
 
 #: templates/crm/add_edit_counterparty.html:255
 msgid "Invalid"
-msgstr ""
+msgstr "Недійсний"
 
 #: templates/crm/add_edit_counterparty.html:256
 msgid "Enriching data..."
-msgstr ""
+msgstr "Збагачення даних..."
 
 #: templates/crm/add_edit_counterparty.html:257
 msgid "Enrichment complete!"
-msgstr ""
+msgstr "Збагачення завершено!"
 
 #: templates/crm/add_edit_counterparty.html:258
 msgid "Saving..."
-msgstr ""
+msgstr "Збереження..."
 
 #: templates/crm/add_edit_counterparty.html:259
 msgid "Updating..."
-msgstr ""
+msgstr "Оновлення..."
 
 #: templates/crm/add_edit_counterparty.html:261
 #: templates/pentesting/scanner.html:527 templates/phoneintel/analyze.html:56
