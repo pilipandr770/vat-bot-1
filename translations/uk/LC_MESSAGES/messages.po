@@ -1359,123 +1359,123 @@ msgstr "Підключені акаунти"
 
 #: templates/mailguard/dashboard.html:30
 msgid "Active Rules"
-msgstr ""
+msgstr "Активні правила"
 
 #: templates/mailguard/dashboard.html:38
 msgid "Messages Today"
-msgstr ""
+msgstr "Повідомлень сьогодні"
 
 #: templates/mailguard/dashboard.html:46 templates/mailguard/dashboard.html:128
 msgid "Pending Approvals"
-msgstr ""
+msgstr "Очікують затвердження"
 
 #: templates/mailguard/dashboard.html:58
 msgid "Email Accounts"
-msgstr ""
+msgstr "E-mail акаунти"
 
 #: templates/mailguard/dashboard.html:61
 msgid "Add Email Account"
-msgstr ""
+msgstr "Додати e-mail акаунт"
 
 #: templates/mailguard/dashboard.html:71
 msgid "Provider"
-msgstr ""
+msgstr "Провайдер"
 
 #: templates/mailguard/dashboard.html:73
 msgid "Last Sync"
-msgstr ""
+msgstr "Остання синхр."
 
 #: templates/mailguard/dashboard.html:74 templates/mailguard/dashboard.html:138
 msgid "Actions"
-msgstr ""
+msgstr "Дії"
 
 #: templates/mailguard/dashboard.html:85
 msgid "Gmail"
-msgstr ""
+msgstr "Gmail"
 
 #: templates/mailguard/dashboard.html:87
 msgid "Microsoft 365"
-msgstr ""
+msgstr "Microsoft 365"
 
 #: templates/mailguard/dashboard.html:89
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: templates/mailguard/dashboard.html:99
 msgid "Never"
-msgstr ""
+msgstr "Ніколи"
 
 #: templates/mailguard/dashboard.html:114
 msgid "No email accounts configured yet."
-msgstr ""
+msgstr "Поки що не налаштовано жодного e-mail акаунту."
 
 #: templates/mailguard/dashboard.html:114
 msgid "Add your first email account to get started."
-msgstr ""
+msgstr "Додайте перший e-mail акаунт, щоб почати."
 
 #: templates/mailguard/dashboard.html:134
 msgid "From"
-msgstr ""
+msgstr "Від"
 
 #: templates/mailguard/dashboard.html:135
 msgid "Subject"
-msgstr ""
+msgstr "Тема"
 
 #: templates/mailguard/dashboard.html:136
 msgid "Draft Reply"
-msgstr ""
+msgstr "Чернетка відповіді"
 
 #: templates/mailguard/dashboard.html:157
 msgid "View Details"
-msgstr ""
+msgstr "Переглянути деталі"
 
 #: templates/mailguard/dashboard.html:160
 msgid "Approve"
-msgstr ""
+msgstr "Схвалити"
 
 #: templates/mailguard/dashboard.html:165
 msgid "Reject"
-msgstr ""
+msgstr "Відхилити"
 
 #: templates/mailguard/dashboard.html:184
 msgid "Are you sure you want to disconnect this email account?"
-msgstr ""
+msgstr "Ви впевнені, що хочете відключити цей e-mail акаунт?"
 
 #: templates/mailguard/dashboard.html:185
 msgid "Are you sure you want to delete this rule?"
-msgstr ""
+msgstr "Ви впевнені, що хочете видалити це правило?"
 
 #: templates/mailguard/dashboard.html:186
 msgid "Reject this draft reply?"
-msgstr ""
+msgstr "Відхилити цю чернетку відповіді?"
 
 #: templates/mailguard/dashboard.html:187
 msgid "Account details coming soon"
-msgstr ""
+msgstr "Деталі акаунту з'являться незабаром"
 
 #: templates/payments/pricing.html:3
 msgid "Pricing - VAT Verification System"
-msgstr ""
+msgstr "Ціни - Система перевірки ПДВ"
 
 #: templates/payments/pricing.html:43
 msgid "Choose Your Plan"
-msgstr ""
+msgstr "Виберіть ваш план"
 
 #: templates/payments/pricing.html:44
 msgid "Transparent pricing. No hidden fees. Cancel anytime."
-msgstr ""
+msgstr "Прозорі ціни. Ніяких прихованих платежів. Можна скасувати в будь-який час."
 
 #: templates/payments/pricing.html:54
 msgid "Most Popular"
-msgstr ""
+msgstr "Найпопулярніший"
 
 #: templates/payments/pricing.html:72
 msgid "verifications"
-msgstr ""
+msgstr "перевірок"
 
 #: templates/payments/pricing.html:74
 msgid "verifications/month"
-msgstr ""
+msgstr "перевірок/місяць"
 
 #: templates/payments/pricing.html:94
 msgid "Current Plan"
