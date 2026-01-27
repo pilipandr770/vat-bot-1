@@ -2079,75 +2079,75 @@ msgstr "Країна"
 msgid "Enter Website URL:"
 msgstr ""
 
-#: templates/pentesting/scanner.html:29
+: #: templates/pentesting/scanner.html:29
 msgid "e.g. example.com or https://example.com"
-msgstr ""
+msgstr "наприклад example.com або https://example.com"
 
-#: templates/pentesting/scanner.html:46
+: #: templates/pentesting/scanner.html:46
 msgid "AI-Powered Analysis with Recommendations"
-msgstr ""
+msgstr "ШІ-аналіз з рекомендаціями"
 
-#: templates/pentesting/scanner.html:525
+: #: templates/pentesting/scanner.html:525
 msgid "Scan Complete"
-msgstr ""
+msgstr "Сканування завершено"
 
-#: templates/pentesting/scanner.html:528 templates/phoneintel/analyze.html:55
+: #: templates/pentesting/scanner.html:528 templates/phoneintel/analyze.html:55
 msgid "Analysis failed"
-msgstr ""
+msgstr "Аналіз не вдався"
 
-#: templates/phoneintel/analyze.html:14
+: #: templates/phoneintel/analyze.html:14
 msgid ""
 "Analyze phone numbers for carrier information, line type, and risk "
 "assessment. No personal data is stored."
-msgstr ""
+msgstr "Аналізуйте телефонні номери для отримання інформації про оператора, тип лінії та оцінку ризику. Жодні персональні дані не зберігаються."
 
-#: templates/phoneintel/analyze.html:19
+: #: templates/phoneintel/analyze.html:19
 msgid "Phone Number"
-msgstr ""
+msgstr "Номер телефону"
 
-#: templates/phoneintel/analyze.html:23
+: #: templates/phoneintel/analyze.html:23
 msgid "Country Hint (ISO2)"
-msgstr ""
+msgstr "Підказка країни (ISO2)"
 
-#: templates/phoneintel/analyze.html:28
+: #: templates/phoneintel/analyze.html:28
 msgid "Analyze"
-msgstr ""
+msgstr "Аналізувати"
 
-#: templates/phoneintel/analyze.html:33
+: #: templates/phoneintel/analyze.html:33
 msgid "Analysis Results"
-msgstr ""
+msgstr "Результати аналізу"
 
-#: templates/phoneintel/analyze.html:44
+: #: templates/phoneintel/analyze.html:44
 msgid "Analyzing..."
-msgstr ""
+msgstr "Аналізую..."
 
-#: templates/phoneintel/analyze.html:45
+: #: templates/phoneintel/analyze.html:45
 msgid "Basic Information"
-msgstr ""
+msgstr "Основна інформація"
 
-#: templates/phoneintel/analyze.html:47
+: #: templates/phoneintel/analyze.html:47
 msgid "Carrier"
-msgstr ""
+msgstr "Оператор"
 
-#: templates/phoneintel/analyze.html:48
+: #: templates/phoneintel/analyze.html:48
 msgid "Line Type"
-msgstr ""
+msgstr "Тип лінії"
 
-#: templates/phoneintel/analyze.html:49
+: #: templates/phoneintel/analyze.html:49
 msgid "Risk Assessment"
-msgstr ""
+msgstr "Оцінка ризику"
 
-#: templates/phoneintel/analyze.html:50
+: #: templates/phoneintel/analyze.html:50
 msgid "Risk Score"
-msgstr ""
+msgstr "Рейтинг ризику"
 
-#: templates/phoneintel/analyze.html:52
+: #: templates/phoneintel/analyze.html:52
 msgid "Disposable"
-msgstr ""
+msgstr "Одноразовий"
 
-#: templates/phoneintel/analyze.html:53
+: #: templates/phoneintel/analyze.html:53
 msgid "Seen in Scam DB"
-msgstr ""
+msgstr "Знайдено в Scam DB"
 
 #: templates/phoneintel/analyze.html:54
 msgid "Suspicious Patterns"
