@@ -620,7 +620,6 @@ msgstr "Zurück zum Scanner"
 
 #: templates/admin/osint_scan.html:13
 msgid ""
-msgid ""
 "Passive data collection about the counterparty's domain, website, or "
 "email."
 msgstr "Passive Datensammlung über die Domain, Website oder E-Mail der Gegenpartei."
@@ -819,7 +818,6 @@ msgid "AI Assistant"
 msgstr "KI-Assistent"
 
 #: templates/crm/add_edit_counterparty.html:153
-msgid ""
 msgid ""
 "Hello! I can help you fill out the company information. What would you "
 "like to know?"
@@ -1060,7 +1058,6 @@ msgid "Do you want to start a new check? This may take several minutes."
 msgstr "Möchten Sie eine neue Prüfung starten? Dies kann mehrere Minuten dauern."
 
 #: templates/crm/counterparty_details.html:360
-msgid ""
 msgid ""
 "Check is starting... (This function must still be connected to the "
 "verification system)"
@@ -1393,7 +1390,6 @@ msgstr "Kann ich jederzeit kündigen?"
 
 #: templates/payments/pricing.html:138
 msgid ""
-msgid ""
 "Yes, you can cancel your subscription at any time without notice. There "
 "are no long-term commitments."
 msgstr "Ja, Sie können Ihr Abonnement jederzeit ohne Vorankündigung kündigen. Es gibt keine langfristigen Verpflichtungen."
@@ -1403,7 +1399,6 @@ msgid "What happens if I exceed my limit?"
 msgstr "Was passiert, wenn ich mein Limit überschreite?"
 
 #: templates/payments/pricing.html:152
-msgid ""
 msgid ""
 "With the free plan, no further verifications will be possible until the "
 "next month begins. With paid plans, you can upgrade at any time to "
@@ -1416,7 +1411,6 @@ msgstr "Welche Zahlungsmethoden akzeptieren Sie?"
 
 #: templates/payments/pricing.html:166
 msgid ""
-msgid ""
 "We accept all major credit cards (Visa, Mastercard, American Express) as "
 "well as SEPA direct debit through our secure payment provider Stripe."
 msgstr "Wir akzeptieren alle gängigen Kreditkarten (Visa, Mastercard, American Express) sowie SEPA-Lastschrift über unseren sicheren Zahlungsanbieter Stripe."
@@ -1426,7 +1420,6 @@ msgid "Can I switch between plans?"
 msgstr "Kann ich zwischen den Plänen wechseln?"
 
 #: templates/payments/pricing.html:180
-msgid ""
 msgid ""
 "Yes, you can upgrade or downgrade at any time. When upgrading, you get "
 "immediate access to additional features. When downgrading, changes take "
@@ -1439,7 +1432,6 @@ msgstr "Gibt es eine Geld-zurück-Garantie?"
 
 #: templates/payments/pricing.html:194
 msgid ""
-msgid ""
 "Yes, we offer a 14-day money-back guarantee for all paid plans. If you "
 "are not satisfied, we will refund you the full amount."
 msgstr "Ja, wir bieten eine 14-tägige Geld-zurück-Garantie für alle kostenpflichtigen Pläne. Wenn Sie nicht zufrieden sind, erstatten wir Ihnen den vollen Betrag."
@@ -1449,7 +1441,6 @@ msgid "Do you need a custom solution?"
 msgstr "Benötigen Sie eine maßgeschneiderte Lösung?"
 
 #: templates/payments/pricing.html:208
-msgid ""
 msgid ""
 "For companies with special requirements, we offer customized Enterprise "
 "solutions. Contact us at"
@@ -1532,7 +1523,6 @@ msgid "Analysis failed"
 msgstr "Analyse fehlgeschlagen"
 
 #: templates/phoneintel/analyze.html:14
-msgid ""
 msgid ""
 "Analyze phone numbers for carrier information, line type, and risk "
 "assessment. No personal data is stored."
