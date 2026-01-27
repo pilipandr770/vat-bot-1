@@ -410,114 +410,114 @@ msgstr "Відповідно до DSGVO"
 
 #: templates/check_details.html:8
 msgid "Check Details"
-msgstr ""
+msgstr "Деталі перевірки"
 
 #: templates/check_details.html:10
 msgid "Checked on"
-msgstr ""
+msgstr "Перевірено"
 
 #: templates/check_details.html:15
 msgid "Back to History"
-msgstr ""
+msgstr "Назад до історії"
 
 #: templates/check_details.html:281 templates/crm/counterparty_details.html:235
 msgid "Sent"
-msgstr ""
+msgstr "Відправлено"
 
 #: templates/index.html:59
 msgid "Your Company Data"
-msgstr ""
+msgstr "Дані вашої компанії"
 
 #: templates/index.html:60
 msgid "Manage Profile"
-msgstr ""
+msgstr "Керувати профілем"
 
 #: templates/index.html:72
 msgid "Tip"
-msgstr ""
+msgstr "Порада"
 
 #: templates/index.html:73
 msgid "Save your company data"
-msgstr ""
+msgstr "Збережіть дані вашої компанії"
 
 #: templates/index.html:74
 msgid "so that they are automatically filled in"
-msgstr ""
+msgstr "щоб вони заповнювалися автоматично"
 
 #: templates/crm/add_edit_counterparty.html:68
 #: templates/crm/counterparty_details.html:53
 #: templates/crm/counterparty_details.html:377 templates/index.html:80
 #: templates/index.html:122
 msgid "VAT Number"
-msgstr ""
+msgstr "Номер ПДВ"
 
 #: templates/index.html:84
 msgid "Your VAT number for VIES validation"
-msgstr ""
+msgstr "Ваш номер ПДВ для перевірки VIES"
 
 #: templates/crm/add_edit_counterparty.html:42
 #: templates/crm/counterparty_details.html:45 templates/index.html:88
 #: templates/index.html:130
 msgid "Company Name"
-msgstr ""
+msgstr "Назва компанії"
 
 #: templates/index.html:94
 msgid "Business Address"
-msgstr ""
+msgstr "Адреса компанії"
 
 #: templates/admin/osint_results.html:23
 #: templates/crm/add_edit_counterparty.html:84
 #: templates/crm/counterparty_details.html:63 templates/index.html:100
 #: templates/mailguard/dashboard.html:70
 msgid "Email"
-msgstr ""
+msgstr "Електронна пошта"
 
 #: templates/index.html:106
 msgid "Phone"
-msgstr ""
+msgstr "Телефон"
 
 #: templates/index.html:118
 msgid "Counterparty Data"
-msgstr ""
+msgstr "Дані контрагента"
 
 #: templates/index.html:125
 msgid "VAT number of the business partner (if known)"
-msgstr ""
+msgstr "Номер ПДВ контрагента (якщо відомо)"
 
 #: templates/crm/add_edit_counterparty.html:48
 #: templates/crm/counterparty_details.html:49
 #: templates/crm/counterparty_details.html:378 templates/index.html:135
 #: templates/phoneintel/analyze.html:46
 msgid "Country"
-msgstr ""
+msgstr "Країна"
 
 #: templates/crm/add_edit_counterparty.html:50 templates/index.html:137
 msgid "Select country"
-msgstr ""
+msgstr "Виберіть країну"
 
 #: templates/index.html:139
 msgid "Free available (incl. business register)"
-msgstr ""
+msgstr "Доступно безкоштовно (включно з торговим реєстром)"
 
 #: templates/index.html:146
 msgid "In progress / Premium"
-msgstr ""
+msgstr "В процесі / Преміум"
 
 #: templates/index.html:149
 msgid "Premium"
-msgstr ""
+msgstr "Преміум"
 
 #: templates/index.html:149
 msgid "In development"
-msgstr ""
+msgstr "У розробці"
 
 #: templates/index.html:156
 msgid "Available"
-msgstr ""
+msgstr "Доступно"
 
 #: templates/index.html:160
 msgid "Ukraine is checked via the EDR (Unified State Register)"
-msgstr ""
+msgstr "Україна перевіряється через ЄДР (Єдиний державний реєстр)"
 
 #: templates/crm/add_edit_counterparty.html:90
 #: templates/crm/counterparty_details.html:87 templates/index.html:181
