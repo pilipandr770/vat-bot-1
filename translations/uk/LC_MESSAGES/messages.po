@@ -522,123 +522,123 @@ msgstr "Україна перевіряється через ЄДР (Єдини�
 #: templates/crm/add_edit_counterparty.html:90
 #: templates/crm/counterparty_details.html:87 templates/index.html:181
 msgid "Contact Person"
-msgstr ""
+msgstr "Контактна особа"
 
 #: templates/index.html:186
 msgid "Start Verification"
-msgstr ""
+msgstr "Почати перевірку"
 
 #: templates/admin/dashboard.html:3
 msgid "Admin Dashboard - VAT Verification System"
-msgstr ""
+msgstr "Адмін-панель - Система перевірки ПДВ"
 
 #: templates/admin/dashboard.html:11
 msgid "Admin Dashboard"
-msgstr ""
+msgstr "Адмін-панель"
 
 #: templates/admin/dashboard.html:13
 msgid "Overview of users, subscriptions and API usage"
-msgstr ""
+msgstr "Огляд користувачів, підписок та використання API"
 
 #: templates/admin/dashboard.html:17
 msgid "Administrator"
-msgstr ""
+msgstr "Адміністратор"
 
 #: templates/admin/dashboard.html:30
 msgid "Total Users"
-msgstr ""
+msgstr "Загальна кількість користувачів"
 
 #: templates/admin/dashboard.html:33 templates/admin/dashboard.html:73
 msgid "this month"
-msgstr ""
+msgstr "цього місяця"
 
 #: templates/admin/dashboard.html:50
 msgid "MRR"
-msgstr ""
+msgstr "MRR"
 
 #: templates/admin/dashboard.html:53
 msgid "Pro"
-msgstr ""
+msgstr "Pro"
 
 #: templates/admin/dashboard.html:53 templates/admin/dashboard.html:140
 msgid "Enterprise"
-msgstr ""
+msgstr "Enterprise"
 
 #: templates/admin/dashboard.html:70
 msgid "Total Revenue"
-msgstr ""
+msgstr "Загальний дохід"
 
 #: templates/admin/dashboard.html:90
 msgid "API Verifications"
-msgstr ""
+msgstr "API-перевірки"
 
 #: templates/admin/dashboard.html:93
 msgid "today"
-msgstr ""
+msgstr "сьогодні"
 
 #: templates/admin/dashboard.html:111
 msgid "Subscription Distribution"
-msgstr ""
+msgstr "Розподіл підписок"
 
 #: templates/admin/dashboard.html:118
 msgid "Free"
-msgstr ""
+msgstr "Безкоштовно"
 
 #: templates/admin/dashboard.html:129
 msgid "Professional"
-msgstr ""
+msgstr "Professional"
 
 #: templates/admin/dashboard.html:157
 msgid "Quick Access"
-msgstr ""
+msgstr "Швидкий доступ"
 
 #: templates/admin/dashboard.html:162
 msgid "User Management"
-msgstr ""
+msgstr "Керування користувачами"
 
 #: templates/admin/dashboard.html:165
 msgid "All Verifications"
-msgstr ""
+msgstr "Всі перевірки"
 
 #: templates/admin/dashboard.html:168
 msgid "System Logs"
-msgstr ""
+msgstr "Журнали системи"
 
 #: templates/admin/dashboard.html:183
 msgid "Recent Registrations"
-msgstr ""
+msgstr "Останні реєстрації"
 
 #: templates/admin/dashboard.html:185 templates/admin/dashboard.html:244
 msgid "View All"
-msgstr ""
+msgstr "Переглянути всі"
 
 #: templates/admin/dashboard.html:192 templates/admin/dashboard.html:251
 msgid "User"
-msgstr ""
+msgstr "Користувач"
 
 #: templates/admin/dashboard.html:193
 msgid "Plan"
-msgstr ""
+msgstr "План"
 
 #: templates/admin/dashboard.html:194
 msgid "Registered"
-msgstr ""
+msgstr "Зареєстровано"
 
 #: templates/admin/dashboard.html:209
 msgid "BASIC"
-msgstr ""
+msgstr "BASIC"
 
 #: templates/admin/dashboard.html:211
 msgid "PROFESSIONAL"
-msgstr ""
+msgstr "PROFESSIONAL"
 
 #: templates/admin/dashboard.html:213
 msgid "ENTERPRISE"
-msgstr ""
+msgstr "ENTERPRISE"
 
 #: templates/admin/dashboard.html:215
 msgid "NONE"
-msgstr ""
+msgstr "НІ"
 
 #: templates/admin/dashboard.html:223 templates/mailguard/dashboard.html:94
 msgid "Active"
