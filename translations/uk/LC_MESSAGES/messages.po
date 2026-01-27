@@ -1271,91 +1271,91 @@ msgstr "Знайти дублікати"
 
 #: templates/crm/index.html:293
 msgid "Counterparty successfully added!"
-msgstr ""
+msgstr "Контрагент успішно додано!"
 
 #: templates/crm/index.html:297
 msgid "Do you want to delete"
-msgstr ""
+msgstr "Ви хочете видалити"
 
 #: templates/crm/index.html:298
 msgid "permanently?"
-msgstr ""
+msgstr "назавжди?"
 
 #: templates/crm/index.html:299
 msgid "This will also delete:"
-msgstr ""
+msgstr "Це також видалить:"
 
 #: templates/crm/index.html:300
 msgid "• All verification histories"
-msgstr ""
+msgstr "• Всі історії перевірок"
 
 #: templates/crm/index.html:301
 msgid "• All verification results"
-msgstr ""
+msgstr "• Всі результати перевірок"
 
 #: templates/crm/index.html:302
 msgid "• All alerts and notifications"
-msgstr ""
+msgstr "• Всі сповіщення та повідомлення"
 
 #: templates/crm/index.html:304
 msgid "Counterparty successfully deleted!"
-msgstr ""
+msgstr "Контрагент успішно видалено!"
 
 #: templates/crm/index.html:307
 msgid "this counterparty"
-msgstr ""
+msgstr "цього контрагента"
 
 #: templates/crm/index.html:308
 msgid "Do you really want to delete"
-msgstr ""
+msgstr "Ви дійсно хочете видалити"
 
 #: templates/crm/index.html:309
 msgid "This will delete:"
-msgstr ""
+msgstr "Це видалить:"
 
 #: templates/crm/index.html:310
 msgid "• Verification histories"
-msgstr ""
+msgstr "• Історії перевірок"
 
 #: templates/crm/index.html:311
 msgid "• Verification results"
-msgstr ""
+msgstr "• Результати перевірок"
 
 #: templates/crm/index.html:312
 msgid "• Alerts and notifications"
-msgstr ""
+msgstr "• Сповіщення та повідомлення"
 
 #: templates/crm/index.html:313
 msgid "This action cannot be undone!"
-msgstr ""
+msgstr "Цю дію не можна скасувати!"
 
 #: templates/legal/agb.html:249
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Політика конфіденційності"
 
 #: templates/legal/datenschutz.html:176
 msgid "GDPR Request Form"
-msgstr ""
+msgstr "Форма запиту GDPR"
 
 #: templates/legal/delete_account.html:170
 msgid "Are you ABSOLUTELY sure? This action cannot be undone!"
-msgstr ""
+msgstr "Ви АБСОЛЮТНО впевнені? Цю дію не можна скасувати!"
 
 #: templates/mailguard/dashboard.html:3
 msgid "MailGuard Dashboard - Email Intelligence"
-msgstr ""
+msgstr "Панель MailGuard - Інтелект електронної пошти"
 
 #: templates/mailguard/dashboard.html:10
 msgid "MailGuard Dashboard"
-msgstr ""
+msgstr "Панель MailGuard"
 
 #: templates/mailguard/dashboard.html:11
 msgid "Email Intelligence & Security"
-msgstr ""
+msgstr "Інтелект і безпека електронної пошти"
 
 #: templates/mailguard/dashboard.html:22
 msgid "Connected Accounts"
-msgstr ""
+msgstr "Підключені акаунти"
 
 #: templates/mailguard/dashboard.html:30
 msgid "Active Rules"
