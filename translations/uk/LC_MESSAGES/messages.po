@@ -642,74 +642,74 @@ msgstr "НІ"
 
 #: templates/admin/dashboard.html:223 templates/mailguard/dashboard.html:94
 msgid "Active"
-msgstr ""
+msgstr "Активні"
 
 #: templates/admin/dashboard.html:225 templates/mailguard/dashboard.html:96
 msgid "Inactive"
-msgstr ""
+msgstr "Неактивні"
 
 #: templates/admin/dashboard.html:242
 msgid "Recent Verifications"
-msgstr ""
+msgstr "Останні перевірки"
 
 #: templates/admin/dashboard.html:252
 msgid "Company"
-msgstr ""
+msgstr "Компанія"
 
 #: templates/admin/dashboard.html:253
 #: templates/crm/counterparty_details.html:211
 msgid "Date"
-msgstr ""
+msgstr "Дата"
 
 #: templates/admin/osint_results.html:4 templates/admin/osint_results.html:11
 msgid "OSINT Scan Results"
-msgstr ""
+msgstr "Результати OSINT-сканування"
 
 #: templates/admin/osint_results.html:18
 msgid "Scan Information"
-msgstr ""
+msgstr "Інформація про сканування"
 
 #: templates/admin/osint_results.html:30
 #: templates/crm/counterparty_details.html:91
 #: templates/mailguard/dashboard.html:137
 msgid "Created"
-msgstr ""
+msgstr "Створено"
 
 #: templates/admin/osint_results.html:41
 msgid "Detailed Results"
-msgstr ""
+msgstr "Детальні результати"
 
 #: templates/admin/osint_results.html:46
 msgid "Service"
-msgstr ""
+msgstr "Сервіс"
 
 #: templates/admin/osint_results.html:48
 msgid "Notes"
-msgstr ""
+msgstr "Примітки"
 
 #: templates/admin/osint_results.html:49
 msgid "Data"
-msgstr ""
+msgstr "Дані"
 
 #: templates/admin/osint_results.html:58
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: templates/admin/osint_results.html:60
 msgid "WARNING"
-msgstr ""
+msgstr "ПОПЕРЕДЖЕННЯ"
 
 #: templates/admin/osint_results.html:62
 msgid "ERROR"
-msgstr ""
+msgstr "ПОМИЛКА"
 
 #: templates/admin/osint_results.html:70
 msgid "View Data"
-msgstr ""
+msgstr "Переглянути дані"
 
 #: templates/admin/osint_results.html:90
 msgid "Back to Scanner"
-msgstr ""
+msgstr "Назад до сканера"
 
 #: templates/admin/osint_scan.html:13
 msgid ""
@@ -779,46 +779,46 @@ msgstr "Якщо помилка не зникає, зверніться до с�
 
 #: templates/auth/login.html:3 templates/auth/login.html:11
 msgid "Login"
-msgstr ""
+msgstr "Вхід"
 
 #: templates/auth/login.html:34
 msgid "Forgot password?"
-msgstr ""
+msgstr "Забули пароль?"
 
 #: templates/auth/register.html:133
 msgid "Already have an account?"
-msgstr ""
+msgstr "Вже маєте обліковий запис?"
 
 #: templates/auth/register.html:134
 msgid "Sign in now"
-msgstr ""
+msgstr "Увійти зараз"
 
 #: templates/chatbot/chat.html:133
 msgid "Connection error. Please try again."
-msgstr ""
+msgstr "Помилка з'єднання. Спробуйте ще раз."
 
 #: templates/chatbot/chat.html:135
 msgid "Unknown error"
-msgstr ""
+msgstr "Невідома помилка"
 
 #: templates/crm/add_edit_counterparty.html:3
 #: templates/crm/add_edit_counterparty.html:14
 msgid "Add Counterparty"
-msgstr ""
+msgstr "Додати контрагента"
 
 #: templates/crm/add_edit_counterparty.html:3
 #: templates/crm/add_edit_counterparty.html:14
 #: templates/crm/add_edit_counterparty.html:20
 msgid "Edit Counterparty"
-msgstr ""
+msgstr "Редагувати контрагента"
 
 #: templates/crm/add_edit_counterparty.html:20
 msgid "Add New Counterparty"
-msgstr ""
+msgstr "Додати нового контрагента"
 
 #: templates/crm/add_edit_counterparty.html:22
 msgid "Enter company information with AI assistance"
-msgstr ""
+msgstr "Введіть інформацію про компанію з допомогою ШІ"
 
 #: templates/crm/add_edit_counterparty.html:31
 msgid "Company Information"
