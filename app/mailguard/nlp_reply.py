@@ -5,7 +5,7 @@ from datetime import datetime
 
 def build_reply(counterparty_profile, thread_history, inbound_message, assistant_profile=None):
     """
-    Сгенерировать ответ на входящее сообщение
+    Сгенерировать ответ на входящее сообщение с расширенным анализом
 
     Args:
         counterparty_profile: профиль контрагента (dict)
@@ -14,7 +14,7 @@ def build_reply(counterparty_profile, thread_history, inbound_message, assistant
         assistant_profile: профиль ассистента (optional dict)
 
     Returns:
-        dict: {'text': str, 'html': str, 'confidence': float}
+        dict: {'text': str, 'html': str, 'confidence': float, 'analysis': dict, 'reasons': list}
     """
     try:
         # Получаем API ключ
@@ -23,17 +23,41 @@ def build_reply(counterparty_profile, thread_history, inbound_message, assistant
             return {
                 'text': 'Ошибка: OpenAI API ключ не настроен',
                 'html': '<p>Ошибка: OpenAI API ключ не настроен</p>',
-                'confidence': 0.0
+                'confidence': 0.0,
+                'analysis': {},
+                'reasons': ['API key not configured']
             }
+
+        # Анализируем сообщение
+        from .mail_analyzer import analyze_message, calculate_reply_confidence
+        
+        subject = inbound_message.get('subject', '')
+        text = inbound_message.get('text', '')
+        from_email = inbound_message.get('from_email', '')
+        
+        message_analysis = analyze_message(subject, text, from_email)
+        
+        # Рассчитываем уверенность
+        thread_length = len(thread_history)
+        counterparty_trust = counterparty_profile.get('trust_level', 'medium')
+        security = inbound_message.get('security') or {}
+        security_status = security.get('status', 'review')
+        
+        confidence, reasons = calculate_reply_confidence(
+            message_analysis,
+            thread_length,
+            counterparty_trust,
+            security_status
+        )
 
         # Настраиваем OpenAI
         client = openai.OpenAI(api_key=api_key)
 
-        # Формируем системный промпт
-        system_prompt = build_system_prompt(counterparty_profile, assistant_profile)
+        # Формируем системный промпт с учетом анализа
+        system_prompt = build_system_prompt(counterparty_profile, assistant_profile, message_analysis)
 
         # Формируем пользовательский промпт
-        user_prompt = build_user_prompt(thread_history, inbound_message)
+        user_prompt = build_user_prompt(thread_history, inbound_message, message_analysis)
 
         # Вызываем OpenAI
         response = client.chat.completions.create(
@@ -55,7 +79,9 @@ def build_reply(counterparty_profile, thread_history, inbound_message, assistant
         return {
             'text': reply_text,
             'html': reply_html,
-            'confidence': 0.8  # Можно рассчитать на основе finish_reason
+            'confidence': confidence,
+            'analysis': message_analysis,
+            'reasons': reasons
         }
 
     except Exception as e:
@@ -63,11 +89,13 @@ def build_reply(counterparty_profile, thread_history, inbound_message, assistant
         return {
             'text': f'Ошибка генерации ответа: {str(e)}',
             'html': f'<p>Ошибка генерации ответа: {str(e)}</p>',
-            'confidence': 0.0
+            'confidence': 0.0,
+            'analysis': {},
+            'reasons': [str(e)]
         }
 
-def build_system_prompt(counterparty_profile, assistant_profile=None):
-    """Создать системный промпт для OpenAI"""
+def build_system_prompt(counterparty_profile, assistant_profile=None, message_analysis=None):
+    """Создать системный промпт для OpenAI с учетом анализа сообщения"""
     tone = counterparty_profile.get('tone', 'professionell')
     language = detect_language(counterparty_profile)
 
@@ -86,6 +114,47 @@ def build_system_prompt(counterparty_profile, assistant_profile=None):
         "- Fasse danach das eingegangene Schreiben in maximal drei Sätzen zusammen, bevor du konkrete Antworten formulierst",
         "- Kennzeichne deutlich, falls eine manuelle Sicherheitsprüfung oder Zurückhaltung geboten ist"
     ]
+    
+    # Добавляем контекст анализа сообщения
+    if message_analysis:
+        analysis_context = [
+            "\nKontext der Nachrichtenanalyse:"
+        ]
+        
+        category = message_analysis.get('category', 'other')
+        category_names = {
+            'invoice': 'Rechnung/Zahlung',
+            'complaint': 'Beschwerde',
+            'order': 'Bestellung',
+            'support': 'Support-Anfrage',
+            'inquiry': 'Informationsanfrage',
+            'notification': 'Benachrichtigung',
+            'marketing': 'Marketing',
+            'other': 'Allgemein'
+        }
+        analysis_context.append(f"- Kategorie: {category_names.get(category, category)}")
+        
+        priority = message_analysis.get('priority', 'normal')
+        if priority in ['urgent', 'high']:
+            analysis_context.append(f"- Priorität: {priority.upper()} - Bitte zeitnah reagieren")
+        
+        sentiment = message_analysis.get('sentiment', 'neutral')
+        sentiment_names = {'positive': 'positiv', 'negative': 'negativ', 'neutral': 'neutral'}
+        analysis_context.append(f"- Stimmung: {sentiment_names.get(sentiment, sentiment)}")
+        
+        if message_analysis.get('has_question'):
+            analysis_context.append("- Enthält Fragen - stelle sicher, dass alle beantwortet werden")
+        
+        if message_analysis.get('has_attachment_request'):
+            analysis_context.append("- Anforderung von Dateien/Dokumenten")
+        
+        intent = message_analysis.get('intent', 'other')
+        if intent == 'request_action':
+            analysis_context.append("- Absender erwartet eine Aktion/Handlung")
+        elif intent == 'request_info':
+            analysis_context.append("- Absender benötigt Informationen")
+        
+        prompt_sections.extend(analysis_context)
 
     if assistant_profile and assistant_profile.get('instructions'):
         prompt_sections.append(
@@ -99,8 +168,8 @@ def build_system_prompt(counterparty_profile, assistant_profile=None):
 
     return "\n\n".join(prompt_sections)
 
-def build_user_prompt(thread_history, inbound_message):
-    """Создать пользовательский промпт"""
+def build_user_prompt(thread_history, inbound_message, message_analysis=None):
+    """Создать пользовательский промпт с анализом"""
     prompt = f"""Входящее письмо:
 Тема: {inbound_message.get('subject', 'Без темы')}
 Текст: {inbound_message.get('text', '')}
@@ -135,6 +204,19 @@ def build_user_prompt(thread_history, inbound_message):
             risk = attachment.get('risk_level', 'unbekannt')
             attachment_lines.append(f"{name} (Risiko: {risk})")
         prompt += "Anhänge:\n" + "\n".join(f"- {line}" for line in attachment_lines) + "\n\n"
+    
+    # Добавляем результаты анализа
+    if message_analysis:
+        prompt += "Automatische Analyse:\n"
+        prompt += f"- Kategorie: {message_analysis.get('category', 'other')}\n"
+        prompt += f"- Priorität: {message_analysis.get('priority', 'normal')}\n"
+        prompt += f"- Stimmung: {message_analysis.get('sentiment', 'neutral')}\n"
+        prompt += f"- Absicht: {message_analysis.get('intent', 'other')}\n"
+        
+        if message_analysis.get('suggested_labels'):
+            prompt += f"- Vorgeschlagene Labels: {', '.join(message_analysis['suggested_labels'])}\n"
+        
+        prompt += "\n"
 
     if thread_history:
         prompt += "История переписки:\n"

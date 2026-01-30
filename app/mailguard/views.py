@@ -246,17 +246,34 @@ def approve_and_send(draft_id):
         return redirect(url_for('mailguard.dashboard'))
 
     try:
-        draft.approved_by_user = True
-        draft.sent_at = datetime.utcnow()
-        db.session.commit()
-
-        # TODO: Реализовать отправку через соответствующий коннектор
-        # send_draft(draft, account)
-
-        flash('Entwurf erfolgreich gesendet', 'success')
+        # Отправляем письмо через SMTP
+        from .connectors.smtp import send_email
+        
+        success = send_email(
+            account=account,
+            to_email=draft.to_email,
+            subject=draft.subject,
+            text_content=draft.body_text or '',
+            html_content=draft.body_html,
+            attachments=draft.get_attachments()
+        )
+        
+        if success:
+            draft.approved_by_user = True
+            draft.sent_at = datetime.utcnow()
+            
+            # Обновляем статус оригинального сообщения
+            if draft.message:
+                draft.message.status = 'sent'
+            
+            db.session.commit()
+            flash('Entwurf erfolgreich gesendet', 'success')
+        else:
+            flash('Fehler beim Senden: SMTP-Verbindung fehlgeschlagen', 'error')
+            
     except Exception as e:
         current_app.logger.error(f"Error sending draft {draft_id}: {e}")
-        flash('Fehler beim Senden des Entwurfs', 'error')
+        flash(f'Fehler beim Senden des Entwurfs: {str(e)}', 'error')
 
     return redirect(url_for('mailguard.dashboard'))
 
@@ -507,3 +524,197 @@ def update_account_instructions(account_id):
         flash('Anweisungen konnten nicht gespeichert werden', 'error')
 
     return redirect(url_for('mailguard.accounts'))
+
+@mailguard_bp.route('/drafts/<int:draft_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_draft(draft_id):
+    """Редактировать черновик"""
+    draft = MailDraft.query.get_or_404(draft_id)
+    
+    # Проверяем, что черновик принадлежит пользователю
+    account = MailAccount.query.filter_by(id=draft.account_id, user_id=current_user.id).first()
+    if not account:
+        flash('Zugriff verweigert', 'error')
+        return redirect(url_for('mailguard.dashboard'))
+    
+    if request.method == 'POST':
+        try:
+            draft.subject = request.form.get('subject', draft.subject)
+            draft.body_text = request.form.get('body_text', draft.body_text)
+            draft.body_html = request.form.get('body_html', draft.body_html)
+            db.session.commit()
+            
+            flash('Entwurf erfolgreich aktualisiert', 'success')
+            return redirect(url_for('mailguard.message_detail', message_id=draft.message_id))
+        except Exception as e:
+            current_app.logger.error(f"Draft edit error: {e}")
+            flash('Fehler beim Aktualisieren des Entwurfs', 'error')
+            db.session.rollback()
+    
+    return render_template('mailguard/edit_draft.html', draft=draft)
+
+
+@mailguard_bp.route('/drafts/<int:draft_id>/regenerate', methods=['POST'])
+@login_required
+def regenerate_draft(draft_id):
+    """Перегенерировать черновик с новыми параметрами"""
+    draft = MailDraft.query.get_or_404(draft_id)
+    
+    # Проверяем, что черновик принадлежит пользователю
+    account = MailAccount.query.filter_by(id=draft.account_id, user_id=current_user.id).first()
+    if not account:
+        return jsonify({'error': 'Zugriff verweigert'}), 403
+    
+    try:
+        message = draft.message
+        if not message:
+            return jsonify({'error': 'Original message not found'}), 404
+        
+        # Получаем дополнительные инструкции от пользователя
+        custom_instructions = request.form.get('instructions', '').strip()
+        
+        # Создаем новый черновик
+        from .tasks import create_reply_draft, normalize_message
+        
+        # Формируем данные сообщения
+        message_data = {
+            'subject': message.subject,
+            'text': message.body_text,
+            'html': message.body_html,
+            'from_email': message.from_email,
+            'security': message.get_security_meta(),
+            'attachments': message.get_attachments()
+        }
+        
+        # Создаем временный профиль ассистента с кастомными инструкциями
+        counterparty = message.counterparty
+        
+        # Удаляем старый черновик
+        db.session.delete(draft)
+        db.session.flush()
+        
+        # Создаем новый черновик
+        new_draft = create_reply_draft(message, counterparty, message_data, None, account)
+        
+        # Если были кастомные инструкции, добавляем их в комментарий
+        if custom_instructions:
+            new_draft.body_text = f"[Специальные инструкции: {custom_instructions}]\n\n{new_draft.body_text}"
+        
+        db.session.commit()
+        
+        flash('Entwurf erfolgreich neu generiert', 'success')
+        return redirect(url_for('mailguard.message_detail', message_id=message.id))
+        
+    except Exception as e:
+        current_app.logger.error(f"Draft regeneration error: {e}")
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@mailguard_bp.route('/messages/<int:message_id>/label', methods=['POST'])
+@login_required
+def label_message(message_id):
+    """Добавить метку к сообщению"""
+    message = MailMessage.query.join(MailAccount).filter(
+        MailAccount.user_id == current_user.id,
+        MailMessage.id == message_id
+    ).first_or_404()
+    
+    try:
+        label = request.form.get('label', '').strip()
+        if not label:
+            return jsonify({'error': 'Label is required'}), 400
+        
+        # Получаем текущие метки
+        current_labels = message.labels.split(',') if message.labels else []
+        
+        # Добавляем новую метку если её нет
+        if label not in current_labels:
+            current_labels.append(label)
+            message.labels = ','.join(current_labels)
+            db.session.commit()
+        
+        return jsonify({'success': True, 'labels': current_labels})
+    except Exception as e:
+        current_app.logger.error(f"Label error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@mailguard_bp.route('/messages/<int:message_id>/unlabel', methods=['POST'])
+@login_required
+def unlabel_message(message_id):
+    """Удалить метку из сообщения"""
+    message = MailMessage.query.join(MailAccount).filter(
+        MailAccount.user_id == current_user.id,
+        MailMessage.id == message_id
+    ).first_or_404()
+    
+    try:
+        label = request.form.get('label', '').strip()
+        if not label:
+            return jsonify({'error': 'Label is required'}), 400
+        
+        # Получаем текущие метки
+        current_labels = message.labels.split(',') if message.labels else []
+        
+        # Удаляем метку
+        if label in current_labels:
+            current_labels.remove(label)
+            message.labels = ','.join(current_labels) if current_labels else None
+            db.session.commit()
+        
+        return jsonify({'success': True, 'labels': current_labels})
+    except Exception as e:
+        current_app.logger.error(f"Unlabel error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@mailguard_bp.route('/messages/bulk-action', methods=['POST'])
+@login_required
+def bulk_action():
+    """Массовые операции с сообщениями"""
+    try:
+        message_ids = request.form.getlist('message_ids[]')
+        action = request.form.get('action')
+        
+        if not message_ids or not action:
+            return jsonify({'error': 'Message IDs and action are required'}), 400
+        
+        # Получаем сообщения пользователя
+        messages = MailMessage.query.join(MailAccount).filter(
+            MailAccount.user_id == current_user.id,
+            MailMessage.id.in_(message_ids)
+        ).all()
+        
+        if action == 'add_label':
+            label = request.form.get('label', '').strip()
+            if not label:
+                return jsonify({'error': 'Label is required'}), 400
+            
+            for message in messages:
+                current_labels = message.labels.split(',') if message.labels else []
+                if label not in current_labels:
+                    current_labels.append(label)
+                    message.labels = ','.join(current_labels)
+        
+        elif action == 'quarantine':
+            for message in messages:
+                message.status = 'quarantined'
+                message.is_quarantined = True
+        
+        elif action == 'mark_safe':
+            for message in messages:
+                if message.status == 'quarantined':
+                    message.status = 'scanned'
+                message.is_quarantined = False
+        
+        else:
+            return jsonify({'error': 'Unknown action'}), 400
+        
+        db.session.commit()
+        return jsonify({'success': True, 'processed': len(messages)})
+        
+    except Exception as e:
+        current_app.logger.error(f"Bulk action error: {e}")
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
