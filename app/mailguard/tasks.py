@@ -242,6 +242,31 @@ def process_incoming_email(account_id, message_data):
                 f"Message {provider_msg_id} quarantined after content scan"
             )
             return
+        
+        # Автоматический анализ и добавление меток
+        from .mail_analyzer import analyze_message, suggest_labels
+        
+        message_analysis = analyze_message(
+            normalized_msg.get('subject', ''),
+            normalized_msg.get('text', ''),
+            normalized_msg.get('from_email', '')
+        )
+        
+        # Сохраняем результаты анализа в метаданных
+        meta_payload['analysis'] = message_analysis
+        message.set_meta(meta_payload)
+        
+        # Автоматически добавляем предложенные метки
+        suggested = message_analysis.get('suggested_labels', [])
+        if suggested:
+            message.labels = ','.join(suggested)
+        
+        # Обновляем приоритет на основе анализа
+        priority_map = {'urgent': 2, 'high': 1, 'normal': 0, 'low': 0}
+        detected_priority = message_analysis.get('priority', 'normal')
+        if counterparty:
+            counterparty.priority = priority_map.get(detected_priority, 0)
+
 
         action, requires_human, matched_rule = apply_rules(normalized_msg)
 
@@ -361,7 +386,7 @@ def create_reply_draft(message, counterparty, message_data, matched_rule, accoun
     # Генерируем ответ с учетом контекста
     reply = build_reply(profile, thread_history, message_data, assistant_profile=assistant_profile)
 
-    # Создаем черновик
+    # Создаем черновик с метаданными
     draft = MailDraft(
         message_id=message.id,
         account_id=message.account_id,
@@ -369,8 +394,17 @@ def create_reply_draft(message, counterparty, message_data, matched_rule, accoun
         subject=f"Re: {message.subject}",
         body_text=reply['text'],
         body_html=reply['html'],
-        suggested_by='assistant'
+        suggested_by='assistant',
+        confidence_score=reply.get('confidence', 0.5)
     )
+    
+    # Сохраняем анализ и причины в метаданных
+    draft.set_meta({
+        'analysis': reply.get('analysis', {}),
+        'reasons': reply.get('reasons', []),
+        'thread_length': len(thread_history),
+        'counterparty_trust': counterparty.trust_level if counterparty else 'unknown'
+    })
 
     db.session.add(draft)
     return draft

@@ -272,6 +272,8 @@ class MailDraft(db.Model):
     suggested_by = db.Column(Enum('assistant', 'rule', 'manual', name='suggested_by_types', schema=SCHEMA), default='assistant')
     approved_by_user = db.Column(db.Boolean, default=False)
     sent_at = db.Column(db.DateTime, nullable=True)
+    confidence_score = db.Column(db.Float, nullable=True)  # AI confidence 0-1
+    meta_json = db.Column(db.Text, default='{}')  # Analysis results and reasons
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def get_attachments(self):
@@ -279,6 +281,14 @@ class MailDraft(db.Model):
 
     def set_attachments(self, attachments):
         self.attachments_json = json.dumps(attachments)
+    
+    def get_meta(self):
+        """Получить метаданные черновика"""
+        return json.loads(self.meta_json) if self.meta_json else {}
+    
+    def set_meta(self, meta):
+        """Установить метаданные черновика"""
+        self.meta_json = json.dumps(meta)
 
 class ScanReport(db.Model):
     """Отчёты сканирования"""
