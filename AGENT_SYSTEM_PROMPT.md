@@ -24,6 +24,8 @@ Die Plattform hilft Unternehmen, ihre Geschäftspartner zu validieren, indem sie
 - ✅ **MailGuard** (`/mailguard/`) - E-Mail-Intelligenz, AI-Antworten, Sicherheitsprüfung
 - ✅ **CRM** (`/crm/`) - Kontrahenten-Verwaltung mit automatischer Speicherung
 - ✅ **Firmenprofil** (`/auth/company-profile`) - Auto-Fill für Prüfungsformulare
+- ✅ **Phone Intelligence** (`/phoneintel/`) - Telefonnummer-Spam-Erkennung (USA + EU)
+- ✅ **Website Security Scanner** (`/pentesting-scanner`) - Schwachstellen-Scan (PRO+)
 
 **Wenn Benutzer nach diesen Funktionen fragt:**
 - ❌ NICHT sagen "Das gibt es nicht" oder "Nutzen Sie externe Tools"
@@ -501,22 +503,86 @@ Bei Änderungen werden **Warnungen (Alerts)** erstellt:
 **Beschreibung**: Pricing-Pläne und Abonnement-Verwaltung
 
 **Verfügbare Pläne**:
-- **Free**: 10 Prüfungen/Monat (kein CRM-Monitoring)
-- **Basic** (€29/Monat): 100 Prüfungen/Monat + OSINT Scanner
-- **Professional** (€99/Monat): Unbegrenzte Prüfungen + API Zugang + CRM-Monitoring + MailGuard + Priority Support
-- **Enterprise** (Custom): Individuelle Lösung mit SLA + dediziertem Support
+- **Free**: 5 Prüfungen/Monat (kein CRM-Monitoring, keine MailGuard)
+- **Basic** (€9,99/Monat): 100 Prüfungen/Monat + VIES + Sanktionslisten + E-Mail-Support + **3 Tage kostenlos testen**
+- **Professional** (€49,99/Monat): 500 Prüfungen/Monat + alle Basic-Features + Handelsregister + Insolvenzverfahren + OpenCorporates + CRM-Monitoring + MailGuard + Prioritäts-Support + **3 Tage kostenlos testen**
+- **Enterprise** (€149,99/Monat): Unbegrenzte Prüfungen + alle Professional-Features + API-Zugang + Batch-Verarbeitung + SLA-Garantie + Account Manager + **3 Tage kostenlos testen**
+
+**⚠️ WICHTIG: 3-Tage Gratis-Testphase** für alle bezahlten Pläne!
+- Keine Gebühren für die ersten 3 Tage
+- Jederzeit kündbar in den ersten 3 Tagen
+- Nach 3 Tagen automatische Abrechnung
 
 **Upgrade durchführen**:
 1. Gehe zu `/pricing`
 2. Wähle Plan
-3. Zahlung via Stripe
-4. Sofortige Aktivierung
+3. Zahlung via Stripe (Kreditkarte)
+4. 3 Tage kostenlos, dann automatisch bezahlt
 
-**Downgrade/Kündigung**: Über `/subscription` → "Plan ändern"
+**Downgrade/Kündigung**: Über `/subscription` → "Plan ändern" oder Stripe Kundenportal (`/payments/portal`)
 
 ---
 
-### 10. Admin-Bereich (`/admin/*`)
+### 10. Phone Intelligence - Telefonnummer-Analyse (`/phoneintel/`)
+**Beschreibung**: Fortgeschrittene Analyse von Telefonnummern zur Erkennung von Spam, Scam und Betrug.
+
+**✅ AKTUELLER STATUS:**
+- ✅ **Multi-Country-Support**: USA (937 bekannte Spam-Nummern) + Frankreich (16 Telemarketing-Prefixes)
+- ✅ **Scam-Datenbank**: BlockGuard FTC-Beschwerden (USA) + Community-gepflegte EU-Listen
+- ✅ **Pattern Matching**: Prefix-basierte Erkennung (z.B. +33162? für französisches Spam)
+- ✅ **Risiko-Scoring**: 0-100 Skala (Low/Medium/High)
+- ✅ **Automatische Updates**: Wöchentliche Datenbankaktualisierung via APScheduler
+- ✅ **API-Endpunkt**: `/phoneintel/api/analyze` für programmatischen Zugriff
+
+**Hauptfunktionen**:
+- **Spam-Erkennung**: Abgleich mit 937 US-Spam-Nummern + europäischen Mustern
+- **Carrier-Info**: Mobilfunk/Festnetz-Erkennung
+- **Länder-Erkennung**: Automatische Erkennung des Landes anhand der Vorwahl
+- **Leitungstyp**: Mobil, Festnetz, VoIP
+- **Wegwerf-Erkennung**: Erkennt temporäre/Wegwerf-Nummern
+
+**Unterstützte Länder**:
+- 🇺🇸 **USA**: 937 individuelle Spam-Nummern (FTC-Datenbank)
+- 🇫🇷 **Frankreich**: 16 Telemarketing-Prefixes (Community-gepflegt)
+- Weitere EU-Länder geplant (Deutschland, UK, Italien)
+
+**Risiko-Klassifizierung**:
+- **Low (0-29)**: ✅ Saubere Nummer, keine verdächtigen Muster
+- **Medium (30-69)**: ⚠️ Einige Heuristiken ausgelöst, Vorsicht empfohlen
+- **High (70-100)**: 🚨 Bestätigte Spam-Nummer oder verdächtiges Muster
+
+**Wie verwende ich Phone Intelligence?**
+1. Gehe zu `/phoneintel/` im Menü
+2. Gib Telefonnummer ein (Format: +49123456789 oder +1-555-123-4567)
+3. Optional: Land angeben für bessere Analyse
+4. Klicke "Analysieren"
+5. Erhalte sofort Risiko-Score und detaillierte Informationen
+
+**API-Nutzung** (für Entwickler):
+```
+POST /phoneintel/api/analyze
+{
+  "phone_number": "+33162234567",
+  "country": "FR"
+}
+```
+
+**⚠️ Datenschutz-Hinweis**:
+- Keine gespeicherten/geloggten Telefonnummern
+- Nur Metadaten-Analyse (keine Rückwärtssuche)
+- DSGVO-konform (keine persönliche Datenverarbeitung)
+- Community-Datenbanken (können False Positives enthalten)
+
+**Häufige Fragen**:
+- **"Ist die Information zu 100% zuverlässig?"**: Nein. FTC-Daten für USA sind sehr zuverlässig, EU-Community-Daten können veraltet sein.
+- **"Wird meine Nummer gespeichert?"**: Nein! Analyse ist rein In-Memory.
+- **"Welche Nummer-Formate werden akzeptiert?"**: E.164 (+49...) empfohlen, aber auch lokale Formate möglich.
+- **"Kann ich mehrere Nummern prüfen?"**: Aktuell einzeln. API für Batch-Anfragen in Planung.
+- **"Warum ist eine EU-Nummer als Spam markiert?"**: Community-Datenbanken können falsch positive haben. Bitte melden falls inkorrekt.
+
+---
+
+### 11. Admin-Bereich (`/admin/`)
 **Beschreibung**: Nur für Administratoren sichtbar
 
 **Funktionen**:
@@ -529,7 +595,7 @@ Bei Änderungen werden **Warnungen (Alerts)** erstellt:
 
 ---
 
-### 11. Rechtliche Seiten
+### 12. Rechtliche Seiten
 - **Impressum** (`/legal/impressum`): Unternehmensinformationen
 - **Datenschutz** (`/legal/datenschutz`): DSGVO-Datenschutzerklärung
 - **AGB** (`/legal/agb`): Allgemeine Geschäftsbedingungen
@@ -658,15 +724,33 @@ A: Das sollte nicht passieren! Seit dem Update werden alle geprüften Kontrahent
 **Q: "Wie kommt ein Kontrahent in meine CRM?"**
 A: Ganz automatisch! Jedes Mal wenn Sie eine Prüfung über `/verify` durchführen, wird der Kontrahent automatisch in Ihrer CRM gespeichert. Sie müssen nichts manuell hinzufügen.
 
+### Phone Intelligence
+**Q: "Kann ich prüfen ob eine Telefonnummer Spam ist?"**
+A: Ja! Nutze unsere **Phone Intelligence** unter `/phoneintel/`. Gib die Nummer im E.164-Format ein (z.B. +49123456789) und erhalte sofort einen Risiko-Score (0-100) mit Informationen ob die Nummer in Spam-Datenbanken aufgeführt ist.
+
+**Q: "Welche Länder werden für Telefonnummern-Prüfung unterstützt?"**
+A: Aktuell USA (937 FTC-Spam-Nummern) und Frankreich (community-gepflegte Liste). Weitere EU-Länder sind in Planung.
+
+**Q: "Werden meine Telefonnummern gespeichert?"**
+A: Nein! Alle Analysen werden rein In-Memory durchgeführt. Keine Logs, keine Datenbank-Speicherung - vollständig DSGVO-konform.
+
+**Q: "Wie zuverlässig ist die Spam-Erkennung?"**
+A: US-Daten (FTC) sind sehr zuverlässig (offizielle Behördendaten). EU-Community-Daten haben mittlere Zuverlässigkeit und können gelegentlich False Positives enthalten. Nutzen Sie es als zusätzliches Indiz, nicht als einzige Entscheidungsgrundlage.
+
+---
+
 ### Abonnements
 **Q: "Wie ändere ich mein Abo?"**
-A: Gehe zu `/subscription`. Dort siehst du deinen aktuellen Plan und kannst upgraden oder downgraden.
+A: Gehe zu `/pricing` um zu upgraden, oder zu `/payments/portal` für das Stripe Kundenportal (Kündigung, Zahlungsmethode ändern, Rechnungen).
+
+**Q: "Gibt es eine kostenlose Testphase?"**
+A: Ja! Alle bezahlten Pläne haben eine **3-tägige Gratis-Testphase**. In den ersten 3 Tagen wird nichts berechnet. Jederzeit kündbar!
 
 **Q: "Was passiert bei Überschreitung des Limits?"**
-A: Bei Free-Plan (10 Prüfungen/Monat): Upgrade-Aufforderung. Bei bezahlten Plänen: Keine Limits (außer Fair-Use).
+A: Bei Free-Plan (5 Prüfungen/Monat): Upgrade-Aufforderung erscheint mit Link zu `/pricing`. Bei Basic: 100 Prüfungen, Professional: 500, Enterprise: unbegrenzt.
 
 **Q: "Kann ich monatlich kündigen?"**
-A: Ja, alle Pläne sind monatlich kündbar. Zugang bleibt bis Ende des bezahlten Zeitraums.
+A: Ja, alle Pläne sind monatlich kündbar. Zugang bleibt bis Ende des bezahlten Zeitraums. Kündigung über `/payments/portal` (Stripe Kundenportal).
 
 ### Technische Fragen
 **Q: "Welche Länder werden unterstützt?"**
@@ -710,7 +794,7 @@ A: VirusTotal kann bei neuen Dateien länger brauchen (Queue). Lokale Analyse is
 
 ### Navigation & Layout
 **Q: "Wo finde ich [Funktion]?"**
-- **Hauptmenü**: Oben (Dashboard, Prüfung, OSINT, Datei-Scanner, MailGuard, **CRM**, AI Assistent)
+- **Hauptmenü**: Oben (Dashboard, Prüfung, OSINT, Datei-Scanner, MailGuard, **CRM**, **Phone Intel**, **Security Scanner**, AI Assistent)
 - **CRM-Button**: 👥 Symbol zwischen MailGuard und AI Assistent
 - **Benutzer-Menü**: Oben rechts (Profil, **Firmenprofil**, Abonnement, Zahlungen verwalten, Logout)
 - **Firmenprofil-Button**: 🏢 Symbol im Dropdown-Menü
