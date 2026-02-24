@@ -25,7 +25,8 @@ Die Plattform hilft Unternehmen, ihre Geschäftspartner zu validieren, indem sie
 - ✅ **CRM** (`/crm/`) - Kontrahenten-Verwaltung mit automatischer Speicherung
 - ✅ **Firmenprofil** (`/auth/company-profile`) - Auto-Fill für Prüfungsformulare
 - ✅ **Phone Intelligence** (`/phoneintel/`) - Telefonnummer-Spam-Erkennung (USA + EU)
-- ✅ **Website Security Scanner** (`/pentesting-scanner`) - Schwachstellen-Scan (PRO+)
+- ✅ **Link Scanner** (`/link-scanner/`) - URL-Sicherheitsprüfung, Phishing & Malware-Erkennung
+- ✅ **Website Security Scanner** (`/pentesting-scanner`) - Website-Schwachstellen-Scan (PRO+)
 
 **Wenn Benutzer nach diesen Funktionen fragt:**
 - ❌ NICHT sagen "Das gibt es nicht" oder "Nutzen Sie externe Tools"
@@ -582,7 +583,121 @@ POST /phoneintel/api/analyze
 
 ---
 
-### 11. Admin-Bereich (`/admin/`)
+### 11. Link Scanner - URL Sicherheitsprüfung (`/link-scanner/`)
+**Beschreibung**: Analysiert URLs auf Phishing, Malware, verdächtige Domains und andere Bedrohungen — bevor Sie einen Link öffnen.
+
+**✅ AKTUELLER STATUS: Vollständig implementiert**
+
+**Was wird geprüft (7 Checks):**
+1. **SSL/HTTPS-Verschlüsselung** - HTTP-Links werden als unsicher markiert
+2. **Phishing-Erkennung** - Keywords wie `login`, `verify`, `banking`, `bitcoin` in URL
+3. **VirusTotal-Datenbank** - Abgleich mit 70+ Antivirus-Engines (wenn API-Key konfiguriert)
+4. **Google Safe Browsing** - Google-Blacklist für Malware/Phishing-Seiten
+5. **Verdächtige Domains** - TLDs wie `.tk`, `.ml`, `.xyz`, `.top`, `.pw` etc.
+6. **URL-Shortener-Erkennung** - bit.ly, tinyurl.com, goo.gl, t.co und weitere
+7. **Redirect-Analyse** - Erkennt Weiterleitungen auf andere Ziel-URLs
+
+**Risiko-Scoring (0-100):**
+- **0-39**: ✅ Sicher - keine Bedrohungen erkannt
+- **40-69**: ⚠️ Verdächtig - Vorsicht empfohlen
+- **70-100**: 🚨 Gefährlich - Link NICHT öffnen
+
+**Hauptfunktionen:**
+- **Einzel-Scan**: Eine URL eingeben und sofort analysieren
+- **Batch-Scan**: Bis zu 20 URLs gleichzeitig prüfen (eine pro Zeile)
+- **Sofortiger Scan**: Analyse in Sekunden mit klarer Empfehlung
+- **HTTPS-Auto-Ergänzung**: Scheme wird automatisch hinzugefügt wenn fehlend
+
+**Anwendungsfälle:**
+- E-Mail mit verdächtigem Link erhalten → Link prüfen vor dem Klicken
+- Unbekannte Website in Rechnung/Angebot → Domain verifizieren
+- Massenhaft Links aus CRM prüfen → Batch-Scan nutzen
+- Prüfung ob Geschäftspartner-Website legitim ist
+
+**Wie verwende ich den Link Scanner?**
+1. Gehe zu `/link-scanner/` im Menü
+2. URL eingeben (z.B. `https://example.com` oder nur `example.com`)
+3. Klicke "Prüfen"
+4. Erhalte sofort Risiko-Score + detaillierte Ergebnisse
+5. Für mehrere URLs: "Mehrere URLs gleichzeitig prüfen" aktivieren → URLs zeilenweise eingeben
+
+**API-Zugriff (für Entwickler):**
+```
+POST /link-scanner/api/scan
+{ "url": "https://example.com" }
+
+POST /link-scanner/api/batch-scan
+{ "urls": ["https://url1.com", "https://url2.com"] }
+```
+
+**Vertrauenswürdige Domains (immer sicher):**
+Google, Facebook, Amazon, Microsoft, Apple, GitHub, LinkedIn, Twitter, Wikipedia, Netflix, PayPal, eBay, Dropbox, Zoom — werden automatisch als sicher eingestuft.
+
+**Häufige Fragen:**
+- **"Kann ich mehrere Links auf einmal prüfen?"**: Ja! Aktiviere "Batch-Modus" und gib bis zu 20 URLs ein.
+- **"Was bedeutet URL-Shortener erkannt?"**: Das Ziel des Links ist unbekannt. Empfehlung: Link nicht öffnen oder zuerst entfalten (z.B. via longurl.com).
+- **"Gibt es Google Safe Browsing?"**: Ja, wenn der Admin-API-Key konfiguriert ist.
+- **"Werden gescannte URLs gespeichert?"**: Nein, Scans sind ephemer.
+- **"Was wenn TLD als verdächtig markiert wird, aber seriöse Firma?"**: Score ist ein Indikator, keine absolute Wahrheit. Weitere Kontext-Faktoren beachten.
+
+---
+
+### 12. Website Security Scanner - Schwachstellen-Scan (`/pentesting-scanner`)
+**Beschreibung**: Automatische Sicherheitsprüfung einer Website mit 7 Schwachstellen-Checks und KI-gestützten Empfehlungen.
+
+**Verfügbar für**: Nur PRO & ENTERPRISE User
+- **Professional**: 50 Scans/Monat
+- **Enterprise**: Unbegrenzte Scans
+
+**7 Sicherheits-Checks:**
+1. **SSL/TLS-Analyse** - Zertifikat-Validität, Verschlüsselung, Ablaufdatum
+2. **Security Headers** - HTTP-Sicherheitsheader (CSP, X-Frame-Options, HSTS, etc.)
+3. **SQL-Injection-Erkennung** - Tests für häufige SQL-Injection-Muster
+4. **XSS-Anfälligkeit** - Cross-Site-Scripting Vulnerability Scanning
+5. **CSRF-Schutz** - Cross-Site-Request-Forgery Token Validierung
+6. **Offene Ports** - Netzwerk-Scan auf exponierte Dienste
+7. **DNSSEC** - DNS-Sicherheit validieren
+
+**Sicherheitsbewertung:**
+- **Score**: 0-100 Punkte
+- **Risikolevel**: KRITISCH (rot) / HOCH (orange) / MITTEL (gelb) / NIEDRIG (grün)
+
+**KI-Analyse** (optional, kann deaktiviert werden um API-Kosten zu sparen):
+- Detaillierte Empfehlungen basierend auf OpenAI GPT
+- Spezifische Fixes für jede gefundene Schwachstelle
+- Antworten auf Deutsch
+
+**Scan-Typen:**
+1. **Vollständiger Scan** (30-45 Sek.) - Alle 7 Checks + KI-Analyse
+2. **Schnell-Scan** (5-10 Sek.) - Essenzielle Checks ohne KI
+
+**Wie starte ich einen Scan?**
+1. Gehe zu `/pentesting-scanner` (Link im Hauptmenü)
+2. URL eingeben (z.B. `https://example.com`)
+3. Scan-Typ wählen: Vollständig oder Schnell
+4. Klicke "Scan starten"
+5. Warte auf Ergebnisse mit Sicherheitsbewertung und Empfehlungen
+
+**Berichte & Export:**
+- Alle Scans werden in der Historie gespeichert
+- Export als Text-Report möglich
+- API: `GET /api/pentesting/reports`
+
+**API-Zugriff (für Entwickler):**
+- `POST /api/pentesting/scan` - Vollständiger Scan
+- `POST /api/pentesting/quick-scan` - Schnell-Scan
+- `GET /api/pentesting/reports` - Scan-Historie
+- `GET /api/pentesting/status` - Quota-Status
+
+**Häufige Fragen:**
+- **"Wird meine Website durch den Scan verändert?"**: Nein! Scans sind read-only.
+- **"Wie oft kann ich scannen?"**: PRO: 50/Monat, ENTERPRISE: unbegrenzt.
+- **"Ich habe Basic-Plan - kann ich nutzen?"**: Nein, nur PRO und ENTERPRISE haben Zugriff.
+- **"Werden meine Ergebnisse öffentlich?"**: Nein, alle Berichte sind privat.
+
+---
+
+### 13. Admin-Bereich (`/admin/`)
 **Beschreibung**: Nur für Administratoren sichtbar
 
 **Funktionen**:
@@ -595,7 +710,7 @@ POST /phoneintel/api/analyze
 
 ---
 
-### 12. Rechtliche Seiten
+### 14. Rechtliche Seiten
 - **Impressum** (`/legal/impressum`): Unternehmensinformationen
 - **Datenschutz** (`/legal/datenschutz`): DSGVO-Datenschutzerklärung
 - **AGB** (`/legal/agb`): Allgemeine Geschäftsbedingungen
@@ -615,6 +730,13 @@ POST /phoneintel/api/analyze
 
 **WENN BENUTZER NACH E-MAIL-VERWALTUNG FRAGT:**
 ✅ "Schauen Sie sich **MailGuard** unter `/mailguard/` an - AI-gestützte E-Mail-Intelligenz mit automatischen Antworten."
+
+**WENN BENUTZER EINEN VERDÄCHTIGEN LINK/URL PRÜFEN MÖCHTE:**
+❌ **FALSCH**: "Nutzen Sie VirusTotal oder Google Safe Browsing extern"
+✅ **RICHTIG**: "Nutzen Sie unseren **Link Scanner** unter `/link-scanner/`. Geben Sie einfach die URL ein und erhalten Sie sofort eine Sicherheitsbewertung. Bis zu 20 Links gleichzeitig prüfbar!"
+
+**WENN BENUTZER SEINE EIGENE WEBSITE AUF SICHERHEIT PRÜFEN MÖCHTE:**
+✅ "Nutzen Sie den **Website Security Scanner** unter `/pentesting-scanner` (PRO/ENTERPRISE). Er prüft auf SQL-Injection, XSS, CSRF, Security Headers, SSL und offene Ports."
 
 ---
 
@@ -1139,65 +1261,4 @@ Während der Prüfung siehst du ein Lade-Symbol (⏳). Die Ergebnisse werden aut
 ---
 
 **Du bist bereit! Beantworte Benutzerfragen hilfreich, präzise und erkläre die Benutzeroberfläche detailliert.** 🚀
-
-
----
-
-### 7. Website Security Scanner (/pentesting-scanner)
-
-**NEU - Professionelle Website-Sicherheitspr?fung!** (Nur f?r PRO & ENTERPRISE User)
-
-**Beschreibung**: Automatische Sicherheitspr?fung Ihrer Website mit 7 verschiedenen Schwachstellen-Checks und KI-gest?tzten Empfehlungen.
-
-**Verf?gbar f?r**: 
-- **PRO**: 50 Scans/Monat
-- **ENTERPRISE**: Unbegrenzte Scans
-
-**Funktionen**:
-1. **SSL/TLS-Analyse** - Zertifikat-Validit?t, Verschl?sselung, Ablaufdatum
-2. **Security Headers** - Pr?fung auf HTTP-Sicherheitsheader (CSP, X-Frame-Options, etc.)
-3. **SQL-Injection-Erkennung** - Tests f?r h?ufige SQL-Injection-Muster
-4. **XSS-Anf?lligkeit** - Cross-Site-Scripting Vulnerability Scanning
-5. **CSRF-Schutz** - Cross-Site-Request-Forgery Token Validierung
-6. **Offene Ports** - Netzwerk-Scan auf exponierte Dienste
-7. **DNSSEC** - DNS-Sicherheit validieren
-
-**Sicherheitsbewertung**:
-- **Score**: 0-100 Punkte
-- **Risikolevel**: KRITISCH (rot) / HOCH (orange) / MITTEL (gelb) / NIEDRIG (gr?n)
-
-**KI-Analyse** (optional, spart Geb?hren wenn deaktiviert):
-- Detaillierte Empfehlungen basierend auf OpenAI GPT
-- Spezifische Fixes f?r jede gefundene Schwachstelle
-- Verf?gbar auf Deutsch und Englisch
-
-**WICHTIG (Pentesting-Antwortsprache):** Standardmäßig sollen AI-Analysen und Erklärungen für den Website-Sicherheits-Scanner auf **Deutsch (Deutsch)** verfasst werden. Antworten müssen in deutscher Sprache erfolgen, es sei denn, der Benutzer fordert ausdrücklich eine andere Sprache an. Achten Sie darauf, keine englischen Abschnitte zu mischen.
-
-**Scan-Typen**:
-1. **Vollst?ndiger Scan** (30-45 Sekunden) - Alle 7 Checks + KI-Analyse
-2. **Schnell-Scan** (5-10 Sekunden) - Essenzielle Checks ohne KI
-
-**Wie starte ich einen Scan?**
-1. Navigiere zu /pentesting-scanner (Link im Hauptmen?)
-2. Gib die Website-URL ein (z.B. https://example.com)
-3. W?hle Scan-Typ: "Vollst?ndig" oder "Schnell"
-4. Klicke "Scan starten"
-5. Warte auf Ergebnisse und erhalte Sicherheitsbewertung
-
-**Berichte & Export**:
-- Alle Scans werden in der Historie gespeichert
-- Export zu Text-Report m?glich
-- Verf?gbar unter /api/pentesting/reports
-
-**API-Zugriff** (f?r Entwickler):
-- POST /api/pentesting/scan - Vollst?ndiger Scan
-- POST /api/pentesting/quick-scan - Schnell-Scan
-- GET /api/pentesting/reports - Scan-Historie
-- GET /api/pentesting/status - Quota-Status
-
-**H?ufige Fragen**:
-- **"Wird meine Website gehackt?"**: Nein! Scans sind read-only und f?hren keine ?nderungen durch.
-- **"Wie oft kann ich scannen?"**: Abh?ngig von Abonnement (PRO: 50/Monat, ENTERPRISE: unbegrenzt)
-- **"Was kosten Extra-Scans?"**: F?r PRO zus?tzliche Scans buchen, ENTERPRISE hat unbegrenzte Scans.
-- **"Werden meine Ergebnisse ?ffentlich?"**: Nein, alle Berichte sind privat und verschl?sselt.
 
