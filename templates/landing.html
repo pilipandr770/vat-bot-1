@@ -632,6 +632,451 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SALES CHATBOT WIDGET
+         ═══════════════════════════════════════════════════════ -->
+    <style>
+        /* ── Bubble button ── */
+        #sales-chat-bubble {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d6efd, #0040c1);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(13,110,253,.5);
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: transform .2s, box-shadow .2s;
+        }
+        #sales-chat-bubble:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(13,110,253,.65); }
+        #sales-chat-bubble .chat-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            width: 20px; height: 20px;
+            background: #ff3b30;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            animation: pulse-badge 2s infinite;
+        }
+        @keyframes pulse-badge {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* ── Chat window ── */
+        #sales-chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            width: 370px;
+            max-height: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.18);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+        #sales-chat-window.open {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* ── Header ── */
+        .sc-header {
+            background: linear-gradient(135deg, #0d6efd, #0040c1);
+            color: #fff;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sc-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .sc-header-info { flex: 1; }
+        .sc-header-info strong { display: block; font-size: 15px; }
+        .sc-header-info small { font-size: 12px; opacity: .85; }
+        .sc-online-dot {
+            width: 8px; height: 8px;
+            background: #34c759;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .sc-close-btn {
+            background: none; border: none; color: #fff;
+            font-size: 20px; cursor: pointer; padding: 0; line-height: 1;
+            opacity: .8;
+        }
+        .sc-close-btn:hover { opacity: 1; }
+
+        /* ── Messages area ── */
+        .sc-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8f9fa;
+            min-height: 200px;
+            max-height: 360px;
+        }
+        .sc-msg {
+            max-width: 86%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        .sc-msg.bot {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            color: #212529;
+        }
+        .sc-msg.user {
+            background: #0d6efd;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+        }
+        .sc-msg.typing {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            align-self: flex-start;
+            padding: 12px 16px;
+        }
+        .sc-typing-dots span {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #adb5bd;
+            margin: 0 2px;
+            animation: dot-bounce .9s infinite;
+        }
+        .sc-typing-dots span:nth-child(2) { animation-delay: .15s; }
+        .sc-typing-dots span:nth-child(3) { animation-delay: .3s; }
+        @keyframes dot-bounce {
+            0%,80%,100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+
+        /* ── Quick replies ── */
+        .sc-quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 16px 4px;
+            background: #f8f9fa;
+        }
+        .sc-quick-btn {
+            font-size: 12px;
+            padding: 5px 11px;
+            border-radius: 20px;
+            border: 1.5px solid #0d6efd;
+            color: #0d6efd;
+            background: #fff;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            white-space: nowrap;
+        }
+        .sc-quick-btn:hover, .sc-quick-btn:focus {
+            background: #0d6efd; color: #fff;
+        }
+
+        /* ── Input area ── */
+        .sc-input-area {
+            padding: 12px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 8px;
+            background: #fff;
+        }
+        .sc-input {
+            flex: 1;
+            border: 1.5px solid #dee2e6;
+            border-radius: 22px;
+            padding: 9px 15px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            max-height: 80px;
+            transition: border-color .15s;
+        }
+        .sc-input:focus { border-color: #0d6efd; }
+        .sc-send-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            font-size: 17px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .15s;
+        }
+        .sc-send-btn:hover { background: #0040c1; }
+        .sc-send-btn:disabled { background: #adb5bd; cursor: default; }
+
+        /* ── CTA inside chat ── */
+        .sc-cta-block {
+            background: linear-gradient(135deg,#e8f0fe,#dbeafe);
+            border: 1px solid #93c5fd;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #1e40af;
+            margin-top: 4px;
+        }
+        .sc-cta-block a {
+            display: inline-block;
+            margin-top: 6px;
+            background: #0d6efd;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .sc-cta-block a:hover { background: #0040c1; }
+
+        @media (max-width: 480px) {
+            #sales-chat-window { width: calc(100vw - 20px); right: 10px; bottom: 90px; }
+            #sales-chat-bubble { right: 16px; bottom: 16px; }
+        }
+    </style>
+
+    <!-- Bubble button -->
+    <button id="sales-chat-bubble" onclick="scToggle()" title="Chat mit uns">
+        <i class="bi bi-chat-dots-fill" id="sc-bubble-icon"></i>
+        <span class="chat-badge" id="sc-badge">1</span>
+    </button>
+
+    <!-- Chat window -->
+    <div id="sales-chat-window">
+        <!-- Header -->
+        <div class="sc-header">
+            <div class="sc-avatar">🤖</div>
+            <div class="sc-header-info">
+                <strong>Alex – Ihr Berater</strong>
+                <small><span class="sc-online-dot"></span>Online · antwortet sofort</small>
+            </div>
+            <button class="sc-close-btn" onclick="scToggle()">✕</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="sc-messages" id="sc-messages"></div>
+
+        <!-- Quick replies (shown initially) -->
+        <div class="sc-quick-replies" id="sc-quick-replies">
+            <button class="sc-quick-btn" onclick="scQuick('Ich prüfe Lieferanten vor Vertragsabschluss')">Lieferanten prüfen</button>
+            <button class="sc-quick-btn" onclick="scQuick('Ich habe Angst vor Betrug und Phishing')">Betrug verhindern</button>
+            <button class="sc-quick-btn" onclick="scQuick('Was kostet die Plattform?')">Preise</button>
+            <button class="sc-quick-btn" onclick="scQuick('Welche Länder werden unterstützt?')">Länder</button>
+        </div>
+
+        <!-- Input -->
+        <div class="sc-input-area">
+            <textarea class="sc-input" id="sc-input" rows="1"
+                placeholder="Schreiben Sie uns..." 
+                onkeydown="scKeyDown(event)"
+                oninput="scAutoResize(this)"></textarea>
+            <button class="sc-send-btn" id="sc-send" onclick="scSend()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        // ── State ──
+        const history = [];          // [{role, content}]
+        let isOpen = false;
+        let isBusy = false;
+        let greeted = false;
+
+        const WELCOME = "👋 Hallo! Ich bin Alex, Ihr persönlicher Berater für die VAT Verifizierung Plattform.\n\nDamit ich Ihnen die passende Lösung zeigen kann – was ist aktuell Ihre größte Herausforderung bei der Geschäftspartner-Prüfung?";
+
+        // ── Toggle ──
+        window.scToggle = function () {
+            isOpen = !isOpen;
+            const win = document.getElementById('sales-chat-window');
+            const icon = document.getElementById('sc-bubble-icon');
+            const badge = document.getElementById('sc-badge');
+
+            if (isOpen) {
+                win.classList.add('open');
+                icon.className = 'bi bi-x-lg';
+                badge.style.display = 'none';
+                if (!greeted) { greeted = true; scAddMsg('bot', WELCOME); }
+                setTimeout(() => document.getElementById('sc-input').focus(), 300);
+            } else {
+                win.classList.remove('open');
+                icon.className = 'bi bi-chat-dots-fill';
+            }
+        };
+
+        // ── Quick replies ──
+        window.scQuick = function (text) {
+            document.getElementById('sc-quick-replies').style.display = 'none';
+            scAddMsg('user', text);
+            scRequest(text);
+        };
+
+        // ── Add message bubble ──
+        function scAddMsg(role, text) {
+            const container = document.getElementById('sc-messages');
+            const div = document.createElement('div');
+            div.className = 'sc-msg ' + role;
+
+            if (role === 'bot') {
+                // Convert markdown-like **bold**, newlines, and detect CTA
+                let html = scFormatText(text);
+                div.innerHTML = html;
+
+                // Auto-inject CTA if message contains registration hint
+                if (/registrier|3 Tage|jetzt starten|kostenlos testen/i.test(text)) {
+                    const cta = document.createElement('div');
+                    cta.className = 'sc-cta-block';
+                    cta.innerHTML = '🎁 <strong>3 Tage kostenlos testen</strong> – keine Kreditkarte!<br><a href="/auth/register">Jetzt registrieren →</a>';
+                    container.appendChild(div);
+                    container.appendChild(cta);
+                    scScrollBottom();
+                    return;
+                }
+            } else {
+                div.textContent = text;
+            }
+
+            container.appendChild(div);
+            scScrollBottom();
+        }
+
+        function scFormatText(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // ── Typing indicator ──
+        function scShowTyping() {
+            const container = document.getElementById('sc-messages');
+            const div = document.createElement('div');
+            div.className = 'sc-msg typing';
+            div.id = 'sc-typing';
+            div.innerHTML = '<span class="sc-typing-dots"><span></span><span></span><span></span></span>';
+            container.appendChild(div);
+            scScrollBottom();
+        }
+        function scHideTyping() {
+            const el = document.getElementById('sc-typing');
+            if (el) el.remove();
+        }
+
+        // ── API call ──
+        async function scRequest(message) {
+            if (isBusy) return;
+            isBusy = true;
+            document.getElementById('sc-send').disabled = true;
+
+            history.push({ role: 'user', content: message });
+            scShowTyping();
+
+            try {
+                const res = await fetch('/api/sales-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, history: history.slice(0, -1) })
+                });
+                const data = await res.json();
+                scHideTyping();
+
+                const reply = data.response || data.error || 'Entschuldigung, bitte versuchen Sie es erneut.';
+                history.push({ role: 'assistant', content: reply });
+                scAddMsg('bot', reply);
+            } catch (e) {
+                scHideTyping();
+                scAddMsg('bot', '⚠️ Kurze Verbindungsstörung. Bitte versuchen Sie es nochmal.');
+            }
+
+            isBusy = false;
+            document.getElementById('sc-send').disabled = false;
+            document.getElementById('sc-input').focus();
+        }
+
+        // ── Send ──
+        window.scSend = function () {
+            const input = document.getElementById('sc-input');
+            const text = input.value.trim();
+            if (!text || isBusy) return;
+            input.value = '';
+            scAutoResize(input);
+            document.getElementById('sc-quick-replies').style.display = 'none';
+            scAddMsg('user', text);
+            scRequest(text);
+        };
+
+        // ── Keyboard ──
+        window.scKeyDown = function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                scSend();
+            }
+        };
+
+        // ── Auto-resize textarea ──
+        window.scAutoResize = function (el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+        };
+
+        // ── Scroll ──
+        function scScrollBottom() {
+            const c = document.getElementById('sc-messages');
+            c.scrollTop = c.scrollHeight;
+        }
+
+        // ── Auto-open after 8 seconds (first visit) ──
+        if (!sessionStorage.getItem('sc_opened')) {
+            setTimeout(() => {
+                sessionStorage.setItem('sc_opened', '1');
+                scToggle();
+            }, 8000);
+        }
+    })();
+    </script>
+    <!-- ═══════════════════════════════════════════════════════ -->
 </body>
 </html>
 

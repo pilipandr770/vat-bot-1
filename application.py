@@ -228,6 +228,9 @@ def create_app(config_name=None):
     from services.chatbot_routes import chatbot_bp
     app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
 
+    from services.sales_chatbot import sales_chatbot_bp
+    app.register_blueprint(sales_chatbot_bp)
+
     from link_scanner.routes import link_scanner
     app.register_blueprint(link_scanner, url_prefix='/link-scanner')
 
