@@ -266,9 +266,13 @@ def create_app(config_name=None):
     # Register Sitemap blueprint
     from routes.sitemap import sitemap_bp
     app.register_blueprint(sitemap_bp)
+
+    # Register Blog blueprint
+    from routes.blog import blog_bp
+    app.register_blueprint(blog_bp)
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        init_scheduler()
+        init_scheduler(app=app)
         # app.mailguard_scheduler = setup_mailguard_scheduler(app)  # TODO: implement
         # Initialize CRM monitoring scheduler
         # app.crm_monitoring_scheduler = init_monitoring_scheduler(app)  # TODO: implement
@@ -298,7 +302,17 @@ def create_app(config_name=None):
         """Landing page for non-authenticated users."""
         if current_user.is_authenticated:
             return redirect(url_for('dashboard'))
-        return render_template('landing.html')
+        # Inject latest 3 blog posts for SEO blog section
+        try:
+            from crm.models import BlogPost
+            latest_blog_posts = (BlogPost.query
+                                 .filter_by(is_published=True)
+                                 .order_by(BlogPost.published_at.desc())
+                                 .limit(3)
+                                 .all())
+        except Exception:
+            latest_blog_posts = []
+        return render_template('landing.html', latest_blog_posts=latest_blog_posts)
     
     @app.route('/dashboard')
     @login_required

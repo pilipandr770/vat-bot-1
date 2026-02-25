@@ -122,6 +122,7 @@
                     <li class="nav-item"><a class="nav-link" href="#features">Funktionen</a></li>
                     <li class="nav-item"><a class="nav-link" href="#pricing">Preise</a></li>
                     <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/blog/"><i class="bi bi-journal-richtext me-1"></i>Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://www.linkedin.com/company/111149982/page-posts/published/" target="_blank">
                         <i class="bi bi-linkedin"></i> LinkedIn
                     </a></li>
@@ -601,6 +602,56 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Blog Section — Latest Articles (auto-generated, SEO boost)
+         ============================================================ -->
+    <section id="blog" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2 class="h3 fw-bold">Aktuelles aus dem B2B-Sicherheits-Blog</h2>
+                <p class="text-muted">Täglich neue Artikel zu VAT-Compliance, Betrugsschutz &amp; sicherem Wirtschaften in Deutschland</p>
+            </div>
+            {% if latest_blog_posts %}
+            <div class="row g-4">
+                {% for post in latest_blog_posts %}
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm" style="transition: transform .2s;">
+                        <div class="card-body d-flex flex-column">
+                            {% if post.category %}
+                            <span class="badge bg-primary mb-2" style="width:fit-content;font-size:.72rem;">
+                                {{ post.category | replace('-', ' ') | title }}
+                            </span>
+                            {% endif %}
+                            <h3 class="h6 fw-bold mb-2">
+                                <a href="/blog/{{ post.slug }}" class="text-dark text-decoration-none">{{ post.title }}</a>
+                            </h3>
+                            {% if post.meta_description %}
+                            <p class="small text-muted flex-grow-1 mb-2">{{ post.meta_description[:120] }}…</p>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top" style="font-size:.78rem;color:#6c757d;">
+                                <span><i class="bi bi-clock me-1"></i>{{ post.read_time_minutes or 3 }} Min.</span>
+                                <span>{{ post.published_at.strftime('%d.%m.%Y') if post.published_at else '' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                <a href="/blog/" class="btn btn-outline-primary">
+                    <i class="bi bi-journal-richtext me-1"></i>Alle Artikel lesen →
+                </a>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="bi bi-journal-bookmark display-4 text-muted"></i>
+                <p class="mt-3 text-muted">Blog wird täglich aktualisiert — erster Artikel erscheint morgen!</p>
+                <a href="/blog/" class="btn btn-outline-primary mt-2">Blog besuchen →</a>
+            </div>
+            {% endif %}
         </div>
     </section>
 

@@ -114,6 +114,45 @@ class CheckResult(db.Model):
         else:
             self.data_json = None
 
+class BlogPost(db.Model):
+    """Auto-generated SEO blog posts."""
+    __tablename__ = 'blog_posts'
+    __table_args__ = {'schema': SCHEMA}
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(300), nullable=False)
+    slug = db.Column(db.String(300), nullable=False, unique=True, index=True)
+    meta_description = db.Column(db.String(500), nullable=True)
+    meta_keywords = db.Column(db.String(500), nullable=True)
+    body_html = db.Column(db.Text, nullable=False)
+    category = db.Column(db.String(100), nullable=True, index=True)
+    tags_json = db.Column(db.Text, nullable=True)
+    source_url = db.Column(db.String(500), nullable=True)
+    source_title = db.Column(db.String(300), nullable=True)
+    read_time_minutes = db.Column(db.Integer, nullable=True)
+    view_count = db.Column(db.Integer, default=0)
+    is_published = db.Column(db.Boolean, default=True, index=True)
+    generated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    published_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    schema_markup = db.Column(db.Text, nullable=True)
+
+    @property
+    def tags(self):
+        if self.tags_json:
+            try:
+                return json.loads(self.tags_json)
+            except Exception:
+                return []
+        return []
+
+    @tags.setter
+    def tags(self, value):
+        self.tags_json = json.dumps(value or [])
+
+    def __repr__(self):
+        return f'<BlogPost {self.slug}>'
+
+
 class Alert(db.Model):
     """Monitoring alerts for status changes."""
     __tablename__ = 'alerts'

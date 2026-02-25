@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 class MonitoringScheduler:
     """Background scheduler for automated monitoring tasks"""
     
-    def __init__(self):
+    def __init__(self, app=None):
         self.scheduler = BackgroundScheduler()
+        self._app = app
         self.scheduler.start()
         logger.info("MonitoringScheduler initialized")
     
@@ -51,6 +52,16 @@ class MonitoringScheduler:
             replace_existing=True
         )
         logger.info("Job 'update_european_scam_db' scheduled for Sunday 03:00 AM weekly")
+        
+        # Daily blog post generation at 07:00 AM
+        self.scheduler.add_job(
+            func=self.generate_blog_post_job,
+            trigger=CronTrigger(hour=7, minute=0),
+            id='generate_blog_post',
+            name='Generate Daily SEO Blog Post',
+            replace_existing=True
+        )
+        logger.info("Job 'generate_blog_post' scheduled for 07:00 AM daily")
         
         # Optional: Additional check at 14:00 PM
         self.scheduler.add_job(
@@ -110,6 +121,22 @@ class MonitoringScheduler:
         except Exception as e:
             logger.error(f"European scam database update job failed: {str(e)}", exc_info=True)
     
+    def generate_blog_post_job(self):
+        """Daily SEO blog post generation job"""
+        try:
+            logger.info("Starting daily blog post generation job...")
+            from services.blog_generator import generate_daily_blog_post
+            if self._app:
+                result = generate_daily_blog_post(self._app)
+                if result:
+                    logger.info("Daily blog post generated successfully")
+                else:
+                    logger.info("Blog post generation skipped (already exists today or no content)")
+            else:
+                logger.warning("Blog generation skipped: no Flask app reference in scheduler")
+        except Exception as e:
+            logger.error(f"Daily blog post generation job failed: {str(e)}", exc_info=True)
+
     def shutdown(self):
         """Shutdown scheduler"""
         self.scheduler.shutdown()
@@ -122,10 +149,10 @@ class MonitoringScheduler:
 # Global scheduler instance
 scheduler = None
 
-def init_scheduler():
+def init_scheduler(app=None):
     """Initialize scheduler"""
     global scheduler
-    scheduler = MonitoringScheduler()
+    scheduler = MonitoringScheduler(app=app)
     scheduler.setup_jobs()
     return scheduler
 

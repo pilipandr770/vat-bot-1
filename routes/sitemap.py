@@ -74,6 +74,31 @@ def generate_sitemap():
                     })
     except Exception as e:
         current_app.logger.warning(f'Could not load programmatic SEO pages for sitemap: {e}')
+
+    # 4. Blog posts (from database — always fresh lastmod)
+    try:
+        from crm.models import BlogPost
+        blog_posts = (BlogPost.query
+                      .filter_by(is_published=True)
+                      .order_by(BlogPost.published_at.desc())
+                      .limit(500)
+                      .all())
+        # Blog index page
+        urls.append({
+            'loc': 'https://vat-verifizierung.de/blog/',
+            'lastmod': blog_posts[0].published_at.date().isoformat() if blog_posts else datetime.now().date().isoformat(),
+            'changefreq': 'daily',
+            'priority': 0.9
+        })
+        for post in blog_posts:
+            urls.append({
+                'loc': f'https://vat-verifizierung.de/blog/{post.slug}',
+                'lastmod': post.published_at.date().isoformat() if post.published_at else datetime.now().date().isoformat(),
+                'changefreq': 'monthly',
+                'priority': 0.75
+            })
+    except Exception as e:
+        current_app.logger.warning(f'Could not load blog posts for sitemap: {e}')
     
     # Генеруємо XML
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
