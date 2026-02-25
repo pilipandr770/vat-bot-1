@@ -27,11 +27,10 @@ def generate_sitemap():
     static_pages = [
         ('/', 'weekly', 1.0),
         ('/pricing', 'weekly', 0.9),
-        ('/about', 'monthly', 0.8),
-        ('/legal/privacy', 'monthly', 0.5),
-        ('/legal/terms', 'monthly', 0.5),
-        ('/contact', 'weekly', 0.7),
-        ('/answers-for-ai', 'weekly', 0.9),
+        ('/pentesting-scanner', 'weekly', 0.8),
+        ('/legal/agb', 'monthly', 0.5),
+        ('/legal/datenschutz', 'monthly', 0.5),
+        ('/legal/impressum', 'monthly', 0.5),
     ]
     
     for url, changefreq, priority in static_pages:
@@ -45,8 +44,9 @@ def generate_sitemap():
     # 2. GEO сторінки
     geo_pages = [
         ('/about/compliance-germany', 'monthly', 0.8),
-        ('/about/why-german-smbs-trust-us', 'monthly', 0.7),
+        ('/about/why-german-smbs-trust-us', 'monthly', 0.8),
         ('/about/eu-vat-rules', 'monthly', 0.7),
+        ('/about/answers-for-ai', 'weekly', 0.9),
     ]
     
     for url, changefreq, priority in geo_pages:

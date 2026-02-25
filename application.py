@@ -262,6 +262,10 @@ def create_app(config_name=None):
     # Register GEO + SME Trust blueprint
     from routes.geo_sme_routes import geo_bp
     app.register_blueprint(geo_bp)
+
+    # Register Sitemap blueprint
+    from routes.sitemap import sitemap_bp
+    app.register_blueprint(sitemap_bp)
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         init_scheduler()
@@ -764,37 +768,6 @@ def create_app(config_name=None):
         print(f"Sanctions result: {sanctions_result['status']}")
         
         print("All API tests completed!")
-
-    # Sitemap generation route
-    @app.route('/sitemap.xml')
-    def sitemap():
-        """Generate XML sitemap for search engines with W3C Datetime format."""
-        from datetime import datetime
-
-        urls = [
-            # Main pages (format: url, lastmod, changefreq, priority)
-            ('/', datetime.now().date(), 'weekly', 1.0),
-            ('/pricing', datetime.now().date(), 'weekly', 0.9),
-            ('/pentesting-scanner', datetime.now().date(), 'weekly', 0.8),
-            ('/legal/agb', datetime.now().date(), 'monthly', 0.5),
-            ('/legal/datenschutz', datetime.now().date(), 'monthly', 0.5),
-            ('/legal/impressum', datetime.now().date(), 'monthly', 0.5),
-        ]
-
-        # Build XML with W3C Datetime format (ISO 8601) - date only format
-        for url, lastmod, changefreq, priority in urls:
-            xml += '  <url>\n'
-            xml += f'    <loc>https://vat-verifizierung.de{url}</loc>\n'
-            xml += f'    <lastmod>{lastmod.isoformat()}</lastmod>\n'
-            xml += f'    <changefreq>{changefreq}</changefreq>\n'
-            xml += f'    <priority>{priority}</priority>\n'
-            xml += '  </url>\n'
-        
-        xml += '</urlset>'
-        
-        response = app.make_response(xml)
-        response.headers['Content-Type'] = 'application/xml'
-        return response
 
     # Robots.txt route
     @app.route('/robots.txt')
