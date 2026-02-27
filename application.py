@@ -862,7 +862,27 @@ def create_app(config_name=None):
         
         # Re-raise if not SSL error
         raise error
-    
+
+    # ── Flask CLI Commands ──────────────────────────────────────────────────
+    import click
+
+    @app.cli.command('generate-blog')
+    @click.option('--force', is_flag=True, default=False,
+                  help='Force generation even if post already exists today')
+    def generate_blog_cmd(force):
+        """Generate today's SEO blog post via OpenAI."""
+        from services.blog_generator import generate_daily_blog_post
+        try:
+            result = generate_daily_blog_post(app, force=force)
+            if result:
+                click.echo(click.style('Blog post generated successfully.', fg='green'))
+            else:
+                click.echo(click.style(
+                    'Skipped: post already exists today or OpenAI returned nothing.', fg='yellow'))
+        except Exception as e:
+            click.echo(click.style(f'Error: {e}', fg='red'))
+            raise SystemExit(1)
+
     return app
 
 # Create app instance for WSGI servers (Gunicorn, etc.)

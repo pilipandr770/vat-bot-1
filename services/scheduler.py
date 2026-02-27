@@ -54,12 +54,15 @@ class MonitoringScheduler:
         logger.info("Job 'update_european_scam_db' scheduled for Sunday 03:00 AM weekly")
         
         # Daily blog post generation at 07:00 AM
+        # misfire_grace_time=21600 → fires even if app was sleeping, up to 6 hours late
         self.scheduler.add_job(
             func=self.generate_blog_post_job,
             trigger=CronTrigger(hour=7, minute=0),
             id='generate_blog_post',
             name='Generate Daily SEO Blog Post',
-            replace_existing=True
+            replace_existing=True,
+            misfire_grace_time=21600,  # 6 hours grace — handles Render cold starts
+            coalesce=True,             # run once even if multiple misfires stacked up
         )
         logger.info("Job 'generate_blog_post' scheduled for 07:00 AM daily")
         

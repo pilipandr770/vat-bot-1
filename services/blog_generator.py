@@ -425,20 +425,21 @@ def _build_schema_markup(post_data: Dict) -> str:
     }, ensure_ascii=False)
 
 
-def generate_daily_blog_post(app) -> bool:
+def generate_daily_blog_post(app, force: bool = False) -> bool:
     """
     Main entry point. Called by the scheduler daily.
     Returns True if a new post was created, False otherwise.
-    """
+    """    
     with app.app_context():
         from crm.models import db, BlogPost
 
-        # Skip if already posted today
-        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-        existing_today = BlogPost.query.filter(BlogPost.generated_at >= today_start).first()
-        if existing_today:
-            logger.info("Blog: bereits ein Artikel heute generiert, überspringe")
-            return False
+        # Skip if already posted today (unless force=True)
+        if not force:
+            today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+            existing_today = BlogPost.query.filter(BlogPost.generated_at >= today_start).first()
+            if existing_today:
+                logger.info("Blog: bereits ein Artikel heute generiert, überspringe")
+                return False
 
         logger.info("Blog: Starte tägliche Artikel-Generierung...")
 

@@ -72,5 +72,31 @@ services:
       - key: GMAIL_PUBSUB_TOPIC
         sync: false
 
+  # ─── Daily Blog Generator Cron Job ───────────────────────────────────────
+  - type: cron
+    name: daily-blog-generator
+    runtime: python3
+    region: frankfurt
+    plan: free
+    branch: main
+    schedule: "0 7 * * *"   # 07:00 UTC every day
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: python scripts/generate_blog.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_SCHEMA
+        value: vat_verification
+      - key: SECRET_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: MAILGUARD_ENCRYPTION_KEY
+        sync: false
+
 # Note: You need to manually create the schema in your existing PostgreSQL database
 # Connect to your database and run: CREATE SCHEMA IF NOT EXISTS vat_verification;
