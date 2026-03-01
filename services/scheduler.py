@@ -152,12 +152,54 @@ class MonitoringScheduler:
 # Global scheduler instance
 scheduler = None
 
+
+def _startup_blog_check(app):
+    """
+    Runs once at startup (in a background thread, with a short delay).
+    If no blog post was generated today, triggers immediate generation.
+    This fixes the Render cold-start problem: APScheduler loses its state on
+    every restart, so the 07:00 AM cron job only fires *tomorrow* if the app
+    wakes up after that time.
+    """
+    import time
+    import threading
+
+    def _run():
+        # Small delay so the DB pool is ready before we hit it
+        time.sleep(15)
+        try:
+            with app.app_context():
+                from crm.models import BlogPost
+                from datetime import datetime
+                today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+                existing = BlogPost.query.filter(BlogPost.generated_at >= today_start).first()
+                if existing:
+                    logger.info("Startup blog check: article already exists for today, skipping.")
+                    return
+                logger.info("Startup blog check: no article for today — triggering generation now.")
+                from services.blog_generator import generate_daily_blog_post
+                result = generate_daily_blog_post(app)
+                if result:
+                    logger.info("Startup blog check: article generated successfully.")
+                else:
+                    logger.warning("Startup blog check: generation returned False (check OpenAI key / DB).")
+        except Exception as e:
+            logger.error(f"Startup blog check failed: {e}", exc_info=True)
+
+    t = threading.Thread(target=_run, name="startup-blog-check", daemon=True)
+    t.start()
+
+
 def init_scheduler(app=None):
     """Initialize scheduler"""
     global scheduler
     scheduler = MonitoringScheduler(app=app)
     scheduler.setup_jobs()
+    # Immediately check if today's post is missing (handles Render cold starts)
+    if app is not None:
+        _startup_blog_check(app)
     return scheduler
+
 
 def get_scheduler():
     """Get scheduler instance"""
