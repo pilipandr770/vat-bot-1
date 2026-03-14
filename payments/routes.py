@@ -30,7 +30,7 @@ def subscribe(plan_name):
     # Validate plan
     if plan_name not in stripe_price_ids:
         flash('Ungültiger Abonnementplan.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('landing'))
 
     # Check if user already has active subscription
     if current_user.active_subscription:
@@ -47,7 +47,7 @@ def subscribe(plan_name):
     if not price_id:
         current_app.logger.error(f"Stripe price ID not configured for plan: {plan_name}")
         flash('Fehler beim Konfigurieren des Plans. Bitte kontaktieren Sie den Support.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('landing'))
 
     try:
         # Create Stripe Checkout Session with Stripe price IDs
@@ -74,7 +74,7 @@ def subscribe(plan_name):
     except stripe.error.StripeError as e:
         current_app.logger.error(f"Stripe error creating checkout session: {str(e)}")
         flash('Fehler beim Erstellen der Checkout-Sitzung. Bitte versuchen Sie es später erneut.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('landing'))
 
 
 @payments_bp.route('/success')
@@ -88,7 +88,7 @@ def success():
     
     if not session_id:
         flash('Ungültige Zahlungssitzung.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('landing'))
     
     stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
     
@@ -99,7 +99,7 @@ def success():
         # Verify user matches
         if str(current_user.id) != session.metadata.get('user_id'):
             flash('Zahlungssitzung stimmt nicht mit Ihrem Konto überein.', 'danger')
-            return redirect(url_for('index'))
+            return redirect(url_for('landing'))
         
         # Get plan details
         plan_name = session.metadata.get('plan_name')
@@ -118,13 +118,9 @@ def success():
             subscription.stripe_subscription_id = session.subscription
             subscription.stripe_customer_id = session.customer
             subscription.status = 'active'
-            subscription.current_period_start = datetime.utcnow()
-            subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
-
-            # Update API limits based on plan
+            subscription.start_date = datetime.utcnow()
+            subscription.end_date = datetime.utcnow() + timedelta(days=30)
             subscription.api_calls_limit = plan_limits.get(plan_name, 100)
-
-            # Reset monthly usage
             subscription.api_calls_used = 0
 
         else:
@@ -136,8 +132,8 @@ def success():
                 status='active',
                 stripe_subscription_id=session.subscription,
                 stripe_customer_id=session.customer,
-                current_period_start=datetime.utcnow(),
-                current_period_end=datetime.utcnow() + timedelta(days=30),
+                start_date=datetime.utcnow(),
+                end_date=datetime.utcnow() + timedelta(days=30),
                 api_calls_limit=api_limit,
                 api_calls_used=0
             )
@@ -151,7 +147,7 @@ def success():
     except stripe.error.StripeError as e:
         current_app.logger.error(f"Stripe error retrieving session: {str(e)}")
         flash('Fehler beim Abrufen der Zahlungsinformationen.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('landing'))
 
 
 @payments_bp.route('/cancel')
@@ -161,7 +157,7 @@ def cancel():
     Handle cancelled payment
     """
     flash('Zahlungsvorgang abgebrochen. Ihr Abonnement wurde nicht geändert.', 'info')
-    return redirect(url_for('index'))
+    return redirect(url_for('landing'))
 
 
 @payments_bp.route('/portal')
