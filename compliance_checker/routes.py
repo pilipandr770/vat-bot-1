@@ -132,18 +132,40 @@ def _detect_cookie(raw_html: str) -> dict:
     return {"present": present, "reject_option": reject, "pre_checked": pre_checked}
 
 
+def _parse_json_robust(raw: str) -> dict | None:
+    """Extract and parse JSON from Claude output, tolerating markdown fences."""
+    # Strip markdown code fences if present
+    text = re.sub(r'^```(?:json)?\s*', '', raw.strip(), flags=re.IGNORECASE)
+    text = re.sub(r'```\s*$', '', text.strip())
+    # Find outermost {...}
+    m = re.search(r'\{.*\}', text, re.DOTALL)
+    if not m:
+        return None
+    candidate = m.group()
+    # Remove unescaped literal newlines inside JSON string values
+    # Replace bare newlines that appear inside string values with \n
+    candidate = re.sub(r'(?<!\\)\n', ' ', candidate)
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError:
+        # Last resort: try jsonrepair-style removal of trailing commas
+        candidate = re.sub(r',\s*([}\]])', r'\1', candidate)
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            return None
+
+
 def _claude_analyze(ptype: str, law: str, elements: list, content: str, hint: str, api_key: str) -> dict:
-    elems = "\n".join(f"  - {e}" for e in elements)
+    elems = "; ".join(elements)  # single line avoids newlines in prompt
     prompt = (
-        f"Analysiere folgende '{ptype}'-Seite auf Konformität mit {law}.\n\n"
-        f"Pflichtangaben gemäß Gesetz:\n{elems}\n\n"
-        f"Analyse-Hinweis: {hint}\n\n"
-        f"Seiteninhalt:\n\"\"\"\n{content}\n\"\"\"\n\n"
-        "Antworte NUR mit validem JSON (kein Text außerhalb):\n"
-        '{"found_elements": ["..."], "missing_elements": ["..."], '
-        '"issues": [{"severity": "critical|warning|ok", "issue": "kurz auf Deutsch", '
-        '"recommendation": "konkreter Vorschlag auf Deutsch"}], '
-        '"summary": "2-3 Sätze Gesamtbewertung auf Deutsch", "compliant": true}'
+        f"Analysiere die '{ptype}'-Seite auf Konformität mit {law}. "
+        f"Pflichtangaben: {elems}. Hinweis: {hint}. "
+        f"Seiteninhalt (max 5000 Zeichen): {content[:5000]}. "
+        'Antworte NUR mit diesem JSON (alle Strings einzeilig, keine Zeilenumbrüche in Werten): '
+        '{"found_elements":["..."],"missing_elements":["..."],'
+        '"issues":[{"severity":"critical","issue":"text","recommendation":"text"}],'
+        '"summary":"2-3 Saetze","compliant":true}'
     )
     try:
         client = anthropic.Anthropic(api_key=api_key)
@@ -151,15 +173,15 @@ def _claude_analyze(ptype: str, law: str, elements: list, content: str, hint: st
             model=CLAUDE_MODEL,
             max_tokens=900,
             system=(
-                "Du bist Experte für deutsches und europäisches IT-Recht, DSGVO und E-Commerce-Recht. "
-                "Analysiere Rechtstexte präzise und praxisnah. "
-                "Antworte AUSSCHLIESSLICH mit einem validen JSON-Objekt — kein Text außerhalb."
+                "Du bist Experte fuer deutsches IT-Recht und DSGVO. "
+                "Antworte AUSSCHLIESSLICH mit einem validen JSON-Objekt. "
+                "Alle String-Werte muessen einzeilig sein (keine Zeilenumbrueche innerhalb von Strings)."
             ),
             messages=[{"role": "user", "content": prompt}],
         )
-        m = re.search(r"\{.*\}", resp.content[0].text, re.DOTALL)
-        if m:
-            return json.loads(m.group())
+        result = _parse_json_robust(resp.content[0].text)
+        if result is not None:
+            return result
     except Exception as e:
         current_app.logger.error(f"Compliance Claude error: {e}")
     return {"found_elements": [], "missing_elements": [], "issues": [], "summary": "Analyse fehlgeschlagen.", "compliant": False}
@@ -265,12 +287,42 @@ def check():
         for r in page_results.values()
     )
 
+    # Build simplified per-page shape expected by the frontend
+    pages: dict = {}
+    for ptype, r in page_results.items():
+        ok_elements = r.get('found_elements', [])
+        issue_texts = [i.get('issue', '') for i in r.get('issues', []) if i.get('severity') in ('critical', 'warning')]
+        pages[ptype] = {
+            'status': 'found' if r['found'] and not issue_texts else ('partial' if r['found'] else 'not_found'),
+            'url': r.get('url', ''),
+            'law': r.get('law', ''),
+            'summary': r.get('summary', ''),
+            'ok_elements': ok_elements,
+            'issues': issue_texts,
+        }
+
+    ai_summary_parts = []
+    if score >= 80:
+        ai_summary_parts.append('Die Website erfüllt die wichtigsten rechtlichen Anforderungen.')
+    elif score >= 60:
+        ai_summary_parts.append('Die Website erfüllt grundlegende Anforderungen, aber es gibt Verbesserungspotenzial.')
+    else:
+        ai_summary_parts.append('Die Website weist erhebliche Compliance-Lücken auf und sollte dringend überarbeitet werden.')
+    if not cookie.get('present'):
+        ai_summary_parts.append('Ein Cookie-Banner fehlt — dies ist häufig gemäß ePrivacy-Richtlinie erforderlich.')
+    if not page_results.get('Impressum', {}).get('found'):
+        ai_summary_parts.append('Das Impressum fehlt — dies ist gemäß §5 TMG zwingend vorgeschrieben.')
+    if not page_results.get('Datenschutzerklärung', {}).get('found'):
+        ai_summary_parts.append('Die Datenschutzerklärung fehlt — DSGVO Art. 13/14 verpflichten dazu.')
+
     return jsonify({
         'url': url,
         'score': score,
         'grade': grade,
-        'page_results': page_results,
+        'pages': pages,
+        'cookie_banner': cookie.get('present', False),
         'cookie': cookie,
         'critical_count': total_critical,
         'warning_count': total_warning,
+        'ai_summary': ' '.join(ai_summary_parts),
     })
