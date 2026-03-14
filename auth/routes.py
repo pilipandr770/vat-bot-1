@@ -10,7 +10,9 @@ try:
 except ImportError:
     from urllib.parse import urlparse as url_parse
 from datetime import datetime, timedelta
-from auth.forms import LoginForm, RegistrationForm
+from auth.forms import (LoginForm, RegistrationForm, PasswordResetRequestForm,
+                         PasswordResetForm, ProfileUpdateForm, ChangePasswordForm,
+                         DeleteAccountForm)
 from auth.models import User, Subscription
 from crm.models import db
 
