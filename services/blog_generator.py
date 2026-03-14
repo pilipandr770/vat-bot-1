@@ -294,8 +294,8 @@ def _fetch_rss_topics(max_age_hours: int = 48) -> Optional[Dict]:
 
 def _pick_topic_from_schedule(app) -> Dict:
     """Pick the next topic from SEO_TOPICS that hasn't been used yet."""
-    from crm.models import BlogPost
-    used_slugs = {row[0] for row in app.extensions['sqlalchemy'].session.query(BlogPost.slug).all()}
+    from crm.models import db, BlogPost
+    used_slugs = {row[0] for row in db.session.query(BlogPost.slug).all()}
     for topic in SEO_TOPICS:
         title, keyword, category, tags = topic
         candidate_slug = _slugify(title)

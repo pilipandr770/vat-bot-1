@@ -269,5 +269,43 @@
     })();
     </script>
     {% block scripts %}{% endblock %}
+
+    <!-- DSGVO / GDPR Cookie Consent Banner -->
+    <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1e293b;color:#e2e8f0;padding:16px 20px;box-shadow:0 -4px 16px rgba(0,0,0,0.35);font-size:0.9rem;">
+      <div style="max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+        <div style="flex:1;min-width:220px;">
+          <strong style="color:#fff;">🍪 Cookie-Einstellungen</strong><br>
+          Wir verwenden Cookies, um den Betrieb der Website sicherzustellen und Ihre Nutzungserfahrung zu verbessern. Details finden Sie in unserer
+          <a href="/datenschutz" style="color:#60a5fa;text-decoration:underline;">Datenschutzerklärung</a>.
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button onclick="cookieConsent('necessary')" style="padding:8px 16px;border:1px solid #60a5fa;background:transparent;color:#60a5fa;border-radius:6px;cursor:pointer;font-size:0.85rem;">
+            Nur Notwendige
+          </button>
+          <button onclick="cookieConsent('all')" style="padding:8px 20px;border:none;background:#2563eb;color:#fff;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+            Alle akzeptieren
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+    (function() {
+      function showBanner() {
+        var b = document.getElementById('cookie-banner');
+        if (b) b.style.display = 'block';
+      }
+      if (!localStorage.getItem('cookie_consent')) {
+        showBanner();
+      }
+    })();
+    </script>
+    <script>
+    function cookieConsent(level) {
+      localStorage.setItem('cookie_consent', level);
+      localStorage.setItem('cookie_consent_date', new Date().toISOString());
+      var b = document.getElementById('cookie-banner');
+      if (b) b.style.display = 'none';
+    }
+    </script>
 </body>
 </html>
