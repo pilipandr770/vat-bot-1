@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Geschäftspartner Prüfung{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Company Data -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="bi bi-building"></i> Ihre Firmendaten</h5>
+            </div>
+            <div class="card-body">
+                <form id="verificationForm">
+                    <div class="mb-3">
+                        <label for="company_vat" class="form-label">USt-IdNr. <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="company_vat" name="company_vat" 
+                               placeholder="DE123456789" required>
+                        <div class="form-text">Ihre USt-IdNr. für VIES-Prüfung</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="company_name" class="form-label">Firmenname <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="company_name" name="company_name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="company_address" class="form-label">Geschäftsadresse <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="company_address" name="company_address" 
+                                  rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="company_email" class="form-label">E-Mail</label>
+                        <input type="email" class="form-control" id="company_email" name="company_email">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="company_phone" class="form-label">Telefon</label>
+                        <input type="tel" class="form-control" id="company_phone" name="company_phone">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Middle Column: Counterparty Data -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="bi bi-person-badge"></i> Geschäftspartner Daten</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="counterparty_vat" class="form-label">USt-IdNr.</label>
+                    <input type="text" class="form-control" id="counterparty_vat" name="counterparty_vat" 
+                           placeholder="DE987654321">
+                    <div class="form-text">USt-IdNr. des Geschäftspartners (falls bekannt)</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="counterparty_name" class="form-label">Firmenname <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="counterparty_name" name="counterparty_name" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="counterparty_country" class="form-label">Land <span class="text-danger">*</span></label>
+                    <select class="form-select" id="counterparty_country" name="counterparty_country" required>
+                        <option value="">Land auswählen</option>
+                        <option value="DE">Deutschland</option>
+                        <option value="AT">Österreich</option>
+                        <option value="NL">Niederlande</option>
+                        <option value="FR">Frankreich</option>
+                        <option value="IT">Italien</option>
+                        <option value="ES">Spanien</option>
+                        <option value="PL">Polen</option>
+                        <option value="CZ">Tschechien</option>
+                        <option value="UA">Ukraine</option>
+                        <option value="US">USA</option>
+                        <option value="GB">Großbritannien</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="counterparty_address" class="form-label">Adresse aus Impressum</label>
+                    <textarea class="form-control" id="counterparty_address" name="counterparty_address" rows="3"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="counterparty_email" class="form-label">E-Mail</label>
+                    <input type="email" class="form-control" id="counterparty_email" name="counterparty_email">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="counterparty_domain" class="form-label">Webseiten-Domain</label>
+                    <input type="text" class="form-control" id="counterparty_domain" name="counterparty_domain" 
+                           placeholder="beispiel.de">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="counterparty_contact" class="form-label">Ansprechpartner</label>
+                    <input type="text" class="form-control" id="counterparty_contact" name="counterparty_contact">
+                </div>
+                
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-search"></i> Prüfung starten
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Verification Results -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="bi bi-clipboard-check"></i> Prüfungsergebnisse</h5>
+            </div>
+            <div class="card-body" id="resultsPanel">
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-arrow-left-circle fs-1"></i>
+                    <p class="mt-2">Füllen Sie die Formulare aus und klicken Sie auf "Prüfung starten"</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading indicator -->
+        <div class="card mt-3" id="loadingPanel" style="display: none;">
+            <div class="card-body text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Prüfung läuft...</p>
+                <div id="loadingProgress"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize CounterpartyVerification class when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    const verification = new CounterpartyVerification();
+});
+</script>
+{% endblock %}

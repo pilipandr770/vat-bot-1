@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}{% if page == 'germany' %}VAT Compliance в Німеччині: Закони та інструменти для KMU{% elif page == 'sme' %}Чому німецькі KMU довіряють VAT Verifizierung{% else %}EU VAT правила: просто пояснено{% endif %} | VAT Verifizierung{% endblock %}
+
+{% block head %}
+<meta name="description" content="{% if page == 'germany' %}Як дотримуватись VAT законів у Німеччині. UStIdNr перевірка, VIES база, дипломні документи. Для GmbH, freelancer та SME.{% elif page == 'sme' %}Тисячі німецьких KMU використовують VAT Verifizierung для автоматизації перевірок партнерів. Безпека, швидкість, надійність.{% else %}Розумійте EU VAT правила без юриста. Основні вимоги для бізнесу в Німеччині, Австрії, Швейцарії.{% endif %}">
+<meta name="keywords" content="{% if page == 'germany' %}UStIdNr prüfen, VAT Compliance Deutschland, Steuernummer verifizieren, VIES Abfrage{% elif page == 'sme' %}KMU Compliance, Risikomanagement, Geschäftspartner verifizieren, Betrugsschutz{% else %}EU VAT Regeln, Steuernummern, Compliance, B2B Handel{% endif %}">
+
+<!-- Breadcrumb Schema for better SERP appearance -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://vat-verifizierung.de/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "About",
+      "item": "https://vat-verifizierung.de/about/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{% if page == 'germany' %}Compliance Germany{% elif page == 'sme' %}SME Trust{% else %}EU VAT Rules{% endif %}",
+      "item": "https://vat-verifizierung.de/about/{% if page == 'germany' %}compliance-germany{% elif page == 'sme' %}why-german-smbs-trust-us{% else %}eu-vat-rules{% endif %}"
+    }
+  ]
+}
+</script>
+
+<!-- LocalBusiness Schema for German Market -->
+{% if page == 'germany' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "VAT Verifizierung - VAT Compliance Germany",
+  "url": "https://vat-verifizierung.de/about/compliance-germany",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Germany",
+    "addressRegion": "Berlin",
+    "postalCode": "10115",
+    "addressCountry": "DE"
+  },
+  "areaServed": ["DE", "AT", "CH"],
+  "expertise": ["VAT Compliance", "VIES Database", "UStIdNr Verification", "Sanctions Screening", "EU Regulations"]
+    ,
+    "description": "Lokale VAT-Compliance-Ressourcen und Leitfäden für deutsche KMU: UStIdNr-Prüfung, Sanktionschecks und Best-Practices."
+}
+</script>
+{% endif %}
+
+<!-- Schema.org -->
+<script type="application/ld+json">
+{% if page == 'germany' %}
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "VAT Compliance in Deutschland: Regeln, Anforderungen, Tools",
+  "description": "Kompletter Leitfaden zu VAT-Regeln in Deutschland für KMU",
+  "author": {"@type": "Organization", "name": "VAT Verifizierung"},
+  "datePublished": "2026-01-15"
+}
+{% elif page == 'sme' %}
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Warum deutsche KMUs VAT Verifizierung vertrauen",
+  "description": "Tausende deutscher mittelständischer Unternehmen nutzen unsere Plattform für sichere Partner-Überprüfung",
+  "author": {"@type": "Organization", "name": "VAT Verifizierung"}
+}
+{% else %}
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "EU VAT Regeln einfach erklärt",
+  "description": "Verstehen Sie EU VAT-Anforderungen ohne Jura-Studium",
+  "author": {"@type": "Organization", "name": "VAT Verifizierung"}
+}
+{% endif %}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mt-3 mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('landing') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('about') }}">About</a></li>
+            <li class="breadcrumb-item active">
+                {% if page == 'germany' %}Compliance Germany
+                {% elif page == 'sme' %}SME Trust
+                {% else %}EU VAT Rules
+                {% endif %}
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Hero -->
+    <div class="row justify-content-center mt-5 mb-5">
+        <div class="col-lg-8 text-center">
+            {% if page == 'germany' %}
+                <h1 class="display-3 mb-4">VAT Compliance in Deutschland</h1>
+                <p class="lead text-muted">Rechtssicher werden: UStIdNr, VIES, Sanktionschecks. Alles was KMUs wissen müssen.</p>
+            {% elif page == 'sme' %}
+                <h1 class="display-3 mb-4">Warum deutsche KMUs uns vertrauen</h1>
+                <p class="lead text-muted">Tausende Mittelständler nutzen VAT Verifizierung täglich für sichere Geschäftspartner-Kontrolle</p>
+            {% else %}
+                <h1 class="display-3 mb-4">EU VAT Regeln – einfach erklärt</h1>
+                <p class="lead text-muted">Keine komplizierten Gesetze. Keine Jargon. Nur die wichtigsten Fakten für deinen Business.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            {% if page == 'germany' %}
+                <section class="mb-5">
+                    <h2 class="mb-3">Was ist UStIdNr?</h2>
+                    <p>Die Umsatzsteuer-Identifikationsnummer (UStIdNr) ist die Steuernummer für Unternehmen in Deutschland. Jedes GmbH, jeder Freiberufler und jeder Online-Shop braucht eine – wenn sie mit der EU handeln.</p>
+                    <div class="alert alert-info">
+                        <strong>🔑 Wichtig:</strong> Eine gültige UStIdNr ist der erste Schritt. Aber oft ist sie manipuliert oder invalid. Mit VAT Verifizierung prüfen Sie in Sekunden.
+                    </div>
+                </section>
+
+                <section class="mb-5">
+                    <h2 class="mb-3">VIES Database: Die offizielle Quelle</h2>
+                    <p>VIES (VAT Information Exchange System) ist die EU-Datenbank mit allen gültigen Steuernummern. VAT Verifizierung verbindet sich direkt mit VIES – kein Umweg, keine Verzögerung.</p>
+                    <ul>
+                        <li>✅ Real-time Prüfung gegen EU-Datenbank</li>
+                        <li>✅ Erkennt gefälschte Nummern sofort</li>
+                        <li>✅ Zeigt Adresse, Anmeldedatum, Status</li>
+                    </ul>
+                </section>
+
+                <section class="mb-5">
+                    <h2 class="mb-3">Sanktionslisten: Das größte Risiko</h2>
+                    <p>Über 1% der europäischen Firmendatenbanken sind auf Sanktionslisten. Wer mit ihnen handelt = Geldstrafe. VAT Verifizierung prüft 195 Länder automatisch.</p>
+                </section>
+
+            {% elif page == 'sme' %}
+                <section class="mb-5">
+                    <h2 class="mb-3">Die Herausforderung für KMUs</h2>
+                    <p>Jedes Unternehmen braucht Partner. Aber wie prüfst du, ob ein Partner:</p>
+                    <ul>
+                        <li>✓ Wirklich existiert?</li>
+                        <li>✓ Keine Sanktionen hat?</li>
+                        <li>✓ Die VAT-Nummer nicht manipuliert?</li>
+                        <li>✓ Keine Fälschungen sind?</li>
+                    </ul>
+                    <p>Manual prüfen = 30 Minuten pro Partner. Mit VAT Verifizierung = 5 Sekunden.</p>
+                </section>
+
+                <section class="mb-5">
+                    <h2 class="mb-3">Warum KMUs uns vertrauen</h2>
+                    <ul>
+                        <li><strong>⚡ Schnelligkeit:</strong> 5 Sekunden statt 30 Minuten pro Partner</li>
+                        <li><strong>🛡️ Sicherheit:</strong> VIES + Sanktionen + Betrugserkennung</li>
+                        <li><strong>📊 Audit-freundlich:</strong> Alle Checks dokumentiert (PDF, API)</li>
+                        <li><strong>💰 ROI:</strong> Nach 1 Monat sparen sie das Abo-Geld</li>
+                        <li><strong>🔗 Integration:</strong> API für Systeme (ERP, Salesforce, etc.)</li>
+                    </ul>
+                </section>
+
+                <section class="mb-5">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h4>Real-World Case</h4>
+                            <p class="mb-0">Mittelständischer Maschinenbauer: Nach Behördenprüfung wegen illegaler Geschäftspartner jetzt 100% VAT Verifizierung. 0 Probleme seit 18 Monaten.</p>
+                        </div>
+                    </div>
+                </section>
+
+            {% else %} <!-- EU VAT Rules -->
+                <section class="mb-5">
+                    <h2 class="mb-3">Was ist VAT?</h2>
+                    <p>VAT = Value Added Tax = MwSt / Mehrwertsteuer. In der EU: 17-27% je Land. VAT wird auf Waren/Diensten erhoben.</p>
+                </section>
+
+                <section class="mb-5">
+                    <h2 class="mb-3">Die Basis-Regeln</h2>
+                    <table class="table table-bordered">
+                        <tr>
+                            <td><strong>Intra-EU B2B Handel</strong></td>
+                            <td>0% VAT wenn beide gültige VAT-Nummern haben</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Imports aus USA/Asien</strong></td>
+                            <td>VAT beim Import (6-27% je Land)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Exports aus EU</strong></td>
+                            <td>0% VAT + Dokumentation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Services online</strong></td>
+                            <td>VAT des Käuferlandes</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="mb-5">
+                    <h2 class="mb-3">Strafen wenn du Fehler machst</h2>
+                    <ul>
+                        <li>🚫 Mit ungültigen Partnern handeln: 5-10% Strafe</li>
+                        <li>🚫 Falsche VAT-Abrechnung: bis 10.000€ Geldstrafe</li>
+                        <li>🚫 Sanktionen ignorieren: 10-25% Strafe + Konten-Sperrung</li>
+                    </ul>
+                </section>
+
+                <section class="mb-5">
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Fun Fact:</strong> 3-7% der europäischen Firmendatenbank sind gefälscht oder haben Sanktionen. Oft sieht man das nicht mit bloßem Auge.
+                    </div>
+                </section>
+            {% endif %}
+
+            <!-- Related Pages & Internal Linking -->
+            <div class="row mt-5 pt-5 border-top">
+                <div class="col-12">
+                    <h3 class="mb-4">Weitere wichtige Ressourcen</h3>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Compliance Deutschland</h5>
+                            <p class="card-text text-muted">Umfassender Leitfaden zu VAT-Anforderungen in Deutschland</p>
+                            <a href="{{ url_for('geo.compliance_germany') }}" class="btn btn-outline-primary btn-sm">Lesen →</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">KMU Vertrauen</h5>
+                            <p class="card-text text-muted">Warum tausende KMUs VAT Verifizierung nutzen</p>
+                            <a href="{{ url_for('geo.sme_trust') }}" class="btn btn-outline-primary btn-sm">Lesen →</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">EU VAT Regeln</h5>
+                            <p class="card-text text-muted">VAT-Anforderungen in allen EU-Ländern erklärt</p>
+                            <a href="{{ url_for('geo.eu_vat_rules') }}" class="btn btn-outline-primary btn-sm">Lesen →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programmatic Pages Links -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h5 class="mb-3 text-muted">Spezifische Leitfäden für verschiedene Geschäftstypen:</h5>
+                    <div class="btn-group btn-group-sm flex-wrap gap-2" role="group">
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='gmbh-berlin') }}" class="btn btn-outline-secondary">GmbH Verify</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='freiberufler-berlin') }}" class="btn btn-outline-secondary">Freiberufler</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='online-shop-berlin') }}" class="btn btn-outline-secondary">Online-Shop</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='startup-berlin') }}" class="btn btn-outline-secondary">Startup</a>
+                        <a href="{{ url_for('programmatic.vat_check_page', slug='kmu-berlin') }}" class="btn btn-outline-secondary">KMU</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Universal CTA -->
+            <div class="mt-5 pt-5 border-top">
+                <h3 class="mb-3">Bereit, dich zu schützen?</h3>
+                <p>VAT Verifizierung ist für dich wenn:</p>
+                <ul>
+                    <li>✓ Du mit Partnern in der EU handelst</li>
+                    <li>✓ Du Risiken minimieren willst</li>
+                    <li>✓ Du Audits bestehen musst</li>
+                    <li>✓ Du zeitsparen willst</li>
+                </ul>
+                <a href="{{ url_for('verification.create') }}" class="btn btn-primary btn-lg mt-3">
+                    <i class="bi bi-check-circle"></i> Jetzt kostenlos testen
+                </a>
+                <p class="text-muted mt-3">Erste Prüfung gratis. Kein Abo. Kein Risiko.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

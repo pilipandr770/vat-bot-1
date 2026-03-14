@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Zahlung erfolgreich - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <!-- Success Icon -->
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+            </div>
+            
+            <!-- Success Message -->
+            <h1 class="display-5 fw-bold mb-3">Zahlung erfolgreich!</h1>
+            <p class="lead text-muted mb-4">
+                Vielen Dank für Ihr Vertrauen. Ihr Abonnement wurde aktiviert.
+            </p>
+            
+            <!-- Subscription Details Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">Ihre Abonnement-Details</h5>
+                    
+                    <div class="row text-start">
+                        <div class="col-6 mb-2">
+                            <strong>Plan:</strong>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <span class="badge bg-primary">{{ current_user.subscription_plan|upper }}</span>
+                        </div>
+                        
+                        <div class="col-6 mb-2">
+                            <strong>API-Limit:</strong>
+                        </div>
+                        <div class="col-6 mb-2">
+                            {% if current_user.active_subscription.api_calls_limit == 999999 %}
+                                Unbegrenzt
+                            {% else %}
+                                {{ current_user.active_subscription.api_calls_limit }} pro Monat
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-6 mb-2">
+                            <strong>Status:</strong>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <span class="badge bg-success">Aktiv</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Next Steps -->
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                Eine Bestätigungs-E-Mail wurde an <strong>{{ current_user.email }}</strong> gesendet.
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-md-block">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-speedometer2 me-2"></i>Zum Dashboard
+                </a>
+                <a href="{{ url_for('payments.customer_portal') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-receipt me-2"></i>Rechnung anzeigen
+                </a>
+            </div>
+            
+            <!-- Support Section -->
+            <div class="mt-5 pt-4 border-top">
+                <h6 class="text-muted mb-3">Benötigen Sie Hilfe?</h6>
+                <p class="small text-muted mb-2">
+                    Unser Support-Team steht Ihnen bei Fragen zur Verfügung.
+                </p>
+                <a href="mailto:support@vat-verification.de" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-envelope me-1"></i>Support kontaktieren
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .container > .row {
+        animation: slideDown 0.5s ease-out;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Nachricht {{ message.subject or "(без темы)" }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mailguard-message-detail mt-4 px-3 px-md-4 px-xl-5">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Hauptmenü</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('mailguard.dashboard') }}">MailGuard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('mailguard.messages') }}">Posteingang</a></li>
+            <li class="breadcrumb-item active">Details</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-envelope-open"></i> {{ message.subject or "(без темы)" }}</h2>
+        <div>
+            <a href="{{ url_for('mailguard.messages') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Zur Liste
+            </a>
+            <a href="{{ url_for('mailguard.message_detail', message_id=message.id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-repeat"></i> Aktualisieren
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8 col-xxl-9">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="fw-semibold">Von:</div>
+                            <div>{{ message.from_email }}</div>
+                            <div class="text-muted small">Konto: {{ message.account.email }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-semibold">Empfangen:</div>
+                            <div>{{ message.received_at.strftime('%d.%m.%Y %H:%M') if message.received_at else '—' }}</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="mail-body">
+                        {% if message.body_html %}
+                            <div class="border rounded p-3 mb-3 bg-light">
+                                {{ message.body_html | safe }}
+                            </div>
+                        {% elif message.body_text %}
+                            <pre class="bg-light p-3 rounded">{{ message.body_text }}</pre>
+                        {% else %}
+                            <p class="text-muted">Kein Text gefunden.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-semibold">
+                    <i class="bi bi-shield-check"></i> Scan-Berichte
+                </div>
+                <div class="card-body">
+                    {% if reports %}
+                        <div class="list-group">
+                            {% for report in reports %}
+                            <div class="list-group-item">
+                                <div class="d-flex flex-wrap justify-content-between gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if report.verdict == 'malicious' %}
+                                            <span class="badge bg-danger">Malware</span>
+                                        {% elif report.verdict == 'suspicious' %}
+                                            <span class="badge bg-warning text-dark">Verdächtig</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Sauber</span>
+                                        {% endif %}
+                                        <span class="badge bg-secondary text-white">Score: {{ report.score }}</span>
+                                    </div>
+                                    <div class="text-muted small">
+                                        {{ report.created_at.strftime('%d.%m.%Y %H:%M') if report.created_at else '' }}
+                                    </div>
+                                </div>
+
+                                {% set details = report.get_details() %}
+                                {% set security = details.get('security') if details else None %}
+
+                                {% if security %}
+                                    {% set alert_class = {
+                                        'danger': 'alert-danger',
+                                        'warning': 'alert-warning',
+                                        'success': 'alert-success',
+                                        'secondary': 'alert-secondary'
+                                    }.get(security.flag_color, 'alert-info') %}
+                                    <div class="alert {{ alert_class }} mt-3 mb-2">
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <strong><i class="bi {{ security.flag_icon or 'bi-shield' }}"></i> {{ security.status_label }}</strong>
+                                            {% if security.summary %}
+                                                <span class="small">{{ security.summary }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <ul class="list-unstyled small mb-0 mt-2">
+                                            <li><strong>Quelle:</strong> {{ security.source or 'unbekannt' }}</li>
+                                            <li><strong>Score:</strong> {{ security.score if security.score is not none else 'n/a' }}/100</li>
+                                            <li><strong>Geprüft:</strong> {{ security.checked_at_display or '—' }}</li>
+                                            {% if security.fallback_used %}
+                                                <li class="text-warning"><i class="bi bi-exclamation-triangle"></i> Externer Scanner nicht verfügbar (Fallback genutzt)</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+
+                                {% if details %}
+                                    {% set attachments = details.get('attachments') if details is mapping else details.attachments if details else [] %}
+                                    {% if attachments %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Anhänge</h6>
+                                            <ul class="list-group list-group-flush small">
+                                                {% for att in attachments %}
+                                                    <li class="list-group-item px-0">
+                                                        <i class="bi bi-paperclip"></i>
+                                                        <strong>{{ att.filename or 'Datei' }}</strong>
+                                                        {% set risk = att.risk_level or att.get('risk_level') %}
+                                                        <span class="badge bg-{{ 'danger' if risk == 'danger' else 'warning text-dark' if risk == 'warning' else 'secondary' }} ms-2">
+                                                            Risiko: {{ risk|default('unbekannt')|title }}
+                                                        </span>
+                                                        {% if att.threats or att.get('threats') %}
+                                                            {% set threats = att.threats or att.get('threats') %}
+                                                            <div class="text-muted mt-1">Hinweise: {{ threats | join(', ') }}</div>
+                                                        {% endif %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if details.get('suspicious_keywords') %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Auffällige Schlüsselwörter</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                {% for keyword in details.get('suspicious_keywords') %}
+                                                    <span class="badge bg-warning text-dark">{{ keyword }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if details.get('links') %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Gefundene Links</h6>
+                                            <ul class="list-unstyled small mb-0">
+                                                {% for link in details.get('links') %}
+                                                    <li>
+                                                        <i class="bi bi-link-45deg"></i>
+                                                        <a href="{{ link }}" target="_blank" rel="noopener" class="text-decoration-none">{{ link }}</a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if details.get('notes') %}
+                                        <div class="mt-3">
+                                            <h6 class="fw-semibold small text-uppercase text-muted">Hinweise</h6>
+                                            <ul class="list-unstyled small mb-0">
+                                                {% for note in details.get('notes') %}
+                                                    <li><i class="bi bi-info-circle"></i> {{ note }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    <button class="btn btn-outline-secondary btn-sm mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#reportRaw{{ report.id }}" aria-expanded="false" aria-controls="reportRaw{{ report.id }}">
+                                        Technische Details
+                                    </button>
+                                    <div class="collapse mt-2" id="reportRaw{{ report.id }}">
+                                        <pre class="bg-light p-2 rounded"><code>{{ details | tojsonpretty }}</code></pre>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Noch keine Scan-Berichte.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    <div class="col-12 col-xl-4 col-xxl-3">
+            {% set security = message.get_security_meta() %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-semibold">
+                    <i class="bi bi-exclamation-triangle"></i> Sicherheitsstatus
+                </div>
+                <div class="card-body">
+                    {% if security %}
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            <span class="badge bg-{{ security.flag_color or 'secondary' }}">
+                                <i class="bi {{ security.flag_icon or 'bi-shield' }}"></i> {{ security.status_label or 'Sicherheitsbericht' }}
+                            </span>
+                            {% if security.checked_at_display %}
+                                <span class="text-muted small">Geprüft: {{ security.checked_at_display }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="mt-3 mb-2">{{ security.summary }}</p>
+
+                        <div class="mb-3">
+                            <div class="fw-semibold small text-muted text-uppercase">Sicherheitsdetails</div>
+                            <ul class="list-unstyled small mb-0">
+                                <li>Score: {{ security.score if security.score is not none else 'n/a' }}/100</li>
+                                <li>Quelle: {{ security.source or 'unbekannt' }}</li>
+                                <li>Links geprüft: {{ security.links_checked or 0 }}</li>
+                            </ul>
+                        </div>
+
+                        {% if security.notes %}
+                            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#securityNotes">
+                                Hinweise anzeigen
+                            </button>
+                            <div class="collapse mt-2" id="securityNotes">
+                                <ul class="list-group list-group-flush small">
+                                    {% for note in security.notes %}
+                                        <li class="list-group-item">{{ note }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted mb-0">Noch kein Sicherheitsbericht verfügbar.</p>
+                    {% endif %}
+
+                    <hr>
+
+                    <p class="mb-1"><strong>Status:</strong>
+                        <span class="badge bg-primary">{{ message.status }}</span>
+                    </p>
+                    <p class="mb-1"><strong>Risiko:</strong>
+                        {% if message.risk_score is not none %}
+                            {{ message.risk_score }} / 100
+                        {% else %}
+                            n/a
+                        {% endif %}
+                    </p>
+                    <p class="mb-0"><strong>Quarantäne:</strong>
+                        {% if message.is_quarantined %}
+                            <span class="badge bg-danger">Ja</span>
+                            {% if message.quarantine_reason %}
+                                <small class="d-block text-muted mt-1">{{ message.quarantine_reason }}</small>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge bg-success">Nein</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-semibold">
+                    <i class="bi bi-paperclip"></i> Anhänge
+                </div>
+                <div class="card-body">
+                    {% if attachments %}
+                        <ul class="list-group list-group-flush">
+                            {% for attachment in attachments %}
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="fw-semibold">{{ attachment.filename }}</div>
+                                        <div class="text-muted small">
+                                            {{ attachment.content_type or 'unbekannt' }}
+                                            {% if attachment.size %}
+                                                &middot; {{ (attachment.size / 1024)|round(1) }} KB
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {% if attachment.risk_level == 'danger' %}
+                                            <span class="badge bg-danger">Gefährlich</span>
+                                        {% elif attachment.risk_level == 'warning' %}
+                                            <span class="badge bg-warning text-dark">Warnung</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Sicher</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% set threats = attachment.get('threats') %}
+                                {% if threats %}
+                                    <small class="text-muted d-block mt-2">{{ threats | join(', ') }}</small>
+                                {% endif %}
+                                {% set scan = attachment.get('scan_result', {}) %}
+                                {% set vt = scan.get('scan_details', {}).get('virustotal') %}
+                                {% if vt and vt.get('link') %}
+                                    <a href="{{ vt.get('link') }}" target="_blank" class="small d-block mt-2">
+                                        <i class="bi bi-box-arrow-up-right"></i> VirusTotal Bericht
+                                    </a>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Keine Anhänge.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-light fw-semibold">
+                    <i class="bi bi-pencil-square"></i> KI-Entwürfe
+                </div>
+                <div class="card-body">
+                    {% if drafts %}
+                        <div class="accordion" id="draftAccordion">
+                            {% for draft in drafts %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ draft.id }}">
+                                    <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ draft.id }}">
+                                        Entwurf vom {{ draft.created_at.strftime('%d.%m.%Y %H:%M') if draft.created_at else '' }}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ draft.id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#draftAccordion">
+                                    <div class="accordion-body">
+                                        <p><strong>Empfänger:</strong> {{ draft.to_email }}</p>
+                                        <p><strong>Betreff:</strong> {{ draft.subject }}</p>
+                                        {% if draft.body_html %}
+                                            <div class="border rounded bg-light p-2 mb-2">{{ draft.body_html | safe }}</div>
+                                        {% elif draft.body_text %}
+                                            <pre class="bg-light p-2">{{ draft.body_text }}</pre>
+                                        {% endif %}
+                                        <p><strong>Status:</strong>
+                                            {% if draft.approved_by_user %}
+                                                <span class="badge bg-success">Genehmigt</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Wartet auf Genehmigung</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Noch keine Entwürfe erstellt.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

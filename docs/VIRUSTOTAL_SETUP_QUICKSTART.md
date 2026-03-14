@@ -1,0 +1,330 @@
+# 🛡️ VirusTotal API Setup - Быстрый старт
+
+## ✅ Что уже готово:
+
+1. **Код реализован:**
+   - ✅ `app/mailguard/attachment_scanner.py` - модуль сканирования
+   - ✅ Gmail connector интегрирован с автоматическим сканированием
+   - ✅ Модель `MailMessage` обновлена (поля для хранения результатов)
+   - ✅ Миграция создана и будет применена при деплое
+
+2. **Render настроен:**
+   - ✅ `flask db upgrade` в buildCommand (автоматические миграции)
+   - ✅ `VIRUSTOTAL_API_KEY` добавлен в render.yml
+
+3. **Деплой готов:**
+   - ✅ Код запушен на GitHub
+   - ✅ Render автоматически задеплоит и применит миграции
+
+---
+
+## 🚀 Что нужно сделать сейчас:
+
+### Шаг 1: Получить VirusTotal API Key (БЕСПЛАТНО)
+
+1. **Зарегистрироваться на VirusTotal:**
+   - Перейти: https://www.virustotal.com/gui/join-us
+   - Войти через Google или создать аккаунт
+
+2. **Получить API ключ:**
+   - Перейти: https://www.virustotal.com/gui/my-apikey
+   - Скопировать ключ (выглядит как: `a1b2c3d4e5f6...`)
+
+3. **Free tier лимиты:**
+   - ✅ 500 запросов в день
+   - ✅ 4 запроса в минуту
+   - ✅ Достаточно для 10-20 пользователей с email automation
+
+---
+
+### Шаг 2: Добавить ключ в Render
+
+1. **Открыть Render Dashboard:**
+   - Перейти: https://dashboard.render.com
+   - Выбрать сервис `vat-verification-platform`
+
+2. **Добавить environment variable:**
+   - Вкладка **Environment**
+   - Нажать **Add Environment Variable**
+   - **Key:** `VIRUSTOTAL_API_KEY`
+   - **Value:** ваш API ключ из шага 1
+   - Нажать **Save Changes**
+
+3. **Дождаться редеплоя:**
+   - Render автоматически перезапустит сервис
+   - Миграции применятся автоматически
+   - Attachment scanning активируется
+
+---
+
+## 🧪 Как протестировать:
+
+### Тест 1: Проверка миграции
+
+После деплоя откройте **Render Shell** и выполните:
+
+```bash
+flask db current
+```
+
+**Ожидаемый вывод:**
+```
+f9b5e3a7c2d4 (head)
+```
+
+Проверьте что новые таблицы созданы:
+```bash
+psql $DATABASE_URL -c "\dt vat_verification.*" | grep mail
+```
+
+**Ожидаемый вывод:**
+```
+ vat_verification | mail_account       | table | ...
+ vat_verification | mail_draft         | table | ...
+ vat_verification | mail_message       | table | ...
+ vat_verification | mail_rule          | table | ...
+ vat_verification | known_counterparty | table | ...
+ vat_verification | scan_report        | table | ...
+```
+
+Проверьте attachment scanning поля:
+```bash
+psql $DATABASE_URL -c "\d vat_verification.mail_message" | grep -E "(attachments|quarantine)"
+```
+
+**Ожидаемый вывод:**
+```
+ attachments_json          | text
+ has_attachments           | boolean
+ has_dangerous_attachments | boolean
+ is_quarantined           | boolean
+ quarantine_reason        | character varying(500)
+```
+
+---
+
+### Тест 2: Проверка VirusTotal API
+
+В Render Shell выполните пошагово:
+
+```bash
+# 1. Запустить Python в контексте приложения
+python
+
+# 2. Внутри Python REPL выполните:
+from wsgi import app
+from app.mailguard.attachment_scanner import AttachmentScanner
+from flask import current_app
+
+# 3. Создать app context и проверить API ключ
+with app.app_context():
+    scanner = AttachmentScanner()
+    print(f"API Key configured: {bool(scanner.vt_api_key)}")
+    if scanner.vt_api_key:
+        print(f"API Key preview: {scanner.vt_api_key[:10]}...")
+    else:
+        print("ERROR: API Key not found!")
+```
+
+**Ожидаемый вывод:**
+```
+API Key configured: True
+API Key preview: 7977663b17...
+```
+
+**Если видите `API Key configured: False`:**
+- Проверьте Environment Variables в Render Dashboard
+- Убедитесь что `VIRUSTOTAL_API_KEY` добавлен
+- Перезапустите сервис (Manual Deploy)
+
+---
+
+### Тест 3: Реальное сканирование
+
+1. **Подключить Gmail аккаунт:**
+   - Перейти: https://vat-bot-1.onrender.com/mailguard/accounts
+   - Нажать "Добавить Gmail"
+   - Авторизоваться
+
+2. **Отправить тестовое письмо:**
+   - Отправьте себе email с вложением (например, PDF)
+   - MailGuard автоматически получит письмо
+   - Attachment будет просканирован на сервере
+
+3. **Проверить результат в логах:**
+
+В Render → Logs ищите:
+```
+Starting scan for attachment: test.pdf (application/pdf)
+Decoded test.pdf: 12345 bytes
+SHA256 hash for test.pdf: abc123...
+VirusTotal hash found for test.pdf: 0/70
+Scan complete for test.pdf: risk_level=safe, is_safe=True
+```
+
+---
+
+## 📊 Что происходит автоматически:
+
+### При получении email с вложениями:
+
+```
+1. Gmail API → Fetch email
+2. AttachmentScanner → Decode base64 (в памяти)
+3. SHA256 hash calculation
+4. VirusTotal check by hash (мгновенно если известен)
+5. If not found → Upload to VirusTotal (30-60 сек)
+6. Save to MailMessage.attachments_json
+7. If dangerous → Auto-quarantine
+```
+
+### Пользователь видит:
+
+- ✅ **Безопасные файлы**: Кнопка "Скачать"
+- ⚠️ **Подозрительные**: Предупреждение + детали
+- 🚨 **Опасные**: Заблокировано + причина
+
+---
+
+## 🔍 Мониторинг использования API:
+
+### Проверить квоту VirusTotal:
+
+```bash
+curl -H "x-apikey: YOUR_API_KEY" https://www.virustotal.com/api/v3/users/YOUR_USER_ID/overall_quotas
+```
+
+### Или в Dashboard:
+- https://www.virustotal.com/gui/user/YOUR_USERNAME/apikey
+- **Daily quota:** 500 / 500
+- **Minute quota:** 4 / 4
+
+### Если квота заканчивается:
+
+**Option 1:** Upgrade to Premium ($192/month)
+- 15,000 requests/day
+- 500 requests/minute
+
+**Option 2:** Добавить ClamAV (бесплатно)
+- См. документацию: `docs/GMAIL_ATTACHMENT_SCANNING.md`
+- Docker container на Render (+$7/month за RAM)
+
+---
+
+## 🐛 Troubleshooting:
+
+### Проблема: "API key not configured"
+
+**Решение:**
+```bash
+# В Render Shell
+echo $VIRUSTOTAL_API_KEY
+# Если пусто → добавьте в Environment variables
+```
+
+---
+
+### Проблема: "Upload failed: 403"
+
+**Причина:** Квота исчерпана (500/день)
+
+**Решение:**
+- Подождите до следующего дня (UTC)
+- Или upgrade to Premium
+
+---
+
+### Проблема: Миграция не применилась
+
+**Проверка:**
+```bash
+flask db current
+# Должно показать: f9b5e3a7c2d4 (head)
+```
+
+**Если показывает старую версию (af13f0999271):**
+```bash
+flask db upgrade
+```
+
+**Если таблицы не созданы:**
+```bash
+# Проверить список таблиц в вашей схеме
+psql $DATABASE_URL -c "\dt vat_verification.*"
+
+# Если mail_account, mail_message отсутствуют:
+flask db upgrade head
+```
+
+**ВАЖНО:** Таблицы создаются в схеме `vat_verification`, НЕ в `public`!  
+Убедитесь что `DB_SCHEMA=vat_verification` установлен в Environment Variables.
+
+---
+
+## 📈 Следующие шаги (опционально):
+
+### 1. UI для отображения scan results
+
+Создать template для показа статуса вложений:
+- ✅ Badge с уровнем риска
+- 🔗 Ссылка на VirusTotal report
+- 📋 Список обнаруженных угроз
+
+### 2. Quarantine management
+
+Admin dashboard для управления карантином:
+- Список заблокированных писем
+- Возможность разблокировать (whitelist)
+- Статистика опасных вложений
+
+### 3. Webhook для async results
+
+VirusTotal может отправлять webhook когда анализ завершен:
+- Не нужно ждать 30-60 секунд
+- Результат приходит автоматически
+
+---
+
+## 💡 Best Practices:
+
+1. **Не показывайте API ключ пользователям**
+   - Храните только в environment variables
+   - Не логируйте полный ключ
+
+2. **Кэшируйте результаты по SHA256**
+   - Если файл уже сканировался → не тратьте API quota
+   - Храните в `attachments_json`
+
+3. **Мониторьте квоту**
+   - Логируйте каждый API call
+   - Алертьте при приближении к лимиту
+
+4. **Fallback на quick scan**
+   - Если VirusTotal недоступен
+   - Эвристический анализ всегда работает
+
+---
+
+## ✅ Checklist перед production:
+
+- [ ] VirusTotal API ключ добавлен в Render
+- [ ] Миграция применилась успешно
+- [ ] Тестовое письмо просканировано
+- [ ] Логи показывают успешное сканирование
+- [ ] Квота VirusTotal не исчерпана
+- [ ] Gmail OAuth работает
+- [ ] UI показывает статус вложений (TODO)
+
+---
+
+**Готово к использованию!** 🎉
+
+После добавления `VIRUSTOTAL_API_KEY` в Render все заработает автоматически.
+
+**Документация:**
+- Полная: `docs/GMAIL_ATTACHMENT_SCANNING.md`
+- Код: `app/mailguard/attachment_scanner.py`
+- Миграция: `migrations/versions/e8a4b92c5d11_*.py`
+
+**Дата создания:** 7 ноября 2025
+**Статус:** Готово к production (после добавления API key)

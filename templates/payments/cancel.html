@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Zahlung abgebrochen - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <!-- Cancel Icon -->
+            <div class="mb-4">
+                <i class="bi bi-x-circle-fill text-warning" style="font-size: 5rem;"></i>
+            </div>
+            
+            <!-- Cancel Message -->
+            <h1 class="display-5 fw-bold mb-3">Zahlung abgebrochen</h1>
+            <p class="lead text-muted mb-4">
+                Sie haben den Zahlungsvorgang abgebrochen. Keine Sorge, es wurden keine Gebühren erhoben.
+            </p>
+            
+            <!-- Information Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">Was jetzt?</h5>
+                    
+                    <div class="text-start">
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                <strong>Kostenloser Plan bleibt aktiv</strong><br>
+                                <small class="text-muted">Sie können weiterhin 5 Prüfungen pro Monat durchführen</small>
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-arrow-repeat text-primary me-2"></i>
+                                <strong>Später upgraden</strong><br>
+                                <small class="text-muted">Sie können jederzeit zu einem bezahlten Plan wechseln</small>
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-question-circle text-info me-2"></i>
+                                <strong>Fragen?</strong><br>
+                                <small class="text-muted">Unser Support-Team hilft Ihnen gerne weiter</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reasons Section -->
+            <div class="alert alert-light border">
+                <h6 class="fw-bold mb-3">Haben Sie Bedenken?</h6>
+                <p class="small mb-2">Wir bieten:</p>
+                <ul class="small text-start list-unstyled mb-0">
+                    <li>✅ 14-tägige Geld-zurück-Garantie</li>
+                    <li>✅ Sichere Zahlungen über Stripe</li>
+                    <li>✅ Jederzeit kündbar</li>
+                    <li>✅ Keine versteckten Gebühren</li>
+                </ul>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-md-block mb-4">
+                <a href="{{ url_for('payments.pricing') }}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Zurück zu den Preisen
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-speedometer2 me-2"></i>Zum Dashboard
+                </a>
+            </div>
+            
+            <!-- Support Section -->
+            <div class="mt-4 pt-3 border-top">
+                <p class="small text-muted mb-2">
+                    Fragen zum Upgrade oder technische Probleme?
+                </p>
+                <a href="mailto:support@vat-verification.de" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-envelope me-1"></i>Support kontaktieren
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    .container > .row {
+        animation: fadeIn 0.5s ease-out;
+    }
+</style>
+{% endblock %}

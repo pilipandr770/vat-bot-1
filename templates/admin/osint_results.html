@@ -1,0 +1,95 @@
+<!-- FILE: templates/admin/osint_results.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ _('OSINT Scan Results') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="bi bi-file-earmark-text"></i> {{ _('OSINT Scan Results') }} #{{ scan.id }}
+            </h2>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ _('Scan Information') }}</h5>
+                            <dl class="row">
+                                <dt class="col-sm-5">{{ _('Domain') }}:</dt>
+                                <dd class="col-sm-7">{{ scan.domain or "-" }}</dd>
+
+                                <dt class="col-sm-5">{{ _('Email') }}:</dt>
+                                <dd class="col-sm-7">{{ scan.email or "-" }}</dd>
+
+                                <dt class="col-sm-5">{{ _('URL') }}:</dt>
+                                <dd class="col-sm-7"><a href="{{ scan.url }}" target="_blank">{{ scan.url or "-" }}</a></dd>
+
+                                <dt class="col-sm-5">
+                                    <i class="bi bi-clock"></i> {{ _('Created') }}:
+                                </dt>
+                                <dd class="col-sm-7">{{ scan.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">{{ _('Detailed Results') }}</h5>
+
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 15%;">{{ _('Service') }}</th>
+                                        <th style="width: 10%;">{{ _('Status') }}</th>
+                                        <th style="width: 25%;">{{ _('Notes') }}</th>
+                                        <th style="width: 50%;">{{ _('Data') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for result in scan.findings %}
+                                    <tr>
+                                        <td><strong>{{ result.service }}</strong></td>
+                                        <td>
+                                            {% if result.status == 'ok' %}
+                                                <span class="badge bg-success">{{ _('OK') }}</span>
+                                            {% elif result.status == 'warn' %}
+                                                <span class="badge bg-warning">{{ _('WARNING') }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ _('ERROR') }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><small>{{ result.notes or "-" }}</small></td>
+                                        <td>
+                                            <small>
+                                                {% if result.data %}
+                                                    <button class="btn btn-sm btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#data-{{ loop.index }}">
+                                                        <i class="bi bi-eye"></i> {{ _('View Data') }}
+                                                    </button>
+                                                    <div class="collapse mt-2" id="data-{{ loop.index }}">
+                                                        <pre><code>{{ result.data }}</code></pre>
+                                                    </div>
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ url_for('osint.scan') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> {{ _('Back to Scanner') }}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

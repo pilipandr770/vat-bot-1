@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Pricing - VAT Verification System') }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Pricing Offers JSON-LD for rich results -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "VAT Verifizierung - Pläne",
+        "description": "Subscription plans for VAT Verifizierung service (Free, Starter, Professional)",
+        "offers": [
+            {% for plan in plans %}
+            {
+                "@type": "Offer",
+                "name": "{{ plan.display_name }}",
+                "sku": "plan-{{ plan.name }}",
+                "price": "{{ "%.2f"|format(plan.price) }}",
+                "priceCurrency": "EUR",
+                "url": "https://vat-verifizierung.de/pricing#{{ plan.name }}",
+                "availability": "https://schema.org/InStock",
+                "priceValidUntil": "2026-12-31",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "VAT Verifizierung Subscription - {{ plan.display_name }}",
+                    "description": "{{ plan.description if plan.description else 'Subscription plan for VAT Verifizierung' }}"
+                },
+                "priceSpecification": {
+                    "@type": "PriceSpecification",
+                    "price": "{{ "%.2f"|format(plan.price) }}",
+                    "priceCurrency": "EUR",
+                    "billingPeriod": "P1M"
+                }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">{{ _('Choose Your Plan') }}</h1>
+        <p class="lead text-muted">{{ _('Transparent pricing. No hidden fees. Cancel anytime.') }}</p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="row g-4 justify-content-center">
+        {% for plan in plans %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 {% if plan.featured %}border-primary shadow-lg{% else %}shadow-sm{% endif %}">
+                {% if plan.featured %}
+                <div class="card-header bg-primary text-white text-center py-2">
+                    <strong>⭐ {{ _('Most Popular') }}</strong>
+                </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <!-- Plan Name -->
+                    <h3 class="card-title text-center mb-3">{{ plan.display_name }}</h3>
+                    
+                    <!-- Price -->
+                    <div class="text-center mb-4">
+                        <h2 class="display-4 fw-bold">€{{ "%.2f"|format(plan.price) }}</h2>
+                        <p class="text-muted">{{ plan.period }}</p>
+                    </div>
+                    
+                    <!-- API Calls -->
+                    <div class="text-center mb-4">
+                        <span class="badge bg-secondary fs-6 px-3 py-2">
+                            {% if plan.api_calls == 'Unbegrenzt' %}
+                            {{ plan.api_calls }} {{ _('verifications') }}
+                            {% else %}
+                            {{ plan.api_calls }} {{ _('verifications/month') }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Features List -->
+                    <ul class="list-unstyled mb-4 flex-grow-1">
+                        {% for feature in plan.features %}
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <!-- CTA Button -->
+                    <div class="text-center mt-auto">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.subscription_plan == plan.name %}
+                            <button class="btn btn-outline-secondary w-100" disabled>
+                                {{ _('Current Plan') }}
+                            </button>
+                            {% else %}
+                                {% if plan.cta_params %}
+                                <a href="{{ url_for(plan.cta_url, **plan.cta_params) }}" 
+                                   class="btn {% if plan.featured %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                    {{ plan.cta }}
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for(plan.cta_url) }}" 
+                                   class="btn {% if plan.featured %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                    {{ plan.cta }}
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('auth.register') }}" 
+                               class="btn {% if plan.featured %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                                {{ plan.cta }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-5 pt-5 border-top">
+        <h2 class="text-center mb-4">{{ _('Frequently Asked Questions') }}</h2>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="pricingFAQ">
+                    <!-- Question 1 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                {{ _('Can I cancel anytime?') }}
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                {{ _('Yes, you can cancel your subscription at any time without notice. There are no long-term commitments.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                {{ _('What happens if I exceed my limit?') }}
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                {{ _('With the free plan, no further verifications will be possible until the next month begins. With paid plans, you can upgrade at any time to perform more verifications.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                {{ _('What payment methods do you accept?') }}
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                {{ _('We accept all major credit cards (Visa, Mastercard, American Express) as well as SEPA direct debit through our secure payment provider Stripe.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                {{ _('Can I switch between plans?') }}
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                {{ _('Yes, you can upgrade or downgrade at any time. When upgrading, you get immediate access to additional features. When downgrading, changes take effect at the end of the current billing period.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                {{ _('Is there a money-back guarantee?') }}
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                {{ _('Yes, we offer a 14-day money-back guarantee for all paid plans. If you are not satisfied, we will refund you the full amount.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                {{ _('Do you need a custom solution?') }}
+                            </button>
+                        </h2>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                {{ _('For companies with special requirements, we offer customized Enterprise solutions. Contact us at') }} <a href="mailto:enterprise@vat-verification.de">enterprise@vat-verification.de</a> {{ _('for a custom quote.') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trust Badges -->
+    <div class="mt-5 pt-4 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p class="text-muted mb-3">{{ _('Trusted by over 500 companies in Europe') }}</p>
+                <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
+                    <span class="badge bg-light text-dark p-3">
+                        <i class="bi bi-shield-check me-2"></i>{{ _('SSL encrypted') }}
+                    </span>
+                    <span class="badge bg-light text-dark p-3">
+                        <i class="bi bi-check-circle me-2"></i>{{ _('GDPR compliant') }}
+                    </span>
+                    <span class="badge bg-light text-dark p-3">
+                        <i class="bi bi-credit-card me-2"></i>{{ _('Stripe secured') }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="mt-5 pt-5 text-center">
+        <h3 class="mb-3">{{ _('Still have questions?') }}</h3>
+        <p class="text-muted mb-4">{{ _('Our support team is here to help.') }}</p>
+        <a href="mailto:support@vat-verification.de" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-envelope me-2"></i>{{ _('Contact us') }}
+        </a>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card.border-primary {
+        position: relative;
+    }
+    
+    .card.border-primary::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #0d6efd, #6610f2);
+        border-radius: 0.375rem;
+        z-index: -1;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}

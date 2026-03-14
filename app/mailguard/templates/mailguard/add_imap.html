@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Подключить IMAP аккаунт - MailGuard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0"><i class="bi bi-gear"></i> Подключить IMAP/SMTP аккаунт</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Инструкция -->
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Где взять эти данные?</strong><br>
+                        Обычно настройки IMAP/SMTP указаны на сайте вашего почтового провайдера.
+                        <br><br>
+                        <strong>Популярные настройки:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Mail.ru:</strong> imap.mail.ru:993 / smtp.mail.ru:465</li>
+                            <li><strong>Yandex:</strong> imap.yandex.ru:993 / smtp.yandex.ru:465</li>
+                            <li><strong>Custom domain:</strong> обычно mail.yourdomain.com</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('mailguard.add_imap_account') }}">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="bi bi-envelope"></i> Email адрес *
+                            </label>
+                            <input type="email" 
+                                   class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                   id="email" 
+                                   name="email" 
+                                   value="{{ form.email.data or '' }}"
+                                   placeholder="your@email.com"
+                                   required>
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.email.errors[0] }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-key"></i> Пароль приложения *
+                            </label>
+                            <input type="password" 
+                                   class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                   id="password" 
+                                   name="password"
+                                   placeholder="Пароль или app-specific password"
+                                   required>
+                            <small class="form-text text-muted">
+                                ⚠️ Для Gmail/Yandex используйте "пароль приложения", а не основной пароль!
+                            </small>
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password.errors[0] }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- IMAP Settings -->
+                        <h5 class="mb-3"><i class="bi bi-download"></i> Настройки IMAP (входящая почта)</h5>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="imap_host" class="form-label">IMAP сервер *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="imap_host" 
+                                       name="imap_host"
+                                       value="{{ form.imap_host.data or '' }}"
+                                       placeholder="imap.example.com"
+                                       required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="imap_port" class="form-label">Порт *</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="imap_port" 
+                                       name="imap_port"
+                                       value="{{ form.imap_port.data or 993 }}"
+                                       placeholder="993"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="imap_ssl" 
+                                   name="imap_ssl"
+                                   {% if form.imap_ssl.data or form.imap_ssl.data is none %}checked{% endif %}>
+                            <label class="form-check-label" for="imap_ssl">
+                                Использовать SSL/TLS (рекомендуется)
+                            </label>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- SMTP Settings -->
+                        <h5 class="mb-3"><i class="bi bi-upload"></i> Настройки SMTP (исходящая почта)</h5>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="smtp_host" class="form-label">SMTP сервер *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="smtp_host" 
+                                       name="smtp_host"
+                                       value="{{ form.smtp_host.data or '' }}"
+                                       placeholder="smtp.example.com"
+                                       required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="smtp_port" class="form-label">Порт *</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="smtp_port" 
+                                       name="smtp_port"
+                                       value="{{ form.smtp_port.data or 465 }}"
+                                       placeholder="465"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="smtp_ssl" 
+                                   name="smtp_ssl"
+                                   {% if form.smtp_ssl.data or form.smtp_ssl.data is none %}checked{% endif %}>
+                            <label class="form-check-label" for="smtp_ssl">
+                                Использовать SSL/TLS (рекомендуется)
+                            </label>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Проверить и подключить
+                            </button>
+                            <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Помощь -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-question-circle"></i> Нужна помощь?</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Где взять "пароль приложения"?</strong></p>
+                    <ul>
+                        <li><strong>Gmail:</strong> Google Account → Security → 2-Step Verification → App passwords</li>
+                        <li><strong>Yandex:</strong> Паспорт → Безопасность → Пароли приложений</li>
+                        <li><strong>Mail.ru:</strong> Настройки → Пароль и безопасность → Пароли для внешних приложений</li>
+                    </ul>
+                    <p class="mb-0 text-muted">
+                        <i class="bi bi-shield-check"></i> 
+                        Мы храним пароли в зашифрованном виде. Никто, кроме вас, не сможет их прочитать.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

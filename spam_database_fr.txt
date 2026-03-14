@@ -1,0 +1,21 @@
+# French Scam Phone Numbers Database
+# Last updated: 2026-01-25 14:57:39
+# Sources: gitbra/spam, Esdayl/NoPhoneSpam_FR, alexdyas/spamnumbers-france
+# Format: E164 (+33123456789) or patterns (+33162?)
+
++33162?
++33163?
++33270?
++33271?
++33377?
++33378?
++33424?
++33425?
++33568?
++33569?
++339476?
++339477?
++339478?
++339479?
++33948?
++33949?

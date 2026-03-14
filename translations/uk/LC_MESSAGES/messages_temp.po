@@ -1,0 +1,2904 @@
+﻿# Ukrainian translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 18:05+0100\n"
+"PO-Revision-Date: 2026-01-25 15:51+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: uk\n"
+"Language-Team: uk <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: application.py:335 templates/base.html:7
+msgid "VAT Verification System"
+msgstr "Система перевірки ПДВ"
+
+#: link_scanner/templates/link_scanner/scan.html:3
+msgid "Link Scanner - URL Security Check"
+msgstr "Сканер посилань - перевірка безпеки URL"
+
+#: link_scanner/templates/link_scanner/scan.html:11 templates/base.html:43
+msgid "Link Scanner"
+msgstr "Сканер посилань"
+
+#: link_scanner/templates/link_scanner/scan.html:12
+msgid "Check URLs for phishing, malware and other threats"
+msgstr "Перевіряйте URL на фішинг, шкідливе ПЗ та інші загрози"
+
+#: link_scanner/templates/link_scanner/scan.html:21
+msgid "Enter URL"
+msgstr "Введіть URL"
+
+#: link_scanner/templates/link_scanner/scan.html:26
+msgid "or"
+msgstr "або"
+
+#: link_scanner/templates/link_scanner/scan.html:29
+msgid "Check"
+msgstr "Перевірити"
+
+#: link_scanner/templates/link_scanner/scan.html:33
+msgid "Enter a complete URL (e.g. https://example.com/page)"
+msgstr "Введіть повний URL (наприклад, https://example.com/page)"
+
+#: link_scanner/templates/link_scanner/scan.html:42
+msgid "Check multiple URLs simultaneously"
+msgstr "Перевіряти кілька URL одночасно"
+
+#: link_scanner/templates/link_scanner/scan.html:50
+msgid "URLs (one per line, max. 20)"
+msgstr "URL (один на рядок, макс. 20)"
+
+#: link_scanner/templates/link_scanner/scan.html:55
+msgid "Check All"
+msgstr "Перевірити всі"
+
+#: link_scanner/templates/link_scanner/scan.html:64
+msgid "What is being checked?"
+msgstr "Що перевіряється?"
+
+#: link_scanner/templates/link_scanner/scan.html:68
+#: link_scanner/templates/link_scanner/scan.html:213
+msgid "SSL/HTTPS encryption"
+msgstr "Шифрування SSL/HTTPS"
+
+#: link_scanner/templates/link_scanner/scan.html:69
+#: link_scanner/templates/link_scanner/scan.html:214
+msgid "Phishing detection"
+msgstr "Виявлення фішингу"
+
+#: link_scanner/templates/link_scanner/scan.html:70
+#: link_scanner/templates/link_scanner/scan.html:215
+msgid "VirusTotal database"
+msgstr "База даних VirusTotal"
+
+#: link_scanner/templates/link_scanner/scan.html:71
+#: link_scanner/templates/link_scanner/scan.html:216
+msgid "Google Safe Browsing"
+msgstr "Google Safe Browsing"
+
+#: link_scanner/templates/link_scanner/scan.html:72
+#: link_scanner/templates/link_scanner/scan.html:217
+msgid "Suspicious domains"
+msgstr "Підозрілі домени"
+
+#: link_scanner/templates/link_scanner/scan.html:73
+#: link_scanner/templates/link_scanner/scan.html:218
+msgid "URL shortener detection"
+msgstr "Виявлення скорочувачів URL"
+
+#: link_scanner/templates/link_scanner/scan.html:74
+#: link_scanner/templates/link_scanner/scan.html:219
+msgid "Redirect analysis"
+msgstr "Аналіз перенаправлень"
+
+#: link_scanner/templates/link_scanner/scan.html:82
+msgid "Recent Checks"
+msgstr "Останні перевірки"
+
+#: link_scanner/templates/link_scanner/scan.html:87
+msgid "No checks performed yet"
+msgstr "Ще не виконано жодної перевірки"
+
+#: link_scanner/templates/link_scanner/scan.html:99
+#: link_scanner/templates/link_scanner/scan.html:209
+msgid "Loading..."
+msgstr "Завантаження..."
+
+#: link_scanner/templates/link_scanner/scan.html:204
+#: templates/pentesting/scanner.html:523
+msgid "Please enter a URL"
+msgstr "Будь ласка, введіть URL"
+
+#: link_scanner/templates/link_scanner/scan.html:205
+#: templates/crm/counterparty_details.html:428 templates/crm/index.html:306
+msgid "Network error"
+msgstr "Помилка мережі"
+
+#: link_scanner/templates/link_scanner/scan.html:206
+msgid "Please enter at least one URL"
+msgstr "Будь ласка, введіть принаймні один URL"
+
+#: link_scanner/templates/link_scanner/scan.html:207
+msgid "No valid URLs found"
+msgstr "Не знайдено дійсних URL"
+
+#: link_scanner/templates/link_scanner/scan.html:208
+msgid "Maximum 20 URLs allowed"
+msgstr "Дозволено максимум 20 URL"
+
+#: link_scanner/templates/link_scanner/scan.html:210
+msgid "Safe"
+msgstr "Безпечний"
+
+#: link_scanner/templates/link_scanner/scan.html:211
+msgid "Suspicious"
+msgstr "Підозрілий"
+
+#: link_scanner/templates/link_scanner/scan.html:212
+msgid "Malicious"
+msgstr "Шкідливий"
+
+#: link_scanner/templates/link_scanner/scan.html:220
+msgid "Accessibility"
+msgstr "Доступність"
+
+#: link_scanner/templates/link_scanner/scan.html:221
+msgid "Heuristic analysis"
+msgstr "Евристичний аналіз"
+
+#: link_scanner/templates/link_scanner/scan.html:222
+msgid "No suspicious patterns found"
+msgstr "Не знайдено підозрілих шаблонів"
+
+#: link_scanner/templates/link_scanner/scan.html:223
+msgid "Trusted domain"
+msgstr "Довірений домен"
+
+#: link_scanner/templates/link_scanner/scan.html:224
+msgid "engines report threat"
+msgstr "рушіїв повідомляють про загрозу"
+
+#: link_scanner/templates/link_scanner/scan.html:225
+#: templates/admin/dashboard.html:195 templates/admin/dashboard.html:254
+#: templates/admin/osint_results.html:47
+#: templates/crm/counterparty_details.html:212
+#: templates/mailguard/dashboard.html:72
+msgid "Status"
+msgstr "Статус"
+
+#: link_scanner/templates/link_scanner/scan.html:226
+msgid "redirects"
+msgstr "перенаправлень"
+
+#: link_scanner/templates/link_scanner/scan.html:227
+msgid "Recommendations"
+msgstr "Рекомендації"
+
+#: link_scanner/templates/link_scanner/scan.html:228
+msgid "Detected threats"
+msgstr "Виявлені загрози"
+
+#: link_scanner/templates/link_scanner/scan.html:229
+msgid "Detailed checks"
+msgstr "Детальні перевірки"
+
+#: link_scanner/templates/link_scanner/scan.html:230
+#: templates/admin/osint_results.html:20 templates/admin/osint_scan.html:21
+#: templates/crm/add_edit_counterparty.html:105
+#: templates/crm/counterparty_details.html:73
+msgid "Domain"
+msgstr "Домен"
+
+#: link_scanner/templates/link_scanner/scan.html:231
+#, fuzzy
+msgid "Scanning"
+msgstr "Сканується..."
+
+#: link_scanner/templates/link_scanner/scan.html:232
+#: templates/admin/osint_scan.html:47
+msgid "Scan completed"
+msgstr "Сканування завершено"
+
+#: link_scanner/templates/link_scanner/scan.html:233
+#: templates/chatbot/chat.html:134 templates/crm/add_edit_counterparty.html:260
+#: templates/crm/counterparty_details.html:353 templates/crm/index.html:294
+#: templates/pentesting/scanner.html:526
+msgid "Error"
+msgstr "Помилка"
+
+#: link_scanner/templates/link_scanner/scan.html:234
+#, fuzzy
+msgid "Batch scan results"
+msgstr "Результати сканування OSINT"
+
+#: link_scanner/templates/link_scanner/scan.html:235
+#: templates/admin/osint_results.html:26
+msgid "URL"
+msgstr "URL"
+
+#: link_scanner/templates/link_scanner/scan.html:236
+#: templates/phoneintel/analyze.html:51
+msgid "Verdict"
+msgstr "Висновок"
+
+#: link_scanner/templates/link_scanner/scan.html:237
+#, fuzzy
+msgid "Score"
+msgstr "Рівень ризику"
+
+#: link_scanner/templates/link_scanner/scan.html:238
+#, fuzzy
+msgid "Time"
+msgstr "Активний"
+
+#: templates/base.html:16
+msgid "VAT Verification"
+msgstr "Перевірка ПДВ"
+
+#: templates/base.html:26
+msgid "Dashboard"
+msgstr "Панель управління"
+
+#: templates/admin/osint_scan.html:4 templates/admin/osint_scan.html:11
+#: templates/base.html:33
+msgid "OSINT Scanner"
+msgstr "OSINT Сканер"
+
+#: templates/base.html:38 templates/phoneintel/analyze.html:3
+#: templates/phoneintel/analyze.html:11
+msgid "Phone Intelligence"
+msgstr "Інтелект телефонії"
+
+#: templates/base.html:48
+msgid "MailGuard"
+msgstr "MailGuard"
+
+#: templates/base.html:53
+msgid "Website Scanner"
+msgstr "Сканер сайтів"
+
+#: templates/base.html:58 templates/crm/add_edit_counterparty.html:12
+msgid "CRM"
+msgstr "CRM"
+
+#: templates/base.html:106
+msgid "Features"
+msgstr "Функції"
+
+#: templates/base.html:109
+msgid "Pricing"
+msgstr "Ціни"
+
+#: templates/base.html:117 templates/landing.html:128
+msgid "Sign In"
+msgstr "Увійти"
+
+#: templates/base.html:121 templates/landing.html:129
+#, fuzzy
+msgid "Start Free"
+msgstr "Почати нову перевірку"
+
+#: templates/base.html:158
+#, fuzzy
+msgid "Rechtliches"
+msgstr "Останні перевірки"
+
+#: templates/base.html:162
+#, fuzzy
+msgid "Impressum"
+msgstr "Преміум"
+
+#: templates/base.html:167
+msgid "Datenschutz"
+msgstr ""
+
+#: templates/base.html:172
+msgid "AGB"
+msgstr ""
+
+#: templates/base.html:177
+msgid "DSGVO-Anfrage"
+msgstr ""
+
+#: templates/base.html:183
+msgid "Kontakt"
+msgstr ""
+
+#: templates/base.html:212
+msgid "Alle Rechte vorbehalten"
+msgstr ""
+
+#: templates/base.html:217
+msgid "DSGVO-konform"
+msgstr ""
+
+#: templates/check_details.html:8
+msgid "Check Details"
+msgstr "Деталі перевірки"
+
+#: templates/check_details.html:10
+msgid "Checked on"
+msgstr "Перевірено"
+
+#: templates/check_details.html:15
+msgid "Back to History"
+msgstr "Назад до історії"
+
+#: templates/check_details.html:281 templates/crm/counterparty_details.html:235
+msgid "Sent"
+msgstr "Надіслано"
+
+#: templates/index.html:59
+#, fuzzy
+msgid "Your Company Data"
+msgstr "Збережіть дані вашої компанії"
+
+#: templates/index.html:60
+msgid "Manage Profile"
+msgstr ""
+
+#: templates/index.html:72
+msgid "Tip"
+msgstr ""
+
+#: templates/index.html:73
+msgid "Save your company data"
+msgstr "Збережіть дані вашої компанії"
+
+#: templates/index.html:74
+msgid "so that they are automatically filled in"
+msgstr "щоб вони автоматично заповнювалися"
+
+#: templates/crm/add_edit_counterparty.html:68
+#: templates/crm/counterparty_details.html:53
+#: templates/crm/counterparty_details.html:377 templates/index.html:80
+#: templates/index.html:122
+msgid "VAT Number"
+msgstr "Номер ПДВ"
+
+#: templates/index.html:84
+msgid "Your VAT number for VIES validation"
+msgstr "Ваш номер ПДВ для перевірки VIES"
+
+#: templates/crm/add_edit_counterparty.html:42
+#: templates/crm/counterparty_details.html:45 templates/index.html:88
+#: templates/index.html:130
+msgid "Company Name"
+msgstr "Назва компанії"
+
+#: templates/index.html:94
+msgid "Business Address"
+msgstr "Адреса бізнесу"
+
+#: templates/admin/osint_results.html:23
+#: templates/crm/add_edit_counterparty.html:84
+#: templates/crm/counterparty_details.html:63 templates/index.html:100
+#: templates/mailguard/dashboard.html:70
+msgid "Email"
+msgstr "Email"
+
+#: templates/index.html:106
+msgid "Phone"
+msgstr "Телефон"
+
+#: templates/index.html:118
+msgid "Counterparty Data"
+msgstr "Дані контрагента"
+
+#: templates/index.html:125
+msgid "VAT number of the business partner (if known)"
+msgstr "Номер ПДВ бізнес-партнера (якщо відомий)"
+
+#: templates/crm/add_edit_counterparty.html:48
+#: templates/crm/counterparty_details.html:49
+#: templates/crm/counterparty_details.html:378 templates/index.html:135
+#: templates/phoneintel/analyze.html:46
+msgid "Country"
+msgstr "Країна"
+
+#: templates/crm/add_edit_counterparty.html:50 templates/index.html:137
+msgid "Select country"
+msgstr "Виберіть країну"
+
+#: templates/index.html:139
+msgid "Free available (incl. business register)"
+msgstr "Безкоштовно доступно (вкл. реєстр бізнесу)"
+
+#: templates/index.html:146
+msgid "In progress / Premium"
+msgstr "В роботі / Преміум"
+
+#: templates/index.html:149
+msgid "Premium"
+msgstr "Преміум"
+
+#: templates/index.html:149
+msgid "In development"
+msgstr "В розробці"
+
+#: templates/index.html:156
+msgid "Available"
+msgstr "Доступно"
+
+#: templates/index.html:160
+msgid "Ukraine is checked via the EDR (Unified State Register)"
+msgstr "Україна перевіряється через ЄДР (Єдиний державний реєстр)"
+
+#: templates/crm/add_edit_counterparty.html:90
+#: templates/crm/counterparty_details.html:87 templates/index.html:181
+msgid "Contact Person"
+msgstr "Контактна особа"
+
+#: templates/index.html:186
+msgid "Start Verification"
+msgstr "Почати перевірку"
+
+#: templates/admin/dashboard.html:3
+msgid "Admin Dashboard - VAT Verification System"
+msgstr "Панель адміністратора - Система перевірки ПДВ"
+
+#: templates/admin/dashboard.html:11
+msgid "Admin Dashboard"
+msgstr "Панель адміністратора"
+
+#: templates/admin/dashboard.html:13
+msgid "Overview of users, subscriptions and API usage"
+msgstr "Огляд користувачів, підписок та використання API"
+
+#: templates/admin/dashboard.html:17
+msgid "Administrator"
+msgstr "Адміністратор"
+
+#: templates/admin/dashboard.html:30
+msgid "Total Users"
+msgstr "Загальна кількість користувачів"
+
+#: templates/admin/dashboard.html:33 templates/admin/dashboard.html:73
+msgid "this month"
+msgstr "цього місяця"
+
+#: templates/admin/dashboard.html:50
+msgid "MRR"
+msgstr "MRR"
+
+#: templates/admin/dashboard.html:53
+msgid "Pro"
+msgstr "Pro"
+
+#: templates/admin/dashboard.html:53 templates/admin/dashboard.html:140
+msgid "Enterprise"
+msgstr "Enterprise"
+
+#: templates/admin/dashboard.html:70
+msgid "Total Revenue"
+msgstr "Загальний дохід"
+
+#: templates/admin/dashboard.html:90
+msgid "API Verifications"
+msgstr "Перевірки API"
+
+#: templates/admin/dashboard.html:93
+msgid "today"
+msgstr "сьогодні"
+
+#: templates/admin/dashboard.html:111
+msgid "Subscription Distribution"
+msgstr "Розподіл підписок"
+
+#: templates/admin/dashboard.html:118
+msgid "Free"
+msgstr "Безкоштовно"
+
+#: templates/admin/dashboard.html:129
+msgid "Professional"
+msgstr "Професійний"
+
+#: templates/admin/dashboard.html:157
+msgid "Quick Access"
+msgstr "Швидкий доступ"
+
+#: templates/admin/dashboard.html:162
+msgid "User Management"
+msgstr "Керування користувачами"
+
+#: templates/admin/dashboard.html:165
+msgid "All Verifications"
+msgstr "Всі перевірки"
+
+#: templates/admin/dashboard.html:168
+msgid "System Logs"
+msgstr "Системні логи"
+
+#: templates/admin/dashboard.html:183
+msgid "Recent Registrations"
+msgstr "Недавні реєстрації"
+
+#: templates/admin/dashboard.html:185 templates/admin/dashboard.html:244
+msgid "View All"
+msgstr "Переглянути всі"
+
+#: templates/admin/dashboard.html:192 templates/admin/dashboard.html:251
+msgid "User"
+msgstr "Користувач"
+
+#: templates/admin/dashboard.html:193
+msgid "Plan"
+msgstr "План"
+
+#: templates/admin/dashboard.html:194
+msgid "Registered"
+msgstr "Зареєстрований"
+
+#: templates/admin/dashboard.html:209
+msgid "BASIC"
+msgstr "БАЗОВИЙ"
+
+#: templates/admin/dashboard.html:211
+msgid "PROFESSIONAL"
+msgstr "ПРОФЕСІЙНИЙ"
+
+#: templates/admin/dashboard.html:213
+msgid "ENTERPRISE"
+msgstr "КОРПОРАТИВНИЙ"
+
+#: templates/admin/dashboard.html:215
+msgid "NONE"
+msgstr "НІЧОГО"
+
+#: templates/admin/dashboard.html:223 templates/mailguard/dashboard.html:94
+msgid "Active"
+msgstr "Активний"
+
+#: templates/admin/dashboard.html:225 templates/mailguard/dashboard.html:96
+msgid "Inactive"
+msgstr "Неактивний"
+
+#: templates/admin/dashboard.html:242
+msgid "Recent Verifications"
+msgstr "Недавні перевірки"
+
+#: templates/admin/dashboard.html:252
+msgid "Company"
+msgstr "Компанія"
+
+#: templates/admin/dashboard.html:253
+#: templates/crm/counterparty_details.html:211
+msgid "Date"
+msgstr "Дата"
+
+#: templates/admin/osint_results.html:4 templates/admin/osint_results.html:11
+msgid "OSINT Scan Results"
+msgstr "Результати сканування OSINT"
+
+#: templates/admin/osint_results.html:18
+msgid "Scan Information"
+msgstr "Інформація про сканування"
+
+#: templates/admin/osint_results.html:30
+#: templates/crm/counterparty_details.html:91
+#: templates/mailguard/dashboard.html:137
+msgid "Created"
+msgstr "Створено"
+
+#: templates/admin/osint_results.html:41
+msgid "Detailed Results"
+msgstr "Детальні результати"
+
+#: templates/admin/osint_results.html:46
+msgid "Service"
+msgstr "Сервіс"
+
+#: templates/admin/osint_results.html:48
+msgid "Notes"
+msgstr "Примітки"
+
+#: templates/admin/osint_results.html:49
+msgid "Data"
+msgstr "Дані"
+
+#: templates/admin/osint_results.html:58
+msgid "OK"
+msgstr "OK"
+
+#: templates/admin/osint_results.html:60
+msgid "WARNING"
+msgstr "ПОПЕРЕДЖЕННЯ"
+
+#: templates/admin/osint_results.html:62
+msgid "ERROR"
+msgstr "ПОМИЛКА"
+
+#: templates/admin/osint_results.html:70
+msgid "View Data"
+msgstr "Переглянути дані"
+
+#: templates/admin/osint_results.html:90
+#, fuzzy
+msgid "Back to Scanner"
+msgstr "Сканер сайтів"
+
+#: templates/admin/osint_scan.html:13
+msgid ""
+"Passive data collection about the counterparty's domain, website, or "
+"email."
+msgstr "Пасивний збір даних про домен, веб-сайт або електронну пошту контрагента."
+
+#: templates/admin/osint_scan.html:16
+msgid "URL (optional)"
+msgstr "URL (необов'язково)"
+
+#: templates/admin/osint_scan.html:17
+msgid "https://example.com"
+msgstr "https://example.com"
+
+#: templates/admin/osint_scan.html:18
+msgid "Complete website URL for header and social media analysis."
+msgstr "Повна URL-адреса веб-сайту для аналізу заголовків та соціальних мереж."
+
+#: templates/admin/osint_scan.html:22
+msgid "example.com"
+msgstr "example.com"
+
+#: templates/admin/osint_scan.html:23
+msgid "Primary company domain for WHOIS, DNS, and SSL checks."
+msgstr "Основний домен компанії для перевірок WHOIS, DNS та SSL."
+
+#: templates/admin/osint_scan.html:26
+msgid "Email (optional)"
+msgstr "Електронна пошта (необов'язково)"
+
+#: templates/admin/osint_scan.html:27
+msgid "info@example.com"
+msgstr "info@example.com"
+
+#: templates/admin/osint_scan.html:28
+msgid "Email for basic format validation."
+msgstr "Електронна пошта для базової перевірки формату."
+
+#: templates/admin/osint_scan.html:33 templates/pentesting/scanner.html:33
+msgid "Start Scan"
+msgstr "Почати сканування"
+
+#: templates/admin/osint_scan.html:45 templates/pentesting/scanner.html:524
+msgid "Scanning..."
+msgstr "Сканується..."
+
+#: templates/admin/osint_scan.html:46
+msgid "Server returned invalid response. Please try again later."
+msgstr "Сервер повернув недійсну відповідь. Спробуйте пізніше."
+
+#: templates/admin/osint_scan.html:48
+msgid "Results"
+msgstr "Результати"
+
+#: templates/admin/osint_scan.html:49
+msgid "View full results"
+msgstr "Переглянути повні результати"
+
+#: templates/admin/osint_scan.html:50
+msgid "Scan error"
+msgstr "Помилка сканування"
+
+#: templates/admin/osint_scan.html:51
+msgid "If the error persists, please contact support."
+msgstr "Якщо помилка зберігається, зверніться до служби підтримки."
+
+#: templates/auth/register.html:133
+msgid "Already have an account?"
+msgstr "Вже маєте обліковий запис?"
+
+#: templates/auth/register.html:134
+#, fuzzy
+msgid "Sign in now"
+msgstr "Увійти"
+
+#: templates/chatbot/chat.html:133
+msgid "Connection error. Please try again."
+msgstr "Помилка з'єднання. Спробуйте ще раз."
+
+#: templates/chatbot/chat.html:135
+#, fuzzy
+msgid "Unknown error"
+msgstr "Невідомо"
+
+#: templates/crm/add_edit_counterparty.html:3
+#: templates/crm/add_edit_counterparty.html:14
+msgid "Add Counterparty"
+msgstr "Додати контрагента"
+
+#: templates/crm/add_edit_counterparty.html:3
+#: templates/crm/add_edit_counterparty.html:14
+#: templates/crm/add_edit_counterparty.html:20
+msgid "Edit Counterparty"
+msgstr "Редагувати контрагента"
+
+#: templates/crm/add_edit_counterparty.html:20
+msgid "Add New Counterparty"
+msgstr "Додати нового контрагента"
+
+#: templates/crm/add_edit_counterparty.html:22
+msgid "Enter company information with AI assistance"
+msgstr "Введіть інформацію про компанію з допомогою ШІ"
+
+#: templates/crm/add_edit_counterparty.html:31
+msgid "Company Information"
+msgstr "Інформація про компанію"
+
+#: templates/crm/add_edit_counterparty.html:45
+msgid "Full legal company name"
+msgstr "Повна юридична назва компанії"
+
+#: templates/crm/add_edit_counterparty.html:51
+msgid "Germany"
+msgstr "Німеччина"
+
+#: templates/crm/add_edit_counterparty.html:52
+msgid "Austria"
+msgstr "Австрія"
+
+#: templates/crm/add_edit_counterparty.html:53
+msgid "Switzerland"
+msgstr "Швейцарія"
+
+#: templates/crm/add_edit_counterparty.html:54
+msgid "France"
+msgstr "Франція"
+
+#: templates/crm/add_edit_counterparty.html:55
+msgid "Italy"
+msgstr "Італія"
+
+#: templates/crm/add_edit_counterparty.html:56
+msgid "Spain"
+msgstr "Іспанія"
+
+#: templates/crm/add_edit_counterparty.html:57
+msgid "Netherlands"
+msgstr "Нідерланди"
+
+#: templates/crm/add_edit_counterparty.html:58
+msgid "Belgium"
+msgstr "Бельгія"
+
+#: templates/crm/add_edit_counterparty.html:59
+msgid "Poland"
+msgstr "Польща"
+
+#: templates/crm/add_edit_counterparty.html:60
+msgid "Czech Republic"
+msgstr "Чеська Республіка"
+
+#: templates/crm/add_edit_counterparty.html:61
+msgid "Ukraine"
+msgstr "Україна"
+
+#: templates/crm/add_edit_counterparty.html:74
+msgid "Validate"
+msgstr "Перевірити"
+
+#: templates/crm/add_edit_counterparty.html:77
+msgid "VAT number for EU companies (optional)"
+msgstr "Номер ПДВ для компаній ЄС (необов'язково)"
+
+#: templates/crm/add_edit_counterparty.html:98
+#: templates/crm/counterparty_details.html:83
+msgid "Address"
+msgstr "Адреса"
+
+#: templates/crm/add_edit_counterparty.html:100
+msgid "Street, City, Postal Code, Country"
+msgstr "Вулиця, Місто, Поштовий індекс, Країна"
+
+#: templates/crm/add_edit_counterparty.html:112
+msgid "Company website domain for additional verification"
+msgstr "Домен веб-сайту компанії для додаткової перевірки"
+
+#: templates/crm/add_edit_counterparty.html:118
+msgid "AI Enrichment"
+msgstr "Збагачення ШІ"
+
+#: templates/crm/add_edit_counterparty.html:120
+msgid "Use AI to automatically fill missing information"
+msgstr "Використовуйте ШІ для автоматичного заповнення відсутньої інформації"
+
+#: templates/crm/add_edit_counterparty.html:128
+msgid "Save Counterparty"
+msgstr "Зберегти контрагента"
+
+#: templates/crm/add_edit_counterparty.html:128
+msgid "Update Counterparty"
+msgstr "Оновити контрагента"
+
+#: templates/crm/add_edit_counterparty.html:131
+msgid "Cancel"
+msgstr "Скасувати"
+
+#: templates/crm/add_edit_counterparty.html:143
+#: templates/crm/add_edit_counterparty.html:264
+msgid "AI Assistant"
+msgstr "Асистент ШІ"
+
+#: templates/crm/add_edit_counterparty.html:153
+msgid ""
+"Hello! I can help you fill out the company information. What would you "
+"like to know?"
+msgstr ""
+"Привіт! Я можу допомогти вам заповнити інформацію про компанію. Що б ви "
+"хотіли знати?"
+
+#: templates/crm/add_edit_counterparty.html:159
+msgid "Ask me about company data..."
+msgstr "Запитайте мене про дані компанії..."
+
+#: templates/crm/add_edit_counterparty.html:168
+msgid "Quick Help"
+msgstr "Швидка допомога"
+
+#: templates/crm/add_edit_counterparty.html:170
+#, fuzzy
+msgid "What information do I need to provide?"
+msgstr "Яка інформація мені потрібна?"
+
+#: templates/crm/add_edit_counterparty.html:171
+msgid "What information do I need?"
+msgstr "Яка інформація мені потрібна?"
+
+#: templates/crm/add_edit_counterparty.html:173
+#: templates/crm/add_edit_counterparty.html:174
+msgid "How to find VAT number?"
+msgstr "Як знайти номер ПДВ?"
+
+#: templates/crm/add_edit_counterparty.html:176
+#: templates/crm/add_edit_counterparty.html:177
+msgid "What is domain used for?"
+msgstr "Для чого використовується домен?"
+
+#: templates/crm/add_edit_counterparty.html:253
+msgid "Validating..."
+msgstr "Перевірка..."
+
+#: templates/crm/add_edit_counterparty.html:254
+#: templates/crm/counterparty_details.html:155
+#: templates/crm/counterparty_details.html:279
+msgid "Valid"
+msgstr "Дійсний"
+
+#: templates/crm/add_edit_counterparty.html:255
+msgid "Invalid"
+msgstr "Недійсний"
+
+#: templates/crm/add_edit_counterparty.html:256
+msgid "Enriching data..."
+msgstr "Збагачення даних..."
+
+#: templates/crm/add_edit_counterparty.html:257
+msgid "Enrichment complete!"
+msgstr "Збагачення завершено!"
+
+#: templates/crm/add_edit_counterparty.html:258
+msgid "Saving..."
+msgstr "Збереження..."
+
+#: templates/crm/add_edit_counterparty.html:259
+msgid "Updating..."
+msgstr "Оновлення..."
+
+#: templates/crm/add_edit_counterparty.html:261
+#: templates/pentesting/scanner.html:527 templates/phoneintel/analyze.html:56
+msgid "Network error occurred"
+msgstr "Сталася помилка мережі"
+
+#: templates/crm/add_edit_counterparty.html:262
+msgid "Ask me anything about company data!"
+msgstr "Запитайте мене про будь-що щодо даних компанії!"
+
+#: templates/crm/add_edit_counterparty.html:263
+msgid "Thinking..."
+msgstr "Думаю..."
+
+#: templates/crm/add_edit_counterparty.html:273
+msgid "Please enter both VAT number and country"
+msgstr "Будь ласка, введіть номер ПДВ та країну"
+
+#: templates/crm/add_edit_counterparty.html:305
+msgid "Could not validate VAT number"
+msgstr "Не вдалося перевірити номер ПДВ"
+
+#: templates/crm/add_edit_counterparty.html:360
+msgid "No additional data found"
+msgstr "Додаткові дані не знайдено"
+
+#: templates/crm/counterparty_details.html:3
+msgid "Details"
+msgstr "Деталі"
+
+#: templates/crm/counterparty_details.html:22
+msgid "Back to List"
+msgstr "Повернутися до списку"
+
+#: templates/crm/counterparty_details.html:25
+msgid "Edit"
+msgstr "Редагувати"
+
+#: templates/crm/counterparty_details.html:28
+#: templates/crm/counterparty_details.html:423
+#: templates/crm/counterparty_details.html:431
+msgid "Delete"
+msgstr "Видалити"
+
+#: templates/crm/counterparty_details.html:40
+msgid "Company Data"
+msgstr "Дані компанії"
+
+#: templates/crm/counterparty_details.html:103
+msgid "Monitoring Status"
+msgstr "Статус моніторингу"
+
+#: templates/crm/counterparty_details.html:112
+msgid "Monitoring Active"
+msgstr "Моніторинг активний"
+
+#: templates/crm/counterparty_details.html:116
+msgid "Monitoring Inactive"
+msgstr "Моніторинг неактивний"
+
+#: templates/crm/counterparty_details.html:123
+msgid "Deactivate"
+msgstr "Деактивувати"
+
+#: templates/crm/counterparty_details.html:127
+msgid "Activate"
+msgstr "Активувати"
+
+#: templates/crm/counterparty_details.html:138
+msgid "Total Checks"
+msgstr "Загальна кількість перевірок"
+
+#: templates/crm/counterparty_details.html:142
+msgid "Successful"
+msgstr "Успішно"
+
+#: templates/crm/counterparty_details.html:146
+#: templates/crm/counterparty_details.html:201
+msgid "Alerts"
+msgstr "Сповіщення"
+
+#: templates/crm/counterparty_details.html:152
+msgid "Last Check"
+msgstr "Остання перевірка"
+
+#: templates/crm/counterparty_details.html:153
+msgid "Overall Status"
+msgstr "Загальний статус"
+
+#: templates/crm/counterparty_details.html:157
+#: templates/crm/counterparty_details.html:281
+msgid "Warning"
+msgstr "Попередження"
+
+#: templates/crm/counterparty_details.html:159
+#: templates/crm/counterparty_details.html:283
+msgid "Problem"
+msgstr "Проблема"
+
+#: templates/crm/counterparty_details.html:164
+msgid "This counterparty has not been checked yet"
+msgstr "Цей контрагент ще не перевірявся"
+
+#: templates/crm/counterparty_details.html:166
+msgid "Check Now"
+msgstr "Перевірити зараз"
+
+#: templates/crm/counterparty_details.html:176
+msgid "Quick Actions"
+msgstr "Швидкі дії"
+
+#: templates/crm/counterparty_details.html:181
+msgid "Start New Check"
+msgstr "Почати нову перевірку"
+
+#: templates/crm/counterparty_details.html:184
+msgid "Export Data"
+msgstr "Експортувати дані"
+
+#: templates/crm/counterparty_details.html:187
+msgid "View Timeline"
+msgstr "Переглянути часову шкалу"
+
+#: templates/crm/counterparty_details.html:208
+msgid "Priority"
+msgstr "Пріоритет"
+
+#: templates/crm/counterparty_details.html:209
+msgid "Type"
+msgstr "Тип"
+
+#: templates/crm/counterparty_details.html:210
+msgid "Message"
+msgstr "Повідомлення"
+
+#: templates/crm/counterparty_details.html:220
+msgid "Critical"
+msgstr "Критичний"
+
+#: templates/crm/counterparty_details.html:222
+msgid "High"
+msgstr "Високий"
+
+#: templates/crm/counterparty_details.html:224
+msgid "Medium"
+msgstr "Середній"
+
+#: templates/crm/counterparty_details.html:226
+msgid "Low"
+msgstr "Низький"
+
+#: templates/crm/counterparty_details.html:239
+msgid "Pending"
+msgstr "Очікує"
+
+#: templates/crm/counterparty_details.html:259
+msgid "Verification History"
+msgstr "Історія перевірок"
+
+#: templates/crm/counterparty_details.html:274
+msgid "Monitoring"
+msgstr "Моніторинг"
+
+#: templates/crm/counterparty_details.html:331
+msgid "No verification history available"
+msgstr "Історія перевірок недоступна"
+
+#: templates/crm/counterparty_details.html:350
+msgid "Monitoring activated!"
+msgstr "Моніторинг активовано!"
+
+#: templates/crm/counterparty_details.html:350
+msgid "Monitoring deactivated!"
+msgstr "Моніторинг деактивовано!"
+
+#: templates/crm/counterparty_details.html:359
+msgid "Do you want to start a new check? This may take several minutes."
+msgstr "Бажаєте розпочати нову перевірку? Це може зайняти кілька хвилин."
+
+#: templates/crm/counterparty_details.html:360
+msgid ""
+"Check is starting... (This function must still be connected to the "
+"verification system)"
+msgstr ""
+"Перевірка починається... (Цю функцію ще потрібно підключити до системи "
+"перевірки)"
+
+#: templates/crm/counterparty_details.html:366 templates/crm/index.html:295
+msgid "Edit function coming soon..."
+msgstr "Функція редагування скоро з'явиться..."
+
+#: templates/crm/counterparty_details.html:375 templates/crm/index.html:296
+msgid "WARNING: PERMANENT DELETION"
+msgstr "ПОПЕРЕДЖЕННЯ: ПОСТІЙНЕ ВИДАЛЕННЯ"
+
+#: templates/crm/counterparty_details.html:376
+#: templates/crm/counterparty_details.html:417
+msgid "Counterparty"
+msgstr "Контрагент"
+
+#: templates/crm/counterparty_details.html:379
+msgid "This will permanently delete"
+msgstr "Це назавжди видалить"
+
+#: templates/crm/counterparty_details.html:380
+msgid "verification history entries"
+msgstr "записи історії перевірок"
+
+#: templates/crm/counterparty_details.html:381
+msgid "All associated check results"
+msgstr "Всі пов'язані результати перевірок"
+
+#: templates/crm/counterparty_details.html:382
+msgid "alert(s) and notifications"
+msgstr "сповіщення та повідомлення"
+
+#: templates/crm/counterparty_details.html:383 templates/crm/index.html:303
+msgid "This action CANNOT be undone!"
+msgstr "Цю дію НЕ МОЖНА буде скасувати!"
+
+#: templates/crm/counterparty_details.html:384
+msgid "Are you ABSOLUTELY sure?"
+msgstr "Ви АБСОЛЮТНО впевнені?"
+
+#: templates/crm/counterparty_details.html:392
+msgid "Final confirmation!"
+msgstr "Остаточне підтвердження!"
+
+#: templates/crm/counterparty_details.html:393
+msgid "Enter the company name exactly to confirm"
+msgstr "Введіть назву компанії точно для підтвердження"
+
+#: templates/crm/counterparty_details.html:399
+msgid "Action cancelled. Company name does not match."
+msgstr "Дію скасовано. Назва компанії не співпадає."
+
+#: templates/crm/counterparty_details.html:399
+msgid "The counterparty was NOT deleted."
+msgstr "Контрагента НЕ було видалено."
+
+#: templates/crm/counterparty_details.html:407
+msgid "Deleting..."
+msgstr "Видаляю..."
+
+#: templates/crm/counterparty_details.html:417
+msgid "was successfully deleted!"
+msgstr "було успішно видалено!"
+
+#: templates/crm/counterparty_details.html:420 templates/crm/index.html:305
+msgid "Error deleting"
+msgstr "Помилка видалення"
+
+#: templates/crm/counterparty_details.html:437
+msgid "Export function coming soon..."
+msgstr "Функція експорту скоро з'явиться..."
+
+#: templates/crm/counterparty_details.html:442
+#, fuzzy
+msgid "Timeline view coming soon..."
+msgstr "Функція редагування скоро з'явиться..."
+
+#: templates/crm/index.html:3
+#, fuzzy
+msgid "CRM - Counterparty Monitoring"
+msgstr "CRM - Моніторинг контрагентів"
+
+#: templates/crm/index.html:10
+#, fuzzy
+msgid "CRM - Counterparty Management"
+msgstr "CRM - Управління контрагентами"
+
+#: templates/crm/index.html:11
+msgid "Manage your counterparties and automatically monitor their status"
+msgstr ""
+
+#: templates/crm/index.html:21
+#, fuzzy
+msgid "Total Counterparties"
+msgstr "Додати контрагента"
+
+#: templates/crm/index.html:29
+#, fuzzy
+msgid "Actively Monitored"
+msgstr "Активні правила"
+
+#: templates/crm/index.html:37
+#, fuzzy
+msgid "New Alerts"
+msgstr "Нові сповіщення"
+
+#: templates/crm/index.html:45
+msgid "Add New"
+msgstr ""
+
+#: templates/crm/index.html:48
+msgid "Find Duplicates"
+msgstr ""
+
+#: templates/crm/index.html:293
+msgid "Counterparty successfully added!"
+msgstr "Контрагента успішно додано!"
+
+#: templates/crm/index.html:297
+msgid "Do you want to delete"
+msgstr "Ви хочете видалити"
+
+#: templates/crm/index.html:298
+msgid "permanently?"
+msgstr "постійно?"
+
+#: templates/crm/index.html:299
+msgid "This will also delete:"
+msgstr "Це також видалить:"
+
+#: templates/crm/index.html:300
+msgid "• All verification histories"
+msgstr "• Всі історії перевірок"
+
+#: templates/crm/index.html:301
+msgid "• All verification results"
+msgstr "• Всі результати перевірок"
+
+#: templates/crm/index.html:302
+msgid "• All alerts and notifications"
+msgstr "• Всі сповіщення та повідомлення"
+
+#: templates/crm/index.html:304
+msgid "Counterparty successfully deleted!"
+msgstr "Контрагента успішно видалено!"
+
+#: templates/crm/index.html:307
+msgid "this counterparty"
+msgstr "цього контрагента"
+
+#: templates/crm/index.html:308
+msgid "Do you really want to delete"
+msgstr "Ви дійсно хочете видалити"
+
+#: templates/crm/index.html:309
+msgid "This will delete:"
+msgstr "Це видалить:"
+
+#: templates/crm/index.html:310
+msgid "• Verification histories"
+msgstr "• Історії перевірок"
+
+#: templates/crm/index.html:311
+msgid "• Verification results"
+msgstr "• Результати перевірок"
+
+#: templates/crm/index.html:312
+msgid "• Alerts and notifications"
+msgstr "• Сповіщення та повідомлення"
+
+#: templates/crm/index.html:313
+#, fuzzy
+msgid "This action cannot be undone!"
+msgstr "Цю дію НЕ МОЖНА буде скасувати!"
+
+#: templates/legal/agb.html:249
+msgid "Privacy Policy"
+msgstr ""
+
+#: templates/legal/datenschutz.html:176
+msgid "GDPR Request Form"
+msgstr ""
+
+#: templates/legal/delete_account.html:170
+#, fuzzy
+msgid "Are you ABSOLUTELY sure? This action cannot be undone!"
+msgstr "Цю дію НЕ МОЖНА буде скасувати!"
+
+#: templates/mailguard/dashboard.html:3
+msgid "MailGuard Dashboard - Email Intelligence"
+msgstr "Панель MailGuard - Інтелект електронної пошти"
+
+#: templates/mailguard/dashboard.html:10
+msgid "MailGuard Dashboard"
+msgstr "Панель MailGuard"
+
+#: templates/mailguard/dashboard.html:11
+msgid "Email Intelligence & Security"
+msgstr "Інтелект електронної пошти та безпека"
+
+#: templates/mailguard/dashboard.html:22
+msgid "Connected Accounts"
+msgstr "Підключені облікові записи"
+
+#: templates/mailguard/dashboard.html:30
+msgid "Active Rules"
+msgstr "Активні правила"
+
+#: templates/mailguard/dashboard.html:38
+msgid "Messages Today"
+msgstr "Повідомлень сьогодні"
+
+#: templates/mailguard/dashboard.html:46 templates/mailguard/dashboard.html:128
+msgid "Pending Approvals"
+msgstr "Очікують схвалення"
+
+#: templates/mailguard/dashboard.html:58
+msgid "Email Accounts"
+msgstr "Облікові записи електронної пошти"
+
+#: templates/mailguard/dashboard.html:61
+#, fuzzy
+msgid "Add Email Account"
+msgstr "Облікові записи електронної пошти"
+
+#: templates/mailguard/dashboard.html:71
+msgid "Provider"
+msgstr "Провайдер"
+
+#: templates/mailguard/dashboard.html:73
+msgid "Last Sync"
+msgstr "Остання синхронізація"
+
+#: templates/mailguard/dashboard.html:74 templates/mailguard/dashboard.html:138
+msgid "Actions"
+msgstr "Дії"
+
+#: templates/mailguard/dashboard.html:85
+msgid "Gmail"
+msgstr "Gmail"
+
+#: templates/mailguard/dashboard.html:87
+msgid "Microsoft 365"
+msgstr "Microsoft 365"
+
+#: templates/mailguard/dashboard.html:89
+msgid "IMAP"
+msgstr "IMAP"
+
+#: templates/mailguard/dashboard.html:99
+msgid "Never"
+msgstr "Ніколи"
+
+#: templates/mailguard/dashboard.html:114
+msgid "No email accounts configured yet."
+msgstr "Облікові записи електронної пошти ще не налаштовані."
+
+#: templates/mailguard/dashboard.html:114
+msgid "Add your first email account to get started."
+msgstr "Додайте свій перший обліковий запис електронної пошти, щоб почати."
+
+#: templates/mailguard/dashboard.html:134
+msgid "From"
+msgstr "Від"
+
+#: templates/mailguard/dashboard.html:135
+msgid "Subject"
+msgstr "Тема"
+
+#: templates/mailguard/dashboard.html:136
+msgid "Draft Reply"
+msgstr "Чернетка відповіді"
+
+#: templates/mailguard/dashboard.html:157
+msgid "View Details"
+msgstr "Переглянути деталі"
+
+#: templates/mailguard/dashboard.html:160
+msgid "Approve"
+msgstr "Схвалити"
+
+#: templates/mailguard/dashboard.html:165
+msgid "Reject"
+msgstr "Відхилити"
+
+#: templates/mailguard/dashboard.html:184
+msgid "Are you sure you want to disconnect this email account?"
+msgstr "Ви впевнені, що хочете відключити цей обліковий запис електронної пошти?"
+
+#: templates/mailguard/dashboard.html:185
+msgid "Are you sure you want to delete this rule?"
+msgstr "Ви впевнені, що хочете видалити це правило?"
+
+#: templates/mailguard/dashboard.html:186
+msgid "Reject this draft reply?"
+msgstr "Відхилити цей чернетковий відповідь?"
+
+#: templates/mailguard/dashboard.html:187
+msgid "Account details coming soon"
+msgstr ""
+
+#: templates/payments/pricing.html:3
+msgid "Pricing - VAT Verification System"
+msgstr "Ціни - Система перевірки ПДВ"
+
+#: templates/payments/pricing.html:43
+msgid "Choose Your Plan"
+msgstr "Оберіть свій план"
+
+#: templates/payments/pricing.html:44
+msgid "Transparent pricing. No hidden fees. Cancel anytime."
+msgstr "Прозорі ціни. Без прихованих платежів. Скасуйте в будь-який час."
+
+#: templates/payments/pricing.html:54
+msgid "Most Popular"
+msgstr "Найпопулярніший"
+
+#: templates/payments/pricing.html:72
+msgid "verifications"
+msgstr "перевірок"
+
+#: templates/payments/pricing.html:74
+msgid "verifications/month"
+msgstr "перевірок/місяць"
+
+#: templates/payments/pricing.html:94
+msgid "Current Plan"
+msgstr "Поточний план"
+
+#: templates/payments/pricing.html:124
+msgid "Frequently Asked Questions"
+msgstr "Часті запитання"
+
+#: templates/payments/pricing.html:133
+msgid "Can I cancel anytime?"
+msgstr "Чи можу я скасувати в будь-який час?"
+
+#: templates/payments/pricing.html:138
+msgid ""
+"Yes, you can cancel your subscription at any time without notice. There "
+"are no long-term commitments."
+msgstr ""
+"Так, ви можете скасувати підписку в будь-який час без попередження. Немає"
+" довгострокових зобов'язань."
+
+#: templates/payments/pricing.html:147
+msgid "What happens if I exceed my limit?"
+msgstr "Що станеться, якщо я перевищу ліміт?"
+
+#: templates/payments/pricing.html:152
+msgid ""
+"With the free plan, no further verifications will be possible until the "
+"next month begins. With paid plans, you can upgrade at any time to "
+"perform more verifications."
+msgstr ""
+"З безкоштовним планом подальші перевірки будуть неможливі до початку "
+"наступного місяця. З платними планами ви можете оновити в будь-який час "
+"для проведення додаткових перевірок."
+
+#: templates/payments/pricing.html:161
+msgid "What payment methods do you accept?"
+msgstr "Які способи оплати ви приймаєте?"
+
+#: templates/payments/pricing.html:166
+msgid ""
+"We accept all major credit cards (Visa, Mastercard, American Express) as "
+"well as SEPA direct debit through our secure payment provider Stripe."
+msgstr ""
+"Ми приймаємо всі основні кредитні картки (Visa, Mastercard, American "
+"Express), а також SEPA прямий дебет через нашого безпечного постачальника"
+" платежів Stripe."
+
+#: templates/payments/pricing.html:175
+msgid "Can I switch between plans?"
+msgstr "Чи можу я перемикатися між планами?"
+
+#: templates/payments/pricing.html:180
+msgid ""
+"Yes, you can upgrade or downgrade at any time. When upgrading, you get "
+"immediate access to additional features. When downgrading, changes take "
+"effect at the end of the current billing period."
+msgstr ""
+"Так, ви можете оновити або понизити план у будь-який час. При оновленні "
+"ви отримуєте негайний доступ до додаткових функцій. При пониженні зміни "
+"набувають чинності в кінці поточного розрахункового періоду."
+
+#: templates/payments/pricing.html:189
+msgid "Is there a money-back guarantee?"
+msgstr "Чи є гарантія повернення грошей?"
+
+#: templates/payments/pricing.html:194
+msgid ""
+"Yes, we offer a 14-day money-back guarantee for all paid plans. If you "
+"are not satisfied, we will refund you the full amount."
+msgstr ""
+"Так, ми пропонуємо 14-денну гарантію повернення грошей для всіх платних "
+"планів. Якщо ви не задоволені, ми повернемо вам повну суму."
+
+#: templates/payments/pricing.html:203
+msgid "Do you need a custom solution?"
+msgstr "Вам потрібне індивідуальне рішення?"
+
+#: templates/payments/pricing.html:208
+msgid ""
+"For companies with special requirements, we offer customized Enterprise "
+"solutions. Contact us at"
+msgstr ""
+"Для компаній з особливими вимогами ми пропонуємо індивідуальні рішення "
+"Enterprise. Зв'яжіться з нами за адресою"
+
+#: templates/payments/pricing.html:208
+msgid "for a custom quote."
+msgstr "для індивідуальної пропозиції."
+
+#: templates/payments/pricing.html:221
+msgid "Trusted by over 500 companies in Europe"
+msgstr "Довіряють понад 500 компаніям в Європі"
+
+#: templates/payments/pricing.html:224
+msgid "SSL encrypted"
+msgstr "SSL зашифровано"
+
+#: templates/payments/pricing.html:227
+msgid "GDPR compliant"
+msgstr "Відповідно до GDPR"
+
+#: templates/payments/pricing.html:230
+msgid "Stripe secured"
+msgstr "Захищено Stripe"
+
+#: templates/payments/pricing.html:239
+msgid "Still have questions?"
+msgstr "Ще маєте запитання?"
+
+#: templates/payments/pricing.html:240
+msgid "Our support team is here to help."
+msgstr "Наша команда підтримки готова допомогти."
+
+#: templates/payments/pricing.html:242
+msgid "Contact us"
+msgstr "Зв'яжіться з нами"
+
+#: templates/pentesting/scanner.html:3
+msgid "Website Security Scanner - Pentesting"
+msgstr "Сканер безпеки сайтів - Пентестинг"
+
+#: templates/pentesting/scanner.html:10
+msgid "Website Security Scanner"
+msgstr "Сканер безпеки сайтів"
+
+#: templates/pentesting/scanner.html:12
+msgid "Comprehensive website vulnerability assessment with AI-powered insights"
+msgstr "Комплексна оцінка вразливостей веб-сайтів з AI-powered інсайтами"
+
+#: templates/pentesting/scanner.html:16
+msgid "⚠️ This feature is only available for PRO and ENTERPRISE users"
+msgstr "⚠️ Ця функція доступна тільки для користувачів PRO та ENTERPRISE"
+
+#: templates/pentesting/scanner.html:17
+msgid "Upgrade now to protect your website"
+msgstr "Оновіть зараз, щоб захистити свій веб-сайт"
+
+#: templates/pentesting/scanner.html:18
+msgid "Upgrade Now"
+msgstr "Оновити зараз"
+
+#: templates/pentesting/scanner.html:24
+msgid "Enter Website URL:"
+msgstr "Введіть URL веб-сайту:"
+
+#: templates/pentesting/scanner.html:29
+msgid "e.g. example.com or https://example.com"
+msgstr "наприклад, example.com або https://example.com"
+
+#: templates/pentesting/scanner.html:46
+msgid "AI-Powered Analysis with Recommendations"
+msgstr "AI-powered аналіз з рекомендаціями"
+
+#: templates/pentesting/scanner.html:525
+msgid "Scan Complete"
+msgstr "Сканування завершено"
+
+#: templates/pentesting/scanner.html:528 templates/phoneintel/analyze.html:55
+msgid "Analysis failed"
+msgstr "Аналіз не вдався"
+
+#: templates/phoneintel/analyze.html:14
+msgid ""
+"Analyze phone numbers for carrier information, line type, and risk "
+"assessment. No personal data is stored."
+msgstr ""
+"Аналізуйте номери телефонів для отримання інформації про оператора, типу "
+"лінії та оцінки ризику. Особисті дані не зберігаються."
+
+#: templates/phoneintel/analyze.html:19
+msgid "Phone Number"
+msgstr "Номер телефону"
+
+#: templates/phoneintel/analyze.html:23
+msgid "Country Hint (ISO2)"
+msgstr "Підказка країни (ISO2)"
+
+#: templates/phoneintel/analyze.html:28
+msgid "Analyze"
+msgstr "Аналізувати"
+
+#: templates/phoneintel/analyze.html:33
+msgid "Analysis Results"
+msgstr "Результати аналізу"
+
+#: templates/phoneintel/analyze.html:44
+msgid "Analyzing..."
+msgstr "Аналізується..."
+
+#: templates/phoneintel/analyze.html:45
+msgid "Basic Information"
+msgstr "Основна інформація"
+
+#: templates/phoneintel/analyze.html:47
+msgid "Carrier"
+msgstr "Оператор"
+
+#: templates/phoneintel/analyze.html:48
+msgid "Line Type"
+msgstr "Тип лінії"
+
+#: templates/phoneintel/analyze.html:49
+msgid "Risk Assessment"
+msgstr "Оцінка ризику"
+
+#: templates/phoneintel/analyze.html:50
+msgid "Risk Score"
+msgstr "Рівень ризику"
+
+#: templates/phoneintel/analyze.html:52
+msgid "Disposable"
+msgstr "Одноразовий"
+
+#: templates/phoneintel/analyze.html:53
+msgid "Seen in Scam DB"
+msgstr "Знайдено в базі шахраїв"
+
+#: templates/phoneintel/analyze.html:54
+msgid "Suspicious Patterns"
+msgstr "Підозрілі патерни"
+
+#: templates/phoneintel/analyze.html:57
+msgid "Unknown"
+msgstr "Невідомо"
+
+#: templates/phoneintel/analyze.html:58
+msgid "Yes"
+msgstr "Так"
+
+#: templates/phoneintel/analyze.html:59
+msgid "No"
+msgstr "Ні"
+
+#~ msgid "E-Mail-Konto hinzufügen"
+#~ msgstr "Додати обліковий запис електронної пошти"
+
+#~ msgid "Sync Now"
+#~ msgstr "Синхронізувати зараз"
+
+#~ msgid "Configure"
+#~ msgstr "Налаштувати"
+
+#~ msgid "Processing Rules"
+#~ msgstr "Правила обробки"
+
+#~ msgid "Create New Rule"
+#~ msgstr "Створити нове правило"
+
+#~ msgid "Name"
+#~ msgstr "Назва"
+
+#~ msgid "Enabled"
+#~ msgstr "Увімкнено"
+
+#~ msgid "No rules configured yet."
+#~ msgstr "Правила ще не налаштовані."
+
+#~ msgid "Create rules to automatically process your emails."
+#~ msgstr "Створіть правила для автоматичної обробки електронних листів."
+
+#~ msgid "Recent Activity"
+#~ msgstr "Недавня активність"
+
+#~ msgid "Received"
+#~ msgstr "Отримано"
+
+#~ msgid "Security Status"
+#~ msgstr "Статус безпеки"
+
+#~ msgid "No recent messages."
+#~ msgstr "Немає недавніх повідомлень."
+
+#~ msgid "Messages will appear here once you connect email accounts."
+#~ msgstr ""
+#~ "Повідомлення з'являться тут після підключення"
+#~ " облікових записів електронної пошти."
+
+#~ msgid ""
+#~ "Verwalten Sie Ihre Kontrahenten und "
+#~ "überwachen Sie automatisch deren Status"
+#~ msgstr "Керуйте своїми контрагентами та автоматично стежте за їх статусом"
+
+#~ msgid "Gesamt Kontrahenten"
+#~ msgstr "Всього контрагентів"
+
+#~ msgid "Aktiv Überwacht"
+#~ msgstr "Активно відстежується"
+
+#~ msgid "Neu Hinzufügen"
+#~ msgstr "Додати нового"
+
+#~ msgid "Duplikate finden"
+#~ msgstr "Знайти дублікати"
+
+#~ msgid ""
+#~ "Passive Datensammlung über Domain, Website "
+#~ "oder E-Mail des Kontrahenten."
+#~ msgstr ""
+#~ "Пасивний збір даних про домен, веб-сайт"
+#~ " або електронну пошту контрагента."
+
+#~ msgid ""
+#~ "Vollständige URL der Website für die "
+#~ "Analyse von Headers und sozialen Medien."
+#~ msgstr "Повна URL веб-сайту для аналізу заголовків та соціальних мереж."
+
+#~ msgid "Primäre Domain des Unternehmens für WHOIS-, DNS- und SSL-Überprüfungen."
+#~ msgstr "Основний домен компанії для перевірок WHOIS, DNS та SSL."
+
+#~ msgid "E-Mail (optional)"
+#~ msgstr "Електронна пошта (необов'язково)"
+
+#~ msgid "E-Mail für grundlegende Format-Validierung."
+#~ msgstr "Електронна пошта для базової перевірки формату."
+
+#~ msgid "Scan starten"
+#~ msgstr "Почати сканування"
+
+#~ msgid "Wird gescannt..."
+#~ msgstr "Сканується..."
+
+#~ msgid "Do you really want to change the user status?"
+#~ msgstr "Ви дійсно хочете змінити статус користувача?"
+
+#~ msgid "Error changing user status."
+#~ msgstr "Помилка зміни статусу користувача."
+
+#~ msgid "Do you really want to change the admin rights?"
+#~ msgstr "Ви дійсно хочете змінити права адміністратора?"
+
+#~ msgid "Error changing admin rights."
+#~ msgstr "Помилка зміни прав адміністратора."
+
+#~ msgid "Impressum - VAT Verification System"
+#~ msgstr "Імпресум - Система перевірки ПДВ"
+
+#~ msgid "Impressum"
+#~ msgstr "Імпресум"
+
+#~ msgid "Angaben gemäß § 5 TMG (Telemediengesetz)"
+#~ msgstr "Відомості відповідно до § 5 TMG (Закон про телемедіа)"
+
+#~ msgid "Anbieter"
+#~ msgstr "Постачальник"
+
+#~ msgid "Kontakt"
+#~ msgstr "Контакт"
+
+#~ msgid "E-Mail:"
+#~ msgstr "E-Mail:"
+
+#~ msgid "Telefon:"
+#~ msgstr "Телефон:"
+
+#~ msgid "Umsatzsteuer-Identifikationsnummer"
+#~ msgstr "Ідентифікаційний номер платника ПДВ"
+
+#~ msgid "USt-IdNr.:"
+#~ msgstr "ІПН:"
+
+#~ msgid "Gemäß § 27 a Umsatzsteuergesetz"
+#~ msgstr "Відповідно до § 27 a Закону про податок на додану вартість"
+
+#~ msgid "Verantwortlich für den Inhalt"
+#~ msgstr "Відповідальний за зміст"
+
+#~ msgid "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:"
+#~ msgstr "Відповідальний за зміст відповідно до § 55 абз. 2 RStV:"
+
+#~ msgid "Streitschlichtung"
+#~ msgstr "Вирішення спорів"
+
+#~ msgid ""
+#~ "Die Europäische Kommission stellt eine "
+#~ "Plattform zur Online-Streitbeilegung (OS) "
+#~ "bereit:"
+#~ msgstr "Європейська комісія надає платформу для онлайн-вирішення спорів (OS):"
+
+#~ msgid ""
+#~ "Wir sind nicht bereit oder verpflichtet,"
+#~ " an Streitbeilegungsverfahren vor einer "
+#~ "Verbraucherschlichtungsstelle teilzunehmen."
+#~ msgstr ""
+#~ "Ми не готові або зобов'язані брати "
+#~ "участь у процедурах вирішення спорів "
+#~ "перед споживчим арбітражем."
+
+#~ msgid "Haftung für Inhalte"
+#~ msgstr "Відповідальність за зміст"
+
+#~ msgid ""
+#~ "Als Diensteanbieter sind wir gemäß § "
+#~ "7 Abs.1 TMG für eigene Inhalte auf"
+#~ " diesen Seiten nach den allgemeinen "
+#~ "Gesetzen verantwortlich. Nach §§ 8 bis"
+#~ " 10 TMG sind wir als Diensteanbieter"
+#~ " jedoch nicht verpflichtet, übermittelte "
+#~ "oder gespeicherte fremde Informationen zu "
+#~ "überwachen oder nach Umständen zu "
+#~ "forschen, die auf eine rechtswidrige "
+#~ "Tätigkeit hinweisen."
+#~ msgstr ""
+#~ "Як постачальник послуг, ми відповідно до"
+#~ " § 7 абз.1 TMG несемо "
+#~ "відповідальність за власний зміст на цих"
+#~ " сторінках відповідно до загальних законів."
+#~ " Згідно з §§ 8-10 TMG, як "
+#~ "постачальник послуг, ми не зобов'язані "
+#~ "контролювати передані або збережені сторонні"
+#~ " відомості або досліджувати обставини, які"
+#~ " вказують на незаконну діяльність."
+
+#~ msgid ""
+#~ "Verpflichtungen zur Entfernung oder Sperrung"
+#~ " der Nutzung von Informationen nach "
+#~ "den allgemeinen Gesetzen bleiben hiervon "
+#~ "unberührt. Eine diesbezügliche Haftung ist "
+#~ "jedoch erst ab dem Zeitpunkt der "
+#~ "Kenntnis einer konkreten Rechtsverletzung "
+#~ "möglich. Bei Bekanntwerden von entsprechenden"
+#~ " Rechtsverletzungen werden wir diese "
+#~ "Inhalte umgehend entfernen."
+#~ msgstr ""
+#~ "Зобов'язання щодо видалення або блокування "
+#~ "використання інформації відповідно до "
+#~ "загальних законів залишаються незмінними. "
+#~ "Однак відповідальність у цьому відношенні "
+#~ "можлива лише з моменту отримання знань"
+#~ " про конкретне порушення прав. При "
+#~ "виявленні відповідних порушень прав ми "
+#~ "негайно видалимо цей зміст."
+
+#~ msgid "Haftung für Links"
+#~ msgstr "Відповідальність за посилання"
+
+#~ msgid ""
+#~ "Unser Angebot enthält Links zu externen"
+#~ " Websites Dritter, auf deren Inhalte "
+#~ "wir keinen Einfluss haben. Deshalb "
+#~ "können wir für diese fremden Inhalte "
+#~ "auch keine Gewähr übernehmen. Für die"
+#~ " Inhalte der verlinkten Seiten ist "
+#~ "stets der jeweilige Anbieter oder "
+#~ "Betreiber der Seiten verantwortlich. Die "
+#~ "verlinkten Seiten wurden zum Zeitpunkt "
+#~ "der Verlinkung auf mögliche Rechtsverstöße "
+#~ "überprüft. Rechtswidrige Inhalte waren zum "
+#~ "Zeitpunkt der Verlinkung nicht erkennbar."
+#~ msgstr ""
+#~ "Наша пропозиція містить посилання на "
+#~ "зовнішні веб-сайти третіх сторін, на "
+#~ "зміст яких ми не маємо впливу. "
+#~ "Тому ми не можемо гарантувати за "
+#~ "цей сторонній зміст. За зміст пов'язаних"
+#~ " сторін завжди відповідає відповідний "
+#~ "постачальник або оператор сторін. Пов'язані"
+#~ " сторінки були перевірені на можливі "
+#~ "порушення прав на момент створення "
+#~ "посилання. Незаконний зміст не був "
+#~ "видимим на момент створення посилання."
+
+#~ msgid ""
+#~ "Eine permanente inhaltliche Kontrolle der "
+#~ "verlinkten Seiten ist jedoch ohne "
+#~ "konkrete Anhaltspunkte einer Rechtsverletzung "
+#~ "nicht zumutbar. Bei Bekanntwerden von "
+#~ "Rechtsverletzungen werden wir derartige Links"
+#~ " umgehend entfernen."
+#~ msgstr ""
+#~ "Однак постійний змістовний контроль пов'язаних"
+#~ " сторін не є можливим без конкретних"
+#~ " ознак порушення прав. При виявленні "
+#~ "порушень прав ми негайно видалимо такі"
+#~ " посилання."
+
+#~ msgid "Urheberrecht"
+#~ msgstr "Авторське право"
+
+#~ msgid ""
+#~ "Die durch die Seitenbetreiber erstellten "
+#~ "Inhalte und Werke auf diesen Seiten "
+#~ "unterliegen dem deutschen Urheberrecht. Die"
+#~ " Vervielfältigung, Bearbeitung, Verbreitung und"
+#~ " jede Art der Verwertung außerhalb "
+#~ "der Grenzen des Urheberrechtes bedürfen "
+#~ "der schriftlichen Zustimmung des jeweiligen"
+#~ " Autors bzw. Erstellers. Downloads und "
+#~ "Kopien dieser Seite sind nur für "
+#~ "den privaten, nicht kommerziellen Gebrauch "
+#~ "gestattet."
+#~ msgstr ""
+#~ "Зміст і твори, створені операторами "
+#~ "сторін на цих сторінках, підпадають під"
+#~ " німецьке авторське право. Розмноження, "
+#~ "обробка, розповсюдження та будь-який вид "
+#~ "використання поза межами авторського права "
+#~ "потребують письмової згоди відповідного автора"
+#~ " або творця. Завантаження та копії "
+#~ "цієї сторінки дозволені лише для "
+#~ "приватного, некомерційного використання."
+
+#~ msgid ""
+#~ "Soweit die Inhalte auf dieser Seite "
+#~ "nicht vom Betreiber erstellt wurden, "
+#~ "werden die Urheberrechte Dritter beachtet. "
+#~ "Insbesondere werden Inhalte Dritter als "
+#~ "solche gekennzeichnet. Sollten Sie trotzdem"
+#~ " auf eine Urheberrechtsverletzung aufmerksam "
+#~ "werden, bitten wir um einen "
+#~ "entsprechenden Hinweis. Bei Bekanntwerden von"
+#~ " Rechtsverletzungen werden wir derartige "
+#~ "Inhalte umgehend entfernen."
+#~ msgstr ""
+#~ "Оскільки зміст на цій сторінці не "
+#~ "створений оператором, дотримуються авторські "
+#~ "права третіх сторін. Зокрема, зміст "
+#~ "третіх сторін позначається як такий. "
+#~ "Якщо ви все ж помітите порушення "
+#~ "авторських прав, ми просимо про "
+#~ "відповідне повідомлення. При виявленні "
+#~ "порушень прав ми негайно видалимо такий"
+#~ " зміст."
+
+#~ msgid "Stand:"
+#~ msgstr "Станом на:"
+
+#~ msgid "AGB - VAT Verification System"
+#~ msgstr "Загальні умови - VAT Verification System"
+
+#~ msgid "Allgemeine Geschäftsbedingungen (AGB)"
+#~ msgstr "Загальні умови договору (ЗУД)"
+
+#~ msgid "Für die Nutzung des VAT Verification Systems"
+#~ msgstr "Для використання системи перевірки VAT"
+
+#~ msgid "§ 1 Geltungsbereich"
+#~ msgstr "§ 1 Сфера дії"
+
+#~ msgid ""
+#~ "(1) Diese Allgemeinen Geschäftsbedingungen "
+#~ "(nachfolgend \"AGB\") gelten für alle "
+#~ "Verträge über die Nutzung des VAT "
+#~ "Verification Systems zwischen AndriiIT "
+#~ "(nachfolgend \"Anbieter\") und dem Nutzer "
+#~ "(nachfolgend \"Kunde\")."
+#~ msgstr ""
+#~ "(1) Ці Загальні умови договору (далі "
+#~ "\"ЗУД\") застосовуються до всіх договорів "
+#~ "про використання системи перевірки VAT "
+#~ "між AndriiIT (далі \"Постачальник\") та "
+#~ "користувачем (далі \"Клієнт\")."
+
+#~ msgid ""
+#~ "(2) Der Anbieter erbringt alle "
+#~ "Leistungen ausschließlich auf der Grundlage"
+#~ " dieser AGB. Abweichende Bedingungen des"
+#~ " Kunden werden nicht anerkannt, es "
+#~ "sei denn, der Anbieter stimmt ihrer "
+#~ "Geltung ausdrücklich schriftlich zu."
+#~ msgstr ""
+#~ "(2) Постачальник надає всі послуги "
+#~ "виключно на основі цих ЗУД. Відмінні "
+#~ "умови клієнта не визнаються, якщо "
+#~ "постачальник явно письмово не погодиться "
+#~ "з їх дією."
+
+#~ msgid "§ 2 Vertragsgegenstand und Leistungsumfang"
+#~ msgstr "§ 2 Предмет договору та обсяг послуг"
+
+#~ msgid ""
+#~ "(1) Der Anbieter stellt dem Kunden "
+#~ "eine webbasierte Plattform zur Verifizierung"
+#~ " von Umsatzsteuer-Identifikationsnummern (USt-"
+#~ "IdNr.) und zur Überprüfung von "
+#~ "Geschäftspartnern zur Verfügung."
+#~ msgstr ""
+#~ "(1) Постачальник надає клієнту веб-платформу"
+#~ " для перевірки ідентифікаційних номерів "
+#~ "платників ПДВ (ІПН) та перевірки ділових"
+#~ " партнерів."
+
+#~ msgid "(2) Die Leistungen umfassen:"
+#~ msgstr "(2) Послуги включають:"
+
+#~ msgid "Abfrage von USt-IdNr. über das VIES-System der EU"
+#~ msgstr "Запит ІПН через систему VIES ЄС"
+
+#~ msgid "Abfrage von Firmendaten aus öffentlichen Registern"
+#~ msgstr "Запит даних компанії з публічних реєстрів"
+
+#~ msgid "Prüfung gegen Sanktionslisten (EU, OFAC, UK)"
+#~ msgstr "Перевірка проти санкційних списків (ЄС, OFAC, Великобританія)"
+
+#~ msgid "Prüfung auf Insolvenzverfahren"
+#~ msgstr "Перевірка на процедури банкрутства"
+
+#~ msgid "Speicherung und Verwaltung der Verifizierungsergebnisse"
+#~ msgstr "Збереження та управління результатами перевірки"
+
+#~ msgid ""
+#~ "(3) Der genaue Leistungsumfang richtet "
+#~ "sich nach dem gewählten Abonnement-Plan"
+#~ " (Free, Starter, Professional, Enterprise)."
+#~ msgstr ""
+#~ "(3) Точний обсяг послуг залежить від "
+#~ "вибраного плану підписки (Безкоштовний, "
+#~ "Початковий, Професійний, Корпоративний)."
+
+#~ msgid ""
+#~ "(4) Der Anbieter ist berechtigt, "
+#~ "Subunternehmer zur Leistungserbringung einzusetzen."
+#~ msgstr "(4) Постачальник має право залучати субпідрядників для надання послуг."
+
+#~ msgid "§ 3 Vertragsschluss und Registrierung"
+#~ msgstr "§ 3 Укладення договору та реєстрація"
+
+#~ msgid ""
+#~ "(1) Der Vertrag kommt durch die "
+#~ "Registrierung des Kunden auf der "
+#~ "Plattform zustande. Mit der Registrierung "
+#~ "gibt der Kunde ein verbindliches Angebot"
+#~ " zum Abschluss eines Nutzungsvertrags ab."
+#~ msgstr ""
+#~ "(1) Договір укладається через реєстрацію "
+#~ "клієнта на платформі. Реєстрацією клієнт "
+#~ "подає обов'язкову пропозицію щодо укладення"
+#~ " договору про використання."
+
+#~ msgid ""
+#~ "(2) Der Anbieter kann das Angebot "
+#~ "durch eine Bestätigungs-E-Mail oder durch "
+#~ "Freischaltung des Zugangs annehmen."
+#~ msgstr ""
+#~ "(2) Постачальник може прийняти пропозицію "
+#~ "через підтверджувальний електронний лист або"
+#~ " через активацію доступу."
+
+#~ msgid ""
+#~ "(3) Der Kunde ist verpflichtet, bei "
+#~ "der Registrierung vollständige und "
+#~ "wahrheitsgemäße Angaben zu machen und "
+#~ "diese aktuell zu halten."
+#~ msgstr ""
+#~ "(3) Клієнт зобов'язаний надавати повну "
+#~ "та правдиву інформацію при реєстрації та"
+#~ " підтримувати її в актуальному стані."
+
+#~ msgid ""
+#~ "(4) Ein Anspruch auf Abschluss eines "
+#~ "Vertrags besteht nicht. Der Anbieter "
+#~ "behält sich das Recht vor, "
+#~ "Registrierungen ohne Angabe von Gründen "
+#~ "abzulehnen."
+#~ msgstr ""
+#~ "(4) Права на укладення договору не "
+#~ "існує. Постачальник залишає за собою "
+#~ "право відхиляти реєстрації без зазначення "
+#~ "причин."
+
+#~ msgid "§ 4 Preise und Zahlungsbedingungen"
+#~ msgstr "§ 4 Ціни та умови оплати"
+
+#~ msgid ""
+#~ "(1) Die Preise für die Nutzung der"
+#~ " Plattform ergeben sich aus der "
+#~ "aktuellen Preisliste auf der Website. "
+#~ "Alle Preise verstehen sich als "
+#~ "Nettopreise zuzüglich der gesetzlichen "
+#~ "Mehrwertsteuer."
+#~ msgstr ""
+#~ "(1) Ціни за використання платформи "
+#~ "визначаються поточним прайс-листом на "
+#~ "веб-сайті. Всі ціни є нетто-цінами плюс"
+#~ " законний ПДВ."
+
+#~ msgid "(2) <strong>Abonnement-Pläne:</strong>"
+#~ msgstr "(2) <strong>Плани підписки:</strong>"
+
+#~ msgid "<strong>Free:</strong> 0 €/Monat - 5 Verifizierungen"
+#~ msgstr "<strong>Безкоштовний:</strong> 0 €/місяць - 5 перевірок"
+
+#~ msgid "<strong>Starter:</strong> 29 €/Monat - 50 Verifizierungen"
+#~ msgstr "<strong>Початковий:</strong> 29 €/місяць - 50 перевірок"
+
+#~ msgid "<strong>Professional:</strong> 79 €/Monat - 200 Verifizierungen"
+#~ msgstr "<strong>Професійний:</strong> 79 €/місяць - 200 перевірок"
+
+#~ msgid "<strong>Enterprise:</strong> 199 €/Monat - Unbegrenzte Verifizierungen"
+#~ msgstr ""
+#~ "<strong>Корпоративний:</strong> 199 €/місяць - "
+#~ "необмежена кількість перевірок"
+
+#~ msgid ""
+#~ "(3) Die Abrechnung erfolgt monatlich im"
+#~ " Voraus. Die Zahlung erfolgt per "
+#~ "Kreditkarte oder anderen auf der "
+#~ "Plattform angebotenen Zahlungsmethoden über "
+#~ "den Zahlungsdienstleister Stripe."
+#~ msgstr ""
+#~ "(3) Розрахунок здійснюється щомісяця авансом."
+#~ " Оплата здійснюється кредитною карткою або"
+#~ " іншими методами оплати, запропонованими на"
+#~ " платформі, через платіжного провайдера "
+#~ "Stripe."
+
+#~ msgid ""
+#~ "(4) Bei Zahlungsverzug ist der Anbieter"
+#~ " berechtigt, den Zugang zur Plattform "
+#~ "zu sperren."
+#~ msgstr ""
+#~ "(4) У разі прострочення платежу "
+#~ "постачальник має право заблокувати доступ "
+#~ "до платформи."
+
+#~ msgid ""
+#~ "(5) Der Anbieter behält sich das "
+#~ "Recht vor, die Preise mit einer "
+#~ "Ankündigungsfrist von 30 Tagen zu "
+#~ "ändern. Bestehende Abonnements bleiben bis "
+#~ "zum Ende der Laufzeit vom bisherigen "
+#~ "Preis erfasst."
+#~ msgstr ""
+#~ "(5) Постачальник залишає за собою право"
+#~ " змінювати ціни з періодом повідомлення "
+#~ "30 днів. Існуючі підписки залишаються за"
+#~ " попередньою ціною до кінця терміну "
+#~ "дії."
+
+#~ msgid "§ 5 Vertragslaufzeit und Kündigung"
+#~ msgstr "§ 5 Термін дії договору та розірвання"
+
+#~ msgid "(1) Der Vertrag wird auf unbestimmte Zeit geschlossen."
+#~ msgstr "(1) Договір укладається на невизначений термін."
+
+#~ msgid ""
+#~ "(2) Der Kunde kann den Vertrag "
+#~ "jederzeit mit sofortiger Wirkung kündigen. "
+#~ "Die Kündigung kann über die Plattform"
+#~ " oder per E-Mail erfolgen."
+#~ msgstr ""
+#~ "(2) Клієнт може розірвати договір у "
+#~ "будь-який час з негайною дією. "
+#~ "Розірвання може здійснюватися через платформу"
+#~ " або електронною поштою."
+
+#~ msgid ""
+#~ "(3) Bereits gezahlte Gebühren werden "
+#~ "nicht erstattet. Bei Kündigung während "
+#~ "eines laufenden Abrechnungszeitraums steht dem"
+#~ " Kunden die Nutzung bis zum Ende "
+#~ "des Abrechnungszeitraums zu."
+#~ msgstr ""
+#~ "(3) Вже сплачені збори не повертаються."
+#~ " При розірванні протягом поточного "
+#~ "розрахункового періоду клієнт має право "
+#~ "на використання до кінця розрахункового "
+#~ "періоду."
+
+#~ msgid ""
+#~ "(4) Der Anbieter kann den Vertrag "
+#~ "mit einer Frist von 30 Tagen "
+#~ "kündigen."
+#~ msgstr "(4) Постачальник може розірвати договір з періодом 30 днів."
+
+#~ msgid ""
+#~ "(5) Das Recht zur außerordentlichen "
+#~ "Kündigung aus wichtigem Grund bleibt "
+#~ "unberührt. Ein wichtiger Grund liegt "
+#~ "insbesondere vor bei:"
+#~ msgstr ""
+#~ "(5) Право на позачергове розірвання з"
+#~ " важливої причини залишається недоторканим. "
+#~ "Важлива причина зокрема існує при:"
+
+#~ msgid "Zahlungsverzug von mehr als 14 Tagen"
+#~ msgstr "Прострочення платежу більше 14 днів"
+
+#~ msgid "Verstoß gegen diese AGB"
+#~ msgstr "Порушення цих ЗУД"
+
+#~ msgid "Missbräuchlicher Nutzung der Plattform"
+#~ msgstr "Зловживання використанням платформи"
+
+#~ msgid "§ 6 Nutzungsrechte und Pflichten des Kunden"
+#~ msgstr "§ 6 Права використання та обов'язки клієнта"
+
+#~ msgid ""
+#~ "(1) Der Kunde erhält ein nicht "
+#~ "ausschließliches, nicht übertragbares Recht "
+#~ "zur Nutzung der Plattform für die "
+#~ "Dauer des Vertrags."
+#~ msgstr ""
+#~ "(1) Клієнт отримує неексклюзивне, непередаване"
+#~ " право на використання платформи протягом"
+#~ " терміну дії договору."
+
+#~ msgid "(2) Der Kunde verpflichtet sich:"
+#~ msgstr "(2) Клієнт зобов'язується:"
+
+#~ msgid "Die Plattform nur für eigene geschäftliche Zwecke zu nutzen"
+#~ msgstr "Використовувати платформу лише для власних ділових цілей"
+
+#~ msgid "Die Zugangsdaten vertraulich zu behandeln"
+#~ msgstr "Тримати дані доступу конфіденційними"
+
+#~ msgid "Die Plattform nicht missbräuchlich zu nutzen"
+#~ msgstr "Не зловживати використанням платформи"
+
+#~ msgid ""
+#~ "Keine automatisierten Abfragen (außer über "
+#~ "bereitgestellte API) durchzuführen"
+#~ msgstr "Не виконувати автоматизованих запитів (крім через надану API)"
+
+#~ msgid "Die gesetzlichen Datenschutzbestimmungen einzuhalten"
+#~ msgstr "Дотримуватися законодавчих положень про захист даних"
+
+#~ msgid ""
+#~ "(3) Der Kunde ist verantwortlich für "
+#~ "alle Aktivitäten, die unter seinem "
+#~ "Account durchgeführt werden."
+#~ msgstr ""
+#~ "(3) Клієнт несе відповідальність за всі"
+#~ " дії, що виконуються під його "
+#~ "обліковим записом."
+
+#~ msgid "§ 7 Verfügbarkeit"
+#~ msgstr "§ 7 Доступність"
+
+#~ msgid ""
+#~ "(1) Der Anbieter bemüht sich um "
+#~ "eine hohe Verfügbarkeit der Plattform, "
+#~ "übernimmt jedoch keine Garantie für eine"
+#~ " ununterbrochene Verfügbarkeit."
+#~ msgstr ""
+#~ "(1) Постачальник докладає зусиль для "
+#~ "високої доступності платформи, але не "
+#~ "гарантує безперервну доступність."
+
+#~ msgid ""
+#~ "(2) Der Anbieter ist berechtigt, die "
+#~ "Plattform für Wartungsarbeiten vorübergehend "
+#~ "außer Betrieb zu nehmen. Geplante "
+#~ "Wartungsarbeiten werden nach Möglichkeit im"
+#~ " Voraus angekündigt."
+#~ msgstr ""
+#~ "(2) Постачальник має право тимчасово "
+#~ "виводити платформу з експлуатації для "
+#~ "технічних робіт. Планові технічні роботи "
+#~ "будуть по можливості оголошені заздалегідь."
+
+#~ msgid ""
+#~ "(3) Der Anbieter haftet nicht für "
+#~ "Ausfälle, die auf höhere Gewalt, "
+#~ "Streiks, Aussperrungen oder technische "
+#~ "Probleme außerhalb seines Einflussbereichs "
+#~ "zurückzuführen sind."
+#~ msgstr ""
+#~ "(3) Постачальник не несе відповідальності "
+#~ "за збої, що спричинені форс-мажорними "
+#~ "обставинами, страйками, локаутами або "
+#~ "технічними проблемами поза сферою його "
+#~ "впливу."
+
+#~ msgid "§ 8 Gewährleistung"
+#~ msgstr "§ 8 Гарантія"
+
+#~ msgid ""
+#~ "(1) Der Anbieter gewährleistet, dass die"
+#~ " Plattform die vertraglich vereinbarte "
+#~ "Beschaffenheit aufweist und frei von "
+#~ "Rechts- und Sachmängeln ist."
+#~ msgstr ""
+#~ "(1) Постачальник гарантує, що платформа "
+#~ "має договірно узгоджені характеристики та "
+#~ "вільна від правових та матеріальних "
+#~ "дефектів."
+
+#~ msgid "(2) Der Anbieter übernimmt keine Gewähr für:"
+#~ msgstr "(2) Постачальник не несе гарантії за:"
+
+#~ msgid ""
+#~ "Die Richtigkeit, Vollständigkeit und "
+#~ "Aktualität der von Drittanbietern (VIES, "
+#~ "Handelsregister, etc.) bereitgestellten Daten"
+#~ msgstr ""
+#~ "Правильність, повноту та актуальність даних,"
+#~ " наданих третіми сторонами (VIES, "
+#~ "торговельні реєстри тощо)"
+
+#~ msgid "Die Verfügbarkeit von Drittdiensten"
+#~ msgstr "Доступність послуг третіх сторін"
+
+#~ msgid "Die Eignung der Plattform für bestimmte Zwecke des Kunden"
+#~ msgstr "Придатність платформи для конкретних цілей клієнта"
+
+#~ msgid ""
+#~ "(3) Der Kunde ist verpflichtet, Mängel"
+#~ " unverzüglich nach Feststellung anzuzeigen."
+#~ msgstr "(3) Клієнт зобов'язаний негайно повідомляти про виявлені дефекти."
+
+#~ msgid "§ 9 Haftung"
+#~ msgstr "§ 9 Відповідальність"
+
+#~ msgid "(1) Der Anbieter haftet unbeschränkt:"
+#~ msgstr "(1) Постачальник несе необмежену відповідальність:"
+
+#~ msgid "Bei Vorsatz und grober Fahrlässigkeit"
+#~ msgstr "При умислі та грубій недбалості"
+
+#~ msgid "Bei Verletzung von Leben, Körper oder Gesundheit"
+#~ msgstr "При порушенні життя, тіла або здоров'я"
+
+#~ msgid "Nach dem Produkthaftungsgesetz"
+#~ msgstr "Згідно із законом про відповідальність за продукцію"
+
+#~ msgid "Im Rahmen einer Garantie"
+#~ msgstr "У рамках гарантії"
+
+#~ msgid ""
+#~ "(2) Bei leicht fahrlässiger Verletzung "
+#~ "wesentlicher Vertragspflichten haftet der "
+#~ "Anbieter beschränkt auf den vertragstypischen,"
+#~ " vorhersehbaren Schaden."
+#~ msgstr ""
+#~ "(2) При легковажному порушенні істотних "
+#~ "договірних зобов'язань постачальник несе "
+#~ "обмежену відповідальність за типові для "
+#~ "договору, передбачувані збитки."
+
+#~ msgid "(3) Im Übrigen ist die Haftung ausgeschlossen."
+#~ msgstr "(3) В решті випадків відповідальність виключена."
+
+#~ msgid ""
+#~ "(4) Die vorstehenden Haftungsbeschränkungen "
+#~ "gelten auch für die persönliche Haftung"
+#~ " der Mitarbeiter, Vertreter und "
+#~ "Erfüllungsgehilfen des Anbieters."
+#~ msgstr ""
+#~ "(4) Наведені обмеження відповідальності також"
+#~ " застосовуються до особистої відповідальності "
+#~ "співробітників, представників та помічників "
+#~ "виконання постачальника."
+
+#~ msgid "§ 10 Datenschutz"
+#~ msgstr "§ 10 Захист даних"
+
+#~ msgid ""
+#~ "(1) Der Anbieter verarbeitet personenbezogene"
+#~ " Daten des Kunden im Einklang mit "
+#~ "der <a href=\"{{ url_for('legal.datenschutz') "
+#~ "}}\">{{ _('Privacy Policy') }}</a> und "
+#~ "den gesetzlichen Bestimmungen (DSGVO, BDSG)."
+#~ msgstr ""
+#~ "(1) Постачальник обробляє персональні дані "
+#~ "клієнта відповідно до <a href=\"{{ "
+#~ "url_for('legal.datenschutz') }}\">{{ _('Privacy "
+#~ "Policy') }}</a> та законодавчих положень "
+#~ "(DSGVO, BDSG)."
+
+#~ msgid ""
+#~ "(2) Der Kunde ist für die "
+#~ "Einhaltung der Datenschutzbestimmungen bei der"
+#~ " Nutzung der Plattform selbst "
+#~ "verantwortlich."
+#~ msgstr ""
+#~ "(2) Клієнт самостійно несе відповідальність"
+#~ " за дотримання положень про захист "
+#~ "даних при використанні платформи."
+
+#~ msgid "§ 11 Änderungen der AGB"
+#~ msgstr "§ 11 Зміни ЗУД"
+
+#~ msgid ""
+#~ "(1) Der Anbieter behält sich das "
+#~ "Recht vor, diese AGB zu ändern. "
+#~ "Änderungen werden dem Kunden mindestens "
+#~ "30 Tage vor ihrem Inkrafttreten per "
+#~ "E-Mail mitgeteilt."
+#~ msgstr ""
+#~ "(1) Постачальник залишає за собою право"
+#~ " змінювати ці ЗУД. Про зміни буде "
+#~ "повідомлено клієнту електронною поштою "
+#~ "принаймні за 30 днів до їх набуття"
+#~ " чинності."
+
+#~ msgid ""
+#~ "(2) Widerspricht der Kunde den "
+#~ "geänderten AGB nicht innerhalb von 30"
+#~ " Tagen nach Zugang der Mitteilung, "
+#~ "gelten die geänderten AGB als "
+#~ "angenommen. Der Anbieter wird den Kunden"
+#~ " in der Mitteilung auf diese Folge"
+#~ " hinweisen."
+#~ msgstr ""
+#~ "(2) Якщо клієнт не заперечує проти "
+#~ "змінених ЗУД протягом 30 днів після "
+#~ "отримання повідомлення, змінені ЗУД вважаються"
+#~ " прийнятими. Постачальник повідомить клієнта "
+#~ "про цю наслідок у повідомленні."
+
+#~ msgid ""
+#~ "(3) Im Fall des Widerspruchs ist "
+#~ "der Anbieter berechtigt, das "
+#~ "Vertragsverhältnis zum Zeitpunkt des "
+#~ "Inkrafttretens der geänderten AGB zu "
+#~ "kündigen."
+#~ msgstr ""
+#~ "(3) У разі заперечення постачальник має"
+#~ " право розірвати договірні відносини на "
+#~ "момент набуття чинності змінених ЗУД."
+
+#~ msgid "§ 12 Schlussbestimmungen"
+#~ msgstr "§ 12 Прикінцеві положення"
+
+#~ msgid ""
+#~ "(1) Es gilt das Recht der "
+#~ "Bundesrepublik Deutschland unter Ausschluss "
+#~ "des UN-Kaufrechts."
+#~ msgstr ""
+#~ "(1) Застосовується право Федеративної "
+#~ "Республіки Німеччина з виключенням Конвенції"
+#~ " ООН про договори міжнародної "
+#~ "купівлі-продажу товарів."
+
+#~ msgid ""
+#~ "(2) Ist der Kunde Kaufmann, juristische"
+#~ " Person des öffentlichen Rechts oder "
+#~ "öffentlich-rechtliches Sondervermögen, ist "
+#~ "ausschließlicher Gerichtsstand für alle "
+#~ "Streitigkeiten aus diesem Vertrag Frankfurt"
+#~ " am Main."
+#~ msgstr ""
+#~ "(2) Якщо клієнт є комерсантом, юридичною"
+#~ " особою публічного права або "
+#~ "публічно-правовим спеціальним майном, єдиним "
+#~ "місцем юрисдикції для всіх спорів з "
+#~ "цього договору є Франкфурт-на-Майні."
+
+#~ msgid ""
+#~ "(3) Sollten einzelne Bestimmungen dieser "
+#~ "AGB unwirksam sein oder werden, bleibt"
+#~ " die Wirksamkeit der übrigen Bestimmungen"
+#~ " hiervon unberührt."
+#~ msgstr ""
+#~ "(3) Якщо окремі положення цих ЗУД "
+#~ "стануть недійсними або такими будуть, це"
+#~ " не впливає на дійсність інших "
+#~ "положень."
+
+#~ msgid "Stand: {{ current_date }}"
+#~ msgstr "Станом на: {{ current_date }}"
+
+#~ msgid "Jetzt registrieren"
+#~ msgstr "Зареєструватися зараз"
+
+#~ msgid "Datenschutzerklärung - VAT Verification System"
+#~ msgstr "Декларація про захист даних - VAT Verification System"
+
+#~ msgid "Datenschutzerklärung"
+#~ msgstr "Декларація про захист даних"
+
+#~ msgid "Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst."
+#~ msgstr "Ми дуже серйозно ставимося до захисту ваших особистих даних."
+
+#~ msgid "DSGVO-konform:"
+#~ msgstr "Відповідно до DSGVO:"
+
+#~ msgid ""
+#~ "Diese Datenschutzerklärung entspricht den "
+#~ "Anforderungen der EU-Datenschutz-"
+#~ "Grundverordnung (DSGVO) und dem "
+#~ "Bundesdatenschutzgesetz (BDSG)."
+#~ msgstr ""
+#~ "Ця декларація про захист даних "
+#~ "відповідає вимогам Загального регламенту ЄС"
+#~ " про захист даних (DSGVO) та "
+#~ "Федерального закону про захист даних "
+#~ "(BDSG)."
+
+#~ msgid "1. Verantwortlicher für die Datenverarbeitung"
+#~ msgstr "1. Відповідальний за обробку даних"
+
+#~ msgid "Verantwortlich im Sinne der DSGVO:"
+#~ msgstr "Відповідальний згідно з DSGVO:"
+
+#~ msgid "2. Erhebung und Speicherung personenbezogener Daten"
+#~ msgstr "2. Збір та зберігання особистих даних"
+
+#~ msgid "2.1 Bei Besuch unserer Website"
+#~ msgstr "2.1 При відвідуванні нашого веб-сайту"
+
+#~ msgid ""
+#~ "Beim Aufrufen unserer Website werden "
+#~ "durch den auf Ihrem Endgerät zum "
+#~ "Einsatz kommenden Browser automatisch "
+#~ "Informationen an den Server unserer "
+#~ "Website gesendet. Diese Informationen werden"
+#~ " temporär in einem sog. Logfile "
+#~ "gespeichert:"
+#~ msgstr ""
+#~ "При відкритті нашого веб-сайту браузер, "
+#~ "що використовується на вашому кінцевому "
+#~ "пристрої, автоматично надсилає інформацію на"
+#~ " сервер нашого веб-сайту. Ця інформація "
+#~ "тимчасово зберігається у так званому "
+#~ "файлі журналу:"
+
+#~ msgid "IP-Adresse des anfragenden Rechners"
+#~ msgstr "IP-адреса запитуючого комп'ютера"
+
+#~ msgid "Datum und Uhrzeit des Zugriffs"
+#~ msgstr "Дата та час доступу"
+
+#~ msgid "Name und URL der abgerufenen Datei"
+#~ msgstr "Назва та URL завантаженого файлу"
+
+#~ msgid "Website, von der aus der Zugriff erfolgt (Referrer-URL)"
+#~ msgstr "Веб-сайт, з якого здійснюється доступ (Referrer-URL)"
+
+#~ msgid "Verwendeter Browser und ggf. das Betriebssystem Ihres Rechners"
+#~ msgstr ""
+#~ "Використовуваний браузер та, можливо, "
+#~ "операційна система вашого комп'ютера"
+
+#~ msgid "Rechtsgrundlage:"
+#~ msgstr "Правова основа:"
+
+#~ msgid ""
+#~ "Art. 6 Abs. 1 lit. f DSGVO "
+#~ "(berechtigtes Interesse an der technischen "
+#~ "Bereitstellung und Optimierung der Website)"
+#~ msgstr ""
+#~ "Стаття 6 параграф 1 літ. f DSGVO"
+#~ " (законний інтерес у технічному "
+#~ "забезпеченні та оптимізації веб-сайту)"
+
+#~ msgid "2.2 Bei Registrierung eines Benutzerkontos"
+#~ msgstr "2.2 При реєстрації облікового запису користувача"
+
+#~ msgid ""
+#~ "Wenn Sie sich bei uns registrieren, "
+#~ "erheben wir folgende personenbezogene Daten:"
+#~ msgstr "Коли ви реєструєтесь у нас, ми збираємо такі особисті дані:"
+
+#~ msgid "E-Mail-Adresse (Pflichtangabe)"
+#~ msgstr "Адреса електронної пошти (обов'язкова)"
+
+#~ msgid "Passwort (verschlüsselt gespeichert)"
+#~ msgstr "Пароль (зберігається зашифрованим)"
+
+#~ msgid "Vorname und Nachname"
+#~ msgstr "Ім'я та прізвище"
+
+#~ msgid "Firmenname"
+#~ msgstr "Назва компанії"
+
+#~ msgid "Telefonnummer (optional)"
+#~ msgstr "Номер телефону (необов'язково)"
+
+#~ msgid "Land"
+#~ msgstr "Країна"
+
+#~ msgid "Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)"
+#~ msgstr "Стаття 6 параграф 1 літ. b DSGVO (виконання договору)"
+
+#~ msgid "Speicherdauer:"
+#~ msgstr "Термін зберігання:"
+
+#~ msgid "Bis zur Löschung Ihres Kontos"
+#~ msgstr "До видалення вашого облікового запису"
+
+#~ msgid "2.3 Bei Nutzung des VAT-Verifizierungsdienstes"
+#~ msgstr "2.3 При використанні служби перевірки VAT"
+
+#~ msgid "Bei der Nutzung unseres Verifizierungsdienstes verarbeiten wir:"
+#~ msgstr "При використанні нашої служби перевірки ми обробляємо:"
+
+#~ msgid "Firmendaten der zu überprüfenden Unternehmen (Name, Adresse, USt-IdNr.)"
+#~ msgstr "Дані компаній, які підлягають перевірці (назва, адреса, ІПН)"
+
+#~ msgid "Verifizierungsergebnisse"
+#~ msgstr "Результати перевірки"
+
+#~ msgid "Datum und Uhrzeit der Verifizierung"
+#~ msgstr "Дата та час перевірки"
+
+#~ msgid ""
+#~ "Bis zur Löschung Ihres Kontos oder "
+#~ "gemäß gesetzlicher Aufbewahrungsfristen"
+#~ msgstr ""
+#~ "До видалення вашого облікового запису "
+#~ "або відповідно до законодавчих термінів "
+#~ "зберігання"
+
+#~ msgid "3. Weitergabe von Daten"
+#~ msgstr "3. Передача даних"
+
+#~ msgid ""
+#~ "Eine Übermittlung Ihrer persönlichen Daten "
+#~ "an Dritte zu anderen als den im"
+#~ " Folgenden aufgeführten Zwecken findet "
+#~ "nicht statt."
+#~ msgstr ""
+#~ "Передача ваших особистих даних третім "
+#~ "сторонам для інших цілей, ніж зазначені"
+#~ " нижче, не відбувається."
+
+#~ msgid "3.1 Zahlungsabwicklung (Stripe)"
+#~ msgstr "3.1 Обробка платежів (Stripe)"
+
+#~ msgid ""
+#~ "Für die Zahlungsabwicklung nutzen wir "
+#~ "den Zahlungsdienstleister Stripe. Dabei werden"
+#~ " Zahlungsinformationen an Stripe übermittelt."
+#~ msgstr ""
+#~ "Для обробки платежів ми використовуємо "
+#~ "платіжного провайдера Stripe. При цьому "
+#~ "інформація про платежі передається Stripe."
+
+#~ msgid "https://stripe.com/de/privacy"
+#~ msgstr "https://stripe.com/de/privacy"
+
+#~ msgid "3.2 Externe API-Dienste"
+#~ msgstr "3.2 Зовнішні служби API"
+
+#~ msgid "Für die VAT-Verifizierung nutzen wir folgende externe Dienste:"
+#~ msgstr "Для перевірки VAT ми використовуємо такі зовнішні служби:"
+
+#~ msgid "VIES (EU-Kommission):"
+#~ msgstr "VIES (Європейська комісія):"
+
+#~ msgid "VAT-Nummer-Verifizierung"
+#~ msgstr "Перевірка номера VAT"
+
+#~ msgid "Handelsregister:"
+#~ msgstr "Торговельний реєстр:"
+
+#~ msgid "Firmendaten-Abfrage"
+#~ msgstr "Запит даних компанії"
+
+#~ msgid "Sanktionslisten (EU/OFAC/UK):"
+#~ msgstr "Санкційні списки (ЄС/OFAC/Великобританія):"
+
+#~ msgid "Compliance-Prüfung"
+#~ msgstr "Перевірка відповідності"
+
+#~ msgid "4. Cookies"
+#~ msgstr "4. Cookies"
+
+#~ msgid ""
+#~ "Unsere Website verwendet Cookies. Cookies "
+#~ "sind kleine Textdateien, die auf Ihrem"
+#~ " Endgerät gespeichert werden. Wir verwenden"
+#~ " ausschließlich technisch notwendige Cookies:"
+#~ msgstr ""
+#~ "Наш веб-сайт використовує cookies. Cookies "
+#~ "- це невеликі текстові файли, які "
+#~ "зберігаються на вашому кінцевому пристрої. "
+#~ "Ми використовуємо виключно технічно необхідні"
+#~ " cookies:"
+
+#~ msgid "Session-Cookie:"
+#~ msgstr "Session-Cookie:"
+
+#~ msgid "Erforderlich für die Anmeldung und Nutzung des Dienstes"
+#~ msgstr "Необхідний для входу та використання служби"
+
+#~ msgid "CSRF-Token:"
+#~ msgstr "CSRF-Token:"
+
+#~ msgid "Sicherheitsmaßnahme gegen Cross-Site-Request-Forgery-Angriffe"
+#~ msgstr "Захисний захід проти атак Cross-Site-Request-Forgery"
+
+#~ msgid "Art. 6 Abs. 1 lit. f DSGVO (technisch notwendig)"
+#~ msgstr "Стаття 6 параграф 1 літ. f DSGVO (технічно необхідний)"
+
+#~ msgid "Speicherdauer: Session-Ende bzw. bis zum Ausloggen"
+#~ msgstr "Термін зберігання: кінець сесії або до виходу з системи"
+
+#~ msgid "5. Ihre Rechte nach der DSGVO"
+#~ msgstr "5. Ваші права згідно з DSGVO"
+
+#~ msgid "Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:"
+#~ msgstr "Ви маєте такі права щодо ваших особистих даних:"
+
+#~ msgid "Recht auf Auskunft (Art. 15 DSGVO):"
+#~ msgstr "Право на інформацію (стаття 15 DSGVO):"
+
+#~ msgid ""
+#~ "Sie können Auskunft über Ihre von "
+#~ "uns verarbeiteten personenbezogenen Daten "
+#~ "verlangen."
+#~ msgstr ""
+#~ "Ви можете вимагати інформацію про ваші"
+#~ " особисті дані, які обробляються нами."
+
+#~ msgid "Recht auf Berichtigung (Art. 16 DSGVO):"
+#~ msgstr "Право на виправлення (стаття 16 DSGVO):"
+
+#~ msgid "Sie können die Berichtigung unrichtiger Daten verlangen."
+#~ msgstr "Ви можете вимагати виправлення неправильних даних."
+
+#~ msgid "Recht auf Löschung (Art. 17 DSGVO):"
+#~ msgstr "Право на видалення (стаття 17 DSGVO):"
+
+#~ msgid ""
+#~ "Sie können die Löschung Ihrer Daten "
+#~ "verlangen, sofern keine gesetzlichen "
+#~ "Aufbewahrungspflichten entgegenstehen."
+#~ msgstr ""
+#~ "Ви можете вимагати видалення ваших "
+#~ "даних, якщо немає законодавчих зобов'язань "
+#~ "щодо зберігання."
+
+#~ msgid "Konto und Daten jetzt löschen"
+#~ msgstr "Видалити обліковий запис та дані зараз"
+
+#~ msgid "Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO):"
+#~ msgstr "Право на обмеження обробки (стаття 18 DSGVO):"
+
+#~ msgid "Sie können die Einschränkung der Verarbeitung Ihrer Daten verlangen."
+#~ msgstr "Ви можете вимагати обмеження обробки ваших даних."
+
+#~ msgid "Recht auf Datenübertragbarkeit (Art. 20 DSGVO):"
+#~ msgstr "Право на переносимість даних (стаття 20 DSGVO):"
+
+#~ msgid ""
+#~ "Sie können verlangen, dass wir Ihnen "
+#~ "Ihre Daten in einem strukturierten, "
+#~ "gängigen Format zur Verfügung stellen."
+#~ msgstr ""
+#~ "Ви можете вимагати, щоб ми надали "
+#~ "вам ваші дані у структурованому, "
+#~ "поширеному форматі."
+
+#~ msgid "Widerspruchsrecht (Art. 21 DSGVO):"
+#~ msgstr "Право на заперечення (стаття 21 DSGVO):"
+
+#~ msgid ""
+#~ "Sie können der Verarbeitung Ihrer Daten"
+#~ " aus Gründen, die sich aus Ihrer "
+#~ "besonderen Situation ergeben, widersprechen."
+#~ msgstr ""
+#~ "Ви можете заперечувати проти обробки "
+#~ "ваших даних з причин, що випливають "
+#~ "з вашої особливой ситуації."
+
+#~ msgid "So nehmen Sie Ihre Rechte wahr:"
+#~ msgstr "Як реалізувати ваші права:"
+
+#~ msgid "Senden Sie eine E-Mail an:"
+#~ msgstr "Надішліть електронний лист на адресу:"
+
+#~ msgid "Oder nutzen Sie unser"
+#~ msgstr "Або скористайтеся нашим"
+
+#~ msgid "6. Beschwerderecht bei einer Aufsichtsbehörde"
+#~ msgstr "6. Право на скаргу до наглядового органу"
+
+#~ msgid ""
+#~ "Sie haben das Recht, sich bei "
+#~ "einer Datenschutz-Aufsichtsbehörde über die"
+#~ " Verarbeitung Ihrer personenbezogenen Daten "
+#~ "durch uns zu beschweren."
+#~ msgstr ""
+#~ "Ви маєте право подати скаргу до "
+#~ "органу з захисту даних щодо обробки "
+#~ "ваших особистих даних нами."
+
+#~ msgid "Zuständige Aufsichtsbehörde in Deutschland:"
+#~ msgstr "Відповідний наглядовий орган у Німеччині:"
+
+#~ msgid "Der Hessische Beauftragte für Datenschutz und Informationsfreiheit"
+#~ msgstr "Гессенський уповноважений із захисту даних та інформаційної свободи"
+
+#~ msgid "Postfach 3163"
+#~ msgstr "Поштова скринька 3163"
+
+#~ msgid "65021 Wiesbaden"
+#~ msgstr "65021 Вісбаден"
+
+#~ msgid "Telefon: 0611 1408 - 0"
+#~ msgstr "Телефон: 0611 1408 - 0"
+
+#~ msgid "Website:"
+#~ msgstr "Веб-сайт:"
+
+#~ msgid "https://datenschutz.hessen.de"
+#~ msgstr "https://datenschutz.hessen.de"
+
+#~ msgid "7. Datensicherheit"
+#~ msgstr "7. Безпека даних"
+
+#~ msgid "Wir verwenden folgende Sicherheitsmaßnahmen zum Schutz Ihrer Daten:"
+#~ msgstr "Ми використовуємо такі заходи безпеки для захисту ваших даних:"
+
+#~ msgid "SSL/TLS-Verschlüsselung:"
+#~ msgstr "Шифрування SSL/TLS:"
+
+#~ msgid "Alle Datenübertragungen erfolgen verschlüsselt"
+#~ msgstr "Всі передачі даних здійснюються зашифрованими"
+
+#~ msgid "Passwort-Hashing:"
+#~ msgstr "Хешування паролів:"
+
+#~ msgid "Passwörter werden mit bcrypt verschlüsselt gespeichert"
+#~ msgstr "Паролі зберігаються зашифрованими за допомогою bcrypt"
+
+#~ msgid "Zugriffskontrolle:"
+#~ msgstr "Контроль доступу:"
+
+#~ msgid "Nur autorisierte Personen haben Zugriff auf personenbezogene Daten"
+#~ msgstr "Тільки авторизовані особи мають доступ до особистих даних"
+
+#~ msgid "Regelmäßige Backups:"
+#~ msgstr "Регулярні резервні копії:"
+
+#~ msgid "Ihre Daten werden regelmäßig gesichert"
+#~ msgstr "Ваші дані регулярно резервуються"
+
+#~ msgid "Firewall und Monitoring:"
+#~ msgstr "Файрвол та моніторинг:"
+
+#~ msgid "Schutz vor unbefugtem Zugriff"
+#~ msgstr "Захист від несанкціонованого доступу"
+
+#~ msgid "8. Aufbewahrungsfristen"
+#~ msgstr "8. Терміни зберігання"
+
+#~ msgid ""
+#~ "Wir speichern personenbezogene Daten nur "
+#~ "so lange, wie es für die "
+#~ "jeweiligen Zwecke erforderlich ist oder "
+#~ "gesetzliche Aufbewahrungsfristen bestehen:"
+#~ msgstr ""
+#~ "Ми зберігаємо особисті дані тільки "
+#~ "стільки, скільки це необхідно для "
+#~ "відповідних цілей або існують законодавчі "
+#~ "терміни зберігання:"
+
+#~ msgid "Benutzerkontodaten:"
+#~ msgstr "Дані облікового запису користувача:"
+
+#~ msgid "Bis zur Löschung des Kontos"
+#~ msgstr "До видалення облікового запису"
+
+#~ msgid "Verifizierungsdaten:"
+#~ msgstr "Дані перевірки:"
+
+#~ msgid "Zahlungsdaten:"
+#~ msgstr "Дані платежів:"
+
+#~ msgid "10 Jahre (gemäß § 147 AO - Abgabenordnung)"
+#~ msgstr "10 років (згідно з § 147 AO - Податковий кодекс)"
+
+#~ msgid "Log-Dateien:"
+#~ msgstr "Файли журналу:"
+
+#~ msgid "Maximal 30 Tage"
+#~ msgstr "Максимум 30 днів"
+
+#~ msgid "9. Änderungen der Datenschutzerklärung"
+#~ msgstr "9. Зміни декларації про захист даних"
+
+#~ msgid ""
+#~ "Wir behalten uns vor, diese "
+#~ "Datenschutzerklärung anzupassen, damit sie "
+#~ "stets den aktuellen rechtlichen Anforderungen"
+#~ " entspricht oder um Änderungen unserer "
+#~ "Leistungen in der Datenschutzerklärung "
+#~ "umzusetzen. Für Ihren erneuten Besuch "
+#~ "gilt dann die neue Datenschutzerklärung."
+#~ msgstr ""
+#~ "Ми залишаємо за собою право адаптувати"
+#~ " цю декларацію про захист даних, щоб"
+#~ " вона завжди відповідала поточним "
+#~ "законодавчим вимогам або для реалізації "
+#~ "змін наших послуг у декларації про "
+#~ "захист даних. Для вашого повторного "
+#~ "відвідування тоді діє нова декларація "
+#~ "про захист даних."
+
+#~ msgid "DSGVO-Anfrage stellen"
+#~ msgstr "Подати запит DSGVO"
+
+#~ msgid "Daten löschen"
+#~ msgstr "Видалити дані"
+
+
+#: templates/base.html:158
+msgid "Rechtliches"
+msgstr "������ �������"
+
+#: templates/base.html:162
+msgid "Impressum"
+msgstr "��������"
+
+#: templates/base.html:167
+msgid "Datenschutz"
+msgstr "������ �����"

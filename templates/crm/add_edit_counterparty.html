@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Add Counterparty') if not is_edit else _('Edit Counterparty') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('crm.index') }}">{{ _('CRM') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ _('Add Counterparty') if not is_edit else _('Edit Counterparty') }}
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="display-4">
+                <i class="bi bi-person-plus-fill"></i>
+                {{ _('Add New Counterparty') if not is_edit else _('Edit Counterparty') }}
+            </h1>
+            <p class="lead">{{ _('Enter company information with AI assistance') }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Form -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-building"></i> {{ _('Company Information') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form id="counterpartyForm" method="POST">
+                        {% if is_edit %}
+                        <input type="hidden" name="counterparty_id" value="{{ counterparty.id }}">
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="company_name" class="form-label">{{ _('Company Name') }} *</label>
+                                <input type="text" class="form-control" id="company_name" name="company_name"
+                                       value="{{ counterparty.company_name if counterparty else '' }}" required>
+                                <div class="form-text">{{ _('Full legal company name') }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="country" class="form-label">{{ _('Country') }} *</label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">{{ _('Select country') }}</option>
+                                    <option value="DE" {{ 'selected' if counterparty and counterparty.country == 'DE' }}>🇩🇪 {{ _('Germany') }}</option>
+                                    <option value="AT" {{ 'selected' if counterparty and counterparty.country == 'AT' }}>🇦🇹 {{ _('Austria') }}</option>
+                                    <option value="CH" {{ 'selected' if counterparty and counterparty.country == 'CH' }}>🇨🇭 {{ _('Switzerland') }}</option>
+                                    <option value="FR" {{ 'selected' if counterparty and counterparty.country == 'FR' }}>🇫🇷 {{ _('France') }}</option>
+                                    <option value="IT" {{ 'selected' if counterparty and counterparty.country == 'IT' }}>🇮🇹 {{ _('Italy') }}</option>
+                                    <option value="ES" {{ 'selected' if counterparty and counterparty.country == 'ES' }}>🇪🇸 {{ _('Spain') }}</option>
+                                    <option value="NL" {{ 'selected' if counterparty and counterparty.country == 'NL' }}>🇳🇱 {{ _('Netherlands') }}</option>
+                                    <option value="BE" {{ 'selected' if counterparty and counterparty.country == 'BE' }}>🇧🇪 {{ _('Belgium') }}</option>
+                                    <option value="PL" {{ 'selected' if counterparty and counterparty.country == 'PL' }}>🇵🇱 {{ _('Poland') }}</option>
+                                    <option value="CZ" {{ 'selected' if counterparty and counterparty.country == 'CZ' }}>🇨🇿 {{ _('Czech Republic') }}</option>
+                                    <option value="UA" {{ 'selected' if counterparty and counterparty.country == 'UA' }}>🇺🇦 {{ _('Ukraine') }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- VAT Number -->
+                        <div class="mb-3">
+                            <label for="vat_number" class="form-label">{{ _('VAT Number') }}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="vat_number" name="vat_number"
+                                       value="{{ counterparty.vat_number if counterparty else '' }}"
+                                       placeholder="DE123456789">
+                                <button class="btn btn-outline-secondary" type="button" id="validateVatBtn">
+                                    <i class="bi bi-check-circle"></i> {{ _('Validate') }}
+                                </button>
+                            </div>
+                            <div class="form-text">{{ _('VAT number for EU companies (optional)') }}</div>
+                            <div id="vatValidationResult" class="mt-2" style="display: none;"></div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">{{ _('Email') }}</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                       value="{{ counterparty.email if counterparty else '' }}"
+                                       placeholder="info@company.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="contact_person" class="form-label">{{ _('Contact Person') }}</label>
+                                <input type="text" class="form-control" id="contact_person" name="contact_person"
+                                       value="{{ counterparty.contact_person if counterparty else '' }}">
+                            </div>
+                        </div>
+
+                        <!-- Address Information -->
+                        <div class="mb-3">
+                            <label for="address" class="form-label">{{ _('Address') }}</label>
+                            <textarea class="form-control" id="address" name="address" rows="3"
+                                      placeholder="{{ _('Street, City, Postal Code, Country') }}">{{ counterparty.address if counterparty else '' }}</textarea>
+                        </div>
+
+                        <!-- Domain -->
+                        <div class="mb-3">
+                            <label for="domain" class="form-label">{{ _('Domain') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">https://</span>
+                                <input type="text" class="form-control" id="domain" name="domain"
+                                       value="{{ counterparty.domain if counterparty else '' }}"
+                                       placeholder="company.com">
+                            </div>
+                            <div class="form-text">{{ _('Company website domain for additional verification') }}</div>
+                        </div>
+
+                        <!-- AI Enrichment Section -->
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" id="enrichBtn">
+                                <i class="bi bi-magic"></i> {{ _('AI Enrichment') }}
+                            </button>
+                            <div class="form-text">{{ _('Use AI to automatically fill missing information') }}</div>
+                            <div id="enrichmentResult" class="mt-3" style="display: none;"></div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="bi bi-check-lg"></i>
+                                {{ _('Save Counterparty') if not is_edit else _('Update Counterparty') }}
+                            </button>
+                            <a href="{{ url_for('crm.index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg"></i> {{ _('Cancel') }}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Assistant Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-robot"></i> {{ _('AI Assistant') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div id="aiAssistant" class="ai-assistant">
+                        <div class="ai-messages" id="aiMessages">
+                            <div class="ai-message ai-message-bot">
+                                <div class="ai-avatar">
+                                    <i class="bi bi-robot"></i>
+                                </div>
+                                <div class="ai-content">
+                                    <p>{{ _('Hello! I can help you fill out the company information. What would you like to know?') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ai-input-group mt-3">
+                            <input type="text" class="form-control" id="aiInput"
+                                   placeholder="{{ _('Ask me about company data...') }}">
+                            <button class="btn btn-primary" id="aiSendBtn">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Suggestions -->
+                    <div class="mt-3">
+                        <h6>{{ _('Quick Help') }}</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="askAI('{{ _('What information do I need to provide?') }}')">
+                                {{ _('What information do I need?') }}
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="askAI('{{ _('How to find VAT number?') }}')">
+                                {{ _('How to find VAT number?') }}
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="askAI('{{ _('What is domain used for?') }}')">
+                                {{ _('What is domain used for?') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.ai-assistant {
+    max-height: 500px;
+}
+
+.ai-messages {
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.ai-message {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+}
+
+.ai-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.ai-message-user .ai-avatar {
+    background-color: #6c757d;
+}
+
+.ai-content {
+    flex: 1;
+}
+
+.ai-content p {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+.ai-message-user .ai-content p {
+    background-color: #007bff;
+    color: white;
+}
+
+.ai-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.ai-input-group .form-control {
+    flex: 1;
+}
+</style>
+
+<script>
+// CRM Add/Edit Counterparty Translations
+const crmAddEditTranslations = {
+    validating: "{{ _('Validating...') }}",
+    valid: "{{ _('Valid') }}",
+    invalid: "{{ _('Invalid') }}",
+    enriching: "{{ _('Enriching data...') }}",
+    enrichmentComplete: "{{ _('Enrichment complete!') }}",
+    saving: "{{ _('Saving...') }}",
+    updating: "{{ _('Updating...') }}",
+    error: "{{ _('Error') }}",
+    networkError: "{{ _('Network error occurred') }}",
+    askMeAnything: "{{ _('Ask me anything about company data!') }}",
+    thinking: "{{ _('Thinking...') }}",
+    aiAssistant: "{{ _('AI Assistant') }}"
+};
+
+// VAT Validation
+document.getElementById('validateVatBtn').addEventListener('click', async function() {
+    const vatNumber = document.getElementById('vat_number').value.trim();
+    const country = document.getElementById('country').value;
+
+    if (!vatNumber || !country) {
+        alert('{{ _('Please enter both VAT number and country') }}');
+        return;
+    }
+
+    const btn = this;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> ' + crmAddEditTranslations.validating;
+    btn.disabled = true;
+
+    try {
+        const response = await fetch('/api/enrichment/enrich', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({vat_number: country + vatNumber})
+        });
+
+        const data = await response.json();
+        const resultDiv = document.getElementById('vatValidationResult');
+
+        if (data.success && data.services.vat_lookup) {
+            const vatData = data.services.vat_lookup;
+            if (vatData.status === 'valid') {
+                resultDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> ' + crmAddEditTranslations.valid + '</div>';
+
+                // Auto-fill company data if available
+                if (vatData.data && vatData.data.name) {
+                    document.getElementById('company_name').value = vatData.data.name;
+                }
+            } else {
+                resultDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ' + crmAddEditTranslations.invalid + '</div>';
+            }
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> {{ _('Could not validate VAT number') }}</div>';
+        }
+
+        resultDiv.style.display = 'block';
+    } catch (error) {
+        document.getElementById('vatValidationResult').innerHTML =
+            '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> ' + crmAddEditTranslations.networkError + '</div>';
+        document.getElementById('vatValidationResult').style.display = 'block';
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
+// AI Enrichment
+document.getElementById('enrichBtn').addEventListener('click', async function() {
+    const btn = this;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> ' + crmAddEditTranslations.enriching;
+    btn.disabled = true;
+
+    const formData = new FormData(document.getElementById('counterpartyForm'));
+    const data = {
+        company_name: formData.get('company_name'),
+        country: formData.get('country'),
+        vat_number: formData.get('vat_number'),
+        email: formData.get('email'),
+        domain: formData.get('domain')
+    };
+
+    try {
+        const response = await fetch('/api/enrichment/enrich', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        const resultDiv = document.getElementById('enrichmentResult');
+
+        if (result.success && result.prefill) {
+            // Auto-fill available data
+            const prefill = result.prefill;
+            if (prefill.company_name && !document.getElementById('company_name').value) {
+                document.getElementById('company_name').value = prefill.company_name;
+            }
+            if (prefill.address && !document.getElementById('address').value) {
+                document.getElementById('address').value = prefill.address;
+            }
+            if (prefill.contact_person && !document.getElementById('contact_person').value) {
+                document.getElementById('contact_person').value = prefill.contact_person;
+            }
+
+            resultDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> ' + crmAddEditTranslations.enrichmentComplete + '</div>';
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> {{ _('No additional data found') }}</div>';
+        }
+
+        resultDiv.style.display = 'block';
+    } catch (error) {
+        document.getElementById('enrichmentResult').innerHTML =
+            '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> ' + crmAddEditTranslations.networkError + '</div>';
+        document.getElementById('enrichmentResult').style.display = 'block';
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
+// Form Submission
+document.getElementById('counterpartyForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('submitBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> ' + ({{ is_edit|tojson }} ? crmAddEditTranslations.updating : crmAddEditTranslations.saving);
+    btn.disabled = true;
+
+    const formData = new FormData(this);
+    const data = {
+        company_name: formData.get('company_name'),
+        country: formData.get('country'),
+        vat_number: formData.get('vat_number'),
+        email: formData.get('email'),
+        contact_person: formData.get('contact_person'),
+        address: formData.get('address'),
+        domain: formData.get('domain')
+    };
+
+    try {
+        const url = {{ is_edit|tojson }} ? `/crm/api/counterparties/{{ counterparty.id if counterparty else 0 }}` : '/crm/api/counterparties';
+        const method = {{ is_edit|tojson }} ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            window.location.href = '/crm/';
+        } else {
+            alert(crmAddEditTranslations.error + ': ' + result.error);
+        }
+    } catch (error) {
+        alert(crmAddEditTranslations.networkError + ': ' + error.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
+// AI Assistant
+let aiMessages = document.getElementById('aiMessages');
+
+function addMessage(content, isUser = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'ai-message ' + (isUser ? 'ai-message-user' : 'ai-message-bot');
+
+    messageDiv.innerHTML = `
+        <div class="ai-avatar">
+            <i class="bi ${isUser ? 'bi-person' : 'bi-robot'}"></i>
+        </div>
+        <div class="ai-content">
+            <p>${content}</p>
+        </div>
+    `;
+
+    aiMessages.appendChild(messageDiv);
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+
+document.getElementById('aiSendBtn').addEventListener('click', function() {
+    const input = document.getElementById('aiInput');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    addMessage(message, true);
+    input.value = '';
+
+    // Simulate AI response (in real implementation, this would call an AI API)
+    setTimeout(() => {
+        addMessage(crmAddEditTranslations.askMeAnything);
+    }, 1000);
+});
+
+document.getElementById('aiInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('aiSendBtn').click();
+    }
+});
+
+function askAI(question) {
+    document.getElementById('aiInput').value = question;
+    document.getElementById('aiSendBtn').click();
+}
+</script>
+
+{% endblock %}</content>
+<parameter name="filePath">c:\Users\ПК\vat-bot-1\templates\crm\add_edit_counterparty.html

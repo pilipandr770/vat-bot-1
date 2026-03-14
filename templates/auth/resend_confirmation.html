@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}E-Mail Bestätigung erneut senden - VAT Verifizierung{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0"><i class="bi bi-envelope"></i> E-Mail Bestätigung erneut senden</h3>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">
+                        Geben Sie Ihre E-Mail-Adresse ein, um einen neuen Bestätigungslink zu erhalten.
+                    </p>
+
+                    <form method="POST" action="{{ url_for('auth.resend_confirmation') }}">
+                        {{ form.hidden_tag() if form else '' }}
+
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label class="form-label">E-Mail-Adresse</label>
+                            <input type="email" class="form-control form-control-lg" 
+                                   placeholder="ihre@email.de" 
+                                   value="{{ current_user.email }}" 
+                                   disabled>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Bestätigungslink wird an diese Adresse gesendet
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-info w-100 py-2">
+                            <i class="bi bi-envelope"></i> Bestätigungslink erneut senden
+                        </button>
+                    </form>
+
+                    <!-- Back to Dashboard -->
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('dashboard') }}" class="text-muted">
+                            <i class="bi bi-arrow-left"></i> Zurück zum Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

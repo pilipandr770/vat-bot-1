@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- Primary Meta Tags -->
+    <title>VAT Verifizierung - Geschäftspartner Compliance Prüfung | SaaS Platform</title>
+    <meta name="title" content="VAT Verifizierung - Automatische Geschäftspartner Verifizierung & Compliance">
+    <meta name="description" content="Automatische USt-IdNr. Verifizierung, Sanktionsprüfung, Phone Intelligence und Geschäftspartner Compliance. VIES, Handelsregister, ЄДР (Ukraine), EU/OFAC Sanktionslisten und Spam-Telefonnummern Integration. 11+ Module für Business Intelligence.">
+    <meta name="keywords" content="VAT Verification, USt-IdNr, VIES, Sanktionsprüfung, Geschäftspartner, Compliance, Business Intelligence, Due Diligence, CRM, Email Security, Website Security Scanner, Pentesting, Vulnerability Assessment, Website Audit, IT Security, Phone Intelligence, Spam Detection, Telefonnummern Analyse, Ukraine, EDR, EDRPOU">
+    <meta name="author" content="VAT Verifizierung">
+    <meta name="theme-color" content="#0d6efd">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vat-verifizierung.de/">
+    <meta property="og:title" content="VAT Verifizierung - Geschäftspartner Compliance Prüfung">
+    <meta property="og:description" content="Automatische Verifizierung von Geschäftspartnern mit VIES, Sanktionslisten, OSINT, Phone Intelligence und KI-Analyse.">
+    <meta property="og:image" content="https://vat-verifizierung.de/static/images/og-image.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://vat-verifizierung.de/">
+    <meta property="twitter:title" content="VAT Verifizierung - Compliance für Geschäftspartner">
+    <meta property="twitter:description" content="Business Intelligence & Compliance Plattform mit automatischer VAT-Verifizierung und Phone Intelligence.">
+    <meta property="twitter:image" content="https://vat-verifizierung.de/static/images/twitter-image.png">
+    
+    <!-- Robots & Crawling -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://vat-verifizierung.de/">
+    
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "VAT Verifizierung",
+        "description": "Automatische Geschäftspartner Verifizierung & Compliance Prüfung mit VIES, Sanktionslisten, Phone Intelligence und Business Intelligence",
+        "url": "https://vat-verifizierung.de",
+        "applicationCategory": "BusinessApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "9.99",
+            "priceCurrency": "EUR"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "500"
+        }
+    }
+    </script>
+    
+    <!-- Local Business (Germany) JSON-LD for GEO trust -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "VAT Verifizierung",
+        "url": "https://vat-verifizierung.de",
+        "logo": "https://vat-verifizierung.de/static/images/logo.png",
+        "telephone": "+49-30-000000",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Musterstraße 1",
+            "addressLocality": "Berlin",
+            "postalCode": "10115",
+            "addressCountry": "DE"
+        },
+        "description": "Automatische Verifizierung von Geschäftspartnern in Deutschland und EU.",
+        "vatID": "DE123456789",
+        "sameAs": [
+            "https://twitter.com/vatverifizierung",
+            "https://linkedin.com/company/vat-verifizierung"
+        ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "VAT Verifizierung",
+        "url": "https://vat-verifizierung.de",
+        "logo": "https://vat-verifizierung.de/static/logo.png",
+        "description": "Business Intelligence & Compliance Platform",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Service",
+            "email": "support@vat-verification.de"
+        },
+        "sameAs": [
+            "https://twitter.com/vatverifizierung",
+            "https://linkedin.com/company/vat-verifizierung"
+        ]
+    }
+    </script>
+    
+    <!-- Canonical & Links -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/landing.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shield-check"></i> VAT Verifizierung
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#features">Funktionen</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pricing">Preise</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/blog/"><i class="bi bi-journal-richtext me-1"></i>Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://www.linkedin.com/company/111149982/page-posts/published/" target="_blank">
+                        <i class="bi bi-linkedin"></i> LinkedIn
+                    </a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Sign In') }}</a></li>
+                    <li class="nav-item"><a class="btn btn-primary ms-2" href="{{ url_for('auth.register') }}">{{ _('Start Free') }}</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        Komplette <span class="text-primary">Business Intelligence</span> Plattform
+                    </h1>
+                    <p class="lead mb-4">
+                        Mehr als nur VAT-Prüfung: Geschäftspartner-Verifizierung, OSINT-Analyse,
+                        Link-Scans, Email-Intelligence, Phone Intelligence und KI-gestütztes CRM.
+                        Alles in einer DSGVO-konformen Plattform.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-rocket"></i> Jetzt starten (3 Tage gratis)
+                        </a>
+                        <a href="#features" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-stars"></i> Alle Features
+                        </a>
+                    </div>
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <i class="bi bi-check-circle text-success"></i> 3 Tage kostenlos testen
+                            <i class="bi bi-check-circle text-success ms-3"></i> Keine Kreditkarte erforderlich
+                            <i class="bi bi-check-circle text-success ms-3"></i> 10+ Module
+                        </small>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{{ url_for('static', filename='images/hero-illustration.svg') }}" 
+                         alt="VAT Verification Dashboard" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Product Hunt Section -->
+    <section class="py-5 bg-white text-center">
+        <div class="container">
+            <h3 class="mb-4">Wir sind auf Product Hunt!</h3>
+            <a href="https://www.producthunt.com/products/vat-verifizierung?embed=true&utm_source=website&utm_medium=landing" target="_blank" rel="noopener">
+                <img src="https://ph-files.imgix.net/040f673b-9f9d-4d2b-89dc-6288b7afc921.png?auto=format&fit=crop&w=240" alt="VAT Verifizierung auf Product Hunt" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            </a>
+            <p class="mt-3 text-muted">
+                <a href="https://www.producthunt.com/products/vat-verifizierung" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                    Auf Product Hunt abstimmen 
+                </a>
+            </p>
+        </div>
+    </section>
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">11+ Module für Ihre Business Intelligence</h2>
+                <p class="lead text-muted">Umfassende Due Diligence, Sicherheit und Automatisierung</p>
+            </div>
+            
+            <div class="row g-4">
+                <!-- VAT Verification -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-primary text-white rounded-circle mb-3">
+                                <i class="bi bi-patch-check fs-1"></i>
+                            </div>
+                            <h3 class="h5">VIES USt-IdNr. Prüfung</h3>
+                            <p class="text-muted">
+                                Echtzeit-Validierung von EU-Umsatzsteuer-Identifikationsnummern direkt 
+                                über die offizielle VIES-Datenbank.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sanctions Lists -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-danger text-white rounded-circle mb-3">
+                                <i class="bi bi-shield-exclamation fs-1"></i>
+                            </div>
+                            <h3 class="h5">Sanktionslisten</h3>
+                            <p class="text-muted">
+                                Automatischer Abgleich mit EU, OFAC und UK Sanktionslisten. 
+                                Schützen Sie Ihr Unternehmen vor Compliance-Risiken.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Business Registry -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-success text-white rounded-circle mb-3">
+                                <i class="bi bi-building fs-1"></i>
+                            </div>
+                            <h3 class="h5">Handelsregister</h3>
+                            <p class="text-muted">
+                                Überprüfung von Firmendaten im deutschen Handelsregister, tschechischen 
+                                und polnischen Registern sowie ukrainischen ЄДР (Einheitliches Staatsregister).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- OSINT Scanner - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon feature-gradient-purple text-white rounded-circle mb-3">
+                                <i class="bi bi-search fs-1"></i>
+                            </div>
+                            <h3 class="h5">OSINT Scanner <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Domain-Analyse, DNS-Records, SSL-Zertifikate, WHOIS, Security Headers 
+                                und Social Media Präsenz prüfen.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+<!-- Link Scanner - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon feature-gradient-a text-white rounded-circle mb-3">
+                                <i class="bi bi-link-45deg fs-1"></i>
+                            </div>
+                            <h3 class="h5">Link Scanner <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Prüfen Sie URLs auf Phishing, Malware und Betrug. Integration mit VirusTotal
+                                und Google Safe Browsing.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MailGuard - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon feature-gradient-b text-white rounded-circle mb-3">
+                                <i class="bi bi-envelope-at fs-1"></i>
+                            </div>
+                            <h3 class="h5">MailGuard AI <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                KI-gestützte Email-Verwaltung mit automatischen Antworten, 
+                                Gmail/Outlook-Integration und Sicherheitsprüfung.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CRM - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon feature-gradient-a text-white rounded-circle mb-3">
+                                <i class="bi bi-people fs-1"></i>
+                            </div>
+                            <h3 class="h5">Smart CRM <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Automatische Speicherung geprüfter Kontrahenten, Notizen, 
+                                Tags und vollständige Prüfungshistorie an einem Ort.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Company Profile - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-warning text-white rounded-circle mb-3">
+                                <i class="bi bi-person-badge fs-1"></i>
+                            </div>
+                            <h3 class="h5">Firmenprofil <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Speichern Sie Ihre Firmendaten einmal und nutzen Sie Auto-Fill 
+                                bei jeder Prüfung. Spart 60 Sekunden pro Prüfung!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Assistant - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon feature-gradient-c text-white rounded-circle mb-3">
+                                <i class="bi bi-robot fs-1"></i>
+                            </div>
+                            <h3 class="h5">KI-Assistent <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Intelligenter Chatbot beantwortet Ihre Fragen zur Plattform 
+                                24/7 und hilft bei der Navigation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- Website Security Scanner - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon feature-gradient-a text-white rounded-circle mb-3">
+                                <i class="bi bi-shield-exclamation fs-1"></i>
+                            </div>
+                            <h3 class="h5">Website Security Scanner <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Professionelle Website-Sicherheitspr?fung mit 7 Schwachstellen-Checks,
+                                SSL/TLS-Analyse, Security Headers und KI-gest?tzte Empfehlungen.
+                            </p>
+                        </div>
+                    </div>
+                </div>                
+                <!-- Phone Intelligence - NEW -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon feature-gradient-d text-white rounded-circle mb-3">
+                                <i class="bi bi-telephone fs-1"></i>
+                            </div>
+                            <h3 class="h5">Phone Intelligence <span class="badge bg-success">NEU</span></h3>
+                            <p class="text-muted">
+                                Erweiterte Telefonnummern-Analyse mit Spam-Erkennung für USA und Europa.
+                                Über 950 bekannte Spam-Nummern in unserer Datenbank.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+<!-- History & Reports -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-info text-white rounded-circle mb-3">
+                                <i class="bi bi-clock-history fs-1"></i>
+                            </div>
+                            <h3 class="h5">Verlauf & Berichte</h3>
+                            <p class="text-muted">
+                                Vollständige Historie aller Prüfungen mit exportierbaren 
+                                Compliance-Berichten im PDF-Format.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monitoring & Alerts -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-warning text-dark rounded-circle mb-3">
+                                <i class="bi bi-bell fs-1"></i>
+                            </div>
+                            <h3 class="h5">Monitoring & Alerts</h3>
+                            <p class="text-muted">
+                                Automatische Benachrichtigungen bei Statusänderungen Ihrer 
+                                Geschäftspartner per E-Mail oder Telegram.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- REST API -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-secondary text-white rounded-circle mb-3">
+                                <i class="bi bi-code-square fs-1"></i>
+                            </div>
+                            <h3 class="h5">REST API</h3>
+                            <p class="text-muted">
+                                Integrieren Sie alle Module nahtlos in Ihre bestehenden 
+                                Systeme über unsere RESTful API.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Transparente Preise</h2>
+                <p class="lead text-muted">Wählen Sie den Plan, der zu Ihrem Unternehmen passt</p>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                <!-- Basic Plan -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h3 class="h4 mb-3">Basierend</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                9,99€<small class="text-muted fs-6">/Monat</small>
+                            </div>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 100 Prüfungen pro Monat</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> VIES Validierung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Sanktionsprüfung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> OSINT Scanner</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link Scanner</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM Basis</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> KI-Assistent</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Firmenprofil</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> E-Mail Support</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> MailGuard AI</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> API Zugang</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> Handelsregister</li>
+                            </ul>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100">
+                                Kostenlos starten (3 Tage)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="col-lg-4">
+                    <div class="card border-primary border-3 shadow-lg">
+                        <div class="card-header bg-primary text-white text-center py-3">
+                            <span class="badge bg-white text-primary">Beliebt</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <h3 class="h4 mb-3">Professional</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                49,99€<small class="text-muted fs-6">/Monat</small>
+                            </div>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 500 Prüfungen pro Monat</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Validierungsdienste</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Handelsregister Prüfung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Erweiterte Sanktionslisten</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> OSINT Scanner (unbegrenzt)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link Scanner (100 URLs/Monat)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> MailGuard AI (3 Accounts)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (1000 Kontakte)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> API Zugang</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verlauf & Berichte</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Prioritäts-Support</li>
+                            </ul>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100">
+                                Jetzt starten
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h3 class="h4 mb-3">Enterprise</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                149,99€<small class="text-muted fs-6">/Monat</small>
+                            </div>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Unbegrenzte Prüfungen</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Professional Features</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> MailGuard AI (Unbegrenzt)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link Scanner (Unbegrenzt)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (Unbegrenzt)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> White-Label Lösung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Custom API Integration</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Dedizierter Account Manager</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 24/7 Premium Support</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> SLA Garantie</li>
+                            </ul>
+                            <a href="mailto:sales@vatverification.com" class="btn btn-outline-primary w-100">
+                                Kontakt aufnehmen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Häufig gestellte Fragen</h2>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Wie funktioniert die USt-IdNr. Prüfung?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Wir nutzen die offizielle VIES-Datenbank der Europäischen Kommission für Echtzeit-Validierung 
+                                    von EU-Umsatzsteuer-Identifikationsnummern. Die Prüfung erfolgt automatisch und liefert 
+                                    sofortige Ergebnisse über die Gültigkeit der USt-IdNr.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Welche Sanktionslisten werden geprüft?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Wir prüfen EU-Sanktionslisten, OFAC (USA) und UK Sanctions List. Die Listen werden täglich 
+                                    aktualisiert und enthalten Personen, Organisationen und Länder mit Handelsbeschränkungen.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Ist meine Daten DSGVO-konform gespeichert?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Ja, alle Daten werden verschlüsselt in EU-Rechenzentren gespeichert und entsprechen den 
+                                    DSGVO-Anforderungen. Sie haben jederzeit Zugriff auf Ihre Daten und können diese löschen.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Kann ich mein Abonnement jederzeit kündigen?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Ja, Sie können Ihr Abonnement jederzeit mit einem Klick kündigen. Es gibt keine 
+                                    Mindestvertragslaufzeit und keine versteckten Kosten.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    Gibt es eine API für Entwickler?
+                                </button>
+                            </h2>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Ja, ab dem Professional-Plan haben Sie Zugriff auf unsere RESTful API. Vollständige 
+                                    Dokumentation mit Code-Beispielen ist im Dashboard verfügbar.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Blog Section — Latest Articles (auto-generated, SEO boost)
+         ============================================================ -->
+    <section id="blog" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2 class="h3 fw-bold">Aktuelles aus dem B2B-Sicherheits-Blog</h2>
+                <p class="text-muted">Täglich neue Artikel zu VAT-Compliance, Betrugsschutz &amp; sicherem Wirtschaften in Deutschland</p>
+            </div>
+            {% if latest_blog_posts %}
+            <div class="row g-4">
+                {% for post in latest_blog_posts %}
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm" style="transition: transform .2s;">
+                        <div class="card-body d-flex flex-column">
+                            {% if post.category %}
+                            <span class="badge bg-primary mb-2" style="width:fit-content;font-size:.72rem;">
+                                {{ post.category | replace('-', ' ') | title }}
+                            </span>
+                            {% endif %}
+                            <h3 class="h6 fw-bold mb-2">
+                                <a href="/blog/{{ post.slug }}" class="text-dark text-decoration-none">{{ post.title }}</a>
+                            </h3>
+                            {% if post.meta_description %}
+                            <p class="small text-muted flex-grow-1 mb-2">{{ post.meta_description[:120] }}…</p>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top" style="font-size:.78rem;color:#6c757d;">
+                                <span><i class="bi bi-clock me-1"></i>{{ post.read_time_minutes or 3 }} Min.</span>
+                                <span>{{ post.published_at.strftime('%d.%m.%Y') if post.published_at else '' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                <a href="/blog/" class="btn btn-outline-primary">
+                    <i class="bi bi-journal-richtext me-1"></i>Alle Artikel lesen →
+                </a>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="bi bi-journal-bookmark display-4 text-muted"></i>
+                <p class="mt-3 text-muted">Blog wird täglich aktualisiert — erster Artikel erscheint morgen!</p>
+                <a href="/blog/" class="btn btn-outline-primary mt-2">Blog besuchen →</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container text-center">
+            <h2 class="display-5 fw-bold mb-4">Bereit loszulegen?</h2>
+            <p class="lead mb-4">Starten Sie jetzt mit 3 Tagen kostenlosem Test</p>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
+                <i class="bi bi-rocket"></i> Jetzt registrieren
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2025 VAT Verifizierung. Alle Rechte vorbehalten. | USt-IdNr: DE456902445</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{{ url_for('legal.agb') }}" class="text-white me-3">AGB</a>
+                    <a href="{{ url_for('legal.datenschutz') }}" class="text-white me-3">Datenschutz</a>
+                    <a href="{{ url_for('legal.impressum') }}" class="text-white">Impressum</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SALES CHATBOT WIDGET
+         ═══════════════════════════════════════════════════════ -->
+    <style>
+        /* ── Bubble button ── */
+        #sales-chat-bubble {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d6efd, #0040c1);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(13,110,253,.5);
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: transform .2s, box-shadow .2s;
+        }
+        #sales-chat-bubble:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(13,110,253,.65); }
+        #sales-chat-bubble .chat-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            width: 20px; height: 20px;
+            background: #ff3b30;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            animation: pulse-badge 2s infinite;
+        }
+        @keyframes pulse-badge {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* ── Chat window ── */
+        #sales-chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            width: 370px;
+            max-height: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.18);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+        #sales-chat-window.open {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* ── Header ── */
+        .sc-header {
+            background: linear-gradient(135deg, #0d6efd, #0040c1);
+            color: #fff;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sc-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .sc-header-info { flex: 1; }
+        .sc-header-info strong { display: block; font-size: 15px; }
+        .sc-header-info small { font-size: 12px; opacity: .85; }
+        .sc-online-dot {
+            width: 8px; height: 8px;
+            background: #34c759;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .sc-close-btn {
+            background: none; border: none; color: #fff;
+            font-size: 20px; cursor: pointer; padding: 0; line-height: 1;
+            opacity: .8;
+        }
+        .sc-close-btn:hover { opacity: 1; }
+
+        /* ── Messages area ── */
+        .sc-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8f9fa;
+            min-height: 200px;
+            max-height: 360px;
+        }
+        .sc-msg {
+            max-width: 86%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        .sc-msg.bot {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            color: #212529;
+        }
+        .sc-msg.user {
+            background: #0d6efd;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+        }
+        .sc-msg.typing {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            align-self: flex-start;
+            padding: 12px 16px;
+        }
+        .sc-typing-dots span {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #adb5bd;
+            margin: 0 2px;
+            animation: dot-bounce .9s infinite;
+        }
+        .sc-typing-dots span:nth-child(2) { animation-delay: .15s; }
+        .sc-typing-dots span:nth-child(3) { animation-delay: .3s; }
+        @keyframes dot-bounce {
+            0%,80%,100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+
+        /* ── Quick replies ── */
+        .sc-quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 16px 4px;
+            background: #f8f9fa;
+        }
+        .sc-quick-btn {
+            font-size: 12px;
+            padding: 5px 11px;
+            border-radius: 20px;
+            border: 1.5px solid #0d6efd;
+            color: #0d6efd;
+            background: #fff;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            white-space: nowrap;
+        }
+        .sc-quick-btn:hover, .sc-quick-btn:focus {
+            background: #0d6efd; color: #fff;
+        }
+
+        /* ── Input area ── */
+        .sc-input-area {
+            padding: 12px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 8px;
+            background: #fff;
+        }
+        .sc-input {
+            flex: 1;
+            border: 1.5px solid #dee2e6;
+            border-radius: 22px;
+            padding: 9px 15px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            max-height: 80px;
+            transition: border-color .15s;
+        }
+        .sc-input:focus { border-color: #0d6efd; }
+        .sc-send-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            font-size: 17px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .15s;
+        }
+        .sc-send-btn:hover { background: #0040c1; }
+        .sc-send-btn:disabled { background: #adb5bd; cursor: default; }
+
+        /* ── CTA inside chat ── */
+        .sc-cta-block {
+            background: linear-gradient(135deg,#e8f0fe,#dbeafe);
+            border: 1px solid #93c5fd;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #1e40af;
+            margin-top: 4px;
+        }
+        .sc-cta-block a {
+            display: inline-block;
+            margin-top: 6px;
+            background: #0d6efd;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .sc-cta-block a:hover { background: #0040c1; }
+
+        @media (max-width: 480px) {
+            #sales-chat-window { width: calc(100vw - 20px); right: 10px; bottom: 90px; }
+            #sales-chat-bubble { right: 16px; bottom: 16px; }
+        }
+    </style>
+
+    <!-- Bubble button -->
+    <button id="sales-chat-bubble" onclick="scToggle()" title="Chat mit uns">
+        <i class="bi bi-chat-dots-fill" id="sc-bubble-icon"></i>
+        <span class="chat-badge" id="sc-badge">1</span>
+    </button>
+
+    <!-- Chat window -->
+    <div id="sales-chat-window">
+        <!-- Header -->
+        <div class="sc-header">
+            <div class="sc-avatar">🤖</div>
+            <div class="sc-header-info">
+                <strong>Alex – Ihr Berater</strong>
+                <small><span class="sc-online-dot"></span>Online · antwortet sofort</small>
+            </div>
+            <button class="sc-close-btn" onclick="scToggle()">✕</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="sc-messages" id="sc-messages"></div>
+
+        <!-- Quick replies (shown initially) -->
+        <div class="sc-quick-replies" id="sc-quick-replies">
+            <button class="sc-quick-btn" onclick="scQuick('Ich prüfe Lieferanten vor Vertragsabschluss')">Lieferanten prüfen</button>
+            <button class="sc-quick-btn" onclick="scQuick('Ich habe Angst vor Betrug und Phishing')">Betrug verhindern</button>
+            <button class="sc-quick-btn" onclick="scQuick('Was kostet die Plattform?')">Preise</button>
+            <button class="sc-quick-btn" onclick="scQuick('Welche Länder werden unterstützt?')">Länder</button>
+        </div>
+
+        <!-- Input -->
+        <div class="sc-input-area">
+            <textarea class="sc-input" id="sc-input" rows="1"
+                placeholder="Schreiben Sie uns..." 
+                onkeydown="scKeyDown(event)"
+                oninput="scAutoResize(this)"></textarea>
+            <button class="sc-send-btn" id="sc-send" onclick="scSend()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        // ── State ──
+        const history = [];          // [{role, content}]
+        let isOpen = false;
+        let isBusy = false;
+        let greeted = false;
+
+        const WELCOME = "👋 Hallo! Ich bin Alex, Ihr persönlicher Berater für die VAT Verifizierung Plattform.\n\nDamit ich Ihnen die passende Lösung zeigen kann – was ist aktuell Ihre größte Herausforderung bei der Geschäftspartner-Prüfung?";
+
+        // ── Toggle ──
+        window.scToggle = function () {
+            isOpen = !isOpen;
+            const win = document.getElementById('sales-chat-window');
+            const icon = document.getElementById('sc-bubble-icon');
+            const badge = document.getElementById('sc-badge');
+
+            if (isOpen) {
+                win.classList.add('open');
+                icon.className = 'bi bi-x-lg';
+                badge.style.display = 'none';
+                if (!greeted) { greeted = true; scAddMsg('bot', WELCOME); }
+                setTimeout(() => document.getElementById('sc-input').focus(), 300);
+            } else {
+                win.classList.remove('open');
+                icon.className = 'bi bi-chat-dots-fill';
+            }
+        };
+
+        // ── Quick replies ──
+        window.scQuick = function (text) {
+            document.getElementById('sc-quick-replies').style.display = 'none';
+            scAddMsg('user', text);
+            scRequest(text);
+        };
+
+        // ── Add message bubble ──
+        function scAddMsg(role, text) {
+            const container = document.getElementById('sc-messages');
+            const div = document.createElement('div');
+            div.className = 'sc-msg ' + role;
+
+            if (role === 'bot') {
+                // Convert markdown-like **bold**, newlines, and detect CTA
+                let html = scFormatText(text);
+                div.innerHTML = html;
+
+                // Auto-inject CTA if message contains registration hint
+                if (/registrier|3 Tage|jetzt starten|kostenlos testen/i.test(text)) {
+                    const cta = document.createElement('div');
+                    cta.className = 'sc-cta-block';
+                    cta.innerHTML = '🎁 <strong>3 Tage kostenlos testen</strong> – keine Kreditkarte!<br><a href="/auth/register">Jetzt registrieren →</a>';
+                    container.appendChild(div);
+                    container.appendChild(cta);
+                    scScrollBottom();
+                    return;
+                }
+            } else {
+                div.textContent = text;
+            }
+
+            container.appendChild(div);
+            scScrollBottom();
+        }
+
+        function scFormatText(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // ── Typing indicator ──
+        function scShowTyping() {
+            const container = document.getElementById('sc-messages');
+            const div = document.createElement('div');
+            div.className = 'sc-msg typing';
+            div.id = 'sc-typing';
+            div.innerHTML = '<span class="sc-typing-dots"><span></span><span></span><span></span></span>';
+            container.appendChild(div);
+            scScrollBottom();
+        }
+        function scHideTyping() {
+            const el = document.getElementById('sc-typing');
+            if (el) el.remove();
+        }
+
+        // ── API call ──
+        async function scRequest(message) {
+            if (isBusy) return;
+            isBusy = true;
+            document.getElementById('sc-send').disabled = true;
+
+            history.push({ role: 'user', content: message });
+            scShowTyping();
+
+            try {
+                const res = await fetch('/api/sales-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, history: history.slice(0, -1) })
+                });
+                const data = await res.json();
+                scHideTyping();
+
+                const reply = data.response || data.error || 'Entschuldigung, bitte versuchen Sie es erneut.';
+                history.push({ role: 'assistant', content: reply });
+                scAddMsg('bot', reply);
+            } catch (e) {
+                scHideTyping();
+                scAddMsg('bot', '⚠️ Kurze Verbindungsstörung. Bitte versuchen Sie es nochmal.');
+            }
+
+            isBusy = false;
+            document.getElementById('sc-send').disabled = false;
+            document.getElementById('sc-input').focus();
+        }
+
+        // ── Send ──
+        window.scSend = function () {
+            const input = document.getElementById('sc-input');
+            const text = input.value.trim();
+            if (!text || isBusy) return;
+            input.value = '';
+            scAutoResize(input);
+            document.getElementById('sc-quick-replies').style.display = 'none';
+            scAddMsg('user', text);
+            scRequest(text);
+        };
+
+        // ── Keyboard ──
+        window.scKeyDown = function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                scSend();
+            }
+        };
+
+        // ── Auto-resize textarea ──
+        window.scAutoResize = function (el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+        };
+
+        // ── Scroll ──
+        function scScrollBottom() {
+            const c = document.getElementById('sc-messages');
+            c.scrollTop = c.scrollHeight;
+        }
+
+        // ── Auto-open after 8 seconds (first visit) ──
+        if (!sessionStorage.getItem('sc_opened')) {
+            setTimeout(() => {
+                sessionStorage.setItem('sc_opened', '1');
+                scToggle();
+            }, 8000);
+        }
+    })();
+    </script>
+    <!-- ═══════════════════════════════════════════════════════ -->
+</body>
+</html>
+
+

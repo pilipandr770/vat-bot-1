@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('MailGuard Dashboard - Email Intelligence') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fas fa-shield-alt"></i> {{ _('MailGuard Dashboard') }}
+                <small class="text-muted">{{ _('Email Intelligence & Security') }}</small>
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Connected Accounts') }}</h5>
+                    <h2>{{ accounts|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Active Rules') }}</h5>
+                    <h2>{{ rules|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Messages Today') }}</h5>
+                    <h2>{{ stats.messages_today }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Pending Approvals') }}</h5>
+                    <h2>{{ stats.pending_approvals }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connected Email Accounts -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ _('Email Accounts') }}</h5>
+                    <div>
+                        <a href="{{ url_for('mailguard.accounts') }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i> {{ _('Add Email Account') }}
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if accounts %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('Email') }}</th>
+                                    <th>{{ _('Provider') }}</th>
+                                    <th>{{ _('Status') }}</th>
+                                    <th>{{ _('Last Sync') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for account in accounts %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-envelope"></i> {{ account.email }}
+                                    </td>
+                                    <td>
+                                        {% if account.provider == 'gmail' %}
+                                            <i class="fab fa-google"></i> {{ _('Gmail') }}
+                                        {% elif account.provider == 'microsoft' %}
+                                            <i class="fab fa-microsoft"></i> {{ _('Microsoft 365') }}
+                                        {% else %}
+                                            <i class="fas fa-server"></i> {{ _('IMAP') }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if account.is_active %}
+                                            <span class="badge badge-success">{{ _('Active') }}</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">{{ _('Inactive') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ account.updated_at.strftime('%Y-%m-%d %H:%M') if account.updated_at else _('Never') }}</td>
+                                    <td>
+                                        <a href="#" onclick="alert(mailguardDashboardTranslations.accountDetailsComingSoon); return false;" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-danger" onclick="disconnectAccount({{ account.id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> {{ _('No email accounts configured yet.') }} {{ _('Add your first email account to get started.') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    {% if pending_drafts %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ _('Pending Approvals') }}</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ _('From') }}</th>
+                                <th>{{ _('Subject') }}</th>
+                                <th>{{ _('Draft Reply') }}</th>
+                                <th>{{ _('Created') }}</th>
+                                <th>{{ _('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for draft in pending_drafts %}
+                            {% set preview_source = draft.body_text or (draft.body_html | striptags if draft.body_html else '') %}
+                            <tr>
+                                <td>{{ draft.message.from_email }}</td>
+                                <td>{{ draft.message.subject }}</td>
+                                <td>
+                                    {% if preview_source %}
+                                        {{ preview_source[:120] }}{% if preview_source|length > 120 %}…{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">–</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ draft.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('mailguard.message_detail', message_id=draft.message_id) }}" class="btn btn-sm btn-primary" style="min-width: 90px;"><i class="bi bi-info-circle"></i> {{ _('View Details') }}</a>
+                                        <form method="POST" action="{{ url_for('mailguard.approve_and_send', draft_id=draft.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-success" style="min-width: 90px;">
+                                                <i class="fas fa-check"></i> {{ _('Approve') }}
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('mailguard.reject_draft', draft_id=draft.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger" style="min-width: 90px;">
+                                                <i class="fas fa-times"></i> {{ _('Reject') }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// MailGuard Dashboard Translations
+const mailguardDashboardTranslations = {
+    areYouSureDisconnect: "{{ _('Are you sure you want to disconnect this email account?') }}",
+    areYouSureDeleteRule: "{{ _('Are you sure you want to delete this rule?') }}",
+    rejectDraftReply: "{{ _('Reject this draft reply?') }}",
+    accountDetailsComingSoon: "{{ _('Account details coming soon') }}"
+};
+
+function disconnectAccount(accountId) {
+    if (confirm(mailguardDashboardTranslations.areYouSureDisconnect)) {
+        fetch(`/mailguard/account/${accountId}/disconnect`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error disconnecting account: ' + data.error);
+            }
+        });
+    }
+}
+
+function deleteRule(ruleId) {
+    if (confirm(mailguardDashboardTranslations.areYouSureDeleteRule)) {
+        fetch(`/mailguard/rule/${ruleId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error deleting rule: ' + data.error);
+            }
+        });
+    }
+}
+
+function rejectDraft(draftId) {
+    if (confirm(mailguardDashboardTranslations.rejectDraftReply)) {
+        fetch(`/mailguard/draft/${draftId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error rejecting draft: ' + data.error);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

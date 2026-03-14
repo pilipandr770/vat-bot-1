@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+{% from "macros.html" import language_selector %}
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ _('VAT Verification System') }}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('landing' if not current_user.is_authenticated else 'dashboard') }}">
+                <i class="bi bi-shield-check"></i> {{ _('VAT Verification') }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if current_user.is_authenticated %}
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> {{ _('Dashboard') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        {# removed verification history link (duplicate of CRM) #}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('osint.scan') }}">
+                            <i class="bi bi-search"></i> {{ _('OSINT Scanner') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('phoneintel.phoneintel_ui') }}">
+                            <i class="bi bi-telephone"></i> {{ _('Phone Intelligence') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('link_scanner.scan_page') }}">
+                            <i class="bi bi-link-45deg"></i> {{ _('Link Scanner') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('mailguard.dashboard') }}">
+                            <i class="bi bi-envelope-check"></i> {{ _('MailGuard') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pentesting_scanner') }}">
+                            <i class="bi bi-shield-exclamation"></i> {{ _('Website Scanner') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('crm.index') }}">
+                            <i class="bi bi-people"></i> {{ _('CRM') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('chatbot.chat_page') }}">
+                            <i class="bi bi-robot"></i> {{ _('AI Assistant') }}
+                        </a>
+                    </li>
+                    {% if current_user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="{{ url_for('admin.dashboard') }}">
+                            <i class="bi bi-shield-lock"></i> {{ _('Admin') }}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        {{ language_selector() }}
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> {{ current_user.first_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
+                                <i class="bi bi-person"></i> {{ _('Profile') }}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.company_profile') }}">
+                                <i class="bi bi-building"></i> {{ _('Company Profile') }}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('payments.pricing') }}">
+                                <i class="bi bi-credit-card"></i> {{ _('Subscription') }}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('payments.customer_portal') }}">
+                                <i class="bi bi-gear"></i> {{ _('Manage Payments') }}
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> {{ _('Logout') }}
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% else %}
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('landing') }}#features">{{ _('Features') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('payments.pricing') }}">{{ _('Pricing') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/company/111149982/page-posts/published/" target="_blank">
+                            <i class="bi bi-linkedin"></i> LinkedIn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Sign In') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2" href="{{ url_for('auth.register') }}">
+                            {{ _('Start Free') }}
+                        </a>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-4 bg-light border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-primary">
+                        <i class="bi bi-shield-check"></i> VAT Verifizierung
+                    </h5>
+                    <p class="text-muted small">
+                        Professionelle Geschäftspartner-Verifizierung für sicheres B2B-Geschäft.
+                    </p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase fw-bold mb-3">{{ _('Rechtliches') }}</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{{ url_for('legal.impressum') }}" class="text-muted text-decoration-none">
+                                <i class="bi bi-file-text"></i> {{ _('Impressum') }}
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('legal.datenschutz') }}" class="text-muted text-decoration-none">
+                                <i class="bi bi-shield-lock"></i> {{ _('Datenschutz') }}
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('legal.agb') }}" class="text-muted text-decoration-none">
+                                <i class="bi bi-file-earmark-text"></i> {{ _('AGB') }}
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('legal.gdpr_request') }}" class="text-muted text-decoration-none">
+                                <i class="bi bi-shield-check"></i> {{ _('DSGVO-Anfrage') }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase fw-bold mb-3">{{ _('Kontakt') }}</h6>
+                    <p class="text-muted small mb-1">
+                        <i class="bi bi-envelope"></i> 
+                        <a href="mailto:andrii.it.info@gmail.com" class="text-muted text-decoration-none">
+                            andrii.it.info@gmail.com
+                        </a>
+                    </p>
+                    <p class="text-muted small mb-1">
+                        <i class="bi bi-telephone"></i> 
+                        <a href="tel:+4916095030120" class="text-muted text-decoration-none">
+                            +49 160 95030120
+                        </a>
+                    </p>
+                    <p class="text-muted small mb-1">
+                        <i class="bi bi-geo-alt"></i> 
+                        Frankfurt am Main, Deutschland
+                    </p>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-linkedin"></i> 
+                        <a href="https://www.linkedin.com/company/111149982/page-posts/published/" target="_blank" class="text-muted text-decoration-none">
+                            LinkedIn
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="row">
+                <div class="col-md-8 text-center text-md-start">
+                    <p class="text-muted small mb-0">
+                        © {{ current_date.year if current_date else 2025 }} AndriiIT. {{ _('Alle Rechte vorbehalten') }}. | USt-IdNr: DE456902445
+                    </p>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-shield-check text-success"></i> {{ _('DSGVO-konform') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
