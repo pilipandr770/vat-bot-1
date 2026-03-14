@@ -271,6 +271,14 @@ def create_app(config_name=None):
     # Register Blog blueprint
     from routes.blog import blog_bp
     app.register_blueprint(blog_bp)
+
+    # Register EU Compliance Checker blueprint
+    from compliance_checker.routes import compliance_checker_bp
+    app.register_blueprint(compliance_checker_bp)
+
+    # Register AI Consumer Panel blueprint
+    from consumer_panel.routes import consumer_panel_bp
+    app.register_blueprint(consumer_panel_bp)
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         init_scheduler(app=app)

@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block title %}EU Website Compliance Checker – Impressum, DSGVO, Cookie-Banner{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <!-- Header -->
+  <div class="text-center mb-5">
+    <div class="mb-3">
+      <span class="badge bg-success fs-6 mb-2">Kostenlos &amp; ohne Registrierung</span>
+    </div>
+    <h1 class="display-5 fw-bold">
+      <i class="bi bi-shield-check text-success me-2"></i>EU Website Compliance Checker
+    </h1>
+    <p class="lead text-muted mt-3" style="max-width:680px;margin:auto">
+      Überprüfen Sie, ob Ihre Website die rechtlichen Anforderungen in Deutschland erfüllt –
+      Impressum (§5 TMG), Datenschutzerklärung (DSGVO), AGB, Widerrufsbelehrung und Cookie-Banner.
+    </p>
+  </div>
+
+  <!-- Input form -->
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-3">
+            <i class="bi bi-globe me-2 text-primary"></i>Website-URL eingeben
+          </h5>
+          <div class="input-group input-group-lg">
+            <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+            <input id="urlInput" type="url" class="form-control"
+                   placeholder="https://example.de"
+                   value="" autocomplete="url">
+            <button id="checkBtn" class="btn btn-success px-4" type="button">
+              <i class="bi bi-search me-1"></i>Prüfen
+            </button>
+          </div>
+          <div class="mt-2 text-muted small">
+            <i class="bi bi-info-circle me-1"></i>
+            Geben Sie die vollständige URL inkl. <code>https://</code> ein.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div id="loadingSection" class="text-center py-5 d-none">
+    <div class="spinner-border text-success mb-3" role="status" style="width:3rem;height:3rem"></div>
+    <p class="text-muted">Prüfung läuft… (ca. 15–30 Sekunden)</p>
+    <div class="progress mt-3 mx-auto" style="max-width:400px;height:8px">
+      <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+           style="width: 10%"></div>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div id="errorSection" class="row justify-content-center mt-4 d-none">
+    <div class="col-lg-8">
+      <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+        <span id="errorMessage">Fehler bei der Prüfung.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="resultsSection" class="mt-5 d-none">
+
+    <!-- Score card -->
+    <div class="row justify-content-center mb-4">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow" id="scoreCard">
+          <div class="card-body text-center py-4">
+            <p class="text-muted mb-1">Compliance-Score für <strong id="checkedUrl"></strong></p>
+            <div id="scoreDisplay" class="display-2 fw-bold my-2"></div>
+            <div id="scoreBadge" class="mb-3"></div>
+            <p id="scoreLabel" class="text-muted mb-0"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cookie banner card -->
+    <div class="row justify-content-center mb-4">
+      <div class="col-lg-8">
+        <div id="cookieCard" class="card shadow-sm">
+          <div class="card-body d-flex align-items-center">
+            <div id="cookieIcon" class="fs-2 me-3"></div>
+            <div>
+              <h6 class="mb-1">Cookie-Banner / Einwilligungsmanagement</h6>
+              <small id="cookieText" class="text-muted"></small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-page accordion -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <h5 class="mb-3"><i class="bi bi-file-text me-2"></i>Detailanalyse pro Seite</h5>
+        <div id="pagesAccordion" class="accordion"></div>
+      </div>
+    </div>
+
+    <!-- AI Summary -->
+    <div class="row justify-content-center mt-4">
+      <div class="col-lg-8">
+        <div class="card border-start border-4 border-primary shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title text-primary mb-2">
+              <i class="bi bi-robot me-1"></i>KI-Zusammenfassung &amp; Empfehlungen
+            </h6>
+            <p id="aiSummary" class="mb-0 text-muted fst-italic"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Check another -->
+    <div class="text-center mt-5">
+      <button id="resetBtn" class="btn btn-outline-secondary px-4">
+        <i class="bi bi-arrow-repeat me-1"></i>Weitere Website prüfen
+      </button>
+    </div>
+
+  </div><!-- /resultsSection -->
+
+</div><!-- /container -->
+
+<script>
+const checkBtn  = document.getElementById('checkBtn');
+const resetBtn  = document.getElementById('resetBtn');
+const urlInput  = document.getElementById('urlInput');
+const loading   = document.getElementById('loadingSection');
+const error     = document.getElementById('errorSection');
+const results   = document.getElementById('resultsSection');
+const progressBar = document.getElementById('progressBar');
+
+let progressTimer;
+
+function startProgress() {
+  let p = 10;
+  progressTimer = setInterval(() => {
+    p = Math.min(p + (90 - p) * 0.08, 88);
+    progressBar.style.width = p + '%';
+  }, 800);
+}
+function stopProgress() {
+  clearInterval(progressTimer);
+  progressBar.style.width = '100%';
+}
+
+function showSection(id) {
+  ['loadingSection','errorSection','resultsSection'].forEach(s => {
+    document.getElementById(s).classList.toggle('d-none', s !== id);
+  });
+}
+
+function scoreColor(score) {
+  if (score >= 80) return {text:'text-success', bg:'bg-success', label:'Sehr gut – Website erfüllt die wichtigsten Anforderungen'};
+  if (score >= 60) return {text:'text-warning', bg:'bg-warning', label:'Ausreichend – Verbesserungen empfohlen'};
+  if (score >= 40) return {text:'text-orange',  bg:'bg-warning', label:'Mangelhaft – mehrere Pflichtangaben fehlen'};
+  return {text:'text-danger', bg:'bg-danger', label:'Kritisch – erhebliche rechtliche Risiken'};
+}
+
+function statusIcon(status) {
+  if (status === 'found')   return '<i class="bi bi-check-circle-fill text-success fs-4"></i>';
+  if (status === 'partial') return '<i class="bi bi-exclamation-triangle-fill text-warning fs-4"></i>';
+  return '<i class="bi bi-x-circle-fill text-danger fs-4"></i>';
+}
+
+function renderResults(data) {
+  const score = data.score;
+  const c = scoreColor(score);
+
+  document.getElementById('checkedUrl').textContent = data.url;
+  document.getElementById('scoreDisplay').textContent = score + '/100';
+  document.getElementById('scoreDisplay').className = 'display-2 fw-bold my-2 ' + c.text;
+  document.getElementById('scoreBadge').innerHTML =
+    `<span class="badge ${c.bg} fs-6">${score >= 80 ? 'COMPLIANT' : score >= 60 ? 'TEILWEISE' : 'NICHT KONFORM'}</span>`;
+  document.getElementById('scoreLabel').textContent = c.label;
+
+  // Cookie
+  const cookieOk = data.cookie_banner;
+  document.getElementById('cookieIcon').innerHTML = cookieOk
+    ? '<i class="bi bi-check-circle-fill text-success"></i>'
+    : '<i class="bi bi-x-circle-fill text-danger"></i>';
+  document.getElementById('cookieText').textContent = cookieOk
+    ? 'Cookie-Banner oder Einwilligungsdialog erkannt.'
+    : 'Kein Cookie-Banner erkannt – häufig erforderlich gemäß ePrivacy-Richtlinie.';
+  document.getElementById('cookieCard').className =
+    'card shadow-sm border-start border-4 ' + (cookieOk ? 'border-success' : 'border-danger');
+
+  // Per-page accordion
+  const accordion = document.getElementById('pagesAccordion');
+  accordion.innerHTML = '';
+  Object.entries(data.pages).forEach(([ptype, pd], i) => {
+    const st = pd.status;
+    const collapseId = 'collapse' + i;
+    const issuesList = (pd.issues || []).map(iss =>
+      `<li class="list-group-item list-group-item-warning py-1 small"><i class="bi bi-exclamation-triangle me-1"></i>${iss}</li>`
+    ).join('');
+    const okList = (pd.ok_elements || []).map(ok =>
+      `<li class="list-group-item list-group-item-success py-1 small"><i class="bi bi-check me-1"></i>${ok}</li>`
+    ).join('');
+    const borderClass = st === 'found' ? 'border-success' : st === 'partial' ? 'border-warning' : 'border-danger';
+
+    accordion.innerHTML += `
+      <div class="accordion-item border-start border-3 ${borderClass} mb-2 shadow-sm">
+        <h2 class="accordion-header">
+          <button class="accordion-button ${i !== 0 ? 'collapsed' : ''}" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+            ${statusIcon(st)} <span class="ms-2 fw-semibold">${ptype}</span>
+            <span class="ms-auto me-3 badge ${st === 'found' ? 'bg-success' : st === 'partial' ? 'bg-warning text-dark' : 'bg-danger'}">
+              ${st === 'found' ? 'Vorhanden' : st === 'partial' ? 'Unvollständig' : 'Fehlt'}
+            </span>
+          </button>
+        </h2>
+        <div id="${collapseId}" class="accordion-collapse collapse ${i === 0 ? 'show' : ''}">
+          <div class="accordion-body pt-2">
+            ${pd.url ? `<p class="small mb-2 text-muted"><i class="bi bi-link me-1"></i><a href="${pd.url}" target="_blank" rel="noopener noreferrer nofollow">${pd.url}</a></p>` : ''}
+            ${pd.summary ? `<p class="small mb-2">${pd.summary}</p>` : ''}
+            ${pd.law ? `<span class="badge bg-secondary mb-2 me-1">${pd.law}</span>` : ''}
+            <ul class="list-group list-group-flush mb-0">
+              ${okList}
+              ${issuesList}
+            </ul>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  // AI summary
+  document.getElementById('aiSummary').textContent = data.ai_summary || 'Keine KI-Zusammenfassung verfügbar.';
+
+  showSection('resultsSection');
+}
+
+checkBtn.addEventListener('click', async () => {
+  const url = urlInput.value.trim();
+  if (!url) { urlInput.focus(); return; }
+  if (!/^https?:\/\/.+/.test(url)) {
+    urlInput.classList.add('is-invalid');
+    return;
+  }
+  urlInput.classList.remove('is-invalid');
+  showSection('loadingSection');
+  startProgress();
+
+  try {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    const resp = await fetch('/compliance-check/check', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken || ''
+      },
+      body: JSON.stringify({ url })
+    });
+    stopProgress();
+    const data = await resp.json();
+    if (!resp.ok) {
+      document.getElementById('errorMessage').textContent = data.error || 'Unbekannter Fehler.';
+      showSection('errorSection');
+      return;
+    }
+    renderResults(data);
+  } catch (err) {
+    stopProgress();
+    document.getElementById('errorMessage').textContent = 'Netzwerkfehler: ' + err.message;
+    showSection('errorSection');
+  }
+});
+
+urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkBtn.click(); });
+
+resetBtn.addEventListener('click', () => {
+  urlInput.value = '';
+  showSection('loadingSection'); // hack to hide all
+  document.getElementById('loadingSection').classList.add('d-none');
+  urlInput.focus();
+});
+</script>
+{% endblock %}

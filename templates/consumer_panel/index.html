@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+{% block title %}KI B2B Marktforschung – Synthetic Consumer Panel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <!-- Header -->
+  <div class="text-center mb-5">
+    <div class="mb-3">
+      <span class="badge bg-primary fs-6 mb-2">Kostenlos &amp; ohne Registrierung</span>
+    </div>
+    <h1 class="display-5 fw-bold">
+      <i class="bi bi-people-fill text-primary me-2"></i>KI B2B Marktforschung
+    </h1>
+    <p class="lead text-muted mt-3" style="max-width:700px;margin:auto">
+      15 synthetische deutsche B2B-Entscheider bewerten Ihr Produkt oder Tool.
+      Erhalten Sie in 60 Sekunden echtes Käufer-Feedback, Zahlungsbereitschaft und
+      einen Executive Summary für Ihre Produktstrategie.
+    </p>
+  </div>
+
+  <!-- Input form -->
+  <div class="row justify-content-center" id="inputSection">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-4">
+            <i class="bi bi-box-seam me-2 text-primary"></i>Produkt beschreiben
+          </h5>
+          <div class="mb-3">
+            <label for="productName" class="form-label fw-semibold">Produktname / Tool-Name</label>
+            <input id="productName" type="text" class="form-control form-control-lg"
+                   placeholder="z.B. VAT-Verification SaaS, HR-Software, Buchhaltungs-Tool…">
+          </div>
+          <div class="mb-4">
+            <label for="productDesc" class="form-label fw-semibold">Produktbeschreibung</label>
+            <textarea id="productDesc" class="form-control" rows="6"
+                      placeholder="Beschreiben Sie Ihr Produkt, seine Hauptfunktionen, Zielgruppe und den wichtigsten Nutzen. Je detaillierter, desto präziser das Panel-Ergebnis."></textarea>
+            <div class="form-text">Mindestens 100 Zeichen für aussagekräftige Ergebnisse empfohlen.</div>
+          </div>
+          <div class="d-grid">
+            <button id="runBtn" class="btn btn-primary btn-lg">
+              <i class="bi bi-play-circle me-2"></i>Panel starten (15 Personas, ~60 Sekunden)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Example personas preview -->
+      <div class="card mt-3 bg-light border-0">
+        <div class="card-body py-3">
+          <p class="mb-2 small fw-semibold text-muted">
+            <i class="bi bi-people me-1"></i>Beispiel-Personas im Panel:
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            {% for p in [
+              ('Klaus M.','Geschäftsführer KMU'),
+              ('Sarah K.','IT-Leiterin'),
+              ('Mohamed A.','CFO'),
+              ('Petra W.','Buchhalterin'),
+              ('Jan B.','Startup-Gründer'),
+              ('Anna S.','Compliance-Officer'),
+              ('Lisa H.','Steuerberaterin'),
+              ('Thomas R.','Vertriebsleiter')
+            ] %}
+            <span class="badge bg-white border text-dark small">{{ p[0] }} – {{ p[1] }}</span>
+            {% endfor %}
+            <span class="badge bg-white border text-muted small">+ 7 weitere…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingSection" class="text-center py-5 d-none">
+    <div class="spinner-border text-primary mb-3" role="status" style="width:3.5rem;height:3.5rem"></div>
+    <h5 class="text-muted mb-2">Panel läuft…</h5>
+    <p class="text-muted small mb-4">
+      15 KI-Personas werden befragt – das kann bis zu 60 Sekunden dauern.
+    </p>
+    <div class="progress mx-auto" style="max-width:420px;height:10px">
+      <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+           style="width:5%"></div>
+    </div>
+    <p id="progressLabel" class="text-muted small mt-2">Initialisiere Personas…</p>
+  </div>
+
+  <!-- Error -->
+  <div id="errorSection" class="row justify-content-center mt-4 d-none">
+    <div class="col-lg-8">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span id="errorMessage">Fehler.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="resultsSection" class="mt-5 d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>Panel-Ergebnisse</h3>
+      <button id="resetBtn" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-repeat me-1"></i>Neues Panel
+      </button>
+    </div>
+
+    <!-- KPI cards row -->
+    <div class="row g-3 mb-4" id="kpiRow">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="card border-start border-4 border-primary shadow mb-4">
+      <div class="card-body">
+        <h5 class="card-title text-primary mb-3">
+          <i class="bi bi-file-earmark-text me-2"></i>Executive Summary
+        </h5>
+        <p id="execSummary" class="mb-0" style="line-height:1.7"></p>
+      </div>
+    </div>
+
+    <!-- Would-buy chart -->
+    <div class="row mb-4">
+      <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-cart-check me-1"></i>Kaufbereitschaft
+            </h6>
+            <div id="wouldBuyChart"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-chat-left-text me-1"></i>Hauptbedenken der Entscheider
+            </h6>
+            <ul id="concernsList" class="list-group list-group-flush small"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="card-title mb-3">
+          <i class="bi bi-stars text-warning me-1"></i>Genannte Hauptvorteile
+        </h6>
+        <ul id="benefitsList" class="list-group list-group-flush small"></ul>
+      </div>
+    </div>
+
+    <!-- Persona table -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="card-title mb-3">
+          <i class="bi bi-table me-1"></i>Antworten aller Personas
+        </h6>
+        <div class="table-responsive">
+          <table class="table table-hover table-sm align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Unternehmen</th>
+                <th class="text-center">Relevanz</th>
+                <th class="text-end">Zahlungsb.</th>
+                <th>Kaufentscheidung</th>
+              </tr>
+            </thead>
+            <tbody id="personaTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const runBtn   = document.getElementById('runBtn');
+const resetBtn = document.getElementById('resetBtn');
+const loading  = document.getElementById('loadingSection');
+const errorSec = document.getElementById('errorSection');
+const resultsSec = document.getElementById('resultsSection');
+const progressBar = document.getElementById('progressBar');
+const progressLabel = document.getElementById('progressLabel');
+
+const progressMessages = [
+  'Initialisiere Personas…',
+  'Befrage Geschäftsführer und IT-Leiter…',
+  'Befrage CFO und Compliance-Officer…',
+  'Befrage Berater und Steuerberater…',
+  'Befrage Operations und HR-Manager…',
+  'Befrage KMU-Inhaber und Freelancer…',
+  'Aggregiere Ergebnisse…',
+  'Erstelle Executive Summary…',
+];
+
+let progressTimer, msgTimer, msgIdx = 0;
+
+function startProgress() {
+  let p = 5;
+  msgIdx = 0;
+  progressBar.style.width = '5%';
+  progressLabel.textContent = progressMessages[0];
+  progressTimer = setInterval(() => {
+    p = Math.min(p + (88 - p) * 0.06, 87);
+    progressBar.style.width = p + '%';
+  }, 1200);
+  msgTimer = setInterval(() => {
+    msgIdx = Math.min(msgIdx + 1, progressMessages.length - 1);
+    progressLabel.textContent = progressMessages[msgIdx];
+  }, 7000);
+}
+function stopProgress() {
+  clearInterval(progressTimer);
+  clearInterval(msgTimer);
+  progressBar.style.width = '100%';
+}
+
+function showSection(name) {
+  ['loadingSection','errorSection','resultsSection'].forEach(id => {
+    document.getElementById(id).classList.toggle('d-none', id !== name);
+  });
+  document.getElementById('inputSection').classList.toggle('d-none', name !== null);
+}
+
+function scoreBar(val, max, color) {
+  const pct = Math.round((val / max) * 100);
+  return `<div class="progress" style="height:8px">
+    <div class="progress-bar bg-${color}" style="width:${pct}%"></div>
+  </div>`;
+}
+
+function buyBadge(val) {
+  if (!val) return '<span class="badge bg-secondary">–</span>';
+  if (val.includes('sofort')) return '<span class="badge bg-success">Ja, sofort</span>';
+  if (val.includes('Test'))   return '<span class="badge bg-primary">Nach Test</span>';
+  if (val.includes('Maybe') || val.includes('Vielleicht')) return '<span class="badge bg-warning text-dark">Vielleicht</span>';
+  return '<span class="badge bg-danger">Nein</span>';
+}
+
+function renderResults(data) {
+  stopProgress();
+
+  // KPI cards
+  const ins = data.insights;
+  const kpiRow = document.getElementById('kpiRow');
+  kpiRow.innerHTML = '';
+
+  if (ins.interest) {
+    const avg = ins.interest.avg;
+    const color = avg >= 7 ? 'success' : avg >= 5 ? 'warning' : 'danger';
+    kpiRow.innerHTML += `
+      <div class="col-sm-6 col-lg-3">
+        <div class="card text-center border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="display-5 fw-bold text-${color}">${avg.toFixed(1)}<small class="fs-5">/10</small></div>
+            <p class="text-muted small mb-1 mt-1">Ø Relevanz</p>
+            ${scoreBar(avg, 10, color)}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  if (ins.price_willingness) {
+    const pw = ins.price_willingness;
+    kpiRow.innerHTML += `
+      <div class="col-sm-6 col-lg-3">
+        <div class="card text-center border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="display-5 fw-bold text-primary">${pw.avg.toFixed(0)}<small class="fs-5"> €</small></div>
+            <p class="text-muted small mb-1 mt-1">Ø Zahlungsbereitschaft/Monat</p>
+            <small class="text-muted">P25: ${pw.p25}€ · Median: ${pw.p50}€ · P75: ${pw.p75}€</small>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  if (ins.would_buy) {
+    const counts = ins.would_buy.counts;
+    const yes = (counts['Ja, sofort kaufen'] || 0) + (counts['Ja, nach kostenlosem Test'] || 0);
+    const total = data.personas_count;
+    const pct = Math.round(100 * yes / total);
+    const color = pct >= 60 ? 'success' : pct >= 35 ? 'warning' : 'danger';
+    kpiRow.innerHTML += `
+      <div class="col-sm-6 col-lg-3">
+        <div class="card text-center border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="display-5 fw-bold text-${color}">${pct}<small class="fs-5">%</small></div>
+            <p class="text-muted small mb-1 mt-1">Kaufbereitschaft</p>
+            <small class="text-muted">${yes}/${total} Entscheider</small>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  kpiRow.innerHTML += `
+    <div class="col-sm-6 col-lg-3">
+      <div class="card text-center border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="display-5 fw-bold text-info">${data.personas_count}</div>
+          <p class="text-muted small mb-1 mt-1">B2B-Personas befragt</p>
+          <small class="text-muted">aus verschiedenen Branchen &amp; Größen</small>
+        </div>
+      </div>
+    </div>`;
+
+  // Executive summary
+  document.getElementById('execSummary').textContent = data.executive_summary || '–';
+
+  // Would-buy bar chart (CSS only)
+  const wbChart = document.getElementById('wouldBuyChart');
+  if (ins.would_buy) {
+    const c = ins.would_buy.counts;
+    const total = data.personas_count;
+    const items = [
+      {label:'Ja, sofort', val: c['Ja, sofort kaufen'] || 0, color:'success'},
+      {label:'Nach Test',  val: c['Ja, nach kostenlosem Test'] || 0, color:'primary'},
+      {label:'Vielleicht', val: c['Vielleicht, muss überzeugen'] || 0, color:'warning'},
+      {label:'Nein',       val: c['Nein'] || 0, color:'danger'},
+    ];
+    wbChart.innerHTML = items.map(it => `
+      <div class="mb-2">
+        <div class="d-flex justify-content-between small mb-1">
+          <span>${it.label}</span><span class="fw-semibold">${it.val}</span>
+        </div>
+        <div class="progress" style="height:14px">
+          <div class="progress-bar bg-${it.color}" style="width:${Math.round(100*it.val/Math.max(total,1))}%"></div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Concerns
+  const cl = document.getElementById('concernsList');
+  cl.innerHTML = (ins.main_concern?.quotes || []).map(q =>
+    `<li class="list-group-item py-1 border-0"><i class="bi bi-dot me-1 text-danger"></i>${q}</li>`
+  ).join('') || '<li class="list-group-item text-muted">Keine Bedenken erfasst.</li>';
+
+  // Benefits
+  const bl = document.getElementById('benefitsList');
+  bl.innerHTML = (ins.key_benefit?.quotes || []).map(q =>
+    `<li class="list-group-item py-1 border-0"><i class="bi bi-check2 me-1 text-success"></i>${q}</li>`
+  ).join('') || '<li class="list-group-item text-muted">Keine Vorteile erfasst.</li>';
+
+  // Persona table
+  const tbody = document.getElementById('personaTableBody');
+  tbody.innerHTML = (data.persona_rows || []).map(row => `<tr>
+    <td class="fw-semibold">${row.name}</td>
+    <td><small>${row.role}</small></td>
+    <td><small class="text-muted">${row.company_size}</small></td>
+    <td class="text-center">
+      ${row.interest != null ? `<span class="badge bg-${row.interest >= 7 ? 'success' : row.interest >= 5 ? 'warning text-dark' : 'secondary'}">${row.interest.toFixed(0)}/10</span>` : '—'}
+    </td>
+    <td class="text-end">
+      ${row.price != null ? `${row.price.toFixed(0)} €` : '—'}
+    </td>
+    <td>${buyBadge(row.would_buy)}</td>
+  </tr>`).join('');
+
+  resultsSec.classList.remove('d-none');
+}
+
+runBtn.addEventListener('click', async () => {
+  const name = document.getElementById('productName').value.trim();
+  const desc = document.getElementById('productDesc').value.trim();
+  if (!name || !desc) {
+    if (!name) document.getElementById('productName').classList.add('is-invalid');
+    if (!desc) document.getElementById('productDesc').classList.add('is-invalid');
+    return;
+  }
+  document.getElementById('productName').classList.remove('is-invalid');
+  document.getElementById('productDesc').classList.remove('is-invalid');
+
+  document.getElementById('inputSection').classList.add('d-none');
+  loading.classList.remove('d-none');
+  errorSec.classList.add('d-none');
+  resultsSec.classList.add('d-none');
+  startProgress();
+
+  try {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    const resp = await fetch('/consumer-panel/run', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken || ''
+      },
+      body: JSON.stringify({ product_name: name, product_description: desc })
+    });
+    stopProgress();
+    loading.classList.add('d-none');
+    const data = await resp.json();
+    if (!resp.ok) {
+      document.getElementById('errorMessage').textContent = data.error || 'Unbekannter Fehler.';
+      errorSec.classList.remove('d-none');
+      document.getElementById('inputSection').classList.remove('d-none');
+      return;
+    }
+    renderResults(data);
+  } catch (err) {
+    stopProgress();
+    loading.classList.add('d-none');
+    document.getElementById('errorMessage').textContent = 'Netzwerkfehler: ' + err.message;
+    errorSec.classList.remove('d-none');
+    document.getElementById('inputSection').classList.remove('d-none');
+  }
+});
+
+resetBtn.addEventListener('click', () => {
+  resultsSec.classList.add('d-none');
+  errorSec.classList.add('d-none');
+  document.getElementById('inputSection').classList.remove('d-none');
+});
+</script>
+{% endblock %}

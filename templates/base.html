@@ -64,6 +64,16 @@
                             <i class="bi bi-robot"></i> {{ _('AI Assistant') }}
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('compliance_checker.index') }}">
+                            <i class="bi bi-shield-check"></i> EU Compliance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('consumer_panel.index') }}">
+                            <i class="bi bi-graph-up-arrow"></i> Marktforschung
+                        </a>
+                    </li>
                     {% if current_user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link text-warning" href="{{ url_for('admin.dashboard') }}">
@@ -105,6 +115,16 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('landing') }}#features">{{ _('Features') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('compliance_checker.index') }}">
+                            <i class="bi bi-shield-check"></i> EU Compliance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('consumer_panel.index') }}">
+                            <i class="bi bi-graph-up-arrow"></i> Marktforschung
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('payments.pricing') }}">{{ _('Pricing') }}</a>
