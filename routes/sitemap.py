@@ -28,6 +28,8 @@ def generate_sitemap():
         ('/', 'weekly', 1.0),
         ('/pricing', 'weekly', 0.9),
         ('/pentesting-scanner', 'weekly', 0.8),
+        ('/compliance-check/', 'weekly', 0.9),
+        ('/consumer-panel/', 'weekly', 0.9),
         ('/legal/agb', 'monthly', 0.5),
         ('/legal/datenschutz', 'monthly', 0.5),
         ('/legal/impressum', 'monthly', 0.5),
