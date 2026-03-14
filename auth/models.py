@@ -104,8 +104,8 @@ class User(UserMixin, db.Model):
             
         sub = self.active_subscription
         if not sub:
-            # Free plan - check monthly limit
-            return self.get_monthly_verification_count() < 50  # Temporarily increased for testing
+            # Free plan - 1 verification per month
+            return self.get_monthly_verification_count() < 1
         
         # Paid plan - check quota
         if sub.api_calls_limit == -1:  # Unlimited

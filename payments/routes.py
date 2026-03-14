@@ -18,17 +18,13 @@ def subscribe(plan_name):
     Create Stripe Checkout session for subscription upgrade
     
     Plans:
-    - basic: €9.99/month (price_1SprwrP22GPrmrodey5s2oUm)
-    - professional: €49.99/month (price_1Sps2RP22GPrmrodNyOZk960)
-    - enterprise: €149.99/month (price_1Sps3vP22GPrmrod0QODGqD7)
-    
-    All plans include 3-day free trial
+    - basic: €9.99/month
+    - professional: €49.90/month
     """
     # Map plan names to Stripe price IDs
     stripe_price_ids = {
         'basic': current_app.config.get('STRIPE_PRICE_BASIC'),
         'professional': current_app.config.get('STRIPE_PRICE_PROFESSIONAL'),
-        'enterprise': current_app.config.get('STRIPE_PRICE_ENTERPRISE'),
     }
     
     # Validate plan
@@ -111,8 +107,7 @@ def success():
         # Define API limits for each plan
         plan_limits = {
             'basic': 100,           # 100 checks/month for €9.99
-            'professional': 500,    # 500 checks/month for €49.99
-            'enterprise': 999999    # Unlimited for €149.99
+            'professional': 500,    # 500 checks/month for €49.90
         }
 
         # Update or create subscription
@@ -206,19 +201,40 @@ def pricing():
     """
     plans = [
         {
+            'name': 'free',
+            'display_name': 'Kostenlos',
+            'price': 0.0,
+            'period': 'dauerhaft',
+            'api_calls': 1,
+            'features': [
+                '1 Prüfung pro Monat',
+                'VIES VAT-Validierung',
+                'Basis Sanktionsprüfung',
+                'KI-Assistent',
+                'E-Mail Support'
+            ],
+            'cta': 'Kostenlos nutzen',
+            'cta_url': 'dashboard',
+            'cta_params': None,
+            'featured': False
+        },
+        {
             'name': 'basic',
-            'display_name': 'Базовый',
+            'display_name': 'Basic',
             'price': 9.99,
-            'period': 'про Месяц',
+            'period': 'pro Monat',
             'api_calls': 100,
             'features': [
                 '100 Prüfungen pro Monat',
                 'VIES VAT-Validierung',
                 'Sanktionslisten-Check',
-                'Email-Support',
-                '3 Tage kostenlos testen'
+                'OSINT Scanner',
+                'Link Scanner',
+                'CRM Basis',
+                'Firmenprofil',
+                'E-Mail Support'
             ],
-            'cta': 'Jetzt starten',
+            'cta': 'Basic wählen',
             'cta_url': 'payments.subscribe',
             'cta_params': {'plan_name': 'basic'},
             'featured': False
@@ -226,7 +242,7 @@ def pricing():
         {
             'name': 'professional',
             'display_name': 'Professional',
-            'price': 49.99,
+            'price': 49.90,
             'period': 'pro Monat',
             'api_calls': 500,
             'features': [
@@ -234,34 +250,15 @@ def pricing():
                 'Alle Basic Features',
                 'Handelsregister-Prüfung',
                 'Insolvenzverfahren-Check',
-                'OpenCorporates-Daten',
+                'MailGuard AI (3 Konten)',
+                'API-Zugang',
                 'PDF-Berichte',
                 'Prioritäts-Support'
             ],
-            'cta': 'Upgrade auf Professional',
+            'cta': 'Professional wählen',
             'cta_url': 'payments.subscribe',
             'cta_params': {'plan_name': 'professional'},
             'featured': True
-        },
-        {
-            'name': 'enterprise',
-            'display_name': 'Enterprise',
-            'price': 149.99,
-            'period': 'pro Monat',
-            'api_calls': 'Unbegrenzt',
-            'features': [
-                'Unbegrenzte Prüfungen',
-                'Alle Professional Features',
-                'API-Zugang',
-                'Batch-Verarbeitung',
-                'Benutzerdefinierte Integrationen',
-                'Dedizierter Account Manager',
-                'SLA-Garantie'
-            ],
-            'cta': 'Upgrade auf Enterprise',
-            'cta_url': 'payments.subscribe',
-            'cta_params': {'plan_name': 'enterprise'},
-            'featured': False
         }
     ]
     

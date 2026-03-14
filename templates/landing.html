@@ -429,11 +429,42 @@
             </div>
             
             <div class="row g-4 justify-content-center">
+                <!-- Free Plan -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h3 class="h4 mb-3">Kostenlos</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                0€<small class="text-muted fs-6">/dauerhaft</small>
+                            </div>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 1 Prüfung pro Monat</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> VIES Validierung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Basis Sanktionsprüfung</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> KI-Assistent</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> E-Mail Support</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> OSINT Scanner</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> MailGuard AI</li>
+                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> API Zugang</li>
+                            </ul>
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary w-100">
+                                Zum Dashboard
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100">
+                                Kostenlos registrieren
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Basic Plan -->
                 <div class="col-lg-4">
                     <div class="card border-0 shadow">
                         <div class="card-body p-4">
-                            <h3 class="h4 mb-3">Basierend</h3>
+                            <h3 class="h4 mb-3">Basic</h3>
                             <div class="display-4 fw-bold mb-3">
                                 9,99€<small class="text-muted fs-6">/Monat</small>
                             </div>
@@ -449,11 +480,16 @@
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> E-Mail Support</li>
                                 <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> MailGuard AI</li>
                                 <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> API Zugang</li>
-                                <li class="mb-2 text-muted"><i class="bi bi-x-circle"></i> Handelsregister</li>
                             </ul>
-                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100">
-                                Kostenlos starten (3 Tage)
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('payments.subscribe', plan_name='basic') }}" class="btn btn-outline-primary w-100">
+                                Basic wählen
                             </a>
+                            {% else %}
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100">
+                                Kostenlos starten
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -467,51 +503,29 @@
                         <div class="card-body p-4">
                             <h3 class="h4 mb-3">Professional</h3>
                             <div class="display-4 fw-bold mb-3">
-                                49,99€<small class="text-muted fs-6">/Monat</small>
+                                49,90€<small class="text-muted fs-6">/Monat</small>
                             </div>
                             <ul class="list-unstyled mb-4">
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 500 Prüfungen pro Monat</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Validierungsdienste</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Basic Features</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Handelsregister Prüfung</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Erweiterte Sanktionslisten</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> OSINT Scanner (unbegrenzt)</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link Scanner (100 URLs/Monat)</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> MailGuard AI (3 Accounts)</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> MailGuard AI (3 Konten)</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (1000 Kontakte)</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> API Zugang</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verlauf & Berichte</li>
                                 <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Prioritäts-Support</li>
                             </ul>
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('payments.subscribe', plan_name='professional') }}" class="btn btn-primary w-100">
+                                Professional wählen
+                            </a>
+                            {% else %}
                             <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100">
                                 Jetzt starten
                             </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Enterprise Plan -->
-                <div class="col-lg-4">
-                    <div class="card border-0 shadow">
-                        <div class="card-body p-4">
-                            <h3 class="h4 mb-3">Enterprise</h3>
-                            <div class="display-4 fw-bold mb-3">
-                                149,99€<small class="text-muted fs-6">/Monat</small>
-                            </div>
-                            <ul class="list-unstyled mb-4">
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Unbegrenzte Prüfungen</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Alle Professional Features</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> MailGuard AI (Unbegrenzt)</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link Scanner (Unbegrenzt)</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> CRM (Unbegrenzt)</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> White-Label Lösung</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Custom API Integration</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Dedizierter Account Manager</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 24/7 Premium Support</li>
-                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> SLA Garantie</li>
-                            </ul>
-                            <a href="mailto:sales@vatverification.com" class="btn btn-outline-primary w-100">
-                                Kontakt aufnehmen
-                            </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
