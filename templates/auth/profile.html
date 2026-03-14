@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <div class="text-center mb-3">
                         <div class="avatar bg-primary text-white rounded-circle mx-auto mb-2" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-                            {{ current_user.first_name[0]}}{{ current_user.last_name[0] }}
+                            {{ (current_user.first_name or '?')[0] }}{{ (current_user.last_name or '?')[0] }}
                         </div>
                         <h5 class="mb-0">{{ current_user.first_name }} {{ current_user.last_name }}</h5>
                         <p class="text-muted small">{{ current_user.email }}</p>

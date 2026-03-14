@@ -76,6 +76,7 @@ def create_app(config_name=None):
     migrate = Migrate(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
+    csrf.init_app(app)
     
     # Configure Babel functions
     def get_locale():
