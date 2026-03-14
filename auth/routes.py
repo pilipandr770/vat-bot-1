@@ -3,6 +3,7 @@ Authentication routes for user registration, login, and password management.
 All text in German (Deutsche).
 """
 
+import secrets
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 try:
@@ -386,7 +387,7 @@ def generate_reset_token(user):
 
 def verify_reset_token(token):
     """Verify password reset token."""
-
+    user = User.query.filter_by(password_reset_token=token).first()
     if user and user.password_reset_expires > datetime.utcnow():
         return user
     
