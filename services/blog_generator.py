@@ -328,15 +328,10 @@ def _generate_article_with_claude(topic: Dict, rss_context: Optional[Dict]) -> O
     rss_block = ""
     if rss_context:
         rss_block = (
-            f"
-Aktuelle Nachricht als Kontext (nicht direkt zitieren):
-"
-            f"Quelle: {rss_context.get('source_name', '')}
-"
-            f"Titel: {rss_context.get('source_title', '')}
-"
-            f"Zusammenfassung: {rss_context.get('summary', '')[:300]}
-"
+            f"\nAktuelle Nachricht als Kontext (nicht direkt zitieren):\n"
+            f"Quelle: {rss_context.get('source_name', '')}\n"
+            f"Titel: {rss_context.get('source_title', '')}\n"
+            f"Zusammenfassung: {rss_context.get('summary', '')[:300]}\n"
         )
 
     system_prompt = (
