@@ -798,6 +798,11 @@ def create_app(config_name=None):
         """Serve robots.txt from static folder."""
         return app.send_static_file('robots.txt')
 
+    @app.route('/ads.txt')
+    def ads_txt():
+        """Serve ads.txt for Google AdSense verification."""
+        return app.send_static_file('ads.txt')
+
     # Security headers middleware
     @app.after_request
     def add_security_headers(response):
