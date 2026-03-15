@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}Promocodes – Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+
+  <!-- Header -->
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h1 class="h3 mb-1"><i class="bi bi-tag-fill text-primary"></i> Promocodes & Rabatte</h1>
+      <p class="text-muted mb-0">Stripe-Coupons erstellen, verwalten und deaktivieren</p>
+    </div>
+    <div class="col-auto">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Dashboard
+      </a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  {% if error %}
+    <div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Stripe-Fehler: {{ error }}</div>
+  {% endif %}
+
+  <div class="row g-4">
+
+    <!-- Create New Coupon -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <i class="bi bi-plus-circle"></i> Neuen Promocode erstellen
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('admin.create_promo_code') }}" id="createForm">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Name / Beschreibung <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control" placeholder="z.B. AppSumo 50% Off" required>
+              <small class="text-muted">Intern sichtbar im Stripe Dashboard</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Promocode <span class="text-danger">*</span></label>
+              <input type="text" name="code" class="form-control text-uppercase" placeholder="z.B. APPSUMO50" required
+                     pattern="[A-Za-z0-9_\-]+" title="Nur Buchstaben, Zahlen, - und _"
+                     oninput="this.value = this.value.toUpperCase()">
+              <small class="text-muted">Kunden geben diesen Code beim Checkout ein</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Rabatt-Typ</label>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="discount_type" value="percent"
+                         id="typePercent" checked onchange="toggleDiscountFields(this.value)">
+                  <label class="form-check-label" for="typePercent">% Prozent</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="discount_type" value="amount"
+                         id="typeAmount" onchange="toggleDiscountFields(this.value)">
+                  <label class="form-check-label" for="typeAmount">€ Festbetrag</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3" id="percentField">
+              <label class="form-label fw-semibold">Rabatt in %</label>
+              <div class="input-group">
+                <input type="number" name="percent_off" class="form-control" min="1" max="100" step="0.01" placeholder="50">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+
+            <div class="mb-3 d-none" id="amountField">
+              <label class="form-label fw-semibold">Rabatt in €</label>
+              <div class="input-group">
+                <span class="input-group-text">€</span>
+                <input type="number" name="amount_off" class="form-control" min="0.01" step="0.01" placeholder="10.00">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Laufzeit</label>
+              <select name="duration" class="form-select" id="durationSelect" onchange="toggleDurationMonths()">
+                <option value="once">Einmalig (once)</option>
+                <option value="forever">Für immer (forever)</option>
+                <option value="repeating">Mehrere Monate (repeating)</option>
+              </select>
+              <small class="text-muted">
+                <b>once</b>: 1. Zahlung | <b>forever</b>: alle Zahlungen | <b>repeating</b>: N Monate
+              </small>
+            </div>
+
+            <div class="mb-3 d-none" id="durationMonthsField">
+              <label class="form-label fw-semibold">Anzahl Monate</label>
+              <input type="number" name="duration_months" class="form-control" min="1" max="24" placeholder="3">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Max. Einlösungen</label>
+              <input type="number" name="max_redemptions" class="form-control" min="1" placeholder="Unbegrenzt">
+              <small class="text-muted">Leer lassen = unbegrenzt</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Ablaufdatum</label>
+              <input type="date" name="expires_at" class="form-control">
+              <small class="text-muted">Leer lassen = kein Ablauf</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-plus-circle"></i> Promocode erstellen
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick presets -->
+      <div class="card shadow-sm mt-3">
+        <div class="card-header"><i class="bi bi-lightning-fill text-warning"></i> Schnell-Vorlagen</div>
+        <div class="card-body p-2">
+          <button class="btn btn-outline-secondary btn-sm w-100 mb-1" onclick="fillPreset('FRIEND50','Freunde 50% Off','percent',50,'forever',null,null,null)">
+            <i class="bi bi-people"></i> Freunde 50% – FRIEND50
+          </button>
+          <button class="btn btn-outline-secondary btn-sm w-100 mb-1" onclick="fillPreset('APPSUMO50','AppSumo 50% Off','percent',50,'once',null,100,null)">
+            <i class="bi bi-bag"></i> AppSumo 50% – APPSUMO50
+          </button>
+          <button class="btn btn-outline-secondary btn-sm w-100 mb-1" onclick="fillPreset('LAUNCH30','Launch 30% 3 Monate','percent',30,'repeating',3,null,null)">
+            <i class="bi bi-rocket"></i> Launch 30% / 3 Monate – LAUNCH30
+          </button>
+          <button class="btn btn-outline-secondary btn-sm w-100" onclick="fillPreset('WELCOME10','Willkommen 10% Off','percent',10,'once',null,null,null)">
+            <i class="bi bi-gift"></i> Welcome 10% – WELCOME10
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Coupons List -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-list-check"></i> Vorhandene Coupons ({{ coupons|length }})</span>
+          <span class="badge bg-secondary">via Stripe API</span>
+        </div>
+        <div class="card-body p-0">
+          {% if not coupons %}
+            <div class="text-center text-muted py-5">
+              <i class="bi bi-tag" style="font-size:3rem;"></i>
+              <p class="mt-2">Noch keine Coupons erstellt.</p>
+            </div>
+          {% else %}
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Name</th>
+                    <th>Rabatt</th>
+                    <th>Laufzeit</th>
+                    <th>Code(s)</th>
+                    <th>Einlösungen</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for c in coupons %}
+                  <tr class="{{ 'table-secondary text-muted' if not c.valid }}">
+                    <td>
+                      <strong>{{ c.name }}</strong>
+                      <br><small class="text-muted font-monospace">{{ c.id }}</small>
+                    </td>
+                    <td><span class="badge bg-success fs-6">{{ c.discount }}</span></td>
+                    <td>
+                      {% if c.duration == 'forever' %}
+                        <span class="badge bg-info">Für immer</span>
+                      {% elif c.duration == 'repeating' %}
+                        <span class="badge bg-primary">{{ c.duration_months }} Monate</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Einmalig</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% for code in c.codes %}
+                        <code class="bg-light rounded px-1">{{ code }}</code>
+                      {% else %}
+                        <span class="text-muted">–</span>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      {{ c.redemptions }}
+                      {% if c.max_redemptions %}/ {{ c.max_redemptions }}{% endif %}
+                    </td>
+                    <td>
+                      {% if c.valid %}
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Aktiv</span>
+                      {% else %}
+                        <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Inaktiv</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if c.valid %}
+                      <form method="POST" action="{{ url_for('admin.delete_promo_code', coupon_id=c.id) }}"
+                            onsubmit="return confirm('Coupon {{ c.name }} wirklich deaktivieren?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </form>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Info box -->
+      <div class="card border-info mt-3">
+        <div class="card-body">
+          <h6 class="card-title text-info"><i class="bi bi-info-circle"></i> Wie funktioniert das?</h6>
+          <ul class="mb-0 small">
+            <li>Codes werden direkt in <strong>Stripe</strong> gespeichert und verwaltet</li>
+            <li>Kunden sehen das Feld "Promocode" automatisch beim Checkout</li>
+            <li>Stripe wendet den Rabatt an und verfolgt Einlösungen in Echtzeit</li>
+            <li><strong>Für AppSumo</strong>: Code APPSUMO50, 50%, once, max. 500 Einlösungen</li>
+            <li><strong>Für Freunde</strong>: Code FRIEND50, 50%, forever, max. 10–20 Einlösungen</li>
+            <li>Alle Coupons auch sichtbar unter: <a href="https://dashboard.stripe.com/coupons" target="_blank">dashboard.stripe.com/coupons</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleDiscountFields(type) {
+  document.getElementById('percentField').classList.toggle('d-none', type !== 'percent');
+  document.getElementById('amountField').classList.toggle('d-none', type !== 'amount');
+}
+function toggleDurationMonths() {
+  const val = document.getElementById('durationSelect').value;
+  document.getElementById('durationMonthsField').classList.toggle('d-none', val !== 'repeating');
+}
+function fillPreset(code, name, type, value, duration, durationMonths, maxRedeem, expiresAt) {
+  const f = document.getElementById('createForm');
+  f.querySelector('[name=name]').value = name;
+  f.querySelector('[name=code]').value = code;
+  if (type === 'percent') {
+    f.querySelector('#typePercent').checked = true;
+    f.querySelector('[name=percent_off]').value = value;
+    toggleDiscountFields('percent');
+  } else {
+    f.querySelector('#typeAmount').checked = true;
+    f.querySelector('[name=amount_off]').value = value;
+    toggleDiscountFields('amount');
+  }
+  f.querySelector('[name=duration]').value = duration;
+  toggleDurationMonths();
+  if (durationMonths) f.querySelector('[name=duration_months]').value = durationMonths;
+  if (maxRedeem) f.querySelector('[name=max_redemptions]').value = maxRedeem;
+  if (expiresAt) f.querySelector('[name=expires_at]').value = expiresAt;
+}
+</script>
+{% endblock %}

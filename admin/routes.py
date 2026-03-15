@@ -10,6 +10,7 @@ from crm.models import Company, Counterparty, VerificationCheck, CheckResult
 from sqlalchemy import func, extract
 from datetime import datetime, timedelta
 import calendar
+import stripe
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -340,3 +341,116 @@ def api_stats():
         'total_mrr': total_mrr,
         'verifications_today': verifications_today
     })
+
+
+# ─── Promo Code Management ────────────────────────────────────────────────────
+
+@admin_bp.route('/promo-codes')
+@login_required
+@admin_required
+def promo_codes():
+    """List all Stripe coupons and promotion codes."""
+    from flask import current_app
+    stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
+
+    coupons = []
+    error = None
+    try:
+        result = stripe.Coupon.list(limit=50)
+        for coupon in result.auto_paging_iter():
+            # Fetch promotion codes for this coupon
+            promo_codes_for_coupon = stripe.PromotionCode.list(coupon=coupon.id, limit=10)
+            codes = [p.code for p in promo_codes_for_coupon.auto_paging_iter()]
+            coupons.append({
+                'id': coupon.id,
+                'name': coupon.name or coupon.id,
+                'discount': f"{coupon.percent_off}%" if coupon.percent_off else f"€{coupon.amount_off / 100:.2f}",
+                'duration': coupon.duration,
+                'duration_months': coupon.duration_in_months,
+                'redemptions': coupon.times_redeemed,
+                'max_redemptions': coupon.max_redemptions,
+                'valid': coupon.valid,
+                'codes': codes,
+            })
+    except stripe.error.StripeError as e:
+        error = str(e)
+
+    return render_template('admin/promo_codes.html', coupons=coupons, error=error)
+
+
+@admin_bp.route('/promo-codes/create', methods=['POST'])
+@login_required
+@admin_required
+def create_promo_code():
+    """Create a new Stripe coupon + promotion code."""
+    from flask import current_app
+    stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
+
+    name = request.form.get('name', '').strip()
+    code = request.form.get('code', '').strip().upper()
+    discount_type = request.form.get('discount_type')  # 'percent' or 'amount'
+    percent_off = request.form.get('percent_off', type=float)
+    amount_off = request.form.get('amount_off', type=float)
+    duration = request.form.get('duration', 'once')  # once / repeating / forever
+    duration_months = request.form.get('duration_months', type=int)
+    max_redemptions = request.form.get('max_redemptions', type=int)
+    expires_at = request.form.get('expires_at')  # YYYY-MM-DD
+
+    if not name or not code:
+        flash('Name und Promocode-Code sind Pflichtfelder.', 'danger')
+        return redirect(url_for('admin.promo_codes'))
+
+    try:
+        coupon_params = {
+            'name': name,
+            'duration': duration,
+            'currency': 'eur',
+        }
+        if discount_type == 'percent' and percent_off:
+            coupon_params['percent_off'] = percent_off
+        elif discount_type == 'amount' and amount_off:
+            coupon_params['amount_off'] = int(amount_off * 100)  # cents
+
+        if duration == 'repeating' and duration_months:
+            coupon_params['duration_in_months'] = duration_months
+
+        if max_redemptions:
+            coupon_params['max_redemptions'] = max_redemptions
+
+        coupon = stripe.Coupon.create(**coupon_params)
+
+        promo_params = {
+            'coupon': coupon.id,
+            'code': code,
+        }
+        if max_redemptions:
+            promo_params['max_redemptions'] = max_redemptions
+        if expires_at:
+            import time
+            from datetime import date
+            exp = datetime.strptime(expires_at, '%Y-%m-%d')
+            promo_params['expires_at'] = int(exp.timestamp())
+
+        stripe.PromotionCode.create(**promo_params)
+
+        discount_str = f"{coupon_params['percent_off']}%" if discount_type == 'percent' else f"{amount_off}€"
+        flash(f'Promocode "{code}" erfolgreich erstellt ({discount_str} Rabatt).', 'success')
+    except stripe.error.StripeError as e:
+        flash(f'Stripe-Fehler: {e.user_message or str(e)}', 'danger')
+
+    return redirect(url_for('admin.promo_codes'))
+
+
+@admin_bp.route('/promo-codes/<coupon_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_promo_code(coupon_id):
+    """Deactivate (delete) a Stripe coupon."""
+    from flask import current_app
+    stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
+    try:
+        stripe.Coupon.delete(coupon_id)
+        flash('Coupon wurde deaktiviert.', 'success')
+    except stripe.error.StripeError as e:
+        flash(f'Fehler: {e.user_message or str(e)}', 'danger')
+    return redirect(url_for('admin.promo_codes'))

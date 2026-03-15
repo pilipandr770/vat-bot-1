@@ -59,6 +59,7 @@ def subscribe(plan_name):
                 'quantity': 1,
             }],
             mode='subscription',
+            allow_promotion_codes=True,  # Show promo code field in checkout
             success_url=url_for('payments.success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=url_for('payments.cancel', _external=True),
             customer_email=current_user.email,
