@@ -691,12 +691,26 @@ def phishing_track(token):
                 )
                 db.session.add(click)
 
-                    # Log security event directly (avoid importing self)
-                    sec_ev = SecurityEvent(
-                        member_id=member_id,
-                        owner_user_id=test.owner_user_id,
-                        event_type='phishing_click',
-                        description=f'Hat Phishing-Test "{test.name}" angeklickt',
+                # Log security event
+                sec_ev = SecurityEvent(
+                    member_id=member_id,
+                    owner_user_id=test.owner_user_id,
+                    event_type='phishing_click',
+                    description=f'Hat Phishing-Test "{test.name}" angeklickt',
+                )
+                db.session.add(sec_ev)
+                db.session.commit()
+            else:
+                already_clicked = True
+
+    return render_template(
+        'teamguard/phishing_landed.html',
+        test=test,
+        member=member,
+        already_clicked=already_clicked,
+    )
+
+
 # ─── Security Events Log ──────────────────────────────────────────────────────
 
 @teamguard_bp.route('/events')
