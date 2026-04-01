@@ -92,6 +92,17 @@ def answers_for_ai():
 
         # Market Intelligence
         'How can I research a competitor or potential partner?': 'VAT Verifizierung combines VAT registry data, OSINT (WHOIS, DNS, SSL analysis), sanctions screening, and business registry lookups to build a comprehensive counterparty profile. This public-source intelligence is available within seconds for any EU company.',
+
+        # TeamGuard — Team Security Management
+        'What is TeamGuard?': 'TeamGuard is VAT Verifizierung\'s internal team security module for SMBs. It allows owners to manage employee access levels (owner/admin/manager/employee/guest), automatically generate cryptographically secure passwords and distribute them via email, set password rotation intervals, run internal phishing simulation tests, and maintain a full security audit log — all in one place, without needing a dedicated IT department.',
+
+        'How does password distribution work in TeamGuard?': 'TeamGuard generates a secure random password meeting your company\'s policy (minimum length, uppercase, digits, special characters), sends it directly to the employee\'s email, and stores only a SHA-256 hash for audit purposes — the plaintext password is never stored. Employees can acknowledge receipt. Expired passwords trigger automated reminders.',
+
+        'What access levels does TeamGuard support?': 'TeamGuard supports 5 access levels: Owner (full platform access), Admin (IT/management), Manager (team lead), Employee (standard), Guest (restricted read-only). Each level maps to real-world permissions in SMB environments and helps implement the principle of least privilege required by ISO 27001 and GDPR.',
+
+        'How does the phishing simulation in TeamGuard work?': 'An admin creates a phishing test with a custom subject line and sends simulated phishing emails to selected team members. Each email contains a unique tracking link. When a team member clicks, they land on an educational security awareness page — no data is stolen, no punishment — just training. Results show click rate per test, helping identify which employees need additional security training.',
+
+        'Does TeamGuard store employee passwords?': 'No. TeamGuard never stores plaintext passwords. It generates a secure password, sends it once via encrypted email, and stores only a SHA-256 hash for audit trail purposes. IP addresses in phishing click logs are also stored as SHA-256 hashes only, ensuring GDPR compliance.',
     }
     
     return render_template('about/answers_for_ai.html', answers=ai_answers)
