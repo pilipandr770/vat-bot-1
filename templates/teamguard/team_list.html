@@ -96,6 +96,7 @@
                   {% if m.is_active %}
                   <form method="post" action="{{ url_for('teamguard.send_password', member_id=m.id) }}"
                         class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="btn btn-outline-primary" title="Neues Passwort senden"
                             onclick="return confirm('Sicheres Passwort an {{ m.email }} senden?')">
                       <i class="bi bi-key"></i>
@@ -103,6 +104,7 @@
                   </form>
                   <form method="post" action="{{ url_for('teamguard.deactivate_member', member_id=m.id) }}"
                         class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="btn btn-outline-danger" title="Deaktivieren / Offboarding"
                             onclick="return confirm('{{ m.full_name }} deaktivieren? Vergessen Sie nicht, alle System-Zugänge zu sperren.')">
                       <i class="bi bi-door-open"></i>

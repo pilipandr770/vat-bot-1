@@ -95,6 +95,7 @@
       Mitarbeiter benötigen neue Passwörter.
     </div>
     <form method="post" action="{{ url_for('teamguard.send_password_bulk') }}" class="d-inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button type="submit" class="btn btn-warning btn-sm"
               onclick="return confirm('Neue Passwörter generieren und per E-Mail versenden?')">
         <i class="bi bi-envelope-check"></i> Alle jetzt zurücksetzen
@@ -158,6 +159,7 @@
                   <td>
                     <form method="post" action="{{ url_for('teamguard.send_password', member_id=m.id) }}"
                           class="d-inline">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button class="btn btn-sm btn-outline-primary"
                               title="Neues Passwort generieren & senden"
                               onclick="return confirm('Sicheres Passwort generieren und an {{ m.email }} senden?')">

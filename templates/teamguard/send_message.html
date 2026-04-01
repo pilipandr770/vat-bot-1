@@ -21,6 +21,7 @@
   <div class="card shadow-sm">
     <div class="card-body">
       <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="mb-3">
           <label class="form-label fw-bold">Empfänger <span class="text-danger">*</span></label>
           <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">

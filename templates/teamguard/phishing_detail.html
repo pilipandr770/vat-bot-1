@@ -136,6 +136,7 @@
             <code style="font-size: 0.7em; word-break: break-all;">{{ tracking_url }}</code>
           </p>
           <form method="post" action="{{ url_for('teamguard.send_phishing_test', test_id=test.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-danger w-100"
                     onclick="return confirm('Phishing-Simulation an alle ausgewählten Mitarbeiter senden?')">
               <i class="bi bi-send-check"></i> Jetzt versenden
