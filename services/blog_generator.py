@@ -222,6 +222,78 @@ SEO_TOPICS = [
     ("OWASP Top 10: Die größten Web-App-Risiken erklärt",
      "OWASP Top 10 Web App Risiken erklärt deutsch", "website-security",
      ["OWASP", "Web-Sicherheit", "Pentest", "Schwachstellen"]),
+    ("Pentest für KMU: Wie Sie Ihre Website auf Sicherheitslücken testen können",
+     "Pentest KMU Website Sicherheitslücken finden", "website-security",
+     ["Pentest", "KMU", "Schwachstellen", "Sicherheitstest"]),
+    ("SQL-Injection, XSS, CSRF: Die häufigsten Web-Angriffe auf Unternehmenswebsites",
+     "SQL Injection XSS CSRF Web Angriffe Unternehmen", "website-security",
+     ["SQL-Injection", "XSS", "CSRF", "Web-Sicherheit"]),
+    ("Automatisierter Sicherheitsscan vs. manueller Pentest: Wann was sinnvoll ist",
+     "Sicherheitsscan automatisch manuell Pentest Unterschied", "website-security",
+     ["Pentest", "Automatisierung", "Sicherheitsscan", "Schwachstellen"]),
+    ("Responsible Disclosure: Was tun, wenn man eine Sicherheitslücke findet?",
+     "Responsible Disclosure Sicherheitslücke melden Deutschland", "website-security",
+     ["Responsible Disclosure", "Bug Bounty", "IT-Sicherheit", "CSIRT"]),
+
+    # Compliance & Regulatory
+    ("ISO 27001 für KMU: Informationssicherheit leicht verständlich",
+     "ISO 27001 KMU Informationssicherheit umsetzen", "compliance",
+     ["ISO 27001", "Informationssicherheit", "KMU", "Zertifizierung"]),
+    ("NIS2-Richtlinie 2024: Was müssen deutsche Unternehmen jetzt tun?",
+     "NIS2 Richtlinie Deutschland Unternehmen Pflichten 2024", "compliance",
+     ["NIS2", "Cybersicherheit", "Deutschland", "Compliance"]),
+    ("Compliance-Kalender für KMU: Wichtige Fristen im Überblick 2025",
+     "Compliance Kalender KMU Fristen 2025 Deutschland", "compliance",
+     ["Compliance", "Fristen", "KMU", "Checkliste"]),
+    ("IT-Grundschutz nach BSI: Der Einstieg für mittelständische Unternehmen",
+     "IT-Grundschutz BSI Mittelstand Einstieg", "compliance",
+     ["IT-Grundschutz", "BSI", "Mittelstand", "Informationssicherheit"]),
+    ("Cyber-Versicherung für KMU: Was ist versichert, was nicht?",
+     "Cyber-Versicherung KMU Leistungen Ausschlüsse Deutschland", "compliance",
+     ["Cyber-Versicherung", "KMU", "Cyberschaden", "IT-Sicherheit"]),
+    ("Supply-Chain-Risiken 2025: Wie Hacker über Zulieferer angreifen",
+     "Supply Chain Angriff Zulieferer Risiko 2025", "compliance",
+     ["Supply Chain", "Lieferkettenangriff", "3rd Party Risk", "Compliance"]),
+    ("Incident Response Plan: Was KMU nach einem Cyberangriff tun müssen",
+     "Incident Response Plan KMU Cyberangriff Vorgehen", "compliance",
+     ["Incident Response", "Cyberangriff", "KMU", "Notfallplan"]),
+
+    # Marketing & Competitive Intelligence
+    ("Wettbewerbsanalyse im B2B: Wie Sie Geschäftspartner und Konkurrenten verstehen",
+     "Wettbewerbsanalyse B2B Unternehmen verstehen Deutschland", "market-intelligence",
+     ["Wettbewerbsanalyse", "B2B", "Market Intelligence", "Geschäftsstrategie"]),
+    ("OSINT zur Marktanalyse: Kostenlose Daten über Ihre Branche nutzen",
+     "OSINT Marktanalyse kostenlose Daten Branche verstehen", "market-intelligence",
+     ["OSINT", "Marktanalyse", "Market Intelligence", "Wettbewerb"]),
+    ("Firmenprofile erstellen: Welche Daten über Geschäftspartner öffentlich verfügbar sind",
+     "Firmenprofil öffentliche Daten Geschäftspartner erstellen", "market-intelligence",
+     ["Firmenprofil", "öffentliche Daten", "Unternehmensanalyse", "B2B"]),
+    ("Branchentrends erkennen: Wie intelligente Unternehmen Marktveränderungen früh sehen",
+     "Branchentrends erkennen Marktveränderungen frühzeitig", "market-intelligence",
+     ["Marktanalyse", "Trends", "Wettbewerb", "B2B-Intelligence"]),
+
+    # Team Security & Password Management
+    ("Passwort-Sicherheit im Unternehmen: Warum 'Passwort123' Ihr Unternehmen gefährdet",
+     "Passwort Sicherheit Unternehmen Mitarbeiter KMU", "team-security",
+     ["Passwort", "Sicherheit", "Mitarbeiter", "KMU"]),
+    ("Passwort-Rotation: Wie oft sollten Mitarbeiter Passwörter wechseln?",
+     "Passwort Rotation Mitarbeiter Wechseln Häufigkeit Empfehlung", "team-security",
+     ["Passwort-Rotation", "IT-Sicherheit", "Mitarbeiter", "Compliance"]),
+    ("Phishing-Simulation im Unternehmen: Mitarbeiter sicher testen und schulen",
+     "Phishing Simulation Mitarbeiter testen schulen Unternehmen", "team-security",
+     ["Phishing-Simulation", "Security Awareness", "Mitarbeiterschulung", "KMU"]),
+    ("Security Awareness Training: Warum technische Maßnahmen allein nicht reichen",
+     "Security Awareness Training Mitarbeiter KMU warum wichtig", "team-security",
+     ["Security Awareness", "Mitarbeiterschulung", "IT-Sicherheit", "KMU"]),
+    ("Zugriffsrechte im Unternehmen: Das Prinzip der minimalen Berechtigung erklärt",
+     "Zugriffsrechte Unternehmen Least Privilege Prinzip KMU", "team-security",
+     ["Zugriffsrechte", "Least Privilege", "IT-Sicherheit", "Benutzerrechte"]),
+    ("Mitarbeiter verlässt Unternehmen: Sicherheits-Checkliste für Offboarding",
+     "Mitarbeiter Offboarding Sicherheit Checkliste Accounts", "team-security",
+     ["Offboarding", "Sicherheit", "Account-Verwaltung", "KMU"]),
+    ("Multi-Faktor-Authentifizierung (MFA) für KMU: Einfache Einführung Schritt für Schritt",
+     "Multi-Faktor-Authentifizierung MFA KMU einführen einfach", "team-security",
+     ["MFA", "2FA", "Authentifizierung", "KMU-Sicherheit"]),
 ]
 
 CATEGORY_LABELS = {
@@ -236,7 +308,10 @@ CATEGORY_LABELS = {
     "due-diligence": "Due Diligence",
     "geo-germany": "Sicher in Deutschland",
     "payments": "Zahlungssicherheit",
-    "website-security": "Website-Sicherheit",
+    "website-security": "Website-Sicherheit / Pentesting",
+    "compliance": "Compliance & Regulierung",
+    "market-intelligence": "Markt & Wettbewerb",
+    "team-security": "Team-Sicherheit",
 }
 
 
@@ -294,8 +369,11 @@ def _fetch_rss_topics(max_age_hours: int = 48) -> Optional[Dict]:
 
 def _pick_topic_from_schedule(app) -> Dict:
     """Pick the next topic from SEO_TOPICS that hasn't been used yet."""
-    from crm.models import db, BlogPost
-    used_slugs = {row[0] for row in db.session.query(BlogPost.slug).all()}
+    from crm.models import BlogPost
+    # Use BlogPost.query (legacy query interface) — avoids accessing
+    # app.extensions['sqlalchemy'].session which breaks on Flask-SQLAlchemy 3.x
+    # when called from inside a nested app context.
+    used_slugs = {row[0] for row in BlogPost.query.with_entities(BlogPost.slug).all()}
     for topic in SEO_TOPICS:
         title, keyword, category, tags = topic
         candidate_slug = _slugify(title)

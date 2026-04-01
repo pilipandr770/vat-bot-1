@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — Mitarbeiter{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people text-primary"></i> Mitarbeiter-Verwaltung</h2>
+    <a href="{{ url_for('teamguard.add_member') }}" class="btn btn-primary">
+      <i class="bi bi-person-plus"></i> Mitarbeiter hinzufügen
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      {% if members %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Mitarbeiter</th>
+              <th>Position</th>
+              <th>Zugriffslevel</th>
+              <th>Passwort geändert</th>
+              <th>Ablauf</th>
+              <th>Status</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in members %}
+            <tr class="{% if not m.is_active %}table-secondary text-muted{% endif %}">
+              <td>
+                <strong>{{ m.full_name }}</strong>
+                {% if not m.is_active %}<span class="badge bg-secondary ms-1">Inaktiv</span>{% endif %}
+                <br><small class="text-muted">{{ m.email }}</small>
+              </td>
+              <td><small>{{ m.position or '—' }}</small></td>
+              <td>
+                <span class="badge
+                  {% if m.access_level == 'owner' %}bg-dark
+                  {% elif m.access_level == 'admin' %}bg-danger
+                  {% elif m.access_level == 'manager' %}bg-warning text-dark
+                  {% elif m.access_level == 'employee' %}bg-primary
+                  {% else %}bg-secondary{% endif %}">
+                  {{ access_labels.get(m.access_level, m.access_level) }}
+                </span>
+              </td>
+              <td>
+                {% if m.password_last_changed %}
+                  {{ m.password_last_changed.strftime('%d.%m.%Y') }}<br>
+                  <small class="text-muted">vor {{ m.days_since_password_change }} Tagen</small>
+                {% else %}
+                  <span class="text-warning">Nicht erfasst</span>
+                {% endif %}
+              </td>
+              <td>
+                {% set eff_rotation = m.password_rotation_days or rotation_days %}
+                {% if m.password_last_changed %}
+                  {% set days_left = eff_rotation - m.days_since_password_change %}
+                  {% if days_left <= 0 %}
+                    <span class="text-danger fw-bold">Abgelaufen</span>
+                  {% elif days_left <= 10 %}
+                    <span class="text-warning">in {{ days_left }} Tagen</span>
+                  {% else %}
+                    <span class="text-success">in {{ days_left }} Tagen</span>
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if not m.is_active %}
+                  <span class="badge bg-secondary">Deaktiviert</span>
+                {% elif m.password_expired %}
+                  <span class="badge bg-danger"><i class="bi bi-exclamation-circle"></i> Abgelaufen</span>
+                {% elif m.password_last_changed is none %}
+                  <span class="badge bg-warning text-dark">Kein Record</span>
+                {% else %}
+                  <span class="badge bg-success"><i class="bi bi-check-circle"></i> OK</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <a href="{{ url_for('teamguard.edit_member', member_id=m.id) }}"
+                     class="btn btn-outline-secondary" title="Bearbeiten">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  {% if m.is_active %}
+                  <form method="post" action="{{ url_for('teamguard.send_password', member_id=m.id) }}"
+                        class="d-inline">
+                    <button class="btn btn-outline-primary" title="Neues Passwort senden"
+                            onclick="return confirm('Sicheres Passwort an {{ m.email }} senden?')">
+                      <i class="bi bi-key"></i>
+                    </button>
+                  </form>
+                  <form method="post" action="{{ url_for('teamguard.deactivate_member', member_id=m.id) }}"
+                        class="d-inline">
+                    <button class="btn btn-outline-danger" title="Deaktivieren / Offboarding"
+                            onclick="return confirm('{{ m.full_name }} deaktivieren? Vergessen Sie nicht, alle System-Zugänge zu sperren.')">
+                      <i class="bi bi-door-open"></i>
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-people fs-1"></i>
+        <p class="mt-2">Noch keine Mitarbeiter.</p>
+        <a href="{{ url_for('teamguard.add_member') }}" class="btn btn-primary">
+          <i class="bi bi-person-plus"></i> Ersten Mitarbeiter hinzufügen
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Offboarding Reminder -->
+  <div class="alert alert-info mt-4">
+    <i class="bi bi-info-circle"></i>
+    <strong>Offboarding-Checkliste:</strong> Wenn ein Mitarbeiter das Unternehmen verlässt →
+    <strong>sofort</strong> alle Zugänge sperren:
+    E-Mail-Konto, CRM, Cloud-Dienste, VPN, Buchhaltungs-Software, WLAN-Passworte.
+    <a href="{{ url_for('teamguard.event_log') }}">Sicherheits-Protokoll prüfen →</a>
+  </div>
+</div>
+{% endblock %}

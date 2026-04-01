@@ -160,6 +160,10 @@ def _startup_blog_check(app):
     This fixes the Render cold-start problem: APScheduler loses its state on
     every restart, so the 07:00 AM cron job only fires *tomorrow* if the app
     wakes up after that time.
+
+    IMPORTANT: Do NOT wrap generate_daily_blog_post() in a second
+    app.app_context() here — that function creates its own context, and nested
+    contexts cause SQLAlchemy session isolation issues on Flask-SQLAlchemy 3.x.
     """
     import time
     import threading
@@ -168,6 +172,7 @@ def _startup_blog_check(app):
         # Small delay so the DB pool is ready before we hit it
         time.sleep(15)
         try:
+            # Check-only block — minimal context, no DB writes
             with app.app_context():
                 from crm.models import BlogPost
                 from datetime import datetime
@@ -176,6 +181,10 @@ def _startup_blog_check(app):
                 if existing:
                     logger.info("Startup blog check: article already exists for today, skipping.")
                     return
+                should_generate = True
+
+            # Call generate OUTSIDE the check context — it manages its own context
+            if should_generate:
                 logger.info("Startup blog check: no article for today — triggering generation now.")
                 from services.blog_generator import generate_daily_blog_post
                 result = generate_daily_blog_post(app)

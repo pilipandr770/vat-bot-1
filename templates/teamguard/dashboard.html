@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — Sicherheits-Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2><i class="bi bi-people-fill text-primary"></i> TeamGuard
+        <small class="text-muted fs-6 ms-2">Teamsicherheit für KMU</small>
+      </h2>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('teamguard.add_member') }}" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Mitarbeiter hinzufügen
+      </a>
+      <a href="{{ url_for('teamguard.send_message') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-envelope"></i> Nachricht senden
+      </a>
+    </div>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="fs-2 fw-bold">{{ members|length }}</div>
+              <div class="small">Aktive Mitarbeiter</div>
+            </div>
+            <i class="bi bi-people fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 {% if expired_members %}bg-danger{% else %}bg-success{% endif %} text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="fs-2 fw-bold">{{ expired_members|length }}</div>
+              <div class="small">Passwörter abgelaufen</div>
+            </div>
+            <i class="bi bi-key fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 {% if no_record_members %}bg-warning text-dark{% else %}bg-success text-white{% endif %}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="fs-2 fw-bold">{{ no_record_members|length }}</div>
+              <div class="small">Kein Passwort-Record</div>
+            </div>
+            <i class="bi bi-question-circle fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 bg-info text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="fs-2 fw-bold">{{ rotation_days }}d</div>
+              <div class="small">Rotationsintervall</div>
+            </div>
+            <i class="bi bi-arrow-repeat fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Banner if issues exist -->
+  {% if expired_members or no_record_members %}
+  <div class="alert alert-warning d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>{{ (expired_members + no_record_members)|unique|list|length }}</strong>
+      Mitarbeiter benötigen neue Passwörter.
+    </div>
+    <form method="post" action="{{ url_for('teamguard.send_password_bulk') }}" class="d-inline">
+      <button type="submit" class="btn btn-warning btn-sm"
+              onclick="return confirm('Neue Passwörter generieren und per E-Mail versenden?')">
+        <i class="bi bi-envelope-check"></i> Alle jetzt zurücksetzen
+      </button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- Left: Password Status Table -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Passwort-Status Team</h5>
+          <a href="{{ url_for('teamguard.team_list') }}" class="btn btn-sm btn-outline-primary">
+            Alle anzeigen
+          </a>
+        </div>
+        <div class="card-body p-0">
+          {% if members %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Mitarbeiter</th>
+                  <th>Position</th>
+                  <th>Zugriff</th>
+                  <th>Passwort zuletzt geändert</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for m in members[:10] %}
+                <tr>
+                  <td>
+                    <strong>{{ m.full_name }}</strong><br>
+                    <small class="text-muted">{{ m.email }}</small>
+                  </td>
+                  <td><small>{{ m.position or '—' }}</small></td>
+                  <td>
+                    <span class="badge bg-secondary">{{ m.access_level }}</span>
+                  </td>
+                  <td>
+                    {% if m.password_last_changed %}
+                      {{ m.password_last_changed.strftime('%d.%m.%Y') }}
+                      <br><small class="text-muted">vor {{ m.days_since_password_change }} Tagen</small>
+                    {% else %}
+                      <span class="text-muted">Unbekannt</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if m.password_expired %}
+                      <span class="badge bg-danger"><i class="bi bi-exclamation-circle"></i> Abgelaufen</span>
+                    {% elif m.password_last_changed is none %}
+                      <span class="badge bg-warning text-dark"><i class="bi bi-question"></i> Kein Record</span>
+                    {% else %}
+                      <span class="badge bg-success"><i class="bi bi-check-circle"></i> OK</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <form method="post" action="{{ url_for('teamguard.send_password', member_id=m.id) }}"
+                          class="d-inline">
+                      <button class="btn btn-sm btn-outline-primary"
+                              title="Neues Passwort generieren & senden"
+                              onclick="return confirm('Sicheres Passwort generieren und an {{ m.email }} senden?')">
+                        <i class="bi bi-key"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-people fs-1"></i>
+            <p class="mt-2">Noch keine Mitarbeiter hinzugefügt.<br>
+              <a href="{{ url_for('teamguard.add_member') }}">Jetzt beginnen →</a>
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Sidebar -->
+    <div class="col-lg-4">
+      <!-- Phishing Tests -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><i class="bi bi-fish text-danger"></i> Phishing-Tests</h6>
+          <a href="{{ url_for('teamguard.create_phishing_test') }}" class="btn btn-sm btn-danger">
+            <i class="bi bi-plus"></i> Neu
+          </a>
+        </div>
+        <div class="card-body">
+          {% if active_phishing %}
+            {% for test in active_phishing %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <strong class="small">{{ test.name }}</strong><br>
+                <small class="text-muted">{{ test.total_clicks }}/{{ test.total_sent }} geklickt</small>
+              </div>
+              <a href="{{ url_for('teamguard.phishing_detail', test_id=test.id) }}"
+                 class="btn btn-xs btn-outline-danger btn-sm">Details</a>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted small mb-1">Keine aktiven Tests.</p>
+          {% endif %}
+          <a href="{{ url_for('teamguard.phishing_list') }}" class="btn btn-sm btn-outline-secondary w-100 mt-2">
+            Alle Tests anzeigen
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header"><h6 class="mb-0"><i class="bi bi-lightning"></i> Schnellzugriff</h6></div>
+        <div class="list-group list-group-flush">
+          <a href="{{ url_for('teamguard.password_policy') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-shield-check me-2 text-primary"></i>Passwort-Richtlinie
+          </a>
+          <a href="{{ url_for('teamguard.send_message') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-envelope me-2 text-success"></i>Nachricht an Team senden
+          </a>
+          <a href="{{ url_for('teamguard.event_log') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-clock-history me-2 text-secondary"></i>Sicherheits-Protokoll
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Events -->
+  {% if recent_events %}
+  <div class="card shadow-sm mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0"><i class="bi bi-clock-history"></i> Letzte Aktivitäten</h5>
+      <a href="{{ url_for('teamguard.event_log') }}" class="btn btn-sm btn-outline-secondary">Vollständiges Protokoll</a>
+    </div>
+    <div class="card-body p-0">
+      <ul class="list-group list-group-flush">
+        {% for ev in recent_events %}
+        <li class="list-group-item d-flex justify-content-between align-items-start py-2">
+          <div>
+            <span class="badge bg-secondary me-2">{{ event_labels.get(ev.event_type, ev.event_type) }}</span>
+            {% if ev.description %}<small>{{ ev.description }}</small>{% endif %}
+          </div>
+          <small class="text-muted text-nowrap ms-2">{{ ev.created_at.strftime('%d.%m %H:%M') }}</small>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Security Checklist Info Box -->
+  <div class="card border-primary mt-4">
+    <div class="card-header bg-primary text-white">
+      <i class="bi bi-info-circle"></i> Sicherheits-Grundregeln für KMU (ISO 27001 / DSGVO)
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <h6><i class="bi bi-key text-primary"></i> Passwort-Hygiene</h6>
+          <ul class="small">
+            <li>Passwörter alle 90 Tage erneuern</li>
+            <li>Minimum 12 Zeichen, gemischt</li>
+            <li>Niemals Passwörter teilen oder wiederverwenden</li>
+            <li>Passwort-Manager verwenden</li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h6><i class="bi bi-door-open text-warning"></i> Zugriffsrechte</h6>
+          <ul class="small">
+            <li>Prinzip der minimalen Berechtigung</li>
+            <li>Bei Offboarding: sofort alle Zugänge sperren</li>
+            <li>Nur notwendige Rechte vergeben</li>
+            <li>Regelmäßige Überprüfung der Zugänge</li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h6><i class="bi bi-fish text-danger"></i> Phishing-Schutz</h6>
+          <ul class="small">
+            <li>Regelmäßige Phishing-Simulationen</li>
+            <li>Mitarbeiter schulen, nicht bestrafen</li>
+            <li>Verdächtige E-Mails immer melden</li>
+            <li>Keine Links aus unbekannten Mails öffnen</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — {{ test.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.dashboard') }}">TeamGuard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.phishing_list') }}">Phishing-Tests</a></li>
+      <li class="breadcrumb-item active">{{ test.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h2><i class="bi bi-fish text-danger"></i> {{ test.name }}</h2>
+      <p class="text-muted">Betreff: <em>{{ test.subject_line }}</em></p>
+    </div>
+    <span class="badge fs-6
+      {% if test.status == 'draft' %}bg-secondary
+      {% elif test.status == 'sent' %}bg-warning text-dark
+      {% else %}bg-success{% endif %}">
+      {{ test.status|upper }}
+    </span>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Stats -->
+  {% if test.status != 'draft' %}
+  <div class="row g-3 mb-4">
+    <div class="col-sm-3">
+      <div class="card text-center border-0 bg-light">
+        <div class="card-body">
+          <div class="fs-1 fw-bold">{{ test.total_sent }}</div>
+          <div class="text-muted">Gesendet</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card text-center border-0 {% if test.total_clicks > 0 %}bg-danger bg-opacity-10{% else %}bg-success bg-opacity-10{% endif %}">
+        <div class="card-body">
+          <div class="fs-1 fw-bold {% if test.total_clicks > 0 %}text-danger{% else %}text-success{% endif %}">
+            {{ test.total_clicks }}
+          </div>
+          <div class="text-muted">Geklickt ⚠️</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card text-center border-0 bg-success bg-opacity-10">
+        <div class="card-body">
+          <div class="fs-1 fw-bold text-success">{{ test.total_sent - test.total_clicks }}</div>
+          <div class="text-muted">Bestanden ✅</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card text-center border-0 bg-light">
+        <div class="card-body">
+          <div class="fs-1 fw-bold
+            {% if test.click_rate >= 30 %}text-danger
+            {% elif test.click_rate >= 10 %}text-warning
+            {% else %}text-success{% endif %}">
+            {{ test.click_rate }}%
+          </div>
+          <div class="text-muted">Klickrate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- Results per member -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header"><h5 class="mb-0">Ergebnisse pro Mitarbeiter</h5></div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Mitarbeiter</th>
+                <th>E-Mail</th>
+                <th>Ergebnis</th>
+                <th>Zeitpunkt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for mid in test.sent_to_member_ids %}
+              {% set m = members_map.get(mid) %}
+              <tr>
+                <td>{{ m.full_name if m else '(Unbekannt)' }}</td>
+                <td><small class="text-muted">{{ m.email if m else '—' }}</small></td>
+                <td>
+                  {% if mid in clicked_ids %}
+                    <span class="badge bg-danger">
+                      <i class="bi bi-exclamation-triangle"></i> Geklickt — Schulung empfohlen
+                    </span>
+                  {% elif test.status == 'sent' %}
+                    <span class="badge bg-success">
+                      <i class="bi bi-check-circle"></i> Nicht geklickt ✅
+                    </span>
+                  {% else %}
+                    <span class="badge bg-secondary">Noch nicht gesendet</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if mid in clicked_ids %}
+                    {% for click in test.clicks.all() if click.member_id == mid %}
+                      <small class="text-muted">{{ click.clicked_at.strftime('%d.%m %H:%M') }}</small>
+                    {% endfor %}
+                  {% else %}—{% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="col-lg-4">
+      {% if test.status == 'draft' %}
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-warning text-dark"><h6 class="mb-0">Test versenden</h6></div>
+        <div class="card-body">
+          <p class="small">Schickt die Phishing-Simulation an
+            <strong>{{ test.total_sent }} Mitarbeiter</strong>.</p>
+          <p class="small text-muted">Tracking-URL:<br>
+            <code style="font-size: 0.7em; word-break: break-all;">{{ tracking_url }}</code>
+          </p>
+          <form method="post" action="{{ url_for('teamguard.send_phishing_test', test_id=test.id) }}">
+            <button type="submit" class="btn btn-danger w-100"
+                    onclick="return confirm('Phishing-Simulation an alle ausgewählten Mitarbeiter senden?')">
+              <i class="bi bi-send-check"></i> Jetzt versenden
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if test.click_rate >= 20 %}
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <strong>Hohe Klickrate ({{ test.click_rate }}%)!</strong><br>
+        Dringend: Security-Awareness-Training für alle Mitarbeiter empfohlen.
+        <a href="{{ url_for('teamguard.send_message') }}" class="alert-link">
+          Jetzt Nachricht senden →
+        </a>
+      </div>
+      {% elif test.click_rate > 0 and test.status != 'draft' %}
+      <div class="alert alert-warning">
+        <i class="bi bi-person-exclamation"></i>
+        <strong>{{ test.total_clicks }} Mitarbeiter geklickt.</strong><br>
+        Empfehlung: Persönliches Training für betroffene Mitarbeiter.
+      </div>
+      {% elif test.status == 'sent' and test.total_clicks == 0 %}
+      <div class="alert alert-success">
+        <i class="bi bi-trophy-fill"></i>
+        <strong>Ausgezeichnet!</strong> Kein Mitarbeiter hat den Test-Link angeklickt.
+      </div>
+      {% endif %}
+
+      <div class="card shadow-sm">
+        <div class="card-header"><h6 class="mb-0">Test-Infos</h6></div>
+        <ul class="list-group list-group-flush small">
+          <li class="list-group-item">Typ: <strong>{{ test.template_type }}</strong></li>
+          <li class="list-group-item">Erstellt: <strong>{{ test.created_at.strftime('%d.%m.%Y') }}</strong></li>
+          {% if test.sent_at %}
+          <li class="list-group-item">Gesendet: <strong>{{ test.sent_at.strftime('%d.%m.%Y %H:%M') }}</strong></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

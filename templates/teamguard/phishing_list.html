@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — Phishing-Tests{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2><i class="bi bi-fish text-danger"></i> Phishing-Simulationen
+        <span class="badge bg-secondary fs-6 ms-2">Awareness Training</span>
+      </h2>
+      <p class="text-muted mb-0">Testen Sie, ob Ihre Mitarbeiter Phishing-E-Mails erkennen.</p>
+    </div>
+    <a href="{{ url_for('teamguard.create_phishing_test') }}" class="btn btn-danger">
+      <i class="bi bi-plus-circle"></i> Neuen Test erstellen
+    </a>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="alert alert-warning">
+    <i class="bi bi-shield-exclamation"></i>
+    <strong>Ethischer Einsatz:</strong> Phishing-Simulationen dienen ausschließlich der
+    <strong>internen Mitarbeiter-Schulung</strong> innerhalb Ihrer Organisation.
+    Alle Tests werden automatisch protokolliert. Die Funktion darf nur für eigene Mitarbeiter verwendet werden.
+    Mitarbeiter die klicken werden zur Schulung weitergeleitet — nicht bestraft.
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  {% if tests %}
+  <div class="row g-3">
+    {% for test in tests %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>{{ test.name }}</strong>
+          <span class="badge
+            {% if test.status == 'draft' %}bg-secondary
+            {% elif test.status == 'sent' %}bg-warning text-dark
+            {% else %}bg-success{% endif %}">
+            {{ test.status|upper }}
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted mb-1"><i class="bi bi-envelope"></i> {{ test.subject_line }}</p>
+          <p class="small mb-2">Typ: <span class="badge bg-light text-dark border">{{ test.template_type }}</span></p>
+
+          {% if test.status != 'draft' %}
+          <div class="d-flex gap-3 text-center mb-2">
+            <div class="flex-fill bg-light rounded p-2">
+              <div class="fw-bold fs-5">{{ test.total_sent }}</div>
+              <div class="small text-muted">Gesendet</div>
+            </div>
+            <div class="flex-fill bg-danger bg-opacity-10 rounded p-2">
+              <div class="fw-bold fs-5 text-danger">{{ test.total_clicks }}</div>
+              <div class="small text-muted">Geklickt</div>
+            </div>
+            <div class="flex-fill bg-light rounded p-2">
+              <div class="fw-bold fs-5 {% if test.click_rate >= 30 %}text-danger{% elif test.click_rate >= 10 %}text-warning{% else %}text-success{% endif %}">
+                {{ test.click_rate }}%
+              </div>
+              <div class="small text-muted">Klickrate</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <p class="small text-muted mb-0">
+            Erstellt: {{ test.created_at.strftime('%d.%m.%Y') }}
+            {% if test.sent_at %}| Gesendet: {{ test.sent_at.strftime('%d.%m.%Y') }}{% endif %}
+          </p>
+        </div>
+        <div class="card-footer">
+          <a href="{{ url_for('teamguard.phishing_detail', test_id=test.id) }}"
+             class="btn btn-sm btn-outline-danger w-100">Details & Ergebnisse</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-fish fs-1"></i>
+    <p class="mt-2">Noch keine Phishing-Simulationen erstellt.</p>
+    <a href="{{ url_for('teamguard.create_phishing_test') }}" class="btn btn-danger">
+      Ersten Test erstellen
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — Sicherheits-Protokoll{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clock-history text-secondary"></i> Sicherheits-Protokoll</h2>
+    <a href="{{ url_for('teamguard.dashboard') }}" class="btn btn-outline-secondary">
+      ← Dashboard
+    </a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      {% if events.items %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Datum</th>
+              <th>Mitarbeiter</th>
+              <th>Ereignis</th>
+              <th>Details</th>
+              <th>Durchgeführt von</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ev in events.items %}
+            <tr>
+              <td><small class="text-muted">{{ ev.created_at.strftime('%d.%m.%Y %H:%M') }}</small></td>
+              <td>
+                {% set m = members_map.get(ev.member_id) %}
+                {% if m %}
+                  <strong>{{ m.full_name }}</strong><br>
+                  <small class="text-muted">{{ m.email }}</small>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge
+                  {% if ev.event_type == 'phishing_click' %}bg-danger
+                  {% elif ev.event_type == 'offboarding' %}bg-warning text-dark
+                  {% elif ev.event_type == 'onboarding' %}bg-success
+                  {% elif ev.event_type == 'password_reset' %}bg-primary
+                  {% else %}bg-secondary{% endif %}">
+                  {{ event_labels.get(ev.event_type, ev.event_type) }}
+                </span>
+              </td>
+              <td><small>{{ ev.description or '—' }}</small></td>
+              <td><small class="text-muted">{{ ev.performed_by or '—' }}</small></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if events.pages > 1 %}
+      <div class="d-flex justify-content-center py-3">
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            {% if events.has_prev %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ events.prev_num }}">←</a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled">
+              <span class="page-link">Seite {{ events.page }}/{{ events.pages }}</span>
+            </li>
+            {% if events.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ events.next_num }}">→</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+
+      {% else %}
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-clock-history fs-1"></i>
+        <p class="mt-2">Noch keine Sicherheitsereignisse protokolliert.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

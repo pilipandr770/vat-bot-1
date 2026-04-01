@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — Mitarbeiter hinzufügen{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 640px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.dashboard') }}">TeamGuard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.team_list') }}">Mitarbeiter</a></li>
+      <li class="breadcrumb-item active">Hinzufügen</li>
+    </ol>
+  </nav>
+
+  <h3><i class="bi bi-person-plus text-primary"></i> Mitarbeiter hinzufügen</h3>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Vollständiger Name <span class="text-danger">*</span></label>
+          <input type="text" name="full_name" class="form-control" required placeholder="z.B. Max Mustermann">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">E-Mail-Adresse <span class="text-danger">*</span></label>
+          <input type="email" name="email" class="form-control" required placeholder="mitarbeiter@firma.de">
+          <div class="form-text">An diese Adresse werden Passwörter und Nachrichten gesendet.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Position / Rolle</label>
+          <input type="text" name="position" class="form-control" placeholder="z.B. Buchhalter, Vertriebsleiter">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Zugriffsebene <span class="text-danger">*</span></label>
+          <select name="access_level" class="form-select" required>
+            {% for level in access_levels %}
+            <option value="{{ level }}" {% if level == 'employee' %}selected{% endif %}>
+              {{ access_labels.get(level, level) }}
+            </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            <strong>Eigentümer</strong> = vollständiger Zugriff |
+            <strong>Admin</strong> = IT/Verwaltung |
+            <strong>Manager</strong> = Team-Lead |
+            <strong>Mitarbeiter</strong> = Standard |
+            <strong>Gast</strong> = eingeschränkt
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Notizen (intern)</label>
+          <textarea name="notes" class="form-control" rows="2"
+                    placeholder="z.B. Erstellungsdatum, Abteilung, besondere Zugänge"></textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Mitarbeiter hinzufügen
+          </button>
+          <a href="{{ url_for('teamguard.team_list') }}" class="btn btn-outline-secondary">Abbrechen</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

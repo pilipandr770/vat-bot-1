@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — {{ member.full_name }} bearbeiten{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 640px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.dashboard') }}">TeamGuard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.team_list') }}">Mitarbeiter</a></li>
+      <li class="breadcrumb-item active">Bearbeiten</li>
+    </ol>
+  </nav>
+
+  <h3><i class="bi bi-pencil text-primary"></i> {{ member.full_name }}</h3>
+  <p class="text-muted">{{ member.email }}</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Vollständiger Name</label>
+          <input type="text" name="full_name" class="form-control" value="{{ member.full_name }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Position / Rolle</label>
+          <input type="text" name="position" class="form-control" value="{{ member.position or '' }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Zugriffsebene</label>
+          <select name="access_level" class="form-select">
+            {% for level in access_levels %}
+            <option value="{{ level }}" {% if level == member.access_level %}selected{% endif %}>
+              {{ access_labels.get(level, level) }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Individuelle Passwort-Rotation (Tage)</label>
+          <input type="number" name="password_rotation_days" class="form-control"
+                 value="{{ member.password_rotation_days or '' }}"
+                 placeholder="Leer lassen = Richtlinie verwenden" min="1" max="365">
+          <div class="form-text">Überschreibt die globale Passwort-Richtlinie für diesen Mitarbeiter.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Notizen</label>
+          <textarea name="notes" class="form-control" rows="2">{{ member.notes or '' }}</textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Speichern</button>
+          <a href="{{ url_for('teamguard.team_list') }}" class="btn btn-outline-secondary">Abbrechen</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

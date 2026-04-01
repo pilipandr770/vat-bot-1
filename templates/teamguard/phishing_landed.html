@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sicherheitswarnung — Phishing-Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5" style="max-width: 640px;">
+
+  {% if test and not already_clicked %}
+  <!-- First click — show educational info -->
+  <div class="card border-danger shadow">
+    <div class="card-header bg-danger text-white text-center py-3">
+      <i class="bi bi-fish fs-1"></i>
+      <h3 class="mt-2 mb-0">Sie haben einen Phishing-Test angeklickt!</h3>
+    </div>
+    <div class="card-body p-4">
+      <div class="alert alert-warning">
+        <strong>Das war ein interner Sicherheitstest — kein echter Angriff.</strong><br>
+        Diese Seite wurde von Ihrer Unternehmensleitung zur
+        <strong>Schulung Ihrer Sicherheitskompetenz</strong> eingerichtet.
+      </div>
+
+      <h5>Was bedeutet das?</h5>
+      <p>Sie haben auf einen Link in einer Simulations-E-Mail geklickt.
+        In einer echten Phishing-Attacke könnten damit Ihre Zugangsdaten gestohlen oder
+        Schadsoftware installiert werden.</p>
+
+      <h5 class="text-danger mt-4"><i class="bi bi-exclamation-triangle"></i> So erkennen Sie echte Phishing-Mails:</h5>
+      <ul>
+        <li><strong>Dringlichkeit + Bedrohung:</strong> "Sofort handeln oder Konto gesperrt!"</li>
+        <li><strong>Seltsamer Absender:</strong> service@goog1e.com statt @google.com</li>
+        <li><strong>Unerwartete Anfragen:</strong> IT bittet per E-Mail um Passwort</li>
+        <li><strong>Hover-Test:</strong> Zeigen Sie mit der Maus auf Links — stimmt die URL?</li>
+        <li><strong>Grammatikfehler</strong> oder ungewöhnlicher Schreibstil</li>
+      </ul>
+
+      <h5 class="text-success mt-4"><i class="bi bi-shield-check"></i> Was tun bei Verdacht?</h5>
+      <ol>
+        <li><strong>Nicht klicken</strong> — keine Links, keine Anhänge öffnen</li>
+        <li>E-Mail an IT-Administrator <strong>weiterleiten</strong></li>
+        <li>In Outlook/Gmail: "Als Phishing melden"</li>
+        <li>Wenn Sie bereits geklickt haben: <strong>sofort Passwort ändern</strong> und IT benachrichtigen</li>
+      </ol>
+
+      <div class="text-center mt-4">
+        <p class="text-muted">Dieser Test wurde von Ihrem Administrator über VAT Verifizierung TeamGuard durchgeführt.<br>
+          Diese Daten dienen ausschließlich Ihrer internen Schulung.</p>
+        <a href="javascript:window.close()" class="btn btn-outline-secondary">
+          Fenster schließen
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Already clicked or invalid token -->
+  <div class="card border-secondary shadow">
+    <div class="card-header bg-secondary text-white text-center py-3">
+      <i class="bi bi-shield-check fs-1"></i>
+      <h3 class="mt-2 mb-0">Sicherheitsseite</h3>
+    </div>
+    <div class="card-body p-4 text-center">
+      <p class="text-muted">Diese Seite ist Teil eines internen Sicherheitstrainings.</p>
+      <p>Sie können dieses Fenster schließen.</p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}TeamGuard — Phishing-Test erstellen{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 700px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.dashboard') }}">TeamGuard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('teamguard.phishing_list') }}">Phishing-Tests</a></li>
+      <li class="breadcrumb-item active">Erstellen</li>
+    </ol>
+  </nav>
+
+  <h3><i class="bi bi-fish text-danger"></i> Phishing-Simulation erstellen</h3>
+
+  <div class="alert alert-warning">
+    <i class="bi bi-shield-check"></i>
+    <strong>Wichtig:</strong> Diese Simulation wird ausschließlich an Ihre eigenen Mitarbeiter gesendet.
+    Sie dient dem Sicherheitsbewusstsein — nicht der Täuschung zu schädlichen Zwecken.
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Test-Name (intern)</label>
+          <input type="text" name="name" class="form-control" required
+                 placeholder="z.B. Q1 2026 Phishing-Awareness-Test">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">E-Mail-Betreff der Simulation</label>
+          <input type="text" name="subject_line" class="form-control" required
+                 placeholder="z.B. Dringende Sicherheitswarnung: Passwort-Änderung erforderlich">
+          <div class="form-text">Dieser Betreff erscheint in der Simulations-E-Mail.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Test-Typ</label>
+          <select name="template_type" class="form-select">
+            <option value="link_click">Link anklicken (Standard)</option>
+          </select>
+          <div class="form-text">Weitere Typen folgen in zukünftigen Versionen.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Empfänger auswählen <span class="text-danger">*</span></label>
+          <div class="border rounded p-2" style="max-height: 220px; overflow-y: auto;">
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="checkbox" id="select_all"
+                     onchange="document.querySelectorAll('input[name=recipient_ids]').forEach(cb => cb.checked = this.checked)">
+              <label class="form-check-label fw-bold" for="select_all">Alle auswählen</label>
+            </div>
+            <hr class="my-1">
+            {% for m in members %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="recipient_ids"
+                     value="{{ m.id }}" id="m_{{ m.id }}">
+              <label class="form-check-label" for="m_{{ m.id }}">
+                {{ m.full_name }} <small class="text-muted">&lt;{{ m.email }}&gt;</small>
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-plus-circle"></i> Test erstellen (als Entwurf)
+          </button>
+          <a href="{{ url_for('teamguard.phishing_list') }}" class="btn btn-outline-secondary">Abbrechen</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

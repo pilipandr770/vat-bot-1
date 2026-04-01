@@ -238,6 +238,13 @@ def create_app(config_name=None):
     from app.mailguard import mailguard_bp
     app.register_blueprint(mailguard_bp)
 
+    # TeamGuard — Team security management
+    try:
+        from app.teamguard.views import teamguard_bp
+        app.register_blueprint(teamguard_bp)
+    except Exception as e:
+        app.logger.warning('TeamGuard blueprint not registered: %s', e)
+
     from app.pentesting.routes import pentesting
     app.register_blueprint(pentesting)
 
@@ -896,6 +903,46 @@ def create_app(config_name=None):
         except Exception as e:
             click.echo(click.style(f'Error: {e}', fg='red'))
             raise SystemExit(1)
+
+    # ── Admin: Manual blog trigger ──────────────────────────────────────────
+    @app.route('/admin/blog/generate', methods=['POST'])
+    @login_required
+    def admin_generate_blog():
+        """Admin-only endpoint to manually trigger blog post generation."""
+        from flask_login import current_user
+        if not getattr(current_user, 'is_admin', False):
+            return jsonify({'error': 'Admin access required'}), 403
+        from services.blog_generator import generate_daily_blog_post
+        force = request.args.get('force', 'false').lower() == 'true'
+        try:
+            result = generate_daily_blog_post(app, force=force)
+            if result:
+                return jsonify({'success': True, 'message': 'Blog post generated successfully'})
+            return jsonify({'success': False, 'message': 'Skipped: post exists today or OpenAI unavailable'})
+        except Exception as e:
+            logger.error(f"Admin blog generation failed: {e}", exc_info=True)
+            return jsonify({'error': str(e)}), 500
+
+    # ── Admin: Scheduler status ─────────────────────────────────────────────
+    @app.route('/admin/scheduler/status')
+    @login_required
+    def admin_scheduler_status():
+        """Admin-only: view scheduled jobs status."""
+        from flask_login import current_user
+        if not getattr(current_user, 'is_admin', False):
+            return jsonify({'error': 'Admin access required'}), 403
+        from services.scheduler import get_scheduler
+        sched = get_scheduler()
+        if not sched:
+            return jsonify({'status': 'not_initialized'})
+        jobs = []
+        for job in sched.get_jobs():
+            jobs.append({
+                'id': job.id,
+                'name': job.name,
+                'next_run': str(job.next_run_time) if job.next_run_time else 'paused',
+            })
+        return jsonify({'status': 'running', 'jobs': jobs})
 
     return app
 
