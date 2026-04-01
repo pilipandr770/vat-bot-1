@@ -228,9 +228,11 @@ def create_app(config_name=None):
     
     from services.chatbot_routes import chatbot_bp
     app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
+    csrf.exempt(chatbot_bp)  # JSON API — no CSRF needed
 
     from services.sales_chatbot import sales_chatbot_bp
     app.register_blueprint(sales_chatbot_bp)
+    csrf.exempt(sales_chatbot_bp)  # Public API — no CSRF needed
 
     from link_scanner.routes import link_scanner
     app.register_blueprint(link_scanner, url_prefix='/link-scanner')

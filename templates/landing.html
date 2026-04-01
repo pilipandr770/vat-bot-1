@@ -1176,7 +1176,14 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message, history: history.slice(0, -1) })
                 });
-                const data = await res.json();
+
+                let data;
+                try {
+                    data = await res.json();
+                } catch (_) {
+                    data = { error: `Server-Fehler (${res.status})` };
+                }
+
                 scHideTyping();
 
                 const reply = data.response || data.error || 'Entschuldigung, bitte versuchen Sie es erneut.';
