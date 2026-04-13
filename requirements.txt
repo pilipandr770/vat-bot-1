@@ -50,3 +50,8 @@ python-json-logger==2.0.7
 # Code quality (dev/CI)
 ruff==0.4.4
 bandit==1.7.9
+
+# Dependency management — source of truth is requirements.in
+# To update: edit requirements.in, then run on Linux/CI:
+#   pip-compile --generate-hashes requirements.in
+pip-tools==7.4.1

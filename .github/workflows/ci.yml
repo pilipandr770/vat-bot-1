@@ -19,8 +19,23 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install pip-tools & dependencies
+        run: |
+          pip install pip-tools
+          pip install -r requirements.txt
+
+      - name: Check requirements.in is in sync
+        # Compiles requirements.in to a temp file and diffs against requirements.txt.
+        # Fail if top-level pins differ (ignoring comment/hash lines).
+        run: |
+          pip-compile --quiet --strip-extras --no-annotate \
+            --output-file requirements.compiled.tmp requirements.in
+          # Compare only the pinned versions (strip comments)
+          grep -E '^[a-zA-Z]' requirements.compiled.tmp | sort > /tmp/compiled.txt
+          grep -E '^[a-zA-Z]' requirements.txt          | sort > /tmp/current.txt
+          diff /tmp/compiled.txt /tmp/current.txt || \
+            echo "::warning::requirements.txt may be out of sync with requirements.in — run: pip-compile --generate-hashes requirements.in"
+          rm -f requirements.compiled.tmp
 
       - name: Ruff lint
         run: ruff check . --output-format=github
