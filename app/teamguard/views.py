@@ -59,11 +59,11 @@ def _send_password_email(member, new_password: str, admin_email: str):
         from email.mime.multipart import MIMEMultipart
         from email.mime.text import MIMEText
 
-        smtp_server = os.environ.get('SMTP_SERVER')
-        smtp_port = int(os.environ.get('SMTP_PORT', 587))
-        smtp_user = os.environ.get('SMTP_USERNAME')
-        smtp_pass = os.environ.get('SMTP_PASSWORD')
-        sender = os.environ.get('MAIL_DEFAULT_SENDER', smtp_user)
+        smtp_server = current_app.config.get('MAIL_SERVER')
+        smtp_port = int(current_app.config.get('MAIL_PORT', 587))
+        smtp_user = current_app.config.get('MAIL_USERNAME')
+        smtp_pass = current_app.config.get('MAIL_PASSWORD')
+        sender = current_app.config.get('MAIL_DEFAULT_SENDER', smtp_user)
 
         if not all([smtp_server, smtp_user, smtp_pass, sender]):
             current_app.logger.warning('TeamGuard: SMTP not configured, cannot send password email')
@@ -114,11 +114,11 @@ def _send_team_message_email(member, subject: str, body: str, sender_email: str)
         from email.mime.multipart import MIMEMultipart
         from email.mime.text import MIMEText
 
-        smtp_server = os.environ.get('SMTP_SERVER')
-        smtp_port = int(os.environ.get('SMTP_PORT', 587))
-        smtp_user = os.environ.get('SMTP_USERNAME')
-        smtp_pass = os.environ.get('SMTP_PASSWORD')
-        mail_sender = os.environ.get('MAIL_DEFAULT_SENDER', smtp_user)
+        smtp_server = current_app.config.get('MAIL_SERVER')
+        smtp_port = int(current_app.config.get('MAIL_PORT', 587))
+        smtp_user = current_app.config.get('MAIL_USERNAME')
+        smtp_pass = current_app.config.get('MAIL_PASSWORD')
+        mail_sender = current_app.config.get('MAIL_DEFAULT_SENDER', smtp_user)
 
         if not all([smtp_server, smtp_user, smtp_pass, mail_sender]):
             return False
@@ -620,11 +620,11 @@ def send_phishing_test(test_id):
             from email.mime.multipart import MIMEMultipart
             from email.mime.text import MIMEText
 
-            smtp_server = os.environ.get('SMTP_SERVER')
-            smtp_port = int(os.environ.get('SMTP_PORT', 587))
-            smtp_user = os.environ.get('SMTP_USERNAME')
-            smtp_pass = os.environ.get('SMTP_PASSWORD')
-            mail_sender = os.environ.get('MAIL_DEFAULT_SENDER', smtp_user)
+            smtp_server = current_app.config.get('MAIL_SERVER')
+            smtp_port = int(current_app.config.get('MAIL_PORT', 587))
+            smtp_user = current_app.config.get('MAIL_USERNAME')
+            smtp_pass = current_app.config.get('MAIL_PASSWORD')
+            mail_sender = current_app.config.get('MAIL_DEFAULT_SENDER', smtp_user)
 
             if smtp_server and smtp_user and smtp_pass:
                 msg = MIMEMultipart('alternative')
@@ -638,14 +638,27 @@ def send_phishing_test(test_id):
                     server.login(smtp_user, smtp_pass)
                     server.send_message(msg)
                 sent += 1
+            else:
+                current_app.logger.warning(
+                    'TeamGuard: SMTP not configured (SMTP_SERVER/SMTP_USERNAME/SMTP_PASSWORD missing); '
+                    'phishing test email NOT sent to member %s', mid
+                )
         except Exception as e:
-            current_app.logger.error(f'Phishing send failed for member {mid}: {e}')
+            current_app.logger.error(f'Phishing send failed for member {mid}: {e}', exc_info=True)
 
-    test.status = 'sent'
-    test.sent_at = datetime.utcnow()
-    db.session.commit()
-
-    flash(f'Phishing-Test an {sent} Mitarbeiter gesendet.', 'success')
+    if sent > 0:
+        test.status = 'sent'
+        test.sent_at = datetime.utcnow()
+        db.session.commit()
+        flash(f'Phishing-Test an {sent} Mitarbeiter gesendet.', 'success')
+    else:
+        # Do NOT mark as sent — leave as draft so admin can fix config and retry
+        db.session.commit()
+        flash(
+            'Fehler: Keine E-Mails wurden gesendet. '
+            'Bitte SMTP-Konfiguration prüfen (SMTP_SERVER, SMTP_USERNAME, SMTP_PASSWORD).',
+            'danger'
+        )
     return redirect(url_for('teamguard.phishing_detail', test_id=test_id))
 
 
@@ -737,3 +750,61 @@ def event_log():
         members_map=members_map,
         event_labels=EVENT_TYPE_LABELS,
     )
+
+
+# ─── SMTP Diagnostics (admin-only) ────────────────────────────────────────────
+
+@teamguard_bp.route('/smtp-test', methods=['POST'])
+@login_required
+def smtp_test():
+    """
+    Send a test email to the currently logged-in user to verify SMTP config.
+    Admin-only diagnostic endpoint.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    import smtplib
+    from email.mime.text import MIMEText
+
+    smtp_server = current_app.config.get('MAIL_SERVER')
+    smtp_port = int(current_app.config.get('MAIL_PORT', 587))
+    smtp_user = current_app.config.get('MAIL_USERNAME')
+    smtp_pass = current_app.config.get('MAIL_PASSWORD')
+    sender = current_app.config.get('MAIL_DEFAULT_SENDER', smtp_user)
+
+    missing = [k for k, v in {
+        'MAIL_SERVER': smtp_server,
+        'MAIL_USERNAME': smtp_user,
+        'MAIL_PASSWORD': smtp_pass,
+    }.items() if not v]
+
+    if missing:
+        flash(
+            f'SMTP nicht konfiguriert. Fehlende Einstellungen: {", ".join(missing)}. '
+            'Bitte Render-Umgebungsvariablen prüfen.',
+            'danger'
+        )
+        return redirect(url_for('teamguard.dashboard'))
+
+    try:
+        msg = MIMEText(
+            f'TeamGuard SMTP-Test erfolgreich. Server: {smtp_server}:{smtp_port}',
+            'plain', 'utf-8'
+        )
+        msg['Subject'] = 'TeamGuard SMTP-Test'
+        msg['From'] = sender
+        msg['To'] = current_user.email
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.send_message(msg)
+
+        flash(f'Test-E-Mail erfolgreich an {current_user.email} gesendet.', 'success')
+        current_app.logger.info('TeamGuard SMTP test OK: server=%s port=%s', smtp_server, smtp_port)
+    except Exception as e:
+        flash(f'SMTP-Fehler: {e}', 'danger')
+        current_app.logger.error('TeamGuard SMTP test FAILED: %s', e, exc_info=True)
+
+    return redirect(url_for('teamguard.dashboard'))
