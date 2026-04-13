@@ -71,7 +71,20 @@ class TestMakeAdminRouteRemoved:
 class TestNoMakeAdminRoute:
     """Regression test — confirm privilege escalation route is gone."""
 
-    def test_cannot_make_admin_via_get(self, auth_client):
-        """Authenticated users cannot escalate privileges via URL."""
-        response = auth_client.get('/make-admin/victim@example.com')
+    def test_cannot_make_admin_via_get(self, client):
+        """Even unauthenticated GET returns 404 — route is gone."""
+        response = client.get('/make-admin/victim@example.com')
         assert response.status_code == 404
+
+
+class TestProductionConfigGuards:
+    def test_production_blocks_insecure_secret_key(self, app, monkeypatch):
+        """ProductionConfig must reject the default insecure SECRET_KEY."""
+        import pytest
+        from application import create_app  # module already loaded by session fixture
+        monkeypatch.setenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+        monkeypatch.setenv('DATABASE_URL', 'postgresql://x:y@localhost:5432/z')
+        monkeypatch.setenv('MAILGUARD_ENCRYPTION_KEY', 'somekey')
+        # ProductionConfig.__init__ detects insecure SECRET_KEY → RuntimeError
+        with pytest.raises(RuntimeError, match='(?i)insecure|SECRET_KEY'):
+            create_app('production')

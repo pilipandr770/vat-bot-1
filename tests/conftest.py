@@ -7,6 +7,8 @@ import pytest
 os.environ.setdefault('FLASK_ENV', 'testing')
 os.environ.setdefault('SECRET_KEY', 'test-secret-key')
 os.environ.setdefault('MAILGUARD_ENCRYPTION_KEY', '')
+# Use no schema for SQLite (schemas are PostgreSQL-only)
+os.environ['DB_SCHEMA'] = 'public'
 
 
 @pytest.fixture(scope='session')

@@ -57,7 +57,26 @@ def create_app(config_name=None):
         config_name = os.environ.get('FLASK_ENV', 'development')
     
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    # Instantiate config so ProductionConfig.__init__ validation runs at call time
+    _conf_cls = config[config_name]
+    _conf_obj = _conf_cls() if isinstance(_conf_cls, type) else _conf_cls
+    app.config.from_object(_conf_obj)
+
+    # ── Defense-in-depth: block insecure defaults in production ───────────
+    # Redundant second guard after ProductionConfig.__init__, but protects
+    # against code paths that may skip instantiation.
+    if config_name == 'production':
+        _insecure_key = 'dev-secret-key-change-in-production'
+        if not app.config.get('SECRET_KEY') or app.config['SECRET_KEY'] == _insecure_key:
+            raise RuntimeError(
+                'FATAL: Insecure or missing SECRET_KEY in production. '
+                'Set the SECRET_KEY environment variable to a strong random value.'
+            )
+        if not app.config.get('MAILGUARD_ENCRYPTION_KEY'):
+            raise RuntimeError(
+                'FATAL: MAILGUARD_ENCRYPTION_KEY is required in production '
+                'to protect IMAP/SMTP credentials.'
+            )
 
     # ── Structured JSON logging ────────────────────────────────────────────
     if not app.debug:
