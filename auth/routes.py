@@ -4,7 +4,9 @@ All text in German (Deutsche).
 """
 
 import secrets
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+import json
+from flask import (Blueprint, render_template, redirect, url_for, flash,
+                   request, current_app, Response)
 from flask_login import login_user, logout_user, login_required, current_user
 try:
     from werkzeug.urls import url_parse
@@ -291,6 +293,74 @@ def delete_account():
             flash('Beim Löschen Ihres Kontos ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Support.', 'error')
 
     return render_template('auth/delete_account.html', form=form)
+
+
+@auth_bp.route('/export-data')
+@login_required
+def export_data():
+    """DSGVO-Datenexport — Download all personal data as JSON (Art. 20 GDPR)."""
+    user = current_user
+    user_id = user.id
+
+    profile = {
+        'id': user_id,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'company_name': user.company_name,
+        'company_vat_number': user.company_vat_number,
+        'company_address': user.company_address,
+        'company_email': user.company_email,
+        'company_phone': user.company_phone,
+        'phone': user.phone,
+        'country': user.country,
+        'created_at': user.created_at.isoformat() if user.created_at else None,
+        'last_login': user.last_login.isoformat() if user.last_login else None,
+        'is_email_confirmed': user.is_email_confirmed,
+    }
+
+    subscriptions = []
+    for sub in user.subscriptions.all():
+        subscriptions.append({
+            'plan': sub.plan,
+            'status': sub.status,
+            'start_date': sub.start_date.isoformat() if sub.start_date else None,
+            'end_date': sub.end_date.isoformat() if sub.end_date else None,
+            'api_calls_used': sub.api_calls_used,
+            'api_calls_limit': sub.api_calls_limit,
+        })
+
+    verifications = []
+    from crm.models import VerificationCheck, CheckResult
+    for check in VerificationCheck.query.filter_by(user_id=user_id).order_by(VerificationCheck.check_date.desc()).limit(500).all():
+        results = [
+            {'service': r.service_name, 'status': r.status, 'data': r.result_data}
+            for r in CheckResult.query.filter_by(check_id=check.id).all()
+        ]
+        verifications.append({
+            'vat_number': check.vat_number,
+            'company_name': check.company_name,
+            'check_date': check.check_date.isoformat() if check.check_date else None,
+            'overall_status': check.overall_status,
+            'results': results,
+        })
+
+    export = {
+        'schema_version': '1.0',
+        'exported_at': datetime.utcnow().isoformat() + 'Z',
+        'gdpr_article': 'Art. 20 GDPR — Right to data portability',
+        'profile': profile,
+        'subscriptions': subscriptions,
+        'verifications': verifications,
+    }
+
+    payload = json.dumps(export, ensure_ascii=False, indent=2)
+    filename = f'vatbot_userdata_{user_id}.json'
+    return Response(
+        payload,
+        mimetype='application/json',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
+    )
 
 
 @auth_bp.route('/company-profile', methods=['GET', 'POST'])
