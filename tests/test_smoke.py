@@ -88,3 +88,22 @@ class TestProductionConfigGuards:
         # ProductionConfig.__init__ detects insecure SECRET_KEY → RuntimeError
         with pytest.raises(RuntimeError, match='(?i)insecure|SECRET_KEY'):
             create_app('production')
+
+
+class TestChatbotOriginProtection:
+    def test_sales_chatbot_blocks_foreign_origin(self, client):
+        """POST from a foreign Origin is rejected with 403."""
+        response = client.post(
+            '/api/sales-chat',
+            json={'message': 'hello'},
+            headers={'Origin': 'https://evil.example.com'},
+        )
+        assert response.status_code == 403
+
+    def test_sales_chatbot_blocks_missing_origin(self, client):
+        """POST without any Origin header is also rejected."""
+        response = client.post(
+            '/api/sales-chat',
+            json={'message': 'hello'},
+        )
+        assert response.status_code == 403

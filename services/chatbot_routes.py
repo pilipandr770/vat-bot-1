@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 import os
 from datetime import datetime
 import anthropic
+from services.security_helpers import require_same_origin
 
 chatbot_bp = Blueprint("chatbot", __name__, template_folder="../templates")
 
@@ -62,6 +63,7 @@ def chat_page():
 
 @chatbot_bp.route("/api/chat/message", methods=["POST"])
 @login_required
+@require_same_origin
 def send_message():
     """Chat endpoint using Claude Messages API."""
     try:

@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 import os
 import logging
 import anthropic
+from services.security_helpers import require_same_origin
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,7 @@ from services.rate_limiter import rate_limit
 
 @sales_chatbot_bp.route("/api/sales-chat", methods=["POST"])
 @rate_limit(requests_per_minute=10, requests_per_hour=50)
+@require_same_origin
 def sales_chat():
     """Public sales chatbot endpoint."""
     try:

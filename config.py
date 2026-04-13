@@ -118,6 +118,9 @@ class Config:
     # Error tracking
     SENTRY_DSN = os.environ.get('SENTRY_DSN')
 
+    # CORS / Origin controls for CSRF-exempt JSON endpoints
+    ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '')
+
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
