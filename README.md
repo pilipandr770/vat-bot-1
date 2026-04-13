@@ -374,3 +374,42 @@ server {
 ---
 
 **Створено з ❤️ для автоматизації перевірки контрагентів**
+
+---
+
+## 🔐 Security & Operations (Sprint 2)
+
+### Dependency Management
+
+Direct dependencies are tracked in `requirements.in`.  
+To update a dependency:
+```bash
+# 1. Edit requirements.in
+# 2. Regenerate the pinned requirements.txt (run on Linux/CI):
+pip-compile --generate-hashes requirements.in
+# 3. Commit both files
+```
+
+### MailGuard Encryption Key
+
+Set a 32-byte Fernet key before first run:
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# → add result as MAILGUARD_ENCRYPTION_KEY env var
+```
+
+### GDPR Compliance
+
+| Feature | Endpoint | Status |
+|---|---|---|
+| Data export (Art. 20) | `GET /auth/export-data` | ✅ |
+| Account deletion (Art. 17) | `POST /auth/delete-account` | ✅ |
+
+### Database Backups
+
+Automated daily backups via `scripts/backup_db.sh` → S3 (30-day retention).  
+See [docs/BACKUP.md](docs/BACKUP.md) for Render.com setup instructions.
+
+### Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a full list of changes per sprint.
