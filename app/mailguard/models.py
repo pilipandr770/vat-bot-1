@@ -1,11 +1,12 @@
-from crm.models import db
+﻿from crm.models import db
 from datetime import datetime, time
 import json
 from sqlalchemy import Enum
 import os
 
 # Определяем схему из переменной окружения
-SCHEMA = os.environ.get('DB_SCHEMA', 'public')
+SCHEMA = os.environ.get('DB_SCHEMA') or None
+_sp = f'{SCHEMA}.' if SCHEMA else ''  # schema prefix for FK strings
 
 class MailAccount(db.Model):
     """Почтовые аккаунты пользователей"""
@@ -13,7 +14,7 @@ class MailAccount(db.Model):
     __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}users.id'), nullable=False)
     provider = db.Column(Enum('gmail', 'outlook', 'imap', name='provider_types', schema=SCHEMA), nullable=False)
     email = db.Column(db.String(255), nullable=False)
     access_token = db.Column(db.Text, nullable=True)  # Зашифрованный
@@ -107,8 +108,8 @@ class MailMessage(db.Model):
     thread_id = db.Column(db.String(255), nullable=True)
     in_reply_to = db.Column(db.String(255), nullable=True)  # Message-ID родительского письма
     references = db.Column(db.Text, nullable=True)  # Полная цепочка Message-IDs
-    account_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.mail_account.id'), nullable=False)
-    counterparty_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.known_counterparty.id'), nullable=True)
+    account_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}mail_account.id'), nullable=False)
+    counterparty_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}known_counterparty.id'), nullable=True)
     from_email = db.Column(db.String(255), nullable=False)
     subject = db.Column(db.String(500), nullable=False)
     body_text = db.Column(db.Text, nullable=True)
@@ -262,8 +263,8 @@ class MailDraft(db.Model):
     __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    message_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.mail_message.id'), nullable=False)
-    account_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.mail_account.id'), nullable=False)
+    message_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}mail_message.id'), nullable=False)
+    account_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}mail_account.id'), nullable=False)
     to_email = db.Column(db.String(255), nullable=False)
     subject = db.Column(db.String(500), nullable=False)
     body_html = db.Column(db.Text, nullable=True)
@@ -296,7 +297,7 @@ class ScanReport(db.Model):
     __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    message_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.mail_message.id'), nullable=False)
+    message_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}mail_message.id'), nullable=False)
     verdict = db.Column(Enum('safe', 'suspicious', 'malicious', name='verdict_types', schema=SCHEMA), nullable=False)
     score = db.Column(db.Integer, nullable=False)  # 0-100
     details_json = db.Column(db.Text, default='{}')  # Детали сканирования

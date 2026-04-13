@@ -1,4 +1,4 @@
-"""
+﻿"""
 TeamGuard Models — Team security management for SMBs.
 
 Tables:
@@ -16,7 +16,8 @@ from datetime import datetime
 
 from crm.models import db
 
-SCHEMA = os.environ.get('DB_SCHEMA', 'public')
+SCHEMA = os.environ.get('DB_SCHEMA') or None
+_sp = f'{SCHEMA}.' if SCHEMA else ''  # schema prefix for FK strings
 
 
 class TeamMember(db.Model):
@@ -26,7 +27,7 @@ class TeamMember(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     # The company admin who manages this member (User.id)
-    owner_user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id', ondelete='CASCADE'),
+    owner_user_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}users.id', ondelete='CASCADE'),
                               nullable=False, index=True)
     full_name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(200), nullable=False)
@@ -102,7 +103,7 @@ class PasswordPolicy(db.Model):
     __table_args__ = {'schema': SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    owner_user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id', ondelete='CASCADE'),
+    owner_user_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}users.id', ondelete='CASCADE'),
                               nullable=False, unique=True, index=True)
 
     # Rotation frequency in days; 0 = rotation disabled
@@ -135,7 +136,7 @@ class PasswordAssignment(db.Model):
     __table_args__ = {'schema': SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    member_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.teamguard_members.id', ondelete='CASCADE'),
+    member_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}teamguard_members.id', ondelete='CASCADE'),
                           nullable=False, index=True)
 
     # SHA-256 hash of generated password for audit purposes (not for authentication)
@@ -159,7 +160,7 @@ class SecurityEvent(db.Model):
     __table_args__ = {'schema': SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    member_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.teamguard_members.id', ondelete='CASCADE'),
+    member_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}teamguard_members.id', ondelete='CASCADE'),
                           nullable=False, index=True)
     owner_user_id = db.Column(db.Integer, nullable=False, index=True)
 
@@ -199,7 +200,7 @@ class PhishingTest(db.Model):
     __table_args__ = {'schema': SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    owner_user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id', ondelete='CASCADE'),
+    owner_user_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}users.id', ondelete='CASCADE'),
                               nullable=False, index=True)
 
     name = db.Column(db.String(200), nullable=False)         # Test name (internal)
@@ -260,9 +261,9 @@ class PhishingClick(db.Model):
     __table_args__ = {'schema': SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    test_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.teamguard_phishing_tests.id', ondelete='CASCADE'),
+    test_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}teamguard_phishing_tests.id', ondelete='CASCADE'),
                         nullable=False, index=True)
-    member_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.teamguard_members.id', ondelete='CASCADE'),
+    member_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}teamguard_members.id', ondelete='CASCADE'),
                           nullable=False, index=True)
 
     clicked_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

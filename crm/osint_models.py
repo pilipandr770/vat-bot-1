@@ -2,7 +2,7 @@
 from datetime import datetime
 import json
 import os
-from .models import db, SCHEMA
+from .models import db, SCHEMA, _sp
 
 
 class OsintScan(db.Model):
@@ -22,7 +22,7 @@ class OsintFinding(db.Model):
     __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    scan_id = db.Column(db.Integer, db.ForeignKey(f"{SCHEMA}.osint_scans.id"), nullable=False, index=True)
+    scan_id = db.Column(db.Integer, db.ForeignKey(f"{_sp}osint_scans.id"), nullable=False, index=True)
     service = db.Column(db.String(64), nullable=False)  # whois/dns/ssl_labs/...
     status = db.Column(db.String(16), nullable=False)   # ok/warn/error
     notes = db.Column(db.Text, nullable=True)

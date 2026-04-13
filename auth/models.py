@@ -11,7 +11,9 @@ import secrets
 import os
 
 # Определяем схему из переменной окружения
-SCHEMA = os.environ.get('DB_SCHEMA', 'public')
+# Empty string → None so SQLite (which has no schema support) works in tests.
+SCHEMA = os.environ.get('DB_SCHEMA') or None
+_sp = f'{SCHEMA}.' if SCHEMA else ''  # schema prefix for FK strings
 
 
 class User(UserMixin, db.Model):
@@ -136,7 +138,7 @@ class Subscription(db.Model):
     __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}users.id'), nullable=False)
     
     # Subscription details
     plan = db.Column(db.String(50), nullable=False, index=True)  # free, pro, enterprise
@@ -247,8 +249,8 @@ class Payment(db.Model):
     __table_args__ = {'schema': SCHEMA}
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.users.id'), nullable=False)
-    subscription_id = db.Column(db.Integer, db.ForeignKey(f'{SCHEMA}.subscriptions.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}users.id'), nullable=False)
+    subscription_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}subscriptions.id'))
     
     # Stripe details
     stripe_payment_intent_id = db.Column(db.String(100), unique=True)

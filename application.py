@@ -464,6 +464,19 @@ def create_app(config_name=None):
         for u in admins:
             click.echo(f'  id={u.id}  email={u.email}  created={u.created_at}  active={u.is_active}')
 
+    @app.cli.command('promote-admin')
+    @click.argument('email')
+    def promote_admin_cmd(email):
+        """Grant admin rights to an existing user by EMAIL."""
+        from auth.models import User
+        user = User.query.filter_by(email=email.strip().lower()).first()
+        if not user:
+            click.echo(click.style(f"User '{email}' not found.", fg='red'), err=True)
+            raise SystemExit(1)
+        user.is_admin = True
+        db.session.commit()
+        click.echo(click.style(f"'{email}' is now admin.", fg='green'))
+
     @app.cli.command('init-db')
     def init_db():
         """Initialize database tables (use flask db upgrade in production)."""
