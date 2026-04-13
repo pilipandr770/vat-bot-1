@@ -6,7 +6,10 @@ Programmatic SEO Routes
 
 from flask import Blueprint, render_template, abort
 import json
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 programmatic_bp = Blueprint('programmatic', __name__, url_prefix='/vat-check')
 
@@ -20,7 +23,7 @@ def load_seo_pages():
             # Індексуємо за slug для швидкого доступу
             return {page['slug']: page for page in pages}
     except Exception as e:
-        print(f"Warning: Could not load SEO pages: {e}")
+        logger.warning('Could not load SEO pages: %s', e)
         return {}
 
 # Глобальна змінна для зберігання сторінок

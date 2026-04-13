@@ -1,3 +1,4 @@
+import logging
 import os
 import json
 import subprocess
@@ -5,6 +6,8 @@ from typing import Dict, Any, List, Set
 
 import phonenumbers
 from phonenumbers import geocoder, carrier, number_type
+
+logger = logging.getLogger(__name__)
 
 
 class PhoneIntelService:
@@ -54,11 +57,13 @@ class PhoneIntelService:
                             if not line.startswith('+'):
                                 line = '+' + line
                             scam_numbers.add(line)
-                print(f"✅ Loaded {db_name}: {len(scam_numbers)} numbers")
+                logger.debug('Loaded %s: %d numbers', db_name, len(scam_numbers))
             else:
-                print(f"⚠️  {db_name} not found at {db_path}")
+                import logging as _log
+                _log.getLogger(__name__).warning('%s not found at %s', db_name, db_path)
         except Exception as e:
-            print(f"❌ Error loading {db_name}: {e}")
+            import logging as _log
+            _log.getLogger(__name__).error('Error loading %s: %s', db_name, e)
         
         return scam_numbers
 

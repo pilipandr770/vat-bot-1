@@ -51,7 +51,8 @@ def is_within_workhours(workhours):
 
     except Exception as e:
         # В случае ошибки считаем, что в рабочих часах
-        print(f"Error checking workhours: {e}")
+        import logging
+        logging.getLogger(__name__).warning('Error checking workhours: %s', e)
         return True
 
 def get_default_rules():
