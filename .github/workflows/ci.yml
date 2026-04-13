@@ -31,7 +31,7 @@ jobs:
       - name: pip-audit (CVE check)
         run: |
           pip install pip-audit
-          pip-audit --require-hashes --disable-pip 2>/dev/null || pip-audit
+          pip-audit --strict
 
   tests:
     name: Tests

@@ -12,23 +12,39 @@ exclude = ["tests*"]
 [tool.ruff]
 line-length = 120
 target-version = "py311"
-exclude = ["migrations/", "scripts/", "*.bak"]
+exclude = [
+    "migrations/",
+    "scripts/",
+    "translations/",
+    ".venv/",
+    "build/",
+    "dist/",
+    "*.bak",
+]
 
 [tool.ruff.lint]
-# E = pycodestyle errors, F = pyflakes, W = warnings, I = isort, B = bugbear, S = bandit
-select = ["E", "F", "W", "I", "B", "S"]
+# E = pycodestyle, F = pyflakes, W = warnings, I = isort, B = bugbear
+# C4 = flake8-comprehensions, UP = pyupgrade, S = bandit-style
+select = ["E", "F", "W", "I", "B", "C4", "UP", "S"]
 ignore = [
-  "E501",   # line too long — handled by formatter
-  "S101",   # use of assert — fine in tests
-  "S105",   # hardcoded password — false positives in config defaults
-  "S106",   # hardcoded password arg
-  "B008",   # do not perform function calls in default args — Flask patterns
-  "S311",   # standard pseudo-random generator — not crypto use
+    "E501",   # line too long — handled by formatter
+    "S101",   # assert used — OK in tests
+    "S105",   # hardcoded password — false positives in config defaults/examples
+    "S106",   # hardcoded password arg
+    "S107",   # hardcoded password default
+    "B008",   # function call in default arg — Flask routing pattern
+    "S311",   # standard pseudo-random — not used for crypto
+    "UP007",  # X | Y union syntax — keep 3.9 compat
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S", "B"]
+"tests/**" = ["S", "B", "S101", "S106"]
 "migrations/**" = ["ALL"]
+"scripts/**" = ["S", "E", "F"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", "scripts", ".venv"]
+skips = ["B101", "B311"]  # assert_used, random
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
