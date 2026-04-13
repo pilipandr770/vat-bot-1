@@ -478,18 +478,41 @@ def generate_blog():
 @login_required
 @admin_required
 def scheduler_status():
-    """View scheduled jobs status."""
+    """View scheduled jobs status for all three schedulers."""
+    from flask import current_app
     from services.scheduler import get_scheduler
-    sched = get_scheduler()
-    if not sched:
-        return jsonify({'status': 'not_initialized'})
-    jobs = [
-        {
-            'id': job.id,
-            'name': job.name,
-            'next_run': str(job.next_run_time) if job.next_run_time else 'paused',
-        }
-        for job in sched.get_jobs()
-    ]
-    return jsonify({'status': 'running', 'jobs': jobs})
+
+    def _jobs(scheduler):
+        if not scheduler:
+            return None
+        try:
+            return [
+                {
+                    'id': j.id,
+                    'name': j.name,
+                    'next_run': str(j.next_run_time) if j.next_run_time else 'paused',
+                }
+                for j in scheduler.get_jobs()
+            ]
+        except Exception as exc:
+            return {'error': str(exc)}
+
+    main_sched = get_scheduler()
+    mailguard_sched = getattr(current_app, 'mailguard_scheduler', None)
+    crm_sched = getattr(current_app, 'crm_monitoring_scheduler', None)
+
+    return jsonify({
+        'monitoring': {
+            'status': 'running' if main_sched else 'not_initialized',
+            'jobs': _jobs(main_sched),
+        },
+        'mailguard': {
+            'status': 'running' if mailguard_sched else 'not_initialized',
+            'jobs': _jobs(mailguard_sched),
+        },
+        'crm_monitoring': {
+            'status': 'running' if crm_sched else 'not_initialized',
+            'jobs': _jobs(crm_sched),
+        },
+    })
 

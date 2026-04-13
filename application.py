@@ -336,9 +336,10 @@ def create_app(config_name=None):
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         init_scheduler(app=app)
-        # app.mailguard_scheduler = setup_mailguard_scheduler(app)  # TODO: implement
-        # Initialize CRM monitoring scheduler
-        # app.crm_monitoring_scheduler = init_monitoring_scheduler(app)  # TODO: implement
+        from app.mailguard.scheduler import setup_mailguard_scheduler
+        from crm.monitoring_scheduler import init_monitoring_scheduler
+        app.mailguard_scheduler = setup_mailguard_scheduler(app)
+        app.crm_monitoring_scheduler = init_monitoring_scheduler(app)
     
     # Mailguard models use the same db instance
     
