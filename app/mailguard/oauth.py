@@ -11,8 +11,13 @@ from .models import db, MailAccount
 def get_cipher():
     key = current_app.config.get('MAILGUARD_ENCRYPTION_KEY')
     if not key:
-        key = Fernet.generate_key()
-        current_app.config['MAILGUARD_ENCRYPTION_KEY'] = key
+        raise RuntimeError(
+            'MAILGUARD_ENCRYPTION_KEY is not configured. '
+            'Set this environment variable to a 32-byte Fernet key before storing email passwords. '
+            'Generate one with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"'
+        )
+    if isinstance(key, str):
+        key = key.encode()
     return Fernet(key)
 
 def encrypt_token(token):
@@ -25,7 +30,14 @@ def decrypt_token(encrypted_token):
     if not encrypted_token:
         return None
     cipher = get_cipher()
-    return cipher.decrypt(encrypted_token.encode()).decode()
+    try:
+        return cipher.decrypt(encrypted_token.encode()).decode()
+    except Exception:
+        raise RuntimeError(
+            'Failed to decrypt MailGuard password. '
+            'The MAILGUARD_ENCRYPTION_KEY may have changed since this password was stored. '
+            'Re-add the email account to fix this.'
+        )
 
 # Gmail OAuth
 GMAIL_SCOPES = [

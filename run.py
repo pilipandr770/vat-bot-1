@@ -61,7 +61,7 @@ def main():
     # Start Flask app
     from app import create_app
     app = create_app()
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    app.run(debug=os.environ.get('FLASK_ENV') == 'development', host='127.0.0.1', port=5000)
 
 if __name__ == '__main__':
     main()

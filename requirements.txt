@@ -1,5 +1,5 @@
-Flask==2.3.3
-Werkzeug==2.3.7
+Flask==3.0.3
+Werkzeug==3.0.3
 SQLAlchemy==2.0.35
 Flask-SQLAlchemy==3.0.5
 Flask-Migrate==4.0.5
@@ -11,9 +11,10 @@ requests==2.31.0
 python-dotenv==1.0.0
 celery==5.3.1
 redis==4.6.0
-psycopg2-binary==2.9.7
+psycopg2-binary==2.9.9
 pytest==7.4.2
 pytest-flask==1.2.0
+pytest-cov==4.1.0
 stripe==6.5.0
 email-validator==2.0.0
 itsdangerous==2.1.2
@@ -41,3 +42,11 @@ msal==1.25.0
 apscheduler==3.10.4
 imapclient==2.3.1
 phonenumbers>=8.13.0
+
+# Error tracking & observability
+sentry-sdk[flask]==1.45.0
+python-json-logger==2.0.7
+
+# Code quality (dev/CI)
+ruff==0.4.4
+bandit==1.7.9

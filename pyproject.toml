@@ -8,3 +8,31 @@ py-modules = []
 [tool.setuptools.packages.find]
 where = ["."]
 exclude = ["tests*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+exclude = ["migrations/", "scripts/", "*.bak"]
+
+[tool.ruff.lint]
+# E = pycodestyle errors, F = pyflakes, W = warnings, I = isort, B = bugbear, S = bandit
+select = ["E", "F", "W", "I", "B", "S"]
+ignore = [
+  "E501",   # line too long — handled by formatter
+  "S101",   # use of assert — fine in tests
+  "S105",   # hardcoded password — false positives in config defaults
+  "S106",   # hardcoded password arg
+  "B008",   # do not perform function calls in default args — Flask patterns
+  "S311",   # standard pseudo-random generator — not crypto use
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B"]
+"migrations/**" = ["ALL"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+filterwarnings = ["ignore::DeprecationWarning"]

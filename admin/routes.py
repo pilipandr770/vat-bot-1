@@ -454,3 +454,42 @@ def delete_promo_code(coupon_id):
     except stripe.error.StripeError as e:
         flash(f'Fehler: {e.user_message or str(e)}', 'danger')
     return redirect(url_for('admin.promo_codes'))
+
+
+@admin_bp.route('/blog/generate', methods=['POST'])
+@login_required
+@admin_required
+def generate_blog():
+    """Manually trigger daily blog post generation."""
+    from services.blog_generator import generate_daily_blog_post
+    from flask import current_app
+    force = request.args.get('force', 'false').lower() == 'true'
+    try:
+        result = generate_daily_blog_post(current_app._get_current_object(), force=force)
+        if result:
+            return jsonify({'success': True, 'message': 'Blog post generated successfully'})
+        return jsonify({'success': False, 'message': 'Skipped: post exists today or AI unavailable'})
+    except Exception as exc:
+        current_app.logger.error('Admin blog generation failed: %s', exc, exc_info=True)
+        return jsonify({'error': str(exc)}), 500
+
+
+@admin_bp.route('/scheduler/status')
+@login_required
+@admin_required
+def scheduler_status():
+    """View scheduled jobs status."""
+    from services.scheduler import get_scheduler
+    sched = get_scheduler()
+    if not sched:
+        return jsonify({'status': 'not_initialized'})
+    jobs = [
+        {
+            'id': job.id,
+            'name': job.name,
+            'next_run': str(job.next_run_time) if job.next_run_time else 'paused',
+        }
+        for job in sched.get_jobs()
+    ]
+    return jsonify({'status': 'running', 'jobs': jobs})
+

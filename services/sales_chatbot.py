@@ -63,7 +63,11 @@ Begrüße herzlich und frage nach dem konkreten Problem, z.B.:
 """
 
 
+from services.rate_limiter import rate_limit
+
+
 @sales_chatbot_bp.route("/api/sales-chat", methods=["POST"])
+@rate_limit(requests_per_minute=10, requests_per_hour=50)
 def sales_chat():
     """Public sales chatbot endpoint."""
     try:

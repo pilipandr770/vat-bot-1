@@ -69,7 +69,7 @@ class Config:
     FILE_SCANNER_TIMEOUT = int(os.environ.get('FILE_SCANNER_TIMEOUT', 30))
     FILE_SCANNER_TOKEN = os.environ.get('FILE_SCANNER_TOKEN')
     
-    # Flask-Mail Configuration
+    # Flask-Mail / SMTP Configuration (single source of truth)
     MAIL_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
     MAIL_PORT = int(os.environ.get('SMTP_PORT', 587))
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'True') == 'True'
@@ -77,14 +77,16 @@ class Config:
     MAIL_USERNAME = os.environ.get('SMTP_USERNAME')
     MAIL_PASSWORD = os.environ.get('SMTP_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@vatverification.com')
-    
+
+    # Aliases for code that references SMTP_* directly
+    SMTP_SERVER = MAIL_SERVER
+    SMTP_PORT = MAIL_PORT
+    SMTP_USERNAME = MAIL_USERNAME
+    SMTP_PASSWORD = MAIL_PASSWORD
+
     # Notification Settings
     TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
-    SMTP_SERVER = os.environ.get('SMTP_SERVER')
-    SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
-    SMTP_USERNAME = os.environ.get('SMTP_USERNAME')
-    SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
     
     # Stripe Configuration
     STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
@@ -113,6 +115,9 @@ class Config:
     MONITORING_INTERVAL_HOURS = int(os.environ.get('MONITORING_INTERVAL_HOURS', 24))
     ALERT_THRESHOLD = float(os.environ.get('ALERT_THRESHOLD', 0.5))
 
+    # Error tracking
+    SENTRY_DSN = os.environ.get('SENTRY_DSN')
+
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
@@ -122,6 +127,19 @@ class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
     FLASK_ENV = 'production'
+
+    def __init__(self):
+        _required = {
+            'SECRET_KEY': os.environ.get('SECRET_KEY'),
+            'DATABASE_URL': os.environ.get('DATABASE_URL'),
+            'MAILGUARD_ENCRYPTION_KEY': os.environ.get('MAILGUARD_ENCRYPTION_KEY'),
+        }
+        missing = [k for k, v in _required.items() if not v or v == 'dev-secret-key-change-in-production']
+        if missing:
+            raise RuntimeError(
+                f"Production startup blocked. Missing or insecure environment variables: {', '.join(missing)}. "
+                "Set them before deploying."
+            )
 
 class TestingConfig(Config):
     """Testing configuration."""
