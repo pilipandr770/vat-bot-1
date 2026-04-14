@@ -335,11 +335,20 @@ def create_app(config_name=None):
     app.register_blueprint(consumer_panel_bp)
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        init_scheduler(app=app)
-        from app.mailguard.scheduler import setup_mailguard_scheduler
-        from crm.monitoring_scheduler import init_monitoring_scheduler
-        app.mailguard_scheduler = setup_mailguard_scheduler(app)
-        app.crm_monitoring_scheduler = init_monitoring_scheduler(app)
+        try:
+            init_scheduler(app=app)
+        except Exception as _sched_exc:
+            app.logger.error('MonitoringScheduler failed to start: %s', _sched_exc, exc_info=True)
+        try:
+            from app.mailguard.scheduler import setup_mailguard_scheduler
+            app.mailguard_scheduler = setup_mailguard_scheduler(app)
+        except Exception as _sched_exc:
+            app.logger.error('MailGuard scheduler failed to start: %s', _sched_exc, exc_info=True)
+        try:
+            from crm.monitoring_scheduler import init_monitoring_scheduler
+            app.crm_monitoring_scheduler = init_monitoring_scheduler(app)
+        except Exception as _sched_exc:
+            app.logger.error('CRM monitoring scheduler failed to start: %s', _sched_exc, exc_info=True)
     
     # Mailguard models use the same db instance
     

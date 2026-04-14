@@ -729,17 +729,20 @@ def scheduler_status():
     from flask import current_app
     from services.scheduler import get_scheduler
 
-    def _jobs(scheduler):
-        if not scheduler:
+    def _jobs(sched):
+        """Works with both MonitoringScheduler wrapper and bare APScheduler."""
+        if not sched:
             return None
         try:
+            # MonitoringScheduler wraps APScheduler in self.scheduler
+            inner = getattr(sched, 'scheduler', sched)
             return [
                 {
                     'id': j.id,
                     'name': j.name,
                     'next_run': str(j.next_run_time) if j.next_run_time else 'paused',
                 }
-                for j in scheduler.get_jobs()
+                for j in inner.get_jobs()
             ]
         except Exception as exc:
             return {'error': str(exc)}

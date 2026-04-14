@@ -10,7 +10,7 @@
       pip install --upgrade pip
       pip install -r requirements.txt
     preDeployCommand: flask db upgrade
-    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
     envVars:
       - key: FLASK_ENV
         value: production
