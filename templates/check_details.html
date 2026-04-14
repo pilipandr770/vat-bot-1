@@ -183,12 +183,18 @@
                                 <i class="bi {% if result.service_name == 'vies' %}bi-patch-check
                                           {% elif result.service_name == 'handelsregister' %}bi-building
                                           {% elif result.service_name == 'sanctions' %}bi-shield-exclamation
+                                          {% elif result.service_name == 'bundesanzeiger' %}bi-newspaper
+                                          {% elif result.service_name == 'epo_patents' %}bi-lightbulb
+                                          {% elif result.service_name == 'opencorporates' %}bi-globe
                                           {% else %}bi-gear{% endif %} me-3"></i>
                                 <div class="flex-grow-1">
                                     <strong>
                                         {% if result.service_name == 'vies' %}VIES VAT Перевірка
                                         {% elif result.service_name == 'handelsregister' %}Handelsregister
                                         {% elif result.service_name == 'sanctions' %}Санкційні списки
+                                        {% elif result.service_name == 'bundesanzeiger' %}Bundesanzeiger — Публікації
+                                        {% elif result.service_name == 'epo_patents' %}EPO — Патентний портфель
+                                        {% elif result.service_name == 'opencorporates' %}OpenCorporates — Реєстраційні дані
                                         {% else %}{{ result.service_name.title() }}{% endif %}
                                     </strong>
                                 </div>
@@ -209,13 +215,202 @@
                          class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
                          data-bs-parent="#servicesAccordion">
                         <div class="accordion-body">
+                            {% if result.service_name == 'bundesanzeiger' %}
+                            {# ===== BUNDESANZEIGER ===== #}
+                            {% set ba = result.data %}
+                            {% set ba_s = ba.get('summary', {}) if ba else {} %}
+                            {% if ba_s.get('has_insolvency') %}
+                            <div class="alert alert-danger mb-3">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                                <strong>Insolvenz-Bekanntmachung!</strong>
+                                Diese Firma hat Insolvenzbekanntmachungen im Bundesanzeiger — hohes Risiko.
+                            </div>
+                            {% endif %}
+                            <div class="row g-2 mb-3">
+                                <div class="col-sm-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="fs-4 fw-bold">{{ ba_s.get('total', 0) }}</div>
+                                        <div class="small text-muted">Публікацій</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="fs-4 fw-bold">{{ ba_s.get('annual_reports', 0) }}</div>
+                                        <div class="small text-muted">Jahresabschlüsse</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="text-center p-2 {% if ba_s.get('insolvency_notices', 0) > 0 %}bg-danger text-white{% else %}bg-light{% endif %} rounded">
+                                        <div class="fs-4 fw-bold">{{ ba_s.get('insolvency_notices', 0) }}</div>
+                                        <div class="small {% if ba_s.get('insolvency_notices', 0) > 0 %}text-white{% else %}text-muted{% endif %}">Insolvenzen</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="small text-muted">Letzte Einreichung</div>
+                                        <div class="fw-bold small">{{ ba_s.get('last_filing_date') or '—' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if ba_s.get('filing_gap_years') and ba_s.get('filing_gap_years') > 2 %}
+                            <div class="alert alert-warning py-2 mb-3">
+                                <i class="bi bi-clock-history"></i>
+                                Keine aktuellen Jahresabschlüsse — letzter Bericht vor {{ ba_s.get('filing_gap_years') }} Jahren.
+                            </div>
+                            {% endif %}
+                            {% if ba and ba.get('publications') %}
+                            <h6 class="mt-2 mb-2">Останні публікації</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover small mb-2">
+                                    <thead class="table-light">
+                                        <tr><th>Datum</th><th>Kategorie</th><th>Betreff</th><th>Gericht</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for pub in ba.get('publications', [])[:10] %}
+                                        <tr>
+                                            <td class="text-nowrap">{{ pub.get('date') or '—' }}</td>
+                                            <td><span class="badge {% if 'Insolvenz' in (pub.get('category') or '') %}bg-danger{% elif 'Jahresabschluss' in (pub.get('category') or '') %}bg-success{% else %}bg-secondary{% endif %}">{{ pub.get('category') or '—' }}</span></td>
+                                            <td>{{ (pub.get('title') or '')[:80] }}</td>
+                                            <td class="text-muted">{{ pub.get('court') or '' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                            {% if ba_s.get('interpretation') %}
+                            <div class="alert alert-light border py-2 small"><i class="bi bi-info-circle"></i> {{ ba_s.get('interpretation') }}</div>
+                            {% endif %}
+
+                            {% elif result.service_name == 'epo_patents' %}
+                            {# ===== EPO PATENTS ===== #}
+                            {% set ep = result.data %}
+                            {% set ep_s = ep.get('summary', {}) if ep else {} %}
+                            <div class="row g-2 mb-3">
+                                <div class="col-sm-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="fs-4 fw-bold">{{ ep_s.get('total_found', 0) }}</div>
+                                        <div class="small text-muted">Патентів знайдено</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="small text-muted">Остання заявка</div>
+                                        <div class="fw-bold small">{{ ep_s.get('most_recent_date') or '—' }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="text-center p-2 {% if ep_s.get('filing_active') %}bg-success text-white{% else %}bg-warning text-dark{% endif %} rounded">
+                                        <div class="fw-bold">{% if ep_s.get('filing_active') %}🔬 Активно подає{% else %}📋 Нові не подаються{% endif %}</div>
+                                        <div class="small">Filing Status</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if ep_s.get('technology_areas') %}
+                            <div class="mb-3">
+                                <h6 class="mb-2">Технологічні сфери:</h6>
+                                {% for area in ep_s.get('technology_areas', []) %}
+                                <span class="badge bg-primary me-1 mb-1">{{ area }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if ep and ep.get('patents') %}
+                            <h6 class="mt-2 mb-2">Останні патенти</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover small mb-2">
+                                    <thead class="table-light">
+                                        <tr><th>Дата</th><th>Назва</th><th>МПК</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for pat in ep.get('patents', [])[:10] %}
+                                        <tr>
+                                            <td class="text-nowrap">{{ pat.get('date') or '—' }}</td>
+                                            <td>{{ (pat.get('title') or '')[:80] }}</td>
+                                            <td>{% for code in (pat.get('ipc_codes') or [])[:3] %}<code class="small me-1">{{ code }}</code>{% endfor %}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                            {% if ep_s.get('interpretation') %}
+                            <div class="alert alert-light border py-2 small"><i class="bi bi-info-circle"></i> {{ ep_s.get('interpretation') }}</div>
+                            {% endif %}
+
+                            {% elif result.service_name == 'opencorporates' %}
+                            {# ===== OPENCORPORATES ===== #}
+                            {% set oc = result.data %}
+                            {% if oc and (oc.get('dissolution_date') or (oc.get('status') or '')|lower in ('dissolved', 'struck off', 'liquidation', 'inactive')) %}
+                            <div class="alert alert-danger mb-3">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                                <strong>Компанія ліквідована або не активна!</strong>
+                                {% if oc.get('dissolution_date') %} Дата ліквідації: {{ oc.get('dissolution_date') }}{% endif %}
+                            </div>
+                            {% endif %}
+                            {% if oc %}
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <dl class="row small mb-0">
+                                        {% if oc.get('company_number') %}
+                                        <dt class="col-sm-5">Реєстр. №:</dt>
+                                        <dd class="col-sm-7"><code>{{ oc.get('company_number') }}</code></dd>
+                                        {% endif %}
+                                        {% if oc.get('jurisdiction') %}
+                                        <dt class="col-sm-5">Юрисдикція:</dt>
+                                        <dd class="col-sm-7"><span class="badge bg-secondary">{{ oc.get('jurisdiction') }}</span></dd>
+                                        {% endif %}
+                                        {% if oc.get('company_type') %}
+                                        <dt class="col-sm-5">Тип:</dt>
+                                        <dd class="col-sm-7">{{ oc.get('company_type') }}</dd>
+                                        {% endif %}
+                                        {% if oc.get('status') %}
+                                        <dt class="col-sm-5">Статус:</dt>
+                                        <dd class="col-sm-7">
+                                            <span class="badge {% if (oc.get('status') or '')|lower == 'active' %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ oc.get('status') }}</span>
+                                        </dd>
+                                        {% endif %}
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row small mb-0">
+                                        {% if oc.get('incorporation_date') %}
+                                        <dt class="col-sm-5">Засновано:</dt>
+                                        <dd class="col-sm-7">{{ oc.get('incorporation_date') }}</dd>
+                                        {% endif %}
+                                        {% if oc.get('dissolution_date') %}
+                                        <dt class="col-sm-5">Ліквідовано:</dt>
+                                        <dd class="col-sm-7 text-danger">{{ oc.get('dissolution_date') }}</dd>
+                                        {% endif %}
+                                        {% if oc.get('registered_address') %}
+                                        <dt class="col-sm-5">Адреса:</dt>
+                                        <dd class="col-sm-7">{{ oc.get('registered_address') }}</dd>
+                                        {% endif %}
+                                    </dl>
+                                </div>
+                            </div>
+                            {% if oc.get('directors') %}
+                            <div class="mb-3">
+                                <h6 class="mb-2">Директори / Kerівники:</h6>
+                                {% for d in oc.get('directors', []) %}
+                                <span class="badge bg-light text-dark border me-1 mb-1"><i class="bi bi-person"></i> {{ d }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if oc.get('opencorporates_url') %}
+                            <a href="{{ oc.get('opencorporates_url') }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-box-arrow-up-right"></i> Відкрити на OpenCorporates →
+                            </a>
+                            {% endif %}
+                            {% endif %}
+
+                            {% else %}
+                            {# ===== GENERIC (all other services) ===== #}
                             <div class="row">
                                 <div class="col-md-8">
                                     {% if result.data %}
                                         <h6>Дані відповіді:</h6>
                                         <pre class="bg-light p-3 rounded small">{{ result.data | tojsonpretty }}</pre>
                                     {% endif %}
-                                    
                                     {% if result.error_message %}
                                         <div class="alert alert-warning">
                                             <i class="bi bi-exclamation-triangle"></i>
@@ -228,16 +423,23 @@
                                     <dl class="small">
                                         <dt>Довіра:</dt>
                                         <dd>{{ (result.confidence_score * 100)|round|int }}%</dd>
-                                        
                                         {% if result.response_time_ms %}
                                         <dt>Час відповіді:</dt>
                                         <dd>{{ result.response_time_ms }} мс</dd>
                                         {% endif %}
-                                        
                                         <dt>Перевірено:</dt>
                                         <dd>{{ result.created_at.strftime('%d.%m.%Y %H:%M') }}</dd>
                                     </dl>
                                 </div>
+                            </div>
+                            {% endif %}
+
+                            {# Metadata footer (all services) #}
+                            <div class="border-top mt-3 pt-2 d-flex gap-3 small text-muted">
+                                <span><i class="bi bi-patch-check"></i> Довіра: <strong>{{ (result.confidence_score * 100)|round|int }}%</strong></span>
+                                {% if result.response_time_ms %}<span><i class="bi bi-stopwatch"></i> {{ result.response_time_ms }} мс</span>{% endif %}
+                                <span><i class="bi bi-calendar2-check"></i> {{ result.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                                {% if result.error_message %}<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> {{ result.error_message }}</span>{% endif %}
                             </div>
                         </div>
                     </div>

@@ -88,13 +88,18 @@ class ResultsSaver:
         Different services have different importance levels.
         """
         weights = {
-            'vies': 0.4,           # VAT validation is very important
-            'sanctions': 0.35,      # Sanctions check is critical
-            'handelsregister': 0.15, # German register is useful but not critical
+            'vies': 0.40,             # VAT validation — critical
+            'sanctions': 0.35,        # Sanctions — critical
+            'bundesanzeiger': 0.20,   # Insolvency + filing history — important
+            'opencorporates': 0.15,   # Cross-border status
+            'handelsregister': 0.15,  # German register
+            'registry_de': 0.15,
             'registry_cz': 0.15,
             'registry_pl': 0.15,
-            'insolvency': 0.1,     # Insolvency is important but less frequent
-            'opencorporates': 0.05  # Additional verification
+            'registry_ua': 0.10,
+            'epo_patents': 0.05,      # Additive signal (not risk-bearing)
+            'insolvency': 0.10,
+            'opencorporates_oc': 0.05,
         }
         return weights.get(service_name, 0.1)
     
@@ -111,9 +116,17 @@ class ResultsSaver:
         # Check for critical issues (sanctions, invalid VAT, etc.)
         sanctions_issues = [issue for issue in critical_issues if issue['service'] == 'sanctions']
         if sanctions_issues:
-            # Sanctions found - critical problem
             highest_sanctions_confidence = max(issue['confidence'] for issue in sanctions_issues)
             return 'error', highest_sanctions_confidence
+
+        # Insolvency notice in Bundesanzeiger is also a critical blocker
+        insolvency_issues = [
+            issue for issue in critical_issues
+            if issue['service'] == 'bundesanzeiger'
+            and (issue.get('data') or {}).get('summary', {}).get('has_insolvency')
+        ]
+        if insolvency_issues:
+            return 'error', 0.95
         
         vat_issues = [score for score in service_scores 
                      if score['service'] == 'vies' and score['status'] == 'error']

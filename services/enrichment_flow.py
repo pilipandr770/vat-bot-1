@@ -6,20 +6,29 @@ from typing import Optional, Dict, Any
 from services.vat_lookup import VatLookupService
 from services.business_registry import BusinessRegistryManager
 from services.osint.scanner import OsintScanner
+from services.registries.de_bundesanzeiger import BundesanzeigerAdapter
+from services.registries.epo_patents import EpoPatentsAdapter
+from services.registries.opencorporates import OpenCorporatesAdapter
 
 
 class EnrichmentOrchestrator:
     """
     Single entry point for counterparty data enrichment.
     Works with free sources:
-    - VIES
-    - Business registries (DE/CZ/PL)
+    - VIES (EU VAT validation)
+    - Business registries (DE/CZ/PL/UA)
+    - Bundesanzeiger (DE mandatory publications + insolvency check)
+    - EPO OPS (patent portfolio, optional — needs EPO_OPS_CONSUMER_KEY)
+    - OpenCorporates (cross-border company data, free tier)
     - OSINT by domain/email (Whois, DNS, SSL, headers, social networks)
     """
 
     def __init__(self) -> None:
         self.vat_lookup = VatLookupService()
         self.registry_manager = BusinessRegistryManager()
+        self.bundesanzeiger = BundesanzeigerAdapter()
+        self.epo_patents = EpoPatentsAdapter()
+        self.opencorporates = OpenCorporatesAdapter()
 
     # ------------------ ПУБЛІЧНИЙ МЕТОД ------------------
     def enrich(
@@ -128,7 +137,58 @@ class EnrichmentOrchestrator:
                             prefills[field] = value
                     messages.append(f"Eintrag im Handelsregister gefunden ({cc}).")
 
-        # 4) Final response
+        # 4) Bundesanzeiger — financial disclosures & insolvency check (DE only)
+        resolved_name = (
+            prefills.get("counterparty_name") or company_name or ""
+        ).strip()
+        resolved_cc = (
+            country_code_hint or prefills.get("counterparty_country") or ""
+        ).upper()
+
+        if resolved_name and resolved_cc == "DE":
+            try:
+                ba_result = self.bundesanzeiger.lookup(company_name=resolved_name)
+                services["bundesanzeiger"] = ba_result
+                if ba_result.get("data", {}).get("summary", {}).get("has_insolvency"):
+                    messages.append("⚠️ Insolvenzbekanntmachung in Bundesanzeiger gefunden!")
+                else:
+                    messages.append("Bundesanzeiger-Pflichtveröffentlichungen geprüft.")
+            except Exception as e:
+                messages.append(f"Bundesanzeiger-Abfrage fehlgeschlagen: {e}")
+
+        # 5) EPO Patents — IP portfolio (all countries, optional API key)
+        if resolved_name:
+            try:
+                patents_result = self.epo_patents.lookup(company_name=resolved_name)
+                # Only add if API is configured or returned data
+                if patents_result.get("data", {}).get("summary", {}).get("total_found", 0) > 0:
+                    services["epo_patents"] = patents_result
+                    messages.append(
+                        f"EPO-Patentdaten: {patents_result['data']['summary']['total_found']} Patente gefunden."
+                    )
+                elif patents_result.get("error_message") != "EPO OPS not configured":
+                    services["epo_patents"] = patents_result
+            except Exception as e:
+                messages.append(f"EPO-Patentabfrage fehlgeschlagen: {e}")
+
+        # 6) OpenCorporates — cross-border company status & directors
+        if resolved_name:
+            try:
+                oc_result = self.opencorporates.lookup(
+                    company_name=resolved_name,
+                    country_code=resolved_cc or None,
+                )
+                if oc_result.get("data", {}).get("found"):
+                    services["opencorporates"] = oc_result
+                    oc_summary = oc_result["data"].get("summary", {})
+                    # Backfill registration number if missing
+                    if oc_summary.get("company_number") and not prefills.get("counterparty_reg_number"):
+                        prefills["counterparty_reg_number"] = oc_summary["company_number"]
+                    messages.append("OpenCorporates-Eintrag gefunden.")
+            except Exception as e:
+                messages.append(f"OpenCorporates-Abfrage fehlgeschlagen: {e}")
+
+        # 7) Final response
         if not prefills and not services:
             return {
                 "success": False,
