@@ -1,4 +1,5 @@
 Flask==3.0.3
+linkedin-api==2.1.1
 Werkzeug==3.0.3
 SQLAlchemy==2.0.35
 Flask-SQLAlchemy==3.0.5
