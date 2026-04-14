@@ -529,6 +529,11 @@ def blog_management():
     import os
     anthropic_ok = bool(os.environ.get('ANTHROPIC_API_KEY'))
 
+    # LinkedIn status
+    from services.linkedin_publisher import is_configured as li_configured, is_authorized as li_authorized
+    linkedin_configured = li_configured()
+    linkedin_authorized = li_authorized()
+
     return render_template(
         'admin/blog.html',
         posts=posts,
@@ -538,6 +543,8 @@ def blog_management():
         topics_remaining=topics_remaining,
         today_post=today_post,
         anthropic_ok=anthropic_ok,
+        linkedin_configured=linkedin_configured,
+        linkedin_authorized=linkedin_authorized,
     )
 
 
@@ -582,6 +589,136 @@ def generate_blog():
     except Exception as exc:
         current_app.logger.error('Admin blog generation failed: %s', exc, exc_info=True)
         return jsonify({'error': str(exc)}), 500
+
+
+# ─── LinkedIn OAuth & Publishing ─────────────────────────────────────────────
+
+@admin_bp.route('/linkedin/auth')
+@login_required
+@admin_required
+def linkedin_auth():
+    """Redirect admin to LinkedIn OAuth2 authorization page."""
+    from services.linkedin_publisher import get_auth_url, is_configured
+    from flask import current_app, request as req
+
+    if not is_configured():
+        flash('LINKEDIN_CLIENT_ID / LINKEDIN_CLIENT_SECRET not set.', 'danger')
+        return redirect(url_for('admin.blog_management'))
+
+    redirect_uri = req.host_url.rstrip('/') + url_for('admin.linkedin_callback')
+    auth_url = get_auth_url(redirect_uri, state='vatbot-admin')
+    return redirect(auth_url)
+
+
+@admin_bp.route('/linkedin/callback')
+@login_required
+@admin_required
+def linkedin_callback():
+    """LinkedIn OAuth2 callback — exchange code for token and save it."""
+    from services.linkedin_publisher import exchange_code, get_member_id
+    from crm.models import LinkedInToken
+    from flask import request as req
+    import os
+    from datetime import datetime, timedelta
+
+    code  = req.args.get('code')
+    error = req.args.get('error')
+
+    if error or not code:
+        flash(f'LinkedIn Auth fehlgeschlagen: {error or "Kein Code"}', 'danger')
+        return redirect(url_for('admin.blog_management'))
+
+    redirect_uri = req.host_url.rstrip('/') + url_for('admin.linkedin_callback')
+
+    try:
+        token_data = exchange_code(code, redirect_uri)
+    except Exception as exc:
+        flash(f'Token-Austausch fehlgeschlagen: {exc}', 'danger')
+        return redirect(url_for('admin.blog_management'))
+
+    access_token = token_data.get('access_token', '')
+    expires_in   = token_data.get('expires_in', 5183944)  # 60 days default
+    expires_at   = datetime.utcnow() + timedelta(seconds=expires_in)
+
+    # Get member sub (who authorized)
+    try:
+        member_id = get_member_id(access_token)
+    except Exception:
+        member_id = ''
+
+    # Org ID from env (already known)
+    org_id = os.environ.get('LINKEDIN_ORGANIZATION_ID', '')
+
+    # Save to DB (replace old rows)
+    LinkedInToken.query.delete()
+    token_row = LinkedInToken(
+        access_token=access_token,
+        expires_at=expires_at,
+        organization_id=org_id,
+        member_id=member_id,
+    )
+    db.session.add(token_row)
+    db.session.commit()
+
+    flash(
+        f'✅ LinkedIn verbunden! Token gültig bis {expires_at.strftime("%d.%m.%Y %H:%M")} UTC. '
+        f'Vergiss nicht, LINKEDIN_ORGANIZATION_ID in Render zu setzen.',
+        'success'
+    )
+    return redirect(url_for('admin.blog_management'))
+
+
+@admin_bp.route('/blog/<int:post_id>/linkedin', methods=['POST'])
+@login_required
+@admin_required
+def blog_post_to_linkedin(post_id):
+    """Manually post an existing blog article to LinkedIn."""
+    from crm.models import BlogPost
+    from services.linkedin_publisher import publish_post, is_authorized
+    from flask import request as req, current_app
+
+    post = BlogPost.query.get_or_404(post_id)
+
+    if not is_authorized():
+        return jsonify({'error': 'LinkedIn not authorized. Visit /admin/linkedin/auth first.'}), 400
+
+    base_url = req.host_url.rstrip('/')
+    article_url = f"{base_url}/blog/{post.slug}"
+
+    try:
+        result = publish_post(
+            title=post.title,
+            url=article_url,
+            summary=post.meta_description or post.title,
+        )
+        li_id = result.get('id', '')
+        post.linkedin_post_id = li_id
+        post.linkedin_posted_at = datetime.utcnow()
+        db.session.commit()
+        return jsonify({'success': True, 'linkedin_id': li_id})
+    except Exception as exc:
+        current_app.logger.error('LinkedIn publish failed: %s', exc, exc_info=True)
+        return jsonify({'error': str(exc)}), 500
+
+
+@admin_bp.route('/linkedin/status')
+@login_required
+@admin_required
+def linkedin_status():
+    """Return LinkedIn configuration / token status as JSON."""
+    from services.linkedin_publisher import is_configured, is_authorized
+    from crm.models import LinkedInToken
+    import os
+
+    token_row = LinkedInToken.query.order_by(LinkedInToken.id.desc()).first()
+    return jsonify({
+        'configured': is_configured(),
+        'authorized': is_authorized(),
+        'org_id': os.environ.get('LINKEDIN_ORGANIZATION_ID', ''),
+        'expires_at': token_row.expires_at.isoformat() if token_row and token_row.expires_at else None,
+        'expired': token_row.is_expired() if token_row else None,
+        'member_id': token_row.member_id if token_row else None,
+    })
 
 
 @admin_bp.route('/scheduler/status')

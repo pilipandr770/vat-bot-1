@@ -574,4 +574,30 @@ def generate_daily_blog_post(app, force: bool = False) -> bool:
         db.session.add(post)
         db.session.commit()
         logger.info(f"Blog: Neuer Artikel veröffentlicht → /blog/{slug}")
+
+        # ── LinkedIn auto-post ────────────────────────────────────────────────
+        try:
+            from services.linkedin_publisher import publish_post, is_authorized
+            if is_authorized():
+                base_url = app.config.get('PREFERRED_URL_SCHEME', 'https') + '://' \
+                           + app.config.get('SERVER_NAME', 'vat-bot-1.onrender.com')
+                article_url = f"{base_url}/blog/{slug}"
+                stripped_summary = re.sub(r'<[^>]+>', ' ', body_html)
+                stripped_summary = re.sub(r'\s+', ' ', stripped_summary).strip()[:200]
+                result = publish_post(
+                    title=post_data["title"],
+                    url=article_url,
+                    summary=meta_description,
+                )
+                li_id = result.get('id', '')
+                post.linkedin_post_id = li_id
+                post.linkedin_posted_at = datetime.utcnow()
+                db.session.commit()
+                logger.info(f"LinkedIn: Artikel gepostet → id={li_id}")
+            else:
+                logger.debug("LinkedIn: nicht autorisiert, überspringe Auto-Post")
+        except Exception as li_exc:
+            logger.warning(f"LinkedIn Auto-Post fehlgeschlagen (nicht kritisch): {li_exc}")
+
         return True
+

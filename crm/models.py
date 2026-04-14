@@ -136,6 +136,8 @@ class BlogPost(db.Model):
     generated_at = db.Column(db.DateTime, default=datetime.utcnow)
     published_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     schema_markup = db.Column(db.Text, nullable=True)
+    linkedin_post_id = db.Column(db.String(200), nullable=True)   # filled after posting
+    linkedin_posted_at = db.Column(db.DateTime, nullable=True)
 
     @property
     def tags(self):
@@ -173,3 +175,26 @@ class Alert(db.Model):
     
     def __repr__(self):
         return f'<Alert {self.alert_type} - {self.severity}>'
+
+
+class LinkedInToken(db.Model):
+    """Stores OAuth2 access token for LinkedIn Company Page."""
+    __tablename__ = 'linkedin_tokens'
+    __table_args__ = {'schema': SCHEMA}
+
+    id = db.Column(db.Integer, primary_key=True)
+    access_token = db.Column(db.Text, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=True)
+    organization_id = db.Column(db.String(50), nullable=True)
+    member_id = db.Column(db.String(100), nullable=True)   # LinkedIn 'sub' (who authorized)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def is_expired(self) -> bool:
+        if not self.expires_at:
+            return False
+        from datetime import timezone
+        now = datetime.utcnow()
+        return now >= self.expires_at
+
+    def __repr__(self):
+        return f'<LinkedInToken org={self.organization_id} expires={self.expires_at}>'

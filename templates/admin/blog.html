@@ -64,6 +64,24 @@
                 </div>
             </div>
         </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    {% if linkedin_authorized %}
+                    <div class="fs-3 fw-bold text-primary"><i class="bi bi-linkedin"></i></div>
+                    <div class="small text-success fw-bold">LinkedIn verbunden</div>
+                    {% elif linkedin_configured %}
+                    <div class="fs-3 fw-bold text-warning"><i class="bi bi-linkedin"></i></div>
+                    <div class="small">
+                        <a href="{{ url_for('admin.linkedin_auth') }}" class="text-warning fw-bold">OAuth starten →</a>
+                    </div>
+                    {% else %}
+                    <div class="fs-3 fw-bold text-secondary"><i class="bi bi-linkedin"></i></div>
+                    <div class="small text-muted">LinkedIn nicht konfiguriert</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Today's post status -->
@@ -143,6 +161,15 @@
                                    class="btn btn-xs btn-outline-primary" title="Öffnen">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                {% if linkedin_authorized %}
+                                <button class="btn btn-xs btn-linkedin btn-post-linkedin"
+                                        data-post-id="{{ post.id }}"
+                                        title="{% if post.linkedin_post_id %}Bereits gepostet{% else %}Auf LinkedIn posten{% endif %}"
+                                        {% if post.linkedin_post_id %}disabled{% endif %}>
+                                    <i class="bi bi-linkedin"></i>
+                                    {% if post.linkedin_post_id %}✓{% endif %}
+                                </button>
+                                {% endif %}
                                 <form method="POST" action="{{ url_for('admin.blog_delete', post_id=post.id) }}"
                                       class="d-inline" onsubmit="return confirm('Artikel löschen?')">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -200,6 +227,9 @@
 {% block scripts %}
 <style>
 .btn-xs { padding: 0.15rem 0.4rem; font-size: .75rem; }
+.btn-linkedin { background-color: #0a66c2; color: #fff; border: none; }
+.btn-linkedin:hover { background-color: #004182; color: #fff; }
+.btn-linkedin:disabled { background-color: #6ea8d9; }
 </style>
 <script>
 function triggerGenerate(force) {
@@ -267,6 +297,36 @@ document.querySelectorAll('.btn-toggle-publish').forEach(btn => {
                     badge.textContent = 'Entwurf';
                 }
             }
+        });
+    });
+});
+
+// Post to LinkedIn
+document.querySelectorAll('.btn-post-linkedin').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const postId = this.dataset.postId;
+        if (!confirm('Diesen Artikel auf LinkedIn veröffentlichen?')) return;
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        fetch(`/admin/blog/${postId}/linkedin`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                this.innerHTML = '<i class="bi bi-linkedin"></i> ✓';
+                this.title = 'Gepostet: ID ' + (data.linkedin_id || '');
+            } else {
+                this.disabled = false;
+                this.innerHTML = '<i class="bi bi-linkedin"></i>';
+                alert('LinkedIn Fehler: ' + (data.error || 'Unbekannt'));
+            }
+        })
+        .catch(err => {
+            this.disabled = false;
+            this.innerHTML = '<i class="bi bi-linkedin"></i>';
+            alert('Netzwerkfehler: ' + err);
         });
     });
 });

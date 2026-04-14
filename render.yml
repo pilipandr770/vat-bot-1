@@ -70,6 +70,14 @@
         sync: false
       - key: EPO_OPS_CONSUMER_SECRET
         sync: false
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false
+      - key: LINKEDIN_ORGANIZATION_ID
+        sync: false
+      - key: LINKEDIN_ACCESS_TOKEN
+        sync: false
 
   # Daily Blog Generator Cron Job
   - type: cron
