@@ -165,6 +165,58 @@
             {% endif %}
         {% endwith %}
 
+        {% if current_user.is_authenticated and current_user.is_admin and request.path.startswith('/admin') %}
+        <nav class="navbar navbar-expand navbar-dark bg-dark mb-3 rounded px-3 py-2">
+            <span class="navbar-brand text-warning me-3 small fw-bold">
+                <i class="bi bi-shield-lock"></i> Admin
+            </span>
+            <ul class="navbar-nav gap-1 flex-wrap">
+                <li class="nav-item">
+                    <a class="nav-link small {% if request.path == '/admin/dashboard' %}active fw-bold{% endif %}"
+                       href="{{ url_for('admin.dashboard') }}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link small {% if request.path.startswith('/admin/users') %}active fw-bold{% endif %}"
+                       href="{{ url_for('admin.users') }}">
+                        <i class="bi bi-people"></i> Nutzer
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link small {% if request.path.startswith('/admin/verifications') %}active fw-bold{% endif %}"
+                       href="{{ url_for('admin.verifications') }}">
+                        <i class="bi bi-clipboard-data"></i> Prüfungen
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link small {% if request.path.startswith('/admin/blog') %}active fw-bold{% endif %}"
+                       href="{{ url_for('admin.blog_management') }}">
+                        <i class="bi bi-newspaper"></i> Blog
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link small {% if request.path.startswith('/admin/logs') %}active fw-bold{% endif %}"
+                       href="{{ url_for('admin.logs') }}">
+                        <i class="bi bi-file-text"></i> Logs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link small {% if request.path.startswith('/admin/promo-codes') %}active fw-bold{% endif %}"
+                       href="{{ url_for('admin.promo_codes') }}">
+                        <i class="bi bi-tag"></i> Promo-Codes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link small {% if request.path.startswith('/admin/scheduler') %}active fw-bold{% endif %}"
+                       href="{{ url_for('admin.scheduler_status') }}">
+                        <i class="bi bi-clock"></i> Scheduler
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </div>
 
