@@ -66,6 +66,10 @@
         sync: false
       - key: OPENCORPORATES_API_KEY
         sync: false
+      - key: EPO_OPS_CONSUMER_KEY
+        sync: false
+      - key: EPO_OPS_CONSUMER_SECRET
+        sync: false
 
   # Daily Blog Generator Cron Job
   - type: cron
@@ -87,11 +91,11 @@
       - key: DB_SCHEMA
         value: vat_verification_claude
       - key: SECRET_KEY
-        sync: false
+        generateValue: true
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: MAILGUARD_ENCRYPTION_KEY
-        sync: false
+        generateValue: true
 
 # Note: Schema must exist before first deploy.
 # Run once via Render shell: CREATE SCHEMA IF NOT EXISTS vat_verification_claude;

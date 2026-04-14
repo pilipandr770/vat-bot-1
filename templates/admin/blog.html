@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Blog-Verwaltung - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <!-- Header -->
+    <div class="row mb-3 align-items-center">
+        <div class="col">
+            <h1 class="h3"><i class="bi bi-newspaper"></i> Blog-Verwaltung</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+                    <li class="breadcrumb-item active">Blog</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <button id="btnGenerate" class="btn btn-success me-2">
+                <i class="bi bi-magic"></i> Jetzt generieren
+            </button>
+            <button id="btnForce" class="btn btn-outline-warning">
+                <i class="bi bi-arrow-clockwise"></i> Erzwingen (force)
+            </button>
+        </div>
+    </div>
+
+    <!-- Status cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-md-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    <div class="fs-3 fw-bold text-primary">{{ total_posts }}</div>
+                    <div class="small text-muted">Artikel gesamt</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    <div class="fs-3 fw-bold text-success">{{ published_posts }}</div>
+                    <div class="small text-muted">Veröffentlicht</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    <div class="fs-3 fw-bold text-info">{{ topics_remaining }}</div>
+                    <div class="small text-muted">Themen übrig (von {{ total_topics }})</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    {% if anthropic_ok %}
+                    <div class="fs-3 fw-bold text-success">✅</div>
+                    <div class="small text-muted">Anthropic API aktiv</div>
+                    {% else %}
+                    <div class="fs-3 fw-bold text-danger">❌</div>
+                    <div class="small text-danger fw-bold">ANTHROPIC_API_KEY fehlt!</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's post status -->
+    <div class="alert {% if today_post %}alert-success{% else %}alert-warning{% endif %} mb-4">
+        {% if today_post %}
+        <i class="bi bi-check-circle-fill"></i>
+        <strong>Heute bereits generiert:</strong>
+        <a href="{{ url_for('blog.article', slug=today_post.slug) }}" target="_blank">
+            {{ today_post.title }}
+        </a>
+        <span class="text-muted small ms-2">{{ today_post.generated_at.strftime('%H:%M UTC') }}</span>
+        {% else %}
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <strong>Heute noch kein Artikel generiert.</strong>
+        Der Cron-Job läuft täglich um 07:00 UTC. Sie können jetzt manuell generieren.
+        {% endif %}
+    </div>
+
+    <!-- Generation result alert (shown after AJAX) -->
+    <div id="genAlert" class="alert d-none mb-3"></div>
+
+    <!-- Blog posts table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Alle Artikel</h6>
+            <a href="{{ url_for('blog.index') }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-box-arrow-up-right"></i> Blog öffnen
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if posts.items %}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Generiert</th>
+                            <th>Titel</th>
+                            <th>Kategorie</th>
+                            <th>Lesezeit</th>
+                            <th>Aufrufe</th>
+                            <th>Status</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts.items %}
+                        <tr id="row-{{ post.id }}">
+                            <td class="text-nowrap small text-muted">
+                                {{ post.generated_at.strftime('%d.%m.%Y %H:%M') if post.generated_at else '—' }}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('blog.article', slug=post.slug) }}" target="_blank"
+                                   class="text-decoration-none small fw-semibold">
+                                    {{ post.title[:70] }}{% if post.title|length > 70 %}…{% endif %}
+                                </a>
+                            </td>
+                            <td class="small">
+                                <span class="badge bg-secondary">{{ post.category or '—' }}</span>
+                            </td>
+                            <td class="small text-muted text-center">
+                                {% if post.read_time_minutes %}{{ post.read_time_minutes }} min{% else %}—{% endif %}
+                            </td>
+                            <td class="small text-center">{{ post.view_count or 0 }}</td>
+                            <td>
+                                <span class="badge {% if post.is_published %}bg-success{% else %}bg-secondary{% endif %} publish-badge"
+                                      data-post-id="{{ post.id }}">
+                                    {% if post.is_published %}Veröffentlicht{% else %}Entwurf{% endif %}
+                                </span>
+                            </td>
+                            <td class="text-nowrap">
+                                <button class="btn btn-xs btn-outline-secondary btn-toggle-publish"
+                                        data-post-id="{{ post.id }}"
+                                        title="Publish/Unpublish">
+                                    <i class="bi bi-toggle-on"></i>
+                                </button>
+                                <a href="{{ url_for('blog.article', slug=post.slug) }}" target="_blank"
+                                   class="btn btn-xs btn-outline-primary" title="Öffnen">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('admin.blog_delete', post_id=post.id) }}"
+                                      class="d-inline" onsubmit="return confirm('Artikel löschen?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-xs btn-outline-danger" title="Löschen">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if posts.pages > 1 %}
+            <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                <small class="text-muted">Seite {{ posts.page }} von {{ posts.pages }} ({{ posts.total }})</small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if posts.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin.blog_management', page=posts.prev_num) }}">«</a>
+                        </li>
+                        {% endif %}
+                        {% for p in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                            {% if p %}
+                            <li class="page-item {% if p == posts.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.blog_management', page=p) }}">{{ p }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if posts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin.blog_management', page=posts.next_num) }}">»</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-newspaper display-4"></i>
+                <p class="mt-3 mb-0">Noch keine Artikel generiert.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.btn-xs { padding: 0.15rem 0.4rem; font-size: .75rem; }
+</style>
+<script>
+function triggerGenerate(force) {
+    const btn = document.getElementById(force ? 'btnForce' : 'btnGenerate');
+    const alert = document.getElementById('genAlert');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Läuft…';
+    alert.className = 'alert d-none';
+
+    const url = "{{ url_for('admin.generate_blog') }}" + (force ? '?force=true' : '');
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert.className = 'alert alert-success';
+            alert.innerHTML = '✅ ' + data.message + ' — <a href="{{ url_for("admin.blog_management") }}" class="alert-link">Seite neu laden</a>';
+        } else if (data.error) {
+            alert.className = 'alert alert-danger';
+            alert.innerHTML = '❌ Fehler: ' + data.error;
+        } else {
+            alert.className = 'alert alert-warning';
+            alert.innerHTML = '⚠️ ' + data.message;
+        }
+    })
+    .catch(err => {
+        alert.className = 'alert alert-danger';
+        alert.innerHTML = '❌ Netzwerkfehler: ' + err;
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = force
+            ? '<i class="bi bi-arrow-clockwise"></i> Erzwingen (force)'
+            : '<i class="bi bi-magic"></i> Jetzt generieren';
+    });
+}
+
+document.getElementById('btnGenerate').addEventListener('click', () => triggerGenerate(false));
+document.getElementById('btnForce').addEventListener('click', () => triggerGenerate(true));
+
+// Toggle publish
+document.querySelectorAll('.btn-toggle-publish').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const postId = this.dataset.postId;
+        fetch(`/admin/blog/${postId}/toggle`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const badge = document.querySelector(`.publish-badge[data-post-id="${postId}"]`);
+                if (data.is_published) {
+                    badge.className = 'badge bg-success publish-badge';
+                    badge.dataset.postId = postId;
+                    badge.textContent = 'Veröffentlicht';
+                } else {
+                    badge.className = 'badge bg-secondary publish-badge';
+                    badge.dataset.postId = postId;
+                    badge.textContent = 'Entwurf';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

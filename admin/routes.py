@@ -493,6 +493,79 @@ def delete_promo_code(coupon_id):
     return redirect(url_for('admin.promo_codes'))
 
 
+@admin_bp.route('/blog')
+@login_required
+@admin_required
+def blog_management():
+    """Blog management page — list posts, scheduler status, manual trigger."""
+    from crm.models import BlogPost
+    from services.blog_generator import SEO_TOPICS
+    from sqlalchemy import func
+
+    page  = request.args.get('page', 1, type=int)
+    posts = BlogPost.query.order_by(BlogPost.generated_at.desc()).paginate(
+        page=page, per_page=20, error_out=False
+    )
+
+    total_posts     = BlogPost.query.count()
+    published_posts = BlogPost.query.filter_by(is_published=True).count()
+    total_topics    = len(SEO_TOPICS)
+
+    # Slugs already used
+    used_slugs = {
+        r[0] for r in BlogPost.query.with_entities(BlogPost.slug).all()
+    }
+    from services.blog_generator import _slugify
+    topics_remaining = sum(
+        1 for t in SEO_TOPICS if _slugify(t[0]) not in used_slugs
+    )
+
+    # Today's post
+    from datetime import datetime
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_post  = BlogPost.query.filter(BlogPost.generated_at >= today_start).first()
+
+    # Anthropic key configured?
+    import os
+    anthropic_ok = bool(os.environ.get('ANTHROPIC_API_KEY'))
+
+    return render_template(
+        'admin/blog.html',
+        posts=posts,
+        total_posts=total_posts,
+        published_posts=published_posts,
+        total_topics=total_topics,
+        topics_remaining=topics_remaining,
+        today_post=today_post,
+        anthropic_ok=anthropic_ok,
+    )
+
+
+@admin_bp.route('/blog/<int:post_id>/toggle', methods=['POST'])
+@login_required
+@admin_required
+def blog_toggle_publish(post_id):
+    """Toggle is_published for a blog post."""
+    from crm.models import BlogPost
+    post = BlogPost.query.get_or_404(post_id)
+    post.is_published = not post.is_published
+    db.session.commit()
+    return jsonify({'success': True, 'is_published': post.is_published})
+
+
+@admin_bp.route('/blog/<int:post_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def blog_delete(post_id):
+    """Delete a blog post."""
+    from crm.models import BlogPost
+    post = BlogPost.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    flash(f'Artikel "{post.title[:60]}" gelöscht.', 'success')
+    return redirect(url_for('admin.blog_management'))
+
+
 @admin_bp.route('/blog/generate', methods=['POST'])
 @login_required
 @admin_required
