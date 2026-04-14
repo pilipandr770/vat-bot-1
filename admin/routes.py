@@ -312,10 +312,47 @@ def logs():
     """
     View system logs and errors
     """
-    # TODO: Implement log viewer
-    # This would read from application logs file
-    # For now, placeholder
-    return render_template('admin/logs.html')
+    from auth.models import User as AuthUser
+
+    tab = request.args.get('tab', 'api')
+    page = request.args.get('page', 1, type=int)
+    per_page = 50
+
+    # Base query: CheckResult + VerificationCheck + User
+    base_q = (
+        db.session.query(CheckResult, VerificationCheck, AuthUser)
+        .join(VerificationCheck, CheckResult.check_id == VerificationCheck.id)
+        .join(AuthUser, VerificationCheck.user_id == AuthUser.id)
+        .order_by(CheckResult.created_at.desc())
+    )
+
+    if tab == 'errors':
+        pagination = base_q.filter(CheckResult.status == 'error').paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+    else:
+        pagination = base_q.paginate(page=page, per_page=per_page, error_out=False)
+
+    # Security logs: recent logins
+    security_logs = (
+        AuthUser.query.filter(AuthUser.last_login.isnot(None))
+        .order_by(AuthUser.last_login.desc())
+        .limit(100)
+        .all()
+    )
+
+    # Quick counters
+    total_errors = CheckResult.query.filter_by(status='error').count()
+    total_api_calls = CheckResult.query.count()
+
+    return render_template(
+        'admin/logs.html',
+        tab=tab,
+        pagination=pagination,
+        security_logs=security_logs,
+        total_errors=total_errors,
+        total_api_calls=total_api_calls,
+    )
 
 
 @admin_bp.route('/api/stats')
