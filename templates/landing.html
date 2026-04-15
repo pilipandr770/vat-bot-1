@@ -138,14 +138,27 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">
-                        Komplette <span class="text-primary">Business Intelligence</span> Plattform
+                    <h1 class="display-4 fw-bold mb-3">
+                        Business Security<br><span class="text-primary">in drei Modulen</span>
                     </h1>
                     <p class="lead mb-4">
-                        Mehr als nur VAT-Prüfung: Geschäftspartner-Verifizierung, OSINT-Analyse,
-                        Link-Scans, Email-Intelligence, Phone Intelligence und KI-gestütztes CRM.
-                        Alles in einer DSGVO-konformen Plattform.
+                        Die All-in-One-Plattform für KMU: Geschäftspartner prüfen,
+                        digitale Ressourcen schützen und Compliance-Anforderungen lückenlos erfüllen.
                     </p>
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="text-center flex-fill">
+                            <i class="bi bi-person-check-fill text-primary fs-4 d-block mb-1"></i>
+                            <small class="fw-semibold" style="font-size:.78rem;">Partner<br>prüfen</small>
+                        </div>
+                        <div class="text-center flex-fill">
+                            <i class="bi bi-shield-fill-check text-danger fs-4 d-block mb-1"></i>
+                            <small class="fw-semibold" style="font-size:.78rem;">Ressourcen<br>schützen</small>
+                        </div>
+                        <div class="text-center flex-fill">
+                            <i class="bi bi-clipboard2-check-fill text-success fs-4 d-block mb-1"></i>
+                            <small class="fw-semibold" style="font-size:.78rem;">Compliance<br>erfüllen</small>
+                        </div>
+                    </div>
                     <div class="d-flex gap-3">
                         <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
                             <i class="bi bi-rocket"></i> Jetzt starten (3 Tage gratis)
@@ -158,7 +171,7 @@
                         <small class="text-muted">
                             <i class="bi bi-check-circle text-success"></i> 3 Tage kostenlos testen
                             <i class="bi bi-check-circle text-success ms-3"></i> Keine Kreditkarte erforderlich
-                            <i class="bi bi-check-circle text-success ms-3"></i> 14+ Module
+                            <i class="bi bi-check-circle text-success ms-3"></i> 3 Kernmodule · 14+ Funktionen
                         </small>
                     </div>
                 </div>
@@ -185,297 +198,284 @@
             </p>
         </div>
     </section>
-    <!-- Features Section -->
-    <section id="features" class="py-5 bg-light">
+    <!-- Features Section — 3 Kernmodule -->
+    <section id="features" class="py-5" style="background:#f0f4f8;">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold">14+ Module für Business Security & Intelligence</h2>
-                <p class="lead text-muted">Due Diligence, Team-Sicherheit, Compliance, OSINT und KI-Marktforschung</p>
+                <h2 class="display-5 fw-bold">Drei Module — eine Plattform</h2>
+                <p class="lead text-muted">Partner prüfen · Ressourcen schützen · Compliance erfüllen</p>
             </div>
-            
-            <div class="row g-4">
-                <!-- VAT Verification -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-primary text-white rounded-circle mb-3">
-                                <i class="bi bi-patch-check fs-1"></i>
-                            </div>
-                            <h3 class="h5">VIES USt-IdNr. Prüfung</h3>
-                            <p class="text-muted">
-                                Echtzeit-Validierung von EU-Umsatzsteuer-Identifikationsnummern direkt 
-                                über die offizielle VIES-Datenbank.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Sanctions Lists -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-danger text-white rounded-circle mb-3">
-                                <i class="bi bi-shield-exclamation fs-1"></i>
-                            </div>
-                            <h3 class="h5">Sanktionslisten</h3>
-                            <p class="text-muted">
-                                Automatischer Abgleich mit EU, OFAC und UK Sanktionslisten. 
-                                Schützen Sie Ihr Unternehmen vor Compliance-Risiken.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Business Registry -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-success text-white rounded-circle mb-3">
-                                <i class="bi bi-building fs-1"></i>
-                            </div>
-                            <h3 class="h5">Handelsregister</h3>
-                            <p class="text-muted">
-                                Überprüfung von Firmendaten im deutschen Handelsregister, tschechischen 
-                                und polnischen Registern sowie ukrainischen ЄДР (Einheitliches Staatsregister).
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- OSINT Scanner - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon feature-gradient-purple text-white rounded-circle mb-3">
-                                <i class="bi bi-search fs-1"></i>
-                            </div>
-                            <h3 class="h5">OSINT Scanner <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                Domain-Analyse, DNS-Records, SSL-Zertifikate, WHOIS, Security Headers 
-                                und Social Media Präsenz prüfen.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-<!-- Link Scanner - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon feature-gradient-a text-white rounded-circle mb-3">
-                                <i class="bi bi-link-45deg fs-1"></i>
-                            </div>
-                            <h3 class="h5">Link Scanner <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                Prüfen Sie URLs auf Phishing, Malware und Betrug. Integration mit VirusTotal
-                                und Google Safe Browsing.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- MailGuard - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon feature-gradient-b text-white rounded-circle mb-3">
-                                <i class="bi bi-envelope-at fs-1"></i>
-                            </div>
-                            <h3 class="h5">MailGuard AI <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                KI-gestützte Email-Verwaltung mit automatischen Antworten, 
-                                Gmail/Outlook-Integration und Sicherheitsprüfung.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- CRM - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon feature-gradient-a text-white rounded-circle mb-3">
-                                <i class="bi bi-people fs-1"></i>
-                            </div>
-                            <h3 class="h5">Smart CRM <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                Automatische Speicherung geprüfter Kontrahenten, Notizen, 
-                                Tags und vollständige Prüfungshistorie an einem Ort.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Company Profile - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-warning text-white rounded-circle mb-3">
-                                <i class="bi bi-person-badge fs-1"></i>
-                            </div>
-                            <h3 class="h5">Firmenprofil <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                Speichern Sie Ihre Firmendaten einmal und nutzen Sie Auto-Fill 
-                                bei jeder Prüfung. Spart 60 Sekunden pro Prüfung!
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- AI Assistant - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon feature-gradient-c text-white rounded-circle mb-3">
-                                <i class="bi bi-robot fs-1"></i>
-                            </div>
-                            <h3 class="h5">KI-Assistent <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                Intelligenter Chatbot beantwortet Ihre Fragen zur Plattform 
-                                24/7 und hilft bei der Navigation.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                
-                <!-- Website Security Scanner - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon feature-gradient-a text-white rounded-circle mb-3">
-                                <i class="bi bi-shield-exclamation fs-1"></i>
-                            </div>
-                            <h3 class="h5">Website Security Scanner <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                Professionelle Website-Sicherheitspr?fung mit 7 Schwachstellen-Checks,
-                                SSL/TLS-Analyse, Security Headers und KI-gest?tzte Empfehlungen.
-                            </p>
-                        </div>
-                    </div>
-                </div>                
-                <!-- Phone Intelligence - NEW -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon feature-gradient-d text-white rounded-circle mb-3">
-                                <i class="bi bi-telephone fs-1"></i>
-                            </div>
-                            <h3 class="h5">Phone Intelligence <span class="badge bg-success">NEU</span></h3>
-                            <p class="text-muted">
-                                Erweiterte Telefonnummern-Analyse mit Spam-Erkennung für USA und Europa.
-                                Über 950 bekannte Spam-Nummern in unserer Datenbank.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <!-- TeamGuard - NEU -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm border-top border-3 border-danger">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-danger text-white rounded-circle mb-3">
-                                <i class="bi bi-people-fill fs-1"></i>
-                            </div>
-                            <h3 class="h5">TeamGuard <span class="badge bg-danger">NEU</span></h3>
-                            <p class="text-muted">
-                                Mitarbeitersicherheit für KMU: Zugriffslevel verwalten, sichere Passwörter
-                                generieren &amp; verteilen, Phishing-Simulation und vollständiger Sicherheits-Audit-Log.
-                            </p>
-                            <a href="/teamguard/" class="btn btn-outline-danger btn-sm mt-2">
-                                <i class="bi bi-arrow-right-circle me-1"></i>TeamGuard öffnen
-                            </a>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- EU Compliance Checker - NEU -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm border-top border-3 border-success">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-success text-white rounded-circle mb-3">
-                                <i class="bi bi-shield-check fs-1"></i>
-                            </div>
-                            <h3 class="h5">EU Compliance Checker <span class="badge bg-danger">NEU</span></h3>
-                            <p class="text-muted">
-                                Prüfen Sie Ihre Website auf Impressum (§5 TMG), Datenschutzerklärung (DSGVO),
-                                AGB, Widerrufsbelehrung und Cookie-Banner — ohne Registrierung, kostenlos.
-                            </p>
-                            <a href="/compliance-check/" class="btn btn-outline-success btn-sm mt-2">
-                                <i class="bi bi-arrow-right-circle me-1"></i>Kostenlos prüfen
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KI B2B Marktforschung - NEU -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm border-top border-3 border-primary">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-primary text-white rounded-circle mb-3">
-                                <i class="bi bi-graph-up-arrow fs-1"></i>
-                            </div>
-                            <h3 class="h5">KI B2B Marktforschung <span class="badge bg-danger">NEU</span></h3>
-                            <p class="text-muted">
-                                15 synthetische B2B-Entscheider bewerten Ihr Produkt: Kaufbereitschaft,
-                                Zahlungsbereitschaft, Bedenken und Executive Summary in ~60 Sek.
-                            </p>
-                            <a href="/consumer-panel/" class="btn btn-outline-primary btn-sm mt-2">
-                                <i class="bi bi-arrow-right-circle me-1"></i>Kostenlos testen
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- History & Reports -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-info text-white rounded-circle mb-3">
-                                <i class="bi bi-clock-history fs-1"></i>
-                            </div>
-                            <h3 class="h5">Verlauf & Berichte</h3>
-                            <p class="text-muted">
-                                Vollständige Historie aller Prüfungen mit exportierbaren 
-                                Compliance-Berichten im PDF-Format.
+            <!-- ═══════════════════════════════════════════
+                 BLOCK 1: Geschäftspartner prüfen
+                 ═══════════════════════════════════════════ -->
+            <div class="mb-5">
+                <div class="bg-primary text-white p-4" style="border-radius:.75rem .75rem 0 0;">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="fw-bold lh-1 me-2" style="font-size:2.8rem;opacity:.25;">01</div>
+                        <div class="flex-grow-1">
+                            <h3 class="h4 fw-bold mb-1">
+                                <i class="bi bi-person-check-fill me-2"></i>Geschäftspartner prüfen
+                            </h3>
+                            <p class="mb-0 small" style="opacity:.85;">
+                                Automatisierte Due Diligence vor jedem Vertragsabschluss: USt-IdNr., Sanktionen, Handelsregister und OSINT — alles in einem Bericht.
                             </p>
                         </div>
+                        <a href="/verify" class="btn btn-light fw-semibold flex-shrink-0">
+                            Jetzt Partner prüfen <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
                     </div>
                 </div>
-                
-                <!-- Monitoring & Alerts -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-warning text-dark rounded-circle mb-3">
-                                <i class="bi bi-bell fs-1"></i>
+                <div class="bg-white border border-primary border-top-0 p-4" style="border-radius:0 0 .75rem .75rem;">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-primary fs-3" style="background:#e8f0fe;">
+                                    <i class="bi bi-patch-check-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">VIES USt-IdNr. Prüfung</h4>
+                                    <p class="small text-muted mb-0">Echtzeit-Validierung über die offizielle EU-VIES-Datenbank. Sofortige Rückmeldung über Gültigkeit und Firmendaten.</p>
+                                </div>
                             </div>
-                            <h3 class="h5">Monitoring & Alerts</h3>
-                            <p class="text-muted">
-                                Automatische Benachrichtigungen bei Statusänderungen Ihrer 
-                                Geschäftspartner per E-Mail oder Telegram.
-                            </p>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- REST API -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-secondary text-white rounded-circle mb-3">
-                                <i class="bi bi-code-square fs-1"></i>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-danger fs-3" style="background:#fdecea;">
+                                    <i class="bi bi-shield-exclamation"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Sanktionslisten EU / OFAC / UK</h4>
+                                    <p class="small text-muted mb-0">Automatischer Abgleich mit EU, OFAC und UK Sanktionslisten — täglich aktualisiert, lückenloser Compliance-Schutz.</p>
+                                </div>
                             </div>
-                            <h3 class="h5">REST API</h3>
-                            <p class="text-muted">
-                                Integrieren Sie alle Module nahtlos in Ihre bestehenden 
-                                Systeme über unsere RESTful API.
-                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-success fs-3" style="background:#d1e7dd;">
+                                    <i class="bi bi-building-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Handelsregister DE / CZ / PL / UA</h4>
+                                    <p class="small text-muted mb-0">Firmendaten aus deutschen, tschechischen, polnischen und ukrainischen Registern — inkl. ЄДР-Abfrage.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 fs-3" style="color:#6f42c1;background:#f3eeff;">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">OSINT Scanner</h4>
+                                    <p class="small text-muted mb-0">Domain, DNS, WHOIS, SSL-Zertifikate und Security Headers — komplette digitale Partnerprüfung auf einen Klick.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-primary fs-3" style="background:#e8f0fe;">
+                                    <i class="bi bi-journal-check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Smart CRM &amp; Verlauf</h4>
+                                    <p class="small text-muted mb-0">Geprüfte Partner automatisch speichern, Notizen hinterlegen, vollständige Prüfungshistorie und PDF-Berichte.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 fs-3" style="color:#d97706;background:#fff3cd;">
+                                    <i class="bi bi-bell-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Monitoring &amp; Alerts</h4>
+                                    <p class="small text-muted mb-0">Automatische Benachrichtigung per E-Mail oder Telegram, sobald sich der Status eines Partners ändert.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- ═══════════════════════════════════════════
+                 BLOCK 2: Ressourcen & Team schützen
+                 ═══════════════════════════════════════════ -->
+            <div class="mb-5">
+                <div class="text-white p-4" style="border-radius:.75rem .75rem 0 0;background:linear-gradient(135deg,#dc3545,#b02a37);">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="fw-bold lh-1 me-2" style="font-size:2.8rem;opacity:.25;">02</div>
+                        <div class="flex-grow-1">
+                            <h3 class="h4 fw-bold mb-1">
+                                <i class="bi bi-shield-fill-check me-2"></i>Ressourcen &amp; Team schützen
+                            </h3>
+                            <p class="mb-0 small" style="opacity:.85;">
+                                E-Mails, Links, Telefonnummern, Websites und Ihr Team — aktiv gegen Phishing, Malware und Social Engineering absichern.
+                            </p>
+                        </div>
+                        <a href="/mailguard/" class="btn btn-light fw-semibold flex-shrink-0">
+                            Zur Sicherheit <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="bg-white border border-danger border-top-0 p-4" style="border-radius:0 0 .75rem .75rem;">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 fs-3" style="color:#0d6efd;background:#e8f0fe;">
+                                    <i class="bi bi-envelope-shield-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">MailGuard AI</h4>
+                                    <p class="small text-muted mb-0">KI-gestützte E-Mail-Verwaltung mit automatischen Antworten, Phishing-Erkennung und Anhänge-Scan über VirusTotal.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-danger fs-3" style="background:#fdecea;">
+                                    <i class="bi bi-link-45deg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Link Scanner</h4>
+                                    <p class="small text-muted mb-0">URLs auf Phishing, Malware und Betrug prüfen — mit VirusTotal und Google Safe Browsing Integration.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-success fs-3" style="background:#d1e7dd;">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Phone Intelligence</h4>
+                                    <p class="small text-muted mb-0">Spam-Erkennung für US- und EU-Nummern. 950+ bekannte Spam-Nummern, wöchentlich aktualisiert, Risikoscore 0–100.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-danger fs-3" style="background:#fdecea;">
+                                    <i class="bi bi-globe2"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Website Security Scanner</h4>
+                                    <p class="small text-muted mb-0">7 Schwachstellen-Checks: SSL/TLS, Security Headers, offene Ports, CVE-Lookup — mit KI-Empfehlungen zur Behebung.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-danger fs-3" style="background:#fdecea;">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">TeamGuard <span class="badge bg-danger ms-1" style="font-size:.65rem;">NEU</span></h4>
+                                    <p class="small text-muted mb-0">Mitarbeitersicherheit: Zugriffslevel, sichere Passwörter generieren &amp; verteilen, Phishing-Simulation, Audit-Log.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center">
+                            <div class="p-3 rounded-2 w-100 small" style="background:#fff5f5;border-left:3px solid #dc3545;">
+                                <strong class="text-danger">Wussten Sie?</strong><br>
+                                91&nbsp;% aller Cyberangriffe auf KMU beginnen mit einer manipulierten E-Mail oder einem gefälschten Link.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 BLOCK 3: Compliance & Regulatorik
+                 ═══════════════════════════════════════════ -->
+            <div class="mb-3">
+                <div class="text-white p-4" style="border-radius:.75rem .75rem 0 0;background:linear-gradient(135deg,#198754,#146c43);">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="fw-bold lh-1 me-2" style="font-size:2.8rem;opacity:.25;">03</div>
+                        <div class="flex-grow-1">
+                            <h3 class="h4 fw-bold mb-1">
+                                <i class="bi bi-clipboard2-check-fill me-2"></i>Compliance &amp; Regulatorik
+                            </h3>
+                            <p class="mb-0 small" style="opacity:.85;">
+                                DSGVO, Impressum, NIS2, AGB — prüfen Sie Ihre eigene Compliance und bleiben Sie bei gesetzlichen Anforderungen immer auf dem neuesten Stand.
+                            </p>
+                        </div>
+                        <a href="/compliance-check/" class="btn btn-light fw-semibold flex-shrink-0">
+                            Compliance prüfen <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="bg-white border border-success border-top-0 p-4" style="border-radius:0 0 .75rem .75rem;">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 text-success fs-3" style="background:#d1e7dd;">
+                                    <i class="bi bi-file-earmark-check-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">EU Compliance Checker <span class="badge bg-success ms-1" style="font-size:.65rem;">NEU</span></h4>
+                                    <p class="small text-muted mb-0">Impressum (§5&nbsp;TMG), Datenschutzerklärung (DSGVO), AGB, Widerrufsbelehrung und Cookie-Banner — kostenlos, ohne Registrierung.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 fs-3" style="color:#6f42c1;background:#f3eeff;">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">KI B2B Marktforschung <span class="badge bg-danger ms-1" style="font-size:.65rem;">NEU</span></h4>
+                                    <p class="small text-muted mb-0">15 synthetische B2B-Entscheider bewerten Ihr Produkt: Kaufbereitschaft, Zahlungsbereitschaft und Executive Summary in ~60 Sek.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 fs-3" style="color:#0d6efd;background:#e8f0fe;">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">Verlauf &amp; PDF-Berichte</h4>
+                                    <p class="small text-muted mb-0">Vollständige Prüfungshistorie mit exportierbaren Compliance-Berichten für Audits, Behörden und interne Dokumentation.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 fs-3" style="color:#6c757d;background:#f8f9fa;">
+                                    <i class="bi bi-code-square"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">REST API</h4>
+                                    <p class="small text-muted mb-0">Alle Module nahtlos in ERP, CRM oder eigene Workflows integrieren — vollständige Entwickler-Dokumentation inklusive.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-3">
+                                <div class="flex-shrink-0 rounded-2 p-2 fs-3" style="color:#fd7e14;background:#fff3cd;">
+                                    <i class="bi bi-robot"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1">KI-Assistent 24/7</h4>
+                                    <p class="small text-muted mb-0">Intelligenter Chatbot beantwortet Ihre Fragen zur Plattform rund um die Uhr und hilft bei Navigation und Auswertung.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center">
+                            <div class="p-3 rounded-2 w-100 small" style="background:#f0fff4;border-left:3px solid #198754;">
+                                <strong class="text-success">DSGVO-konform:</strong><br>
+                                Alle Daten verschlüsselt in EU-Rechenzentren gespeichert. Jederzeit einsehbar und löschbar.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- /.feature-blocks -->
         </div>
     </section>
+
 
     <!-- Pricing Section -->
     <section id="pricing" class="py-5">
