@@ -751,10 +751,14 @@ def scheduler_status():
     mailguard_sched = getattr(current_app, 'mailguard_scheduler', None)
     crm_sched = getattr(current_app, 'crm_monitoring_scheduler', None)
 
+    # Expose last-error hint stored on the app object (set during create_app)
+    sched_error = getattr(current_app, '_scheduler_init_error', None)
+
     return jsonify({
         'monitoring': {
             'status': 'running' if main_sched else 'not_initialized',
             'jobs': _jobs(main_sched),
+            'error': str(sched_error) if sched_error and not main_sched else None,
         },
         'mailguard': {
             'status': 'running' if mailguard_sched else 'not_initialized',

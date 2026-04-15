@@ -579,11 +579,17 @@ def generate_daily_blog_post(app, force: bool = False) -> bool:
         try:
             from services.linkedin_publisher import publish_post, is_authorized
             if is_authorized():
-                base_url = app.config.get('PREFERRED_URL_SCHEME', 'https') + '://' \
-                           + app.config.get('SERVER_NAME', 'vat-bot-1.onrender.com')
-                article_url = f"{base_url}/blog/{slug}"
-                stripped_summary = re.sub(r'<[^>]+>', ' ', body_html)
-                stripped_summary = re.sub(r'\s+', ' ', stripped_summary).strip()[:200]
+                # Build the canonical article URL using SITE_BASE_URL env var,
+                # app config, or fall back to the production domain.
+                # NOTE: Flask sets SERVER_NAME=None by default, so we must NOT
+                # use app.config.get('SERVER_NAME') — it returns None even when
+                # a fallback is provided, causing a TypeError.
+                _site_base = (
+                    os.environ.get('SITE_BASE_URL')
+                    or app.config.get('BASE_URL')
+                    or 'https://vat-verifizierung.de'
+                ).rstrip('/')
+                article_url = f"{_site_base}/blog/{slug}"
                 result = publish_post(
                     title=post_data["title"],
                     url=article_url,

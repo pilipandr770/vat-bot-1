@@ -9,7 +9,7 @@ from flask_babel import Babel, gettext as _, lazy_gettext as _l
 from config import config
 from crm.models import db, VerificationCheck
 from auth.models import User
-from services.scheduler import init_scheduler
+from services.scheduler import init_scheduler, ensure_startup_blog_check
 from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
@@ -339,6 +339,12 @@ def create_app(config_name=None):
             init_scheduler(app=app)
         except Exception as _sched_exc:
             app.logger.error('MonitoringScheduler failed to start: %s', _sched_exc, exc_info=True)
+            app._scheduler_init_error = _sched_exc
+            # Scheduler failed but we still want today's blog post on cold start
+            try:
+                ensure_startup_blog_check(app)
+            except Exception:
+                pass
         try:
             from app.mailguard.scheduler import setup_mailguard_scheduler
             app.mailguard_scheduler = setup_mailguard_scheduler(app)

@@ -15,66 +15,61 @@ class MonitoringScheduler:
     """Background scheduler for automated monitoring tasks"""
     
     def __init__(self, app=None):
-        self.scheduler = BackgroundScheduler()
+        self.scheduler = BackgroundScheduler(daemon=True)
         self._app = app
         self.scheduler.start()
         logger.info("MonitoringScheduler initialized")
     
     def setup_jobs(self):
-        """Setup all scheduled jobs"""
-        
-        # Daily monitoring check at 02:00 AM
-        self.scheduler.add_job(
-            func=self.daily_monitoring_job,
-            trigger=CronTrigger(hour=2, minute=0),
-            id='daily_monitoring',
-            name='Daily Counterparty Monitoring Check',
-            replace_existing=True
-        )
-        logger.info("Job 'daily_monitoring' scheduled for 02:00 AM daily")
-        
-        # Send alert emails at 08:00 AM
-        self.scheduler.add_job(
-            func=self.send_alerts_job,
-            trigger=CronTrigger(hour=8, minute=0),
-            id='send_alerts',
-            name='Send Alert Emails',
-            replace_existing=True
-        )
-        logger.info("Job 'send_alerts' scheduled for 08:00 AM daily")
-        
-        # Update European scam databases weekly on Sunday at 03:00 AM
-        self.scheduler.add_job(
-            func=self.update_european_scam_db_job,
-            trigger=CronTrigger(day_of_week='sun', hour=3, minute=0),
-            id='update_european_scam_db',
-            name='Update European Scam Databases',
-            replace_existing=True
-        )
-        logger.info("Job 'update_european_scam_db' scheduled for Sunday 03:00 AM weekly")
-        
-        # Daily blog post generation at 07:00 AM
-        # misfire_grace_time=21600 → fires even if app was sleeping, up to 6 hours late
-        self.scheduler.add_job(
-            func=self.generate_blog_post_job,
-            trigger=CronTrigger(hour=7, minute=0),
-            id='generate_blog_post',
-            name='Generate Daily SEO Blog Post',
-            replace_existing=True,
-            misfire_grace_time=21600,  # 6 hours grace — handles Render cold starts
-            coalesce=True,             # run once even if multiple misfires stacked up
-        )
-        logger.info("Job 'generate_blog_post' scheduled for 07:00 AM daily")
-        
-        # Optional: Additional check at 14:00 PM
-        self.scheduler.add_job(
-            func=self.daily_monitoring_job,
-            trigger=CronTrigger(hour=14, minute=0),
-            id='afternoon_monitoring',
-            name='Afternoon Counterparty Monitoring Check',
-            replace_existing=True
-        )
-        logger.info("Job 'afternoon_monitoring' scheduled for 14:00 PM daily")
+        """Setup all scheduled jobs — each job is added independently so one
+        failure does not prevent the others from being registered."""
+
+        _jobs = [
+            dict(
+                func=self.daily_monitoring_job,
+                trigger=CronTrigger(hour=2, minute=0),
+                id='daily_monitoring',
+                name='Daily Counterparty Monitoring Check',
+                replace_existing=True,
+            ),
+            dict(
+                func=self.send_alerts_job,
+                trigger=CronTrigger(hour=8, minute=0),
+                id='send_alerts',
+                name='Send Alert Emails',
+                replace_existing=True,
+            ),
+            dict(
+                func=self.update_european_scam_db_job,
+                trigger=CronTrigger(day_of_week='sun', hour=3, minute=0),
+                id='update_european_scam_db',
+                name='Update European Scam Databases',
+                replace_existing=True,
+            ),
+            dict(
+                func=self.generate_blog_post_job,
+                trigger=CronTrigger(hour=7, minute=0),
+                id='generate_blog_post',
+                name='Generate Daily SEO Blog Post',
+                replace_existing=True,
+                misfire_grace_time=21600,  # 6 h — handles Render cold starts
+                coalesce=True,
+            ),
+            dict(
+                func=self.daily_monitoring_job,
+                trigger=CronTrigger(hour=14, minute=0),
+                id='afternoon_monitoring',
+                name='Afternoon Counterparty Monitoring Check',
+                replace_existing=True,
+            ),
+        ]
+
+        for job_kwargs in _jobs:
+            try:
+                self.scheduler.add_job(**job_kwargs)
+                logger.info("Scheduled job '%s'", job_kwargs['id'])
+            except Exception as exc:
+                logger.error("Failed to schedule job '%s': %s", job_kwargs['id'], exc, exc_info=True)
     
     def daily_monitoring_job(self):
         """Daily monitoring check job"""
@@ -202,7 +197,11 @@ def _startup_blog_check(app):
 def init_scheduler(app=None):
     """Initialize scheduler"""
     global scheduler
-    scheduler = MonitoringScheduler(app=app)
+    try:
+        scheduler = MonitoringScheduler(app=app)
+    except Exception as exc:
+        logger.error('BackgroundScheduler failed to start: %s', exc, exc_info=True)
+        raise
     scheduler.setup_jobs()
     # Immediately check if today's post is missing (handles Render cold starts)
     if app is not None:
@@ -213,3 +212,13 @@ def init_scheduler(app=None):
 def get_scheduler():
     """Get scheduler instance"""
     return scheduler
+
+
+def ensure_startup_blog_check(app):
+    """
+    Standalone helper — trigger the startup blog check regardless of whether
+    APScheduler initialized successfully.  Call this from create_app() as a
+    safety net so today's post is always generated on cold start even if the
+    full scheduler is unavailable.
+    """
+    _startup_blog_check(app)

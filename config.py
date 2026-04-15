@@ -45,6 +45,10 @@ class Config:
     
     SQLALCHEMY_ENGINE_OPTIONS = engine_options
     
+    # Canonical site URL \u2014 used for blog/LinkedIn auto-post links.
+    # Set SITE_BASE_URL env var in Render to override (e.g. https://vat-verifizierung.de).
+    BASE_URL = os.environ.get('SITE_BASE_URL', 'https://vat-verifizierung.de')
+
     # API Keys
     VIES_API_KEY = os.environ.get('VIES_API_KEY')
     HANDELSREGISTER_API_KEY = os.environ.get('HANDELSREGISTER_API_KEY')
