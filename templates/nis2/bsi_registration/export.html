@@ -8,7 +8,7 @@
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4><i class="bi bi-download text-primary"></i> Registrierungsdaten exportieren</h4>
         <div class="d-flex gap-2">
-          <a href="{{ url_for('nis2.bsi_export_json', registration_id=reg.id) }}"
+          <a href="{{ url_for('nis2.bsi_export_json', reg_id=reg.id) }}"
              class="btn btn-outline-primary">
             <i class="bi bi-file-code"></i> Als JSON herunterladen
           </a>
@@ -77,11 +77,11 @@
       {% endif %}
 
       <div class="d-flex gap-2">
-        <a href="{{ url_for('nis2.bsi_wizard_step', registration_id=reg.id, step=4) }}"
+        <a href="{{ url_for('nis2.bsi_wizard_step', reg_id=reg.id, step=4) }}"
            class="btn btn-outline-secondary">
           <i class="bi bi-arrow-left"></i> Zurück zum Wizard
         </a>
-        <a href="{{ url_for('nis2.bsi_landing') }}" class="btn btn-outline-primary">
+        <a href="{{ url_for('nis2.bsi_registration_landing') }}" class="btn btn-outline-primary">
           Zur BSI-Übersicht
         </a>
       </div>

@@ -15,7 +15,7 @@
           {% if score_data.bsi_registered %}
             <span class="badge bg-success fs-6 p-2"><i class="bi bi-check-circle"></i> BSI registriert</span>
           {% else %}
-            <a href="{{ url_for('nis2.bsi_landing') }}" class="btn btn-warning btn-sm">
+            <a href="{{ url_for('nis2.bsi_registration_landing') }}" class="btn btn-warning btn-sm">
               <i class="bi bi-building"></i> BSI-Registrierung starten
             </a>
           {% endif %}
@@ -150,7 +150,7 @@
   <div class="row mt-5 g-3">
     <div class="col-12"><h5 class="fw-bold"><i class="bi bi-grid"></i> Module</h5></div>
     <div class="col-md-3">
-      <a href="{{ url_for('nis2.bsi_landing') }}" class="text-decoration-none">
+      <a href="{{ url_for('nis2.bsi_registration_landing') }}" class="text-decoration-none">
         <div class="card border-0 shadow-sm p-3 text-center h-100">
           <i class="bi bi-building fs-2 text-primary mb-2"></i>
           <strong>BSI-Registrierung</strong>
