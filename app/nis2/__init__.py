@@ -23,6 +23,40 @@ nis2_bp = Blueprint(
     template_folder='../../templates/nis2',
 )
 
+# ── Access control: Professional plan only ────────────────────────────────────
+from flask import redirect, url_for, flash, render_template
+from flask_login import current_user
+
+
+@nis2_bp.before_request
+def require_professional_plan():
+    """Block NIS2 access for non-professional users (except public ack pages)."""
+    from flask import request as _req
+    from flask_login import current_user as cu
+
+    # Public routes — acknowledgment links sent to team members (no login needed)
+    if _req.endpoint and 'training_ack' in _req.endpoint:
+        return None
+
+    # Must be authenticated
+    if not cu.is_authenticated:
+        return redirect(url_for('auth.login'))
+
+    # Admins always have access
+    if cu.is_admin:
+        return None
+
+    # Check plan
+    plan = cu.subscription_plan  # 'free', 'basic', 'professional'
+    if plan != 'professional':
+        flash(
+            'Das NIS2 Compliance-Modul ist nur im Professional-Tarif verfügbar. '
+            'Bitte upgraden Sie Ihr Abonnement.',
+            'warning'
+        )
+        return redirect(url_for('payments.pricing'))
+
+
 # Register sub-module routes
 from .dashboard import register_dashboard_routes
 register_dashboard_routes(nis2_bp)
