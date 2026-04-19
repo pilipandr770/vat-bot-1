@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Schulungen (§30 Nr. 7 BSIG) — NIS2{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h1 class="h3 mb-1"><i class="bi bi-mortarboard-fill text-primary me-2"></i>Awareness-Schulungen</h1>
+      <p class="text-muted mb-0">§30 Abs. 2 Nr. 7 BSIG — Pflichtunterweisungen für alle Mitarbeiter</p>
+    </div>
+    <a href="{{ url_for('nis2.training_create') }}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i> Neue Schulung
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  {% if trainings %}
+  <div class="row g-3">
+    {% for t in trainings %}
+    <div class="col-md-6 col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between mb-2">
+            <span class="badge
+              {% if t.status == 'draft' %}bg-secondary
+              {% elif t.status == 'sent' %}bg-primary
+              {% else %}bg-success{% endif %}">
+              {{ t.status | upper }}
+            </span>
+            <small class="text-muted">{{ t.topic_label }}</small>
+          </div>
+          <h6 class="card-title mb-2">{{ t.title }}</h6>
+          {% if t.status != 'draft' %}
+          <div class="d-flex gap-3 text-muted small mb-2">
+            <span><i class="bi bi-people me-1"></i>{{ t.sent_count }} versendet</span>
+            <span class="{% if t.ack_count == t.sent_count and t.sent_count > 0 %}text-success{% endif %}">
+              <i class="bi bi-check2-circle me-1"></i>{{ t.ack_count }} bestätigt
+            </span>
+          </div>
+          {% if t.sent_count > 0 %}
+          <div class="progress mb-2" style="height:6px">
+            <div class="progress-bar bg-success" style="width:{{ (t.ack_count / t.sent_count * 100)|int }}%"></div>
+          </div>
+          {% endif %}
+          {% endif %}
+          {% if t.due_date %}
+          <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>Fällig: {{ t.due_date.strftime('%d.%m.%Y') }}</small>
+          {% endif %}
+        </div>
+        <div class="card-footer bg-transparent d-flex gap-2">
+          <a href="{{ url_for('nis2.training_detail', training_id=t.id) }}" class="btn btn-sm btn-outline-primary flex-grow-1">
+            <i class="bi bi-eye me-1"></i> Details
+          </a>
+          <a href="{{ url_for('nis2.training_report', training_id=t.id) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-file-earmark-bar-graph"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-mortarboard display-4 d-block mb-3 opacity-25"></i>
+    <p class="mb-1">Noch keine Schulungen erstellt.</p>
+    <p class="small">Erstellen Sie Ihre erste Pflichtunterweisung gemäß §30 Nr. 7 BSIG.</p>
+    <div class="d-flex gap-2 justify-content-center mt-3">
+      <a href="{{ url_for('nis2.training_create') }}?topic=phishing" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-fish me-1"></i> Phishing
+      </a>
+      <a href="{{ url_for('nis2.training_create') }}?topic=passwords" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-key me-1"></i> Passwörter & MFA
+      </a>
+      <a href="{{ url_for('nis2.training_create') }}?topic=general" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-shield me-1"></i> Allgemein
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

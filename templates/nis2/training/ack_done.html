@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bestätigt — {{ training.title }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body style="background:#f3f4f6">
+<div style="max-width:500px;margin:4rem auto;padding:1rem">
+  <div class="card border-0 shadow text-center p-5">
+    <div style="width:80px;height:80px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem">
+      <i class="bi bi-check2-circle text-success" style="font-size:2.5rem"></i>
+    </div>
+    <h2 class="h4 text-success mb-2">Vielen Dank, {{ ack.confirmed_name }}!</h2>
+    <p class="text-muted mb-3">
+      Ihre Kenntnisnahme wurde erfolgreich gespeichert.
+    </p>
+    <div class="bg-light rounded p-3 text-start small mb-3">
+      <div><strong>Schulung:</strong> {{ training.title }}</div>
+      <div><strong>Bestätigt am:</strong> {{ ack.acknowledged_at.strftime('%d.%m.%Y um %H:%M') }} Uhr</div>
+      <div><strong>Name:</strong> {{ ack.confirmed_name }}</div>
+      <div><strong>E-Mail:</strong> {{ ack.recipient_email }}</div>
+    </div>
+    <p class="text-muted small">
+      <i class="bi bi-shield-check me-1"></i>
+      Diese Bestätigung wird für die Compliance-Dokumentation gemäß
+      §30 Abs. 2 Nr. 7 BSIG aufbewahrt.
+    </p>
+    <div class="mt-2 text-muted small">
+      Sie können dieses Fenster jetzt schließen.
+    </div>
+  </div>
+</div>
+</body>
+</html>

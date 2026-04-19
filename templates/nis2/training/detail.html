@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}{{ training.title }} — Schulung NIS2{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('nis2.dashboard') }}">NIS2</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('nis2.training_list') }}">Schulungen</a></li>
+      <li class="breadcrumb-item active">{{ training.title | truncate(40) }}</li>
+    </ol>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }} alert-dismissible fade show">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Header -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-8">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge fs-6
+          {% if training.status == 'draft' %}bg-secondary
+          {% elif training.status == 'sent' %}bg-primary
+          {% else %}bg-success{% endif %}">
+          {{ training.status | upper }}
+        </span>
+        <small class="text-muted">{{ training.topic_label }}</small>
+      </div>
+      <h1 class="h3 mb-0">{{ training.title }}</h1>
+      {% if training.due_date %}
+      <small class="text-muted">
+        <i class="bi bi-calendar-event me-1"></i>Fällig: {{ training.due_date.strftime('%d.%m.%Y') }}
+      </small>
+      {% endif %}
+    </div>
+    <div class="col-md-4 text-md-end d-flex flex-column gap-2 align-items-md-end">
+      <a href="{{ url_for('nis2.training_report', training_id=training.id) }}"
+         class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-file-earmark-bar-graph me-1"></i> Auditbericht
+      </a>
+      {% if training.status == 'draft' %}
+      <form method="POST"
+            action="{{ url_for('nis2.training_delete', training_id=training.id) }}"
+            onsubmit="return confirm('Entwurf löschen?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-trash me-1"></i> Löschen
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Stats -->
+    <div class="col-md-3">
+      <div class="row g-3">
+        <div class="col-6 col-md-12">
+          <div class="card border-0 shadow-sm text-center p-3">
+            <div class="display-6 fw-bold text-primary">{{ training.sent_count }}</div>
+            <div class="text-muted small">Versendet</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-12">
+          <div class="card border-0 shadow-sm text-center p-3">
+            <div class="display-6 fw-bold text-success">{{ training.ack_count }}</div>
+            <div class="text-muted small">Bestätigt</div>
+          </div>
+        </div>
+        {% if training.sent_count > 0 %}
+        <div class="col-12">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="d-flex justify-content-between small mb-1">
+              <span>Rücklaufquote</span>
+              <strong>{{ (training.ack_count / training.sent_count * 100)|int }}%</strong>
+            </div>
+            <div class="progress" style="height:8px">
+              <div class="progress-bar bg-success"
+                   style="width:{{ (training.ack_count / training.sent_count * 100)|int }}%"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Send button -->
+      {% if training.status == 'draft' %}
+      <div class="card border-0 shadow-sm mt-3 p-3">
+        <p class="small text-muted mb-2">Schulung ist noch ein Entwurf. Jetzt versenden?</p>
+        <form method="POST" action="{{ url_for('nis2.training_send', training_id=training.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-primary w-100">
+            <i class="bi bi-send me-1"></i> An alle versenden
+          </button>
+        </form>
+      </div>
+      {% elif training.status == 'sent' %}
+      <div class="card border-0 shadow-sm mt-3 p-3">
+        <p class="small text-muted mb-2">Neue Empfänger hinzugefügt? Erneut versenden:</p>
+        <form method="POST" action="{{ url_for('nis2.training_send', training_id=training.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-outline-primary w-100 btn-sm">
+            <i class="bi bi-send me-1"></i> Neue Empfänger senden
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Recipient table -->
+    <div class="col-md-9">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent fw-semibold">
+          Empfänger & Bestätigungen
+        </div>
+        {% if acks %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>E-Mail</th>
+                <th>Versendet</th>
+                <th>Geöffnet</th>
+                <th>Bestätigt</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ack in acks %}
+              <tr>
+                <td>{{ ack.recipient_name or '–' }}</td>
+                <td class="text-muted small">{{ ack.recipient_email }}</td>
+                <td class="small">{{ ack.sent_at.strftime('%d.%m.%Y') if ack.sent_at else '–' }}</td>
+                <td class="small">
+                  {% if ack.opened_at %}
+                    <span class="text-info">{{ ack.opened_at.strftime('%d.%m %H:%M') }}</span>
+                  {% else %}
+                    <span class="text-muted">–</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if ack.acknowledged %}
+                    <span class="badge bg-success">
+                      <i class="bi bi-check2 me-1"></i>{{ ack.acknowledged_at.strftime('%d.%m.%Y %H:%M') }}
+                    </span>
+                  {% else %}
+                    <span class="badge bg-light text-dark">Ausstehend</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if not ack.acknowledged %}
+                  <form method="POST"
+                        action="{{ url_for('nis2.training_resend', training_id=training.id, ack_id=ack.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-sm btn-outline-secondary" title="Erinnerung senden">
+                      <i class="bi bi-bell"></i>
+                    </button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="card-body text-muted text-center py-4">
+          <i class="bi bi-people display-5 d-block mb-2 opacity-25"></i>
+          Noch keine Empfänger. Schulung versenden, um Bestätigungen zu erhalten.
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Content preview -->
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-header bg-transparent fw-semibold">
+          <i class="bi bi-file-text me-1"></i> Schulungsinhalt (Vorschau)
+        </div>
+        <div class="card-body" style="font-size:14px">
+          <div class="prose">
+            {{ training.content_md | replace('### ', '<h5>') | replace('## ', '<h4>') | replace('# ', '<h3>') | safe }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

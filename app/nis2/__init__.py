@@ -41,3 +41,6 @@ register_incident_routes(nis2_bp)
 
 from .supply_chain.routes import register_supply_chain_routes
 register_supply_chain_routes(nis2_bp)
+
+from .training.routes import register_training_routes
+register_training_routes(nis2_bp)

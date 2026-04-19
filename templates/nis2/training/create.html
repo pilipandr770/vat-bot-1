@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Schulung erstellen — NIS2{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:900px">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('nis2.dashboard') }}">NIS2</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('nis2.training_list') }}">Schulungen</a></li>
+      <li class="breadcrumb-item active">Neue Schulung</li>
+    </ol>
+  </nav>
+
+  <h1 class="h3 mb-1"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Neue Pflichtschulung erstellen</h1>
+  <p class="text-muted mb-4">§30 Abs. 2 Nr. 7 BSIG — Inhalte werden per E-Mail versendet, Bestätigung mit Namensunterschrift</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="row g-4">
+      <!-- Left: Settings -->
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-transparent fw-semibold">Einstellungen</div>
+          <div class="card-body">
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Thema</label>
+              <select name="topic" id="topicSelect" class="form-select">
+                {% for value, label in topics %}
+                <option value="{{ value }}" {{ 'selected' if value == prefill_topic }}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Titel*</label>
+              <input type="text" name="title" class="form-control" required
+                     placeholder="z.B. Phishing-Schulung Q2 2026">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Kurzfassung <small class="text-muted">(für Erinnerungs-E-Mail)</small></label>
+              <textarea name="summary" class="form-control" rows="3"
+                        placeholder="Was lernen Mitarbeiter in dieser Schulung?"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Bestätigungsfrist</label>
+              <input type="date" name="due_date" class="form-control"
+                     min="{{ now.strftime('%Y-%m-%d') if now is defined else '' }}">
+            </div>
+          </div>
+        </div>
+
+        <!-- Audience -->
+        <div class="card border-0 shadow-sm mt-3">
+          <div class="card-header bg-transparent fw-semibold">
+            Empfänger
+            {% if team_members %}
+            <button type="button" class="btn btn-sm btn-outline-primary float-end"
+                    onclick="fillFromTeam()">
+              <i class="bi bi-people me-1"></i> Team einfügen
+            </button>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <label class="form-label">E-Mail-Adressen <small class="text-muted">(eine pro Zeile)</small></label>
+            <textarea name="audience" id="audienceField" class="form-control font-monospace" rows="8"
+                      placeholder="max@example.com&#10;Max Mustermann &lt;max@example.com&gt;&#10;anna@example.com; Anna Schmidt"></textarea>
+            <div class="form-text">Formate: email, Name &lt;email&gt;, oder email; Name</div>
+
+            {% if team_members %}
+            <script>
+              const teamMembers = {{ team_members | map(attribute='email') | list | tojson }};
+              const teamNames = {{ team_members | map(attribute='full_name') | list | tojson }};
+              function fillFromTeam() {
+                const lines = teamMembers.map((e, i) => teamNames[i] + ' <' + e + '>');
+                document.getElementById('audienceField').value = lines.join('\n');
+              }
+            </script>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Content editor -->
+      <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Schulungsinhalt (Markdown)*</span>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-outline-secondary" onclick="togglePreview()">
+                <i class="bi bi-eye me-1"></i> Vorschau
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <textarea name="content_md" id="contentEditor" class="form-control border-0 rounded-0"
+                      style="min-height:500px;font-family:monospace;font-size:13px;resize:vertical"
+                      required>{{ prefill_content }}</textarea>
+            <div id="previewPane" class="p-3 d-none" style="min-height:500px;background:#f9fafb"></div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end mt-3">
+          <a href="{{ url_for('nis2.training_list') }}" class="btn btn-outline-secondary">Abbrechen</a>
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-save me-1"></i> Als Entwurf speichern
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+// Change topic → load template content
+document.getElementById('topicSelect').addEventListener('change', function() {
+  const content = window._topicContent && window._topicContent[this.value];
+  if (content) document.getElementById('contentEditor').value = content;
+});
+
+// Simple markdown preview (basic)
+function togglePreview() {
+  const editor = document.getElementById('contentEditor');
+  const preview = document.getElementById('previewPane');
+  if (preview.classList.contains('d-none')) {
+    preview.innerHTML = '<em class="text-muted">Vorschau wird geladen…</em>';
+    preview.classList.remove('d-none');
+    editor.classList.add('d-none');
+    // Basic markdown to HTML
+    let html = editor.value
+      .replace(/^### (.+)$/gm, '<h5>$1</h5>')
+      .replace(/^## (.+)$/gm, '<h4>$1</h4>')
+      .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
+      .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>');
+    preview.innerHTML = '<p>' + html + '</p>';
+  } else {
+    preview.classList.add('d-none');
+    editor.classList.remove('d-none');
+  }
+}
+</script>
+{% endblock %}

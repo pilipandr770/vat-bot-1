@@ -126,14 +126,29 @@ def _calculate_compliance_score(user_id: int) -> dict:
     }
 
     # ── Nr. 7: Schulungen & Sensibilisierung ─────────────────────────────
-    has_training_concept = 'training_concept' in isms_types
+    from .models import SecurityTraining, TrainingAcknowledgment
+    total_trainings = SecurityTraining.query.filter_by(user_id=user_id).count()
+    # Count distinct staff who confirmed at least one training
+    confirmed_acks = (
+        db.session.query(TrainingAcknowledgment.recipient_email)
+        .join(SecurityTraining, TrainingAcknowledgment.training_id == SecurityTraining.id)
+        .filter(SecurityTraining.user_id == user_id,
+                TrainingAcknowledgment.acknowledged == True)
+        .distinct()
+        .count()
+    )
+    # Score: 30 per sent training (max 60) + 40 if any acks exist
+    nr7_score = min(60, total_trainings * 30) + (40 if confirmed_acks > 0 else 0)
+    nr7_status = ('complete' if nr7_score >= 100
+                  else ('partial' if nr7_score > 0 else 'open'))
     measures['nr7'] = {
         'label': 'Schulungen & Cyber-Hygiene-Sensibilisierung',
         'paragraph': '§30 Nr. 7',
-        'score': 30 if has_training_concept else 0,
-        'status': 'partial' if has_training_concept else 'open',
-        'action_url': '/nis2/isms/',
-        'action_label': 'Schulungskonzept erstellen',
+        'score': nr7_score,
+        'status': nr7_status,
+        'detail': f'{total_trainings} Schulung(en) erstellt, {confirmed_acks} Mitarbeiter bestätigt',
+        'action_url': '/nis2/training/',
+        'action_label': 'Schulung erstellen',
         'icon': 'bi-mortarboard',
     }
 

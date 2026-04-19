@@ -786,3 +786,125 @@ class SupplierAssessment(db.Model):
 
     def __repr__(self):
         return f'<SupplierAssessment supplier={self.supplier_id} score={self.risk_score}>'
+
+
+# ─────────────────────────────────────────────────────────────────
+# SECURITY AWARENESS TRAINING (§30 Nr. 7 BSIG)
+# ─────────────────────────────────────────────────────────────────
+
+TRAINING_TOPICS = [
+    ('phishing',         'Phishing & Social Engineering'),
+    ('passwords',        'Sichere Passwörter & MFA'),
+    ('ransomware',       'Ransomware & Malware'),
+    ('data_protection',  'Datenschutz & DSGVO'),
+    ('remote_work',      'Sicheres Homeoffice & VPN'),
+    ('social_media',     'Social Media & OSINT-Risiken'),
+    ('incident',         'Vorfallmeldung & Notfallprozesse'),
+    ('access_control',   'Zugangskontrolle & Berechtigungen'),
+    ('cloud_security',   'Cloud-Sicherheit'),
+    ('general',          'Allgemeine Cybersicherheit'),
+]
+
+
+class SecurityTraining(db.Model):
+    """
+    Pflichtunterweisung / Security-Awareness-Schulung (§30 Abs. 2 Nr. 7 BSIG).
+    Wird per Email an Teammitglieder versendet; Lesebestätigung mit Token.
+    """
+
+    __tablename__ = 'nis2_trainings'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{_sp}users.id', ondelete='CASCADE'),
+                        nullable=False, index=True)
+
+    title = db.Column(db.String(300), nullable=False)
+    topic = db.Column(db.String(50), default='general')
+
+    # Content — Markdown lecture text
+    content_md = db.Column(db.Text, nullable=False)
+
+    # Summary shown on acknowledgment page (auto-extract or manual)
+    summary = db.Column(db.Text)
+
+    # Audience (free text or JSON list of emails)
+    audience_json = db.Column(db.Text)          # JSON list of {name, email}
+
+    # Status: draft | sent | closed
+    status = db.Column(db.String(20), default='draft', index=True)
+
+    # Deadline for acknowledgment
+    due_date = db.Column(db.Date)
+
+    # Sent / closed timestamps
+    sent_at = db.Column(db.DateTime)
+    closed_at = db.Column(db.DateTime)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    acknowledgments = db.relationship(
+        'TrainingAcknowledgment', backref='training',
+        lazy='dynamic', cascade='all, delete-orphan',
+    )
+
+    def get_audience(self):
+        try:
+            return json.loads(self.audience_json) if self.audience_json else []
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    def set_audience(self, audience_list):
+        self.audience_json = json.dumps(audience_list, ensure_ascii=False)
+
+    @property
+    def ack_count(self):
+        return self.acknowledgments.filter_by(acknowledged=True).count()
+
+    @property
+    def sent_count(self):
+        return self.acknowledgments.count()
+
+    @property
+    def topic_label(self):
+        return dict(TRAINING_TOPICS).get(self.topic, self.topic)
+
+    def __repr__(self):
+        return f'<SecurityTraining {self.id} "{self.title}" [{self.status}]>'
+
+
+class TrainingAcknowledgment(db.Model):
+    """
+    Lesebestätigung eines Empfängers (§30 Nr. 7 BSIG Nachweis).
+    Token-basiert — kein Login erforderlich.
+    """
+
+    __tablename__ = 'nis2_training_acks'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    id = db.Column(db.Integer, primary_key=True)
+    training_id = db.Column(db.Integer,
+                            db.ForeignKey(f'{_sp}nis2_trainings.id', ondelete='CASCADE'),
+                            nullable=False, index=True)
+
+    # Recipient info
+    recipient_name = db.Column(db.String(200), nullable=False)
+    recipient_email = db.Column(db.String(200), nullable=False)
+
+    # Unique token for the acknowledgment link (UUID)
+    token = db.Column(db.String(64), unique=True, nullable=False, index=True)
+
+    # Tracking
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    opened_at = db.Column(db.DateTime)     # first click on link
+    acknowledged = db.Column(db.Boolean, default=False)
+    acknowledged_at = db.Column(db.DateTime)
+    ip_address = db.Column(db.String(45))  # IPv4 or IPv6
+
+    # Optional: typed confirmation name ("Ich, Max Mustermann, bestätige...")
+    confirmed_name = db.Column(db.String(200))
+
+    def __repr__(self):
+        return (f'<TrainingAck training={self.training_id} '
+                f'email={self.recipient_email} ack={self.acknowledged}>')

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Schulungsbericht — {{ training.title }}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; font-size: 13px; color: #1a1a1a; margin: 0; padding: 20px; }
+    .header { border-bottom: 3px solid #1a56db; padding-bottom: 16px; margin-bottom: 20px; }
+    .header h1 { font-size: 20px; color: #1a56db; margin: 0 0 4px; }
+    .header .sub { color: #6b7280; font-size: 12px; }
+    .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .meta-box { background: #f3f4f6; padding: 12px; border-radius: 6px; text-align: center; }
+    .meta-box .val { font-size: 24px; font-weight: bold; color: #1a56db; }
+    .meta-box .lbl { font-size: 11px; color: #6b7280; }
+    .val-green { color: #16a34a !important; }
+    .val-red { color: #dc2626 !important; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th { background: #1a56db; color: white; padding: 8px 10px; text-align: left; font-size: 12px; }
+    td { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    .badge-ok { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; }
+    .badge-pend { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; }
+    .legal-box { background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 6px; font-size: 11px; color: #1e40af; }
+    .footer { border-top: 1px solid #e5e7eb; margin-top: 20px; padding-top: 10px; color: #9ca3af; font-size: 11px; }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print" style="margin-bottom:16px">
+  <button onclick="window.print()" style="background:#1a56db;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:13px">
+    🖨️ Drucken / PDF speichern
+  </button>
+  <a href="{{ url_for('nis2.training_detail', training_id=training.id) }}"
+     style="margin-left:8px;color:#6b7280;font-size:12px">← Zurück</a>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <h1>📋 Schulungs-Nachweis: {{ training.title }}</h1>
+  <div class="sub">
+    NIS2-Pflichtschulung gemäß §30 Abs. 2 Nr. 7 BSIG &nbsp;|&nbsp;
+    Thema: {{ topics.get(training.topic, training.topic) }} &nbsp;|&nbsp;
+    Berichtsdatum: {{ now.strftime('%d.%m.%Y %H:%M') }}
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="meta-grid">
+  <div class="meta-box">
+    <div class="val">{{ training.sent_count }}</div>
+    <div class="lbl">Versendet</div>
+  </div>
+  <div class="meta-box">
+    <div class="val val-green">{{ training.ack_count }}</div>
+    <div class="lbl">Bestätigt</div>
+  </div>
+  <div class="meta-box">
+    <div class="val {{ 'val-red' if (training.sent_count - training.ack_count) > 0 else 'val-green' }}">
+      {{ training.sent_count - training.ack_count }}
+    </div>
+    <div class="lbl">Ausstehend</div>
+  </div>
+  <div class="meta-box">
+    <div class="val">
+      {% if training.sent_count > 0 %}
+        {{ (training.ack_count / training.sent_count * 100)|int }}%
+      {% else %}–{% endif %}
+    </div>
+    <div class="lbl">Rücklaufquote</div>
+  </div>
+</div>
+
+<!-- Training info -->
+<table style="margin-bottom:16px">
+  <tr>
+    <td style="width:30%;color:#6b7280;font-weight:bold">Titel</td>
+    <td>{{ training.title }}</td>
+  </tr>
+  <tr>
+    <td style="color:#6b7280;font-weight:bold">Thema</td>
+    <td>{{ topics.get(training.topic, training.topic) }}</td>
+  </tr>
+  <tr>
+    <td style="color:#6b7280;font-weight:bold">Status</td>
+    <td>{{ training.status | upper }}</td>
+  </tr>
+  <tr>
+    <td style="color:#6b7280;font-weight:bold">Versanddatum</td>
+    <td>{{ training.sent_at.strftime('%d.%m.%Y %H:%M') if training.sent_at else '–' }}</td>
+  </tr>
+  <tr>
+    <td style="color:#6b7280;font-weight:bold">Fällig bis</td>
+    <td>{{ training.due_date.strftime('%d.%m.%Y') if training.due_date else '–' }}</td>
+  </tr>
+</table>
+
+<!-- Acknowledgments table -->
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>E-Mail</th>
+      <th>Versendet</th>
+      <th>Geöffnet</th>
+      <th>Bestätigt am</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ack in acks %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ ack.confirmed_name or ack.recipient_name or '–' }}</td>
+      <td>{{ ack.recipient_email }}</td>
+      <td>{{ ack.sent_at.strftime('%d.%m.%Y') if ack.sent_at else '–' }}</td>
+      <td>{{ ack.opened_at.strftime('%d.%m.%Y %H:%M') if ack.opened_at else '–' }}</td>
+      <td>{{ ack.acknowledged_at.strftime('%d.%m.%Y %H:%M') if ack.acknowledged_at else '–' }}</td>
+      <td>
+        {% if ack.acknowledged %}
+          <span class="badge-ok">✓ Bestätigt</span>
+        {% else %}
+          <span class="badge-pend">⏳ Ausstehend</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="7" style="text-align:center;color:#9ca3af;padding:16px">
+        Keine Einträge
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Legal note -->
+<div class="legal-box">
+  <strong>Rechtsgrundlage:</strong> §30 Abs. 2 Nr. 7 NIS2UmsuCG / BSIG —
+  Schulungen und Cyber-Hygiene-Maßnahmen für alle Personen, die Zugang zu Netz- und Informationssystemen haben.<br>
+  Dieser Bericht dient als Nachweis gegenüber dem Bundesamt für Sicherheit in der Informationstechnik (BSI)
+  und kann bei Audits nach §39 BSIG vorgelegt werden.
+  Aufbewahrungspflicht: mindestens 3 Jahre.
+</div>
+
+<div class="footer">
+  Erstellt: {{ now.strftime('%d.%m.%Y um %H:%M') }} Uhr &nbsp;|&nbsp;
+  Plattform: VAT Verifizierung GmbH NIS2-Compliance &nbsp;|&nbsp;
+  vat-verifizierung.de
+</div>
+
+</body>
+</html>
