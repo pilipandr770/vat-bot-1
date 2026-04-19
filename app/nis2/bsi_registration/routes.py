@@ -30,7 +30,10 @@ def register_bsi_routes(bp):
             reg = BSIRegistration.query.filter_by(user_id=current_user.id).order_by(
                 BSIRegistration.created_at.desc()
             ).first()
-        return render_template('nis2/bsi_registration/landing.html', registration=reg)
+        return render_template('nis2/bsi_registration/landing.html',
+                               registration=reg,
+                               sectors=NIS2_SECTORS,
+                               legal_forms=LEGAL_FORMS)
 
     @bp.route('/bsi-registration/check', methods=['GET', 'POST'])
     def bsi_check():
@@ -38,23 +41,28 @@ def register_bsi_routes(bp):
         Public Betroffenheits-Check.
         Determines if the company is subject to NIS2 without requiring login.
         """
-        result = None
-        if request.method == 'POST':
-            data = request.get_json(silent=True) or request.form
-            sector = data.get('sector', '')
-            employees = _safe_int(data.get('employees', 0))
-            revenue = _safe_int(data.get('revenue', 0))
-            is_dns_tld = data.get('is_dns_tld') in (True, 'true', '1', 'on')
+        if request.method == 'GET':
+            return redirect(url_for('nis2.bsi_registration_landing'))
 
-            result = _determine_betroffenheit(sector, employees, revenue, is_dns_tld)
+        data = request.get_json(silent=True) or request.form
+        sector = data.get('sector', '')
+        is_dns_tld = data.get('is_dns_tld') in (True, 'true', '1', 'on')
 
-            if request.is_json:
-                return jsonify(result)
+        # Form sends string values from select dropdowns
+        emp_str = data.get('employees', 'under50')
+        rev_str = data.get('revenue', 'under10')
+        employees = _parse_employees(emp_str)
+        revenue = _parse_revenue(rev_str)
+
+        result = _determine_betroffenheit(sector, employees, revenue, is_dns_tld)
+
+        if request.is_json:
+            return jsonify(result)
 
         return render_template(
-            'nis2/bsi_registration/check.html',
-            sectors=NIS2_SECTORS,
+            'nis2/bsi_registration/check_result.html',
             result=result,
+            sectors=NIS2_SECTORS,
         )
 
     # ── Wizard ────────────────────────────────────────────────────────────
@@ -186,6 +194,18 @@ def register_bsi_routes(bp):
 # ─────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────
+
+def _parse_employees(value: str) -> int:
+    """Convert select dropdown string value to numeric employees count."""
+    mapping = {'under50': 10, '50to249': 100, '250plus': 500}
+    return mapping.get(str(value), _safe_int(value, 0))
+
+
+def _parse_revenue(value: str) -> int:
+    """Convert select dropdown string value to numeric revenue (EUR)."""
+    mapping = {'under10': 5_000_000, '10to50': 20_000_000, 'over50': 100_000_000}
+    return mapping.get(str(value), _safe_int(value, 0))
+
 
 def _safe_int(value, default=0):
     try:

@@ -64,7 +64,8 @@ def register_incident_routes(bp):
             return redirect(url_for('nis2.incident_detail', incident_id=incident.id))
 
         return render_template('nis2/incident_response/create.html',
-                               categories=INCIDENT_CATEGORIES)
+                               categories=INCIDENT_CATEGORIES,
+                               now=datetime.utcnow())
 
     # ── Incident detail ───────────────────────────────────────────
     @bp.route('/incidents/<int:incident_id>')
