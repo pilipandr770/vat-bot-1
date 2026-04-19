@@ -47,8 +47,14 @@
           <i class="bi bi-magic"></i> Dokumente jetzt generieren
         </button>
         <div id="progressArea" class="mt-3" style="display:none;">
-          <div class="spinner-border text-success me-2" role="status"></div>
-          <span id="progressText">KI generiert Dokumente... Dies kann 1–3 Minuten dauern.</span>
+          <div class="d-flex align-items-center mb-2">
+            <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
+            <span id="progressLabel">KI generiert Dokumente… Dies kann 1–3 Minuten dauern.</span>
+          </div>
+          <div class="progress" style="height:8px;">
+            <div id="progressBar" class="progress-bar bg-success" role="progressbar"
+                 style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
         </div>
         <div id="doneArea" style="display:none;" class="mt-3">
           <div class="alert alert-success">
@@ -66,45 +72,85 @@
 
 {% block scripts %}
 <script>
-function startGeneration() {
-  document.getElementById('generateBtn').disabled = true;
-  document.getElementById('progressArea').style.display = 'block';
-  
-  fetch('{{ url_for("nis2.isms_generate", interview_id=interview.id) }}', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content,
-    },
-    body: JSON.stringify({})
-  })
-  .then(r => r.json())
-  .then(data => {
-    document.getElementById('progressArea').style.display = 'none';
-    
-    // Update status icons
-    data.generated.forEach(item => {
-      const el = document.getElementById('status_' + item.doc_type);
-      if (el) {
-        const icon = el.querySelector('.status-icon');
-        icon.className = 'bi bi-check-circle text-success status-icon';
-      }
+async function startGeneration() {
+  const btn = document.getElementById('generateBtn');
+  const progressArea = document.getElementById('progressArea');
+  const doneArea = document.getElementById('doneArea');
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+  const interviewId = {{ interview.id }};
+
+  btn.disabled = true;
+  progressArea.style.display = 'block';
+  doneArea.style.display = 'none';
+
+  // Step 1: get list of docs to generate
+  let docTypes;
+  try {
+    const r = await fetch(`/nis2/isms/interview/${interviewId}/generate`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+      body: JSON.stringify({})
     });
-    data.errors.forEach(item => {
-      const el = document.getElementById('status_' + item.doc_type);
-      if (el) {
-        const icon = el.querySelector('.status-icon');
-        icon.className = 'bi bi-x-circle text-danger status-icon';
+    if (!r.ok) throw new Error('Server error ' + r.status);
+    const data = await r.json();
+    docTypes = data.doc_types || [];
+  } catch (err) {
+    progressArea.style.display = 'none';
+    btn.disabled = false;
+    alert('Fehler: ' + err.message);
+    return;
+  }
+
+  if (docTypes.length === 0) {
+    progressArea.style.display = 'none';
+    doneArea.style.display = 'block';
+    return;
+  }
+
+  // Step 2: generate each document sequentially
+  const progressBar = document.getElementById('progressBar');
+  const progressLabel = document.getElementById('progressLabel');
+  let done = 0;
+  let errors = [];
+
+  for (const docType of docTypes) {
+    const docMeta = {{ doc_types | tojson }};
+    const meta = docMeta[docType] || {};
+    const label = meta.title || docType;
+    if (progressLabel) progressLabel.textContent = `Generiere: ${label}…`;
+
+    try {
+      const r = await fetch(`/nis2/isms/interview/${interviewId}/generate-one`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+        body: JSON.stringify({doc_type: docType})
+      });
+
+      const el = document.getElementById('status_' + docType);
+      if (r.ok) {
+        done++;
+        if (el) el.querySelector('.status-icon').className = 'bi bi-check-circle text-success status-icon';
+      } else {
+        let errMsg = 'HTTP ' + r.status;
+        try { const d = await r.json(); errMsg = d.error || errMsg; } catch(e) {}
+        errors.push(docType + ': ' + errMsg);
+        if (el) el.querySelector('.status-icon').className = 'bi bi-x-circle text-danger status-icon';
       }
-    });
-    
-    document.getElementById('doneArea').style.display = 'block';
-  })
-  .catch(err => {
-    document.getElementById('progressArea').style.display = 'none';
-    document.getElementById('generateBtn').disabled = false;
-    alert('Fehler beim Generieren: ' + err.message);
-  });
+    } catch (err) {
+      errors.push(docType + ': ' + err.message);
+      const el = document.getElementById('status_' + docType);
+      if (el) el.querySelector('.status-icon').className = 'bi bi-x-circle text-danger status-icon';
+    }
+
+    const pct = Math.round(((done) / docTypes.length) * 100);
+    if (progressBar) { progressBar.style.width = pct + '%'; progressBar.setAttribute('aria-valuenow', pct); }
+  }
+
+  progressArea.style.display = 'none';
+  if (errors.length) {
+    alert('Fehler bei ' + errors.length + ' Dokument(en):\n' + errors.join('\n'));
+  }
+  doneArea.style.display = 'block';
 }
 </script>
 {% endblock %}

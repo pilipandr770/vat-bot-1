@@ -109,60 +109,63 @@ def register_isms_routes(bp):
     @bp.route('/isms/interview/<int:interview_id>/generate', methods=['POST'])
     @login_required
     def isms_generate(interview_id: int):
+        """Legacy bulk-generate — kept for back-compat. Returns list of doc_types to generate."""
+        interview = ISMSInterview.query.get_or_404(interview_id)
+        if interview.user_id != current_user.id:
+            abort(403)
+        phase4 = interview.get_phase_data(4) or {}
+        selected_docs = _parse_selected_docs(phase4.get('documents_to_generate', []))
+        return jsonify({'doc_types': selected_docs})
+
+    @bp.route('/isms/interview/<int:interview_id>/generate-one', methods=['POST'])
+    @login_required
+    def isms_generate_one(interview_id: int):
+        """Generate a single document. Called sequentially by JS to avoid worker timeout."""
         interview = ISMSInterview.query.get_or_404(interview_id)
         if interview.user_id != current_user.id:
             abort(403)
 
+        data = request.get_json() or {}
+        doc_type_key = data.get('doc_type', '').strip()
+        if not doc_type_key:
+            return jsonify({'error': 'doc_type required'}), 400
+
         all_data = interview.get_all_data()
-        phase4 = interview.get_phase_data(4) or {}
-        selected_docs = _parse_selected_docs(phase4.get('documents_to_generate', []))
+        doc_meta = ISMS_DOC_TYPES_MAP.get(doc_type_key, {})
+        doc_name = doc_meta.get('title', doc_type_key) if isinstance(doc_meta, dict) else str(doc_meta)
+
+        existing = ISMSDocument.query.filter_by(
+            interview_id=interview_id,
+            doc_type=doc_type_key,
+        ).first()
+
+        if existing and not data.get('regenerate'):
+            return jsonify({'doc_type': doc_type_key, 'id': existing.id, 'cached': True})
 
         generator = ISMSDocumentGenerator()
-        generated = []
-        errors = []
+        content, error = generator.generate_document(doc_type_key, all_data)
+        if error:
+            return jsonify({'doc_type': doc_type_key, 'error': error}), 500
 
-        for doc_type_key in selected_docs:
-            doc_meta = ISMS_DOC_TYPES_MAP.get(doc_type_key, {})
-            doc_name = doc_meta.get('title', doc_type_key) if isinstance(doc_meta, dict) else str(doc_meta)
-
-            # Skip if already generated and not regenerating
-            existing = ISMSDocument.query.filter_by(
+        if existing:
+            existing.content_md = content
+            existing.content = content
+            doc = existing
+        else:
+            doc = ISMSDocument(
+                user_id=current_user.id,
                 interview_id=interview_id,
                 doc_type=doc_type_key,
-            ).first()
-
-            if existing and not request.json.get('regenerate'):
-                generated.append({'doc_type': doc_type_key, 'id': existing.id, 'cached': True})
-                continue
-
-            content, error = generator.generate_document(doc_type_key, all_data)
-            if error:
-                errors.append({'doc_type': doc_type_key, 'error': error})
-                continue
-
-            if existing:
-                existing.content_md = content
-                existing.content = content
-                doc = existing
-            else:
-                doc = ISMSDocument(
-                    user_id=current_user.id,
-                    interview_id=interview_id,
-                    doc_type=doc_type_key,
-                    title=doc_name,
-                    content_md=content,
-                    content=content,
-                    is_generated=True,
-                )
-                db.session.add(doc)
-
-            db.session.commit()
-            generated.append({'doc_type': doc_type_key, 'id': doc.id, 'cached': False})
+                title=doc_name,
+                content_md=content,
+                content=content,
+                is_generated=True,
+            )
+            db.session.add(doc)
 
         interview.completed_at = datetime.utcnow()
         db.session.commit()
-
-        return jsonify({'generated': generated, 'errors': errors})
+        return jsonify({'doc_type': doc_type_key, 'id': doc.id, 'cached': False})
 
     # ── Document list ─────────────────────────────────────────────
     @bp.route('/isms/interview/<int:interview_id>/documents')
