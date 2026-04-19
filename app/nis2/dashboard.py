@@ -127,6 +127,7 @@ def _calculate_compliance_score(user_id: int) -> dict:
 
     # ── Nr. 7: Schulungen & Sensibilisierung ─────────────────────────────
     from .models import SecurityTraining, TrainingAcknowledgment
+    from crm.models import db
     total_trainings = SecurityTraining.query.filter_by(user_id=user_id).count()
     # Count distinct staff who confirmed at least one training
     confirmed_acks = (
