@@ -9,6 +9,20 @@
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
+      # ── System security tools for NIS2 site audit ──────────────────────
+      apt-get install -y --no-install-recommends nmap nikto dnsutils 2>/dev/null || true
+      # ── Go runtime ─────────────────────────────────────────────────────
+      if [ ! -d /usr/local/go ]; then
+        wget -q https://go.dev/dl/go1.22.4.linux-amd64.tar.gz -O /tmp/go.tar.gz
+        tar -C /usr/local -xzf /tmp/go.tar.gz && rm /tmp/go.tar.gz
+      fi
+      export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+      # ── Go-based security tools ─────────────────────────────────────────
+      go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest   2>/dev/null || true
+      go install github.com/projectdiscovery/httpx/cmd/httpx@latest        2>/dev/null || true
+      go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest 2>/dev/null || true
+      # Copy Go binaries to a system-wide path so they're found at runtime
+      cp $HOME/go/bin/* /usr/local/bin/ 2>/dev/null || true
     preDeployCommand: flask db upgrade
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
     envVars:

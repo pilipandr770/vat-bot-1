@@ -292,17 +292,75 @@ def run_audit(
     tools_used.append("cookie_check")
     _log("INFO", "✅ Cookie-Check abgeschlossen")
 
-    # ── 4. Optional external tools (skipped gracefully) ───────────────────
-    external_tools = ["nmap", "nuclei", "httpx", "subfinder", "nikto"]
-    skipped = []
-    for tool in external_tools:
-        if not shutil.which(tool):
-            skipped.append(tool)
+    # ── 4. Optional external tools ────────────────────────────────────────
+    domain = target.replace("https://", "").replace("http://", "").split("/")[0]
+    ext_results: Dict[str, str] = {}
+    skipped: List[str] = []
+
+    # --- nmap ---------------------------------------------------------------
+    if shutil.which("nmap"):
+        _log("CMD", f"nmap -sV --script ssl-cert,http-security-headers -p 80,443 {domain}")
+        out = _run_cmd(["nmap", "-sV", "--script", "ssl-cert,http-security-headers",
+                        "-p", "80,443", "--host-timeout", "30s", domain], timeout=60)
+        if out:
+            ext_results["nmap"] = out
+            tools_used.append("nmap")
+            _log("INFO", f"✅ nmap abgeschlossen ({len(out)} Zeichen)")
+    else:
+        skipped.append("nmap")
+
+    # --- httpx ---------------------------------------------------------------
+    if shutil.which("httpx"):
+        _log("CMD", f"httpx -u {target} -title -tech-detect -status-code -nc")
+        out = _run_cmd(["httpx", "-u", target, "-title", "-tech-detect",
+                        "-status-code", "-nc", "-silent"], timeout=30)
+        if out:
+            ext_results["httpx"] = out
+            tools_used.append("httpx")
+            _log("INFO", f"✅ httpx abgeschlossen")
+    else:
+        skipped.append("httpx")
+
+    # --- subfinder -----------------------------------------------------------
+    if shutil.which("subfinder"):
+        _log("CMD", f"subfinder -d {domain} -silent")
+        out = _run_cmd(["subfinder", "-d", domain, "-silent", "-timeout", "20"], timeout=40)
+        if out:
+            ext_results["subfinder"] = out
+            tools_used.append("subfinder")
+            _log("INFO", f"✅ subfinder — {len(out.splitlines())} Subdomains gefunden")
+    else:
+        skipped.append("subfinder")
+
+    # --- nuclei --------------------------------------------------------------
+    if shutil.which("nuclei"):
+        _log("CMD", f"nuclei -u {target} -severity critical,high,medium -nc -silent")
+        out = _run_cmd(["nuclei", "-u", target, "-severity", "critical,high,medium",
+                        "-nc", "-silent", "-timeout", "20"], timeout=120)
+        if out:
+            ext_results["nuclei"] = out
+            tools_used.append("nuclei")
+            _log("INFO", f"✅ nuclei — {len(out.splitlines())} Treffer")
+    else:
+        skipped.append("nuclei")
+
+    # --- nikto ---------------------------------------------------------------
+    if shutil.which("nikto"):
+        _log("CMD", f"nikto -h {target} -maxtime 60")
+        out = _run_cmd(["nikto", "-h", target, "-maxtime", "60", "-nointeractive"], timeout=90)
+        if out:
+            ext_results["nikto"] = out
+            tools_used.append("nikto")
+            _log("INFO", "✅ nikto abgeschlossen")
+    else:
+        skipped.append("nikto")
+
     if skipped:
-        _log(
-            "TOOLS_USED",
-            f"ℹ️ Externe Tools nicht installiert (übersprungen): {', '.join(skipped)}",
-        )
+        _log("TOOLS_USED",
+             f"ℹ️ Nicht verfügbare Tools (übersprungen): {', '.join(skipped)}")
+    if tools_used:
+        _log("TOOLS_USED",
+             f"🔧 Verwendete Tools: {', '.join(tools_used)}")
 
     # ── 5. Claude AI analysis ──────────────────────────────────────────────
     _log("AGENT", "🤖 Claude AI analysiert Sicherheitsdaten …")
@@ -335,6 +393,17 @@ TLS-Warnungen: {json.dumps(tls_info.get("warnings", []), ensure_ascii=False)}
 
 ### Alle gesammelten Warnungen
 {json.dumps(live.get("warnings", []), ensure_ascii=False)}
+""" + (
+        "\n### nmap-Scan\n" + ext_results["nmap"]        if "nmap"     in ext_results else ""
+    ) + (
+        "\n### httpx-Scan\n" + ext_results["httpx"]      if "httpx"    in ext_results else ""
+    ) + (
+        "\n### Subdomains (subfinder)\n" + ext_results["subfinder"] if "subfinder" in ext_results else ""
+    ) + (
+        "\n### nuclei-Findings\n" + ext_results["nuclei"] if "nuclei"   in ext_results else ""
+    ) + (
+        "\n### nikto-Scan\n" + ext_results["nikto"]      if "nikto"    in ext_results else ""
+    ) + """
 
 Analysiere diese Daten und erstelle ein JSON-Array mit Findings für den NIS2/DSGVO-Auditbericht.
 """
