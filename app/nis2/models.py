@@ -40,25 +40,74 @@ _sp = f'{SCHEMA}.' if SCHEMA else ''
 # BSI REGISTRATION
 # ─────────────────────────────────────────────────────────────────
 
+# Structured sector groups for <optgroup> rendering in templates.
+# Each entry: (group_label, [(value, label), ...])
+NIS2_SECTOR_GROUPS = [
+    ('⚡ Energie (Anlage 1 BSIG)', [
+        ('energie_strom',       'Strom / Elektrizitätsversorgung'),
+        ('energie_gas',         'Gas / Erdgas-Fernleitungen und -Verteilung'),
+        ('energie_oel',         'Öl / Mineralöl-Versorgung und -Speicherung'),
+        ('energie_fernwaerme',  'Fernwärme / Fernkälte'),
+        ('energie_wasserstoff', 'Wasserstoff-Erzeugung, -Speicherung, -Transport'),
+    ]),
+    ('🚂 Transport & Verkehr (Anlage 1)', [
+        ('transport_luftfahrt', 'Luftfahrt (Fluggesellschaften, Flughäfen, Flugsicherung)'),
+        ('transport_bahn',      'Eisenbahn / Schienenverkehr'),
+        ('transport_schiff',    'Schifffahrt / Hafenbetrieb / Schiffsmanagement'),
+        ('transport_strasse',   'Straßenverkehr / Logistik / Lkw-Transporte'),
+        ('transport_urban',     'Öffentlicher Nahverkehr (ÖPNV)'),
+    ]),
+    ('🏥 Gesundheitswesen (Anlage 1)', [
+        ('gesundheit_krankenhaus',  'Krankenhäuser / Kliniken / stationäre Versorgung'),
+        ('gesundheit_labor',        'Laboratorien / Diagnostik / Medizinlabore'),
+        ('gesundheit_pharma',       'Pharmaindustrie / Arzneimittelherstellung'),
+        ('gesundheit_medizingeraete','Medizingeräte-Hersteller (Klasse IIa/IIb/III)'),
+        ('gesundheit_forschung',    'Medizinische Forschung / klinische Studien'),
+    ]),
+    ('💧 Wasser (Anlage 1)', [
+        ('trinkwasser', 'Trinkwasser / Wasserversorgung und -aufbereitung'),
+        ('abwasser',    'Abwasser / Abwasserentsorgung und -behandlung'),
+    ]),
+    ('🏦 Finanz & Banken (Anlage 1)', [
+        ('bankwesen',    'Bankwesen / Kreditinstitute / Zahlungsdienstleister'),
+        ('finanzmarkt',  'Finanzmarktinfrastrukturen (Börsen, CCPs, Handelsplätze)'),
+    ]),
+    ('💻 Digitale Infrastruktur & IT (Anlage 1)', [
+        ('digital_cloud',    'Cloud Computing / SaaS / IaaS / PaaS'),
+        ('digital_rz',       'Rechenzentren / Colocation-Betreiber'),
+        ('digital_cdn',      'CDN / Content-Delivery-Netzwerke'),
+        ('digital_dns',      'DNS-Auflösungsdienste / TLD-Registry'),
+        ('digital_vertrauen','Qualifizierte Vertrauensdienste (eIDAS / eID)'),
+        ('digital_telekom',  'Telekommunikation / Internet-Austauschpunkte (IXP)'),
+        ('digital_netz',     'Öffentliche Kommunikationsnetze / ISP'),
+        ('ikt_management',   'IKT-Dienstemanagement / Managed Service Provider (MSP)'),
+    ]),
+    ('🏛️ Öffentliche Verwaltung & Weltraum (Anlage 1)', [
+        ('oeffentliche_verwaltung', 'Öffentliche Verwaltung (Bund, Länder, Kommunen)'),
+        ('weltraum',                'Weltraum / Satellitenbetrieb / Bodenstationen'),
+    ]),
+    ('📦 Wichtige Einrichtungen — Anlage 2 BSIG', [
+        ('post',                        'Post- und Kurierdienste'),
+        ('abfallwirtschaft',            'Abfallwirtschaft / Entsorgung'),
+        ('chemie',                      'Chemie / Herstellung und Vertrieb von Chemikalien'),
+        ('lebensmittel',                'Lebensmittel / Produktion, Verarbeitung und Vertrieb'),
+        ('verarbeitendes_medizin',      'Verarbeitendes Gewerbe — Medizingeräte (Klasse I)'),
+        ('verarbeitendes_elektronik',   'Verarbeitendes Gewerbe — Computer / Elektronik / Optik'),
+        ('verarbeitendes_maschinenbau', 'Verarbeitendes Gewerbe — Maschinenbau'),
+        ('verarbeitendes_fahrzeuge',    'Verarbeitendes Gewerbe — Fahrzeugbau / Automotive'),
+        ('verarbeitendes_gewerbe',      'Verarbeitendes Gewerbe — Sonstige Herstellung'),
+        ('digitale_dienste_marktplatz', 'Digitale Dienste — Online-Marktplätze'),
+        ('digitale_dienste_suche',      'Digitale Dienste — Online-Suchmaschinen'),
+        ('digitale_dienste_sozial',     'Digitale Dienste — Soziale Netzwerke'),
+        ('forschung',                   'Forschungseinrichtungen'),
+    ]),
+]
+
+# Flat list (value, label) — kept for backward compatibility
 NIS2_SECTORS = [
-    ('energie', 'Energie'),
-    ('transport', 'Transport und Verkehr'),
-    ('bankwesen', 'Bankwesen'),
-    ('finanzmarkt', 'Finanzmarktinfrastrukturen'),
-    ('gesundheit', 'Gesundheitswesen'),
-    ('trinkwasser', 'Trinkwasser'),
-    ('abwasser', 'Abwasser'),
-    ('digitale_infrastruktur', 'Digitale Infrastruktur'),
-    ('ikt_management', 'IKT-Dienstemanagement'),
-    ('oeffentliche_verwaltung', 'Öffentliche Verwaltung'),
-    ('weltraum', 'Weltraum'),
-    ('post', 'Post- und Kurierdienste'),
-    ('abfallwirtschaft', 'Abfallwirtschaft'),
-    ('chemie', 'Herstellung, Produktion und Vertrieb von Chemikalien'),
-    ('lebensmittel', 'Produktion, Verarbeitung und Vertrieb von Lebensmitteln'),
-    ('verarbeitendes_gewerbe', 'Verarbeitendes Gewerbe / Herstellung von Waren'),
-    ('digitale_dienste', 'Anbieter digitaler Dienste'),
-    ('forschung', 'Forschung'),
+    (value, label)
+    for _group_label, entries in NIS2_SECTOR_GROUPS
+    for value, label in entries
 ]
 
 LEGAL_FORMS = [

@@ -15,7 +15,7 @@ from flask import render_template, request, jsonify, redirect, url_for, flash, s
 from flask_login import login_required, current_user
 from crm.models import db
 
-from ..models import BSIRegistration, NIS2_SECTORS, LEGAL_FORMS
+from ..models import BSIRegistration, NIS2_SECTORS, NIS2_SECTOR_GROUPS, LEGAL_FORMS
 
 
 def register_bsi_routes(bp):
@@ -33,6 +33,7 @@ def register_bsi_routes(bp):
         return render_template('nis2/bsi_registration/landing.html',
                                registration=reg,
                                sectors=NIS2_SECTORS,
+                               sector_groups=NIS2_SECTOR_GROUPS,
                                legal_forms=LEGAL_FORMS)
 
     @bp.route('/bsi-registration/check', methods=['GET', 'POST'])
@@ -214,21 +215,27 @@ def _safe_int(value, default=0):
         return default
 
 
+def _sector_group(sector: str) -> str:
+    """Map specific subsector key to its parent NIS2 sector group."""
+    if sector.startswith('energie_') or sector == 'energie':
+        return 'energie'
+    if sector.startswith('transport_') or sector == 'transport':
+        return 'transport'
+    if sector.startswith('gesundheit_') or sector == 'gesundheit':
+        return 'gesundheit'
+    if sector.startswith('digital_') or sector == 'digitale_infrastruktur':
+        return 'digitale_infrastruktur'
+    if sector.startswith('verarbeitendes_') or sector == 'verarbeitendes_gewerbe':
+        return 'verarbeitendes_gewerbe'
+    if sector.startswith('digitale_dienste') or sector == 'digitale_dienste':
+        return 'digitale_dienste'
+    return sector
+
+
 def _determine_betroffenheit(sector, employees, revenue, is_dns_tld):
     """
-    Returns entity classification per NIS2UmsuCG §28 BSIG:
-    - besonders_wichtig (highly critical entities)
-    - wichtig (important entities)
-    - nicht_betroffen (not affected)
-
-    Highly critical sectors (Anlage 1 BSIG):
-      energie, transport, bankwesen, finanzmarkt, gesundheit,
-      trinkwasser, abwasser, digitale_infrastruktur, ikt_management,
-      oeffentliche_verwaltung, weltraum
-
-    Important sectors (Anlage 2 BSIG):
-      post, abfallwirtschaft, chemie, lebensmittel,
-      verarbeitendes_gewerbe, digitale_dienste, forschung
+    Returns entity classification per NIS2UmsuCG §28 BSIG.
+    Uses _sector_group() to map subsector keys to parent groups.
     """
     if not sector:
         return {
@@ -237,16 +244,20 @@ def _determine_betroffenheit(sector, employees, revenue, is_dns_tld):
             'reason': 'Kein Sektor angegeben.',
         }
 
-    # Automatically affected regardless of size
-    if is_dns_tld or sector in ('digitale_infrastruktur',):
+    group = _sector_group(sector)
+
+    # Auto-classification regardless of size (§28 Abs. 3 BSIG)
+    AUTO_CRITICAL = {'digital_dns', 'digital_vertrauen', 'digital_netz'}
+    if is_dns_tld or sector in AUTO_CRITICAL or group == 'digitale_infrastruktur':
         return {
             'affected': True,
             'entity_type': 'besonders_wichtig',
             'reason': (
-                'DNS-Anbieter, TLD-Registrare und qualifizierte Vertrauensdienstanbieter '
-                'sind unabhängig von Größe und Umsatz betroffen (§28 Abs. 3 BSIG).'
+                'DNS-Anbieter, TLD-Registrare, Internet-Austauschpunkte und qualifizierte '
+                'Vertrauensdienstanbieter sind unabhängig von Größe und Umsatz betroffen '
+                '(§28 Abs. 3 BSIG).'
             ),
-            'threshold_hit': 'Automatisch (Sonderregel)',
+            'threshold_hit': 'Automatisch (Sonderregel §28 Abs. 3)',
             'fines': 'bis €10 Mio. oder 2% des weltweiten Jahresumsatzes',
         }
 
@@ -260,44 +271,55 @@ def _determine_betroffenheit(sector, employees, revenue, is_dns_tld):
         'verarbeitendes_gewerbe', 'digitale_dienste', 'forschung',
     }
 
-    meets_threshold = employees >= 50 or revenue >= 10_000_000
+    meets_250 = employees >= 250 or revenue >= 50_000_000
+    meets_50 = employees >= 50 or revenue >= 10_000_000
 
-    if not meets_threshold:
-        return {
-            'affected': False,
-            'entity_type': 'nicht_betroffen',
-            'reason': (
-                f'Ihr Unternehmen mit {employees} Mitarbeitern und '
-                f'€{revenue:,} Jahresumsatz liegt unterhalb der NIS2-Schwellenwerte '
-                '(≥50 Mitarbeiter ODER ≥€10 Mio. Jahresumsatz). '
-                'Beachten Sie: Ihre Kunden könnten Sie dennoch vertraglich zur NIS2-Compliance verpflichten.'
-            ),
-        }
-
-    if sector in HIGHLY_CRITICAL:
+    if group in HIGHLY_CRITICAL:
+        if not meets_50:
+            return {
+                'affected': False,
+                'entity_type': 'nicht_betroffen',
+                'reason': (
+                    f'Ihr Unternehmen liegt unterhalb der NIS2-Schwellenwerte '
+                    f'(≥50 MA oder ≥€10 Mio.). '
+                    'Beachten Sie: Kunden können vertraglich NIS2-Compliance fordern.'
+                ),
+            }
+        entity_type = 'besonders_wichtig' if meets_250 else 'wichtig'
+        fines = ('bis €10 Mio. oder 2% Umsatz' if entity_type == 'besonders_wichtig'
+                 else 'bis €7 Mio. oder 1,4% Umsatz')
         return {
             'affected': True,
-            'entity_type': 'besonders_wichtig',
+            'entity_type': entity_type,
             'reason': (
-                f'Ihr Unternehmen im Sektor „{sector}" ist als '
-                '„besonders wichtige Einrichtung" (Anlage 1 BSIG) eingestuft.'
+                f'Ihr Unternehmen im Sektor „{sector}" fällt unter '
+                f'Anlage 1 BSIG und ist als „{entity_type.replace("_", " ")} Einrichtung" eingestuft.'
             ),
-            'threshold_hit': f'{employees} MA / €{revenue:,} Umsatz',
-            'fines': 'bis €10 Mio. oder 2% des weltweiten Jahresumsatzes',
-            'registration_deadline': '6. März 2026 (bereits abgelaufen — sofort registrieren!)',
+            'threshold_hit': f'{employees} MA / €{revenue:,} Jahresumsatz',
+            'fines': fines,
+            'registration_deadline': '17. Januar 2025 (abgelaufen — sofort registrieren!)',
         }
 
-    if sector in IMPORTANT:
+    if group in IMPORTANT:
+        if not meets_50:
+            return {
+                'affected': False,
+                'entity_type': 'nicht_betroffen',
+                'reason': (
+                    'Ihr Unternehmen liegt unterhalb der Schwellenwerte für Anlage-2-Sektoren '
+                    '(≥50 MA oder ≥€10 Mio.). Dennoch kann vertragliche Compliance gefordert werden.'
+                ),
+            }
         return {
             'affected': True,
             'entity_type': 'wichtig',
             'reason': (
-                f'Ihr Unternehmen im Sektor „{sector}" ist als '
-                '„wichtige Einrichtung" (Anlage 2 BSIG) eingestuft.'
+                f'Ihr Unternehmen im Sektor „{sector}" fällt unter '
+                'Anlage 2 BSIG und ist als „wichtige Einrichtung" eingestuft.'
             ),
-            'threshold_hit': f'{employees} MA / €{revenue:,} Umsatz',
+            'threshold_hit': f'{employees} MA / €{revenue:,} Jahresumsatz',
             'fines': 'bis €7 Mio. oder 1,4% des weltweiten Jahresumsatzes',
-            'registration_deadline': '6. März 2026 (bereits abgelaufen — sofort registrieren!)',
+            'registration_deadline': '17. Januar 2025 (abgelaufen — sofort registrieren!)',
         }
 
     return {

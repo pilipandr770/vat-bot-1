@@ -25,8 +25,12 @@
               <label class="form-label fw-semibold">Branche / Sektor*</label>
               <select name="sector" class="form-select" required>
                 <option value="">— Bitte wählen —</option>
-                {% for value, label in sectors %}
-                <option value="{{ value }}">{{ label }}</option>
+                {% for group_label, entries in sector_groups %}
+                <optgroup label="{{ group_label }}">
+                  {% for value, label in entries %}
+                  <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </optgroup>
                 {% endfor %}
               </select>
             </div>
