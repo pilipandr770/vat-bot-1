@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Lieferant hinzufügen — NIS2{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <h4 class="mb-4"><i class="bi bi-plus-circle text-info"></i> Neuen Lieferanten erfassen</h4>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Firmenname*</label>
+              <input type="text" name="company_name" class="form-control" required
+                     placeholder="z.B. Cloud Provider GmbH">
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kategorie*</label>
+                <select name="category" class="form-select" required>
+                  <option value="">— Kategorie wählen —</option>
+                  {% for val, label in categories %}
+                  <option value="{{ val }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kritikalität</label>
+                <select name="criticality" class="form-select">
+                  <option value="low">Niedrig</option>
+                  <option value="medium" selected>Mittel</option>
+                  <option value="high">Hoch</option>
+                  <option value="critical">Kritisch</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Kontakt-E-Mail</label>
+                <input type="email" name="contact_email" class="form-control"
+                       placeholder="sicherheit@lieferant.de">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">USt-IdNr. / VAT</label>
+                <input type="text" name="vat_number" class="form-control" placeholder="DE123456789">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Erbrachte Dienstleistungen / Produkte</label>
+              <textarea name="services_provided" class="form-control" rows="2"
+                        placeholder="z.B. Cloud-Infrastruktur, IT-Support, Softwarelizenz..."></textarea>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="card bg-light p-3">
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" name="avv_signed"
+                           id="avvCheck" onchange="toggleAvvDate(this)">
+                    <label class="form-check-label fw-semibold" for="avvCheck">
+                      AVV unterzeichnet?
+                    </label>
+                  </div>
+                  <div id="avvDateField" style="display:none">
+                    <label class="form-label small">AVV-Datum</label>
+                    <input type="date" name="avv_date" class="form-control form-control-sm">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card bg-light p-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="iso27001_certified"
+                           id="isoCheck">
+                    <label class="form-check-label fw-semibold" for="isoCheck">
+                      ISO 27001 zertifiziert?
+                    </label>
+                  </div>
+                  <div class="form-text small">Zertifizierung verbessert den Risiko-Score.</div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-info text-white">
+                <i class="bi bi-check-circle"></i> Lieferant speichern
+              </button>
+              <a href="{{ url_for('nis2.supply_chain_dashboard') }}" class="btn btn-outline-secondary">Abbrechen</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+function toggleAvvDate(checkbox) {
+  document.getElementById('avvDateField').style.display = checkbox.checked ? 'block' : 'none';
+}
+</script>
+{% endblock %}
+{% endblock %}

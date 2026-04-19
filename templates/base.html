@@ -79,6 +79,11 @@
                             <i class="bi bi-graph-up-arrow"></i> Marktforschung
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('nis2.dashboard') }}">
+                            <i class="bi bi-shield-fill-check"></i> NIS2
+                        </a>
+                    </li>
                     {% if current_user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link text-warning" href="{{ url_for('admin.dashboard') }}">

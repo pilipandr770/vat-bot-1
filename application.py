@@ -333,6 +333,15 @@ def create_app(config_name=None):
     # Register AI Consumer Panel blueprint
     from consumer_panel.routes import consumer_panel_bp
     app.register_blueprint(consumer_panel_bp)
+
+    # Register NIS2 Compliance Platform blueprint
+    try:
+        from app.nis2 import nis2_bp
+        app.register_blueprint(nis2_bp)
+        from app.nis2.continuous_monitoring.scheduler import init_nis2_monitoring_scheduler
+        init_nis2_monitoring_scheduler(app)
+    except Exception as _nis2_exc:
+        app.logger.warning('NIS2 blueprint not registered: %s', _nis2_exc)
     # Init scheduler (only in production/when not in debug reload)
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         try:

@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}BSI-Registrierung — Schritt {{ step }}/5{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-9">
+
+      <!-- Progress -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0"><i class="bi bi-building"></i> BSI-Registrierungs-Wizard</h5>
+          <span class="text-muted small">Schritt {{ step }} von 5</span>
+        </div>
+        <div class="progress" style="height: 8px;">
+          <div class="progress-bar bg-primary" style="width: {{ step * 20 }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between small text-muted mt-1">
+          <span class="{{ 'fw-bold text-primary' if step == 1 }}">Unternehmen</span>
+          <span class="{{ 'fw-bold text-primary' if step == 2 }}">Sektor</span>
+          <span class="{{ 'fw-bold text-primary' if step == 3 }}">Kontakte</span>
+          <span class="{{ 'fw-bold text-primary' if step == 4 }}">Technik</span>
+          <span class="{{ 'fw-bold text-primary' if step == 5 }}">Prüfung</span>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary bg-opacity-10">
+          <strong>
+            {% if step == 1 %}Schritt 1: Unternehmensangaben
+            {% elif step == 2 %}Schritt 2: Sektor & Klassifizierung
+            {% elif step == 3 %}Schritt 3: Kontaktpersonen
+            {% elif step == 4 %}Schritt 4: Technische Angaben
+            {% elif step == 5 %}Schritt 5: Prüfung & Abschluss
+            {% endif %}
+          </strong>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            {% if step == 1 %}
+              <div class="row">
+                <div class="col-md-8 mb-3">
+                  <label class="form-label">Firmenname*</label>
+                  <input type="text" name="company_name" class="form-control" required
+                         value="{{ reg.company_name or '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Rechtsform*</label>
+                  <select name="legal_form" class="form-select" required>
+                    <option value="">— wählen —</option>
+                    {% for form in legal_forms %}
+                    <option value="{{ form }}" {{ 'selected' if reg.legal_form == form }}>{{ form }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Handelsregisternummer (HRB)</label>
+                  <input type="text" name="hrb_number" class="form-control" placeholder="HRB 123456"
+                         value="{{ reg.hrb_number or '' }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Registergericht</label>
+                  <input type="text" name="registry_court" class="form-control" placeholder="Amtsgericht München"
+                         value="{{ reg.registry_court or '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">USt-IdNr.</label>
+                  <input type="text" name="vat_id" class="form-control" placeholder="DE123456789"
+                         value="{{ reg.vat_id or '' }}">
+                </div>
+                <div class="col-md-8 mb-3">
+                  <label class="form-label">Straße & Hausnummer*</label>
+                  <input type="text" name="street" class="form-control" required
+                         value="{{ reg.street or '' }}">
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label">PLZ*</label>
+                  <input type="text" name="postal_code" class="form-control" required
+                         value="{{ reg.postal_code or '' }}">
+                </div>
+                <div class="col-md-5 mb-3">
+                  <label class="form-label">Stadt*</label>
+                  <input type="text" name="city" class="form-control" required
+                         value="{{ reg.city or '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Mitarbeiteranzahl*</label>
+                  <input type="number" name="employee_count" class="form-control" min="1" required
+                         value="{{ reg.employee_count or '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Jahresumsatz (EUR)</label>
+                  <input type="number" name="annual_revenue_eur" class="form-control"
+                         value="{{ reg.annual_revenue_eur or '' }}">
+                </div>
+              </div>
+
+            {% elif step == 2 %}
+              <div class="mb-3">
+                <label class="form-label">NIS2-Sektor*</label>
+                <select name="sector" class="form-select" required>
+                  <option value="">— Sektor wählen —</option>
+                  {% for value, label in sectors %}
+                  <option value="{{ value }}" {{ 'selected' if reg.sector == value }}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Untersektor / Spezialisierung</label>
+                <input type="text" name="subsector" class="form-control" placeholder="z.B. Krankenhäuser, Wasserversorgung..."
+                       value="{{ reg.subsector or '' }}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Einordnung*</label>
+                <select name="entity_type" class="form-select" required>
+                  <option value="besonders_wichtig" {{ 'selected' if reg.entity_type == 'besonders_wichtig' }}>
+                    Besonders wichtige Einrichtung (§28 Abs. 1)
+                  </option>
+                  <option value="wichtig" {{ 'selected' if reg.entity_type == 'wichtig' }}>
+                    Wichtige Einrichtung (§28 Abs. 2)
+                  </option>
+                </select>
+              </div>
+
+            {% elif step == 3 %}
+              {% set contacts = reg.get_contacts() %}
+              <h6 class="mb-3">Geschäftsführung / Vertretungsberechtigte Person</h6>
+              <div class="row mb-4">
+                <div class="col-md-4"><label class="form-label">Name*</label><input type="text" name="gf_name" class="form-control" value="{{ contacts.get('gf',{}).get('name','') }}" required></div>
+                <div class="col-md-4"><label class="form-label">E-Mail*</label><input type="email" name="gf_email" class="form-control" value="{{ contacts.get('gf',{}).get('email','') }}" required></div>
+                <div class="col-md-4"><label class="form-label">Telefon</label><input type="tel" name="gf_phone" class="form-control" value="{{ contacts.get('gf',{}).get('phone','') }}"></div>
+              </div>
+              <h6 class="mb-3">IT-Sicherheitsbeauftragter / CISO</h6>
+              <div class="row mb-4">
+                <div class="col-md-4"><label class="form-label">Name*</label><input type="text" name="ciso_name" class="form-control" value="{{ contacts.get('it_security',{}).get('name','') }}" required></div>
+                <div class="col-md-4"><label class="form-label">E-Mail*</label><input type="email" name="ciso_email" class="form-control" value="{{ contacts.get('it_security',{}).get('email','') }}" required></div>
+                <div class="col-md-4"><label class="form-label">Telefon</label><input type="tel" name="ciso_phone" class="form-control" value="{{ contacts.get('it_security',{}).get('phone','') }}"></div>
+              </div>
+              <h6 class="mb-3">NIS2-Meldestelle (für BSI-Kommunikation)</h6>
+              <div class="row">
+                <div class="col-md-4"><label class="form-label">Name*</label><input type="text" name="meldestelle_name" class="form-control" value="{{ contacts.get('meldestelle',{}).get('name','') }}" required></div>
+                <div class="col-md-4"><label class="form-label">E-Mail*</label><input type="email" name="meldestelle_email" class="form-control" value="{{ contacts.get('meldestelle',{}).get('email','') }}" required></div>
+                <div class="col-md-4"><label class="form-label">Telefon 24/7*</label><input type="tel" name="meldestelle_phone" class="form-control" value="{{ contacts.get('meldestelle',{}).get('phone','') }}" required></div>
+              </div>
+
+            {% elif step == 4 %}
+              {% set tech = reg.get_technical() %}
+              <div class="mb-3">
+                <label class="form-label">IP-Adressbereiche (eine pro Zeile)</label>
+                <textarea name="ip_ranges" class="form-control font-monospace" rows="4"
+                          placeholder="192.168.1.0/24&#10;10.0.0.0/8">{{ (tech.get('ip_ranges',[])|join('\n')) if tech.get('ip_ranges') else '' }}</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Domains / Hostnamen (eine pro Zeile)</label>
+                <textarea name="domains" class="form-control font-monospace" rows="3"
+                          placeholder="example.de&#10;portal.example.de">{{ (tech.get('domains',[])|join('\n')) if tech.get('domains') else '' }}</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Cloud-Anbieter</label>
+                <input type="text" name="cloud_providers" class="form-control"
+                       placeholder="AWS, Azure, Google Cloud, Hetzner..."
+                       value="{{ tech.get('cloud_providers','')|join(', ') if tech.get('cloud_providers') is iterable else tech.get('cloud_providers','') }}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Kritische IT-Dienste (Freitext)</label>
+                <textarea name="it_services" class="form-control" rows="3"
+                          placeholder="z.B. SAP ERP, Produktions-SPS, Kundenportal...">{{ tech.get('it_services','') }}</textarea>
+              </div>
+
+            {% elif step == 5 %}
+              <div class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>Alle Angaben vollständig!</strong> Überprüfen Sie die Zusammenfassung und schließen Sie die Registrierung ab.
+              </div>
+              <table class="table table-sm">
+                <tr><th>Unternehmen</th><td>{{ reg.company_name }}</td></tr>
+                <tr><th>Rechtsform</th><td>{{ reg.legal_form }}</td></tr>
+                <tr><th>Sektor</th><td>{{ reg.sector }}</td></tr>
+                <tr><th>Einordnung</th><td>{{ reg.entity_type_label }}</td></tr>
+                <tr><th>Adresse</th><td>{{ reg.street }}, {{ reg.postal_code }} {{ reg.city }}</td></tr>
+                <tr><th>Mitarbeiter</th><td>{{ reg.employee_count }}</td></tr>
+              </table>
+            {% endif %}
+
+            <div class="d-flex justify-content-between mt-4">
+              {% if step > 1 %}
+                <a href="{{ url_for('nis2.bsi_wizard_step', registration_id=reg.id, step=step-1) }}" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Zurück
+                </a>
+              {% else %}
+                <div></div>
+              {% endif %}
+              <button type="submit" class="btn btn-primary">
+                {% if step < 5 %}Weiter <i class="bi bi-arrow-right"></i>
+                {% else %}<i class="bi bi-check-circle"></i> Registrierung abschließen
+                {% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

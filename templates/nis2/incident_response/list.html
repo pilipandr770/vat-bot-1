@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Sicherheitsvorfälle — NIS2{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1"><i class="bi bi-exclamation-triangle text-danger"></i> Incident Response</h4>
+      <small class="text-muted">§30 Nr. 2 + §32 BSIG — BSI-Meldepflichten: 24h / 72h / 30 Tage</small>
+    </div>
+    <a href="{{ url_for('nis2.incident_create') }}" class="btn btn-danger">
+      <i class="bi bi-plus-circle"></i> Vorfall melden
+    </a>
+  </div>
+
+  {% if incidents %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Titel</th>
+          <th>Kategorie</th>
+          <th>Schwere</th>
+          <th>Status</th>
+          <th>Erkannt</th>
+          <th>BSI 24h</th>
+          <th>BSI 72h</th>
+          <th>Aktion</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inc in incidents %}
+        <tr>
+          <td>
+            <a href="{{ url_for('nis2.incident_detail', incident_id=inc.id) }}"
+               class="text-decoration-none fw-semibold">{{ inc.title }}</a>
+          </td>
+          <td>
+            {% for cat_val, cat_label in categories %}
+            {% if cat_val == inc.category %}{{ cat_label }}{% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            <span class="badge bg-{{ inc.severity_color }}">{{ inc.severity|upper }}</span>
+          </td>
+          <td>
+            <span class="badge bg-{{ inc.status_color }}">{{ inc.status|upper }}</span>
+          </td>
+          <td>{{ inc.detected_at.strftime('%d.%m.%Y %H:%M') }}</td>
+          <td>
+            {% if inc.fruehwarnung_sent %}
+              <span class="text-success"><i class="bi bi-check-circle"></i> Gesendet</span>
+            {% elif inc.fruehwarnung_deadline and now > inc.fruehwarnung_deadline %}
+              <span class="text-danger"><i class="bi bi-alarm"></i> ÜBERFÄLLIG</span>
+            {% else %}
+              <span class="text-warning">
+                <i class="bi bi-clock"></i>
+                {% if inc.fruehwarnung_deadline %}
+                  {{ (inc.fruehwarnung_deadline - now).seconds // 3600 }}h verbleibend
+                {% else %}—{% endif %}
+              </span>
+            {% endif %}
+          </td>
+          <td>
+            {% if inc.zwischenmeldung_sent %}
+              <span class="text-success"><i class="bi bi-check-circle"></i> Gesendet</span>
+            {% elif inc.zwischenmeldung_deadline and now > inc.zwischenmeldung_deadline %}
+              <span class="text-danger"><i class="bi bi-alarm"></i> ÜBERFÄLLIG</span>
+            {% else %}
+              <span class="text-muted small">
+                {% if inc.zwischenmeldung_deadline %}
+                  bis {{ inc.zwischenmeldung_deadline.strftime('%d.%m %H:%M') }}
+                {% else %}—{% endif %}
+              </span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('nis2.incident_detail', incident_id=inc.id) }}"
+               class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-arrow-right-circle"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-shield-check fs-1 text-success mb-3"></i>
+    <h5 class="text-muted">Keine Sicherheitsvorfälle</h5>
+    <p class="text-muted">Im Ernstfall hier einen Vorfall melden und BSI-Meldungen automatisch generieren.</p>
+    <a href="{{ url_for('nis2.incident_create') }}" class="btn btn-outline-danger">
+      <i class="bi bi-plus-circle"></i> Testvorfall anlegen
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

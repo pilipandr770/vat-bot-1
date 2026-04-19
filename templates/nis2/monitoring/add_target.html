@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Domain hinzufügen — NIS2 Monitoring{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h4 class="mb-4"><i class="bi bi-plus-circle text-primary"></i> Domain zum Monitoring hinzufügen</h4>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Domain / URL*</label>
+              <input type="text" name="domain" class="form-control" required
+                     placeholder="example.de (ohne https://)">
+              <div class="form-text">Wird für TLS, HTTP-Header, DNS und Schwachstellenscans verwendet.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Bezeichnung (optional)</label>
+              <input type="text" name="label" class="form-control" placeholder="z.B. Hauptwebsite, Kundenportal">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Scan-Frequenz</label>
+              <select name="scan_frequency" class="form-select">
+                <option value="weekly">Wöchentlich</option>
+                <option value="monthly" selected>Monatlich (empfohlen)</option>
+                <option value="quarterly">Quartalsweise</option>
+              </select>
+            </div>
+            <div class="card bg-light mb-3 p-3">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="alert_on_degradation"
+                       id="alertCheck" checked>
+                <label class="form-check-label fw-semibold" for="alertCheck">
+                  E-Mail-Alert bei Score-Verschlechterung
+                </label>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label small">Alert-Schwellwert (Punkte)</label>
+                  <input type="number" name="alert_threshold" class="form-control form-control-sm" value="10" min="1" max="100">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small">Alert-E-Mail</label>
+                  <input type="email" name="alert_email" class="form-control form-control-sm"
+                         value="{{ current_user.email }}">
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Domain hinzufügen
+              </button>
+              <a href="{{ url_for('nis2.monitoring_dashboard') }}" class="btn btn-outline-secondary">Abbrechen</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

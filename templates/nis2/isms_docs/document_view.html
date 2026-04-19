@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ doc.title }} — ISMS Dokument{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <a href="{{ url_for('nis2.isms_documents', interview_id=doc.interview_id) }}"
+         class="text-muted text-decoration-none small"><i class="bi bi-arrow-left"></i> Dokumente</a>
+      <h4 class="mt-1 mb-0">{{ doc.title }}</h4>
+      <small class="text-muted">
+        {{ doc.type_info.get('paragraph', '') }} | {{ doc.type_info.get('bsi_std', '') }}
+        | v{{ doc.version }} | Erstellt: {{ doc.created_at.strftime('%d.%m.%Y') }}
+        {% if doc.review_overdue %}
+          <span class="badge bg-warning text-dark ms-2"><i class="bi bi-clock"></i> Review überfällig</span>
+        {% endif %}
+      </small>
+    </div>
+    <a href="{{ url_for('nis2.isms_document_download', doc_id=doc.id) }}"
+       class="btn btn-outline-primary">
+      <i class="bi bi-download"></i> Markdown herunterladen
+    </a>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <div id="docContent" class="markdown-body">{{ doc.content_md or doc.content }}</div>
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+<script>
+  const content = document.getElementById('docContent');
+  content.innerHTML = marked.parse(content.textContent);
+</script>
+{% endblock %}
+{% endblock %}

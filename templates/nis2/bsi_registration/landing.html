@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}BSI-Registrierungs-Assistent — NIS2{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Hero -->
+  <div class="text-center mb-5">
+    <i class="bi bi-building fs-1 text-primary"></i>
+    <h1 class="h2 mt-2">BSI-Registrierungs-Assistent</h1>
+    <p class="lead text-muted">Sind Sie von NIS2 betroffen? Unser Assistent prüft das in 2 Minuten — kostenlos.<br>
+      Dann führt er Sie Schritt für Schritt durch die §33-BSIG-Registrierung im BSI MUK-Portal.</p>
+  </div>
+
+  <div class="row justify-content-center mb-5">
+    <!-- Quick Check Card -->
+    <div class="col-md-7">
+      <div class="card border-primary shadow">
+        <div class="card-header bg-primary text-white">
+          <strong><i class="bi bi-clipboard-check"></i> Schnell-Check: Bin ich NIS2-betroffen?</strong>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('nis2.bsi_check') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Branche / Sektor*</label>
+              <select name="sector" class="form-select" required>
+                <option value="">— Bitte wählen —</option>
+                {% for value, label in sectors %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Anzahl Mitarbeiter*</label>
+                <select name="employees" class="form-select" required>
+                  <option value="under50">Weniger als 50</option>
+                  <option value="50to249">50 – 249</option>
+                  <option value="250plus">250 und mehr</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Jahresumsatz (Mio. €)*</label>
+                <select name="revenue" class="form-select" required>
+                  <option value="under10">Weniger als 10 Mio.</option>
+                  <option value="10to50">10 – 50 Mio.</option>
+                  <option value="over50">Mehr als 50 Mio.</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" name="is_dns_tld" id="isDnsTld">
+              <label class="form-check-label" for="isDnsTld">
+                Unternehmen ist DNS-Anbieter, TLD-Registry oder ähnliche kritische Infrastruktur
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-search"></i> Betroffenheit prüfen
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info sidebar -->
+    <div class="col-md-5 mt-4 mt-md-0">
+      <div class="card border-0 bg-light h-100">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary"></i> Wer ist betroffen?</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><span class="badge bg-danger">Besonders wichtig</span> Ab 250 MA oder €50 Mio. Umsatz in kritischen Sektoren</li>
+            <li class="mb-2"><span class="badge bg-warning text-dark">Wichtig</span> Ab 50 MA oder €10 Mio. Umsatz in betroffenen Sektoren</li>
+            <li><span class="badge bg-success">Nicht betroffen</span> Kleine Unternehmen (unter 50 MA + unter €10 Mio.)</li>
+          </ul>
+          <hr>
+          <h6 class="fw-bold mb-2"><i class="bi bi-calendar-check"></i> Deadline</h6>
+          <p class="small text-muted">Das NIS2UmsuCG ist seit 17. Oktober 2024 in Kraft. BSI-Registrierung war bis 17. Januar 2025 vorgesehen. Handeln Sie jetzt.</p>
+          <h6 class="fw-bold mb-2"><i class="bi bi-cash text-danger"></i> Bußgelder</h6>
+          <p class="small text-muted mb-0">Besonders wichtige Einrichtungen: bis <strong>€10 Mio.</strong> oder 2% des weltweiten Jahresumsatzes (§60 BSIG).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <h5 class="text-center fw-bold mb-4">Wie funktioniert der Assistent?</h5>
+      <div class="row g-3 text-center">
+        <div class="col-md-3">
+          <div class="p-3 rounded bg-light">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:40px;height:40px;font-size:1.1rem;">1</div>
+            <div class="fw-semibold">Betroffenheits-Check</div>
+            <small class="text-muted">Kostenfrei, ohne Login</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 rounded bg-light">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:40px;height:40px;font-size:1.1rem;">2</div>
+            <div class="fw-semibold">Unternehmensdaten</div>
+            <small class="text-muted">Stammdaten, Kontakte</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 rounded bg-light">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:40px;height:40px;font-size:1.1rem;">3</div>
+            <div class="fw-semibold">Technische Details</div>
+            <small class="text-muted">IP-Ranges, Domains</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 rounded bg-light">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:40px;height:40px;font-size:1.1rem;">4</div>
+            <div class="fw-semibold">Export</div>
+            <small class="text-muted">JSON für BSI MUK-Portal</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

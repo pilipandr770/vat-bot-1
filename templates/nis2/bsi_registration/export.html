@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}BSI-Registrierungsdaten exportieren{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-download text-primary"></i> Registrierungsdaten exportieren</h4>
+        <div class="d-flex gap-2">
+          <a href="{{ url_for('nis2.bsi_export_json', registration_id=reg.id) }}"
+             class="btn btn-outline-primary">
+            <i class="bi bi-file-code"></i> Als JSON herunterladen
+          </a>
+          <button onclick="window.print()" class="btn btn-outline-secondary">
+            <i class="bi bi-printer"></i> Drucken / PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert-info mb-4">
+        <i class="bi bi-info-circle me-2"></i>
+        Diese Daten sind für die Registrierung im BSI MUK-Portal vorbereitet.
+        Bitte melden Sie sich unter <a href="https://muk.bsi.bund.de" target="_blank">muk.bsi.bund.de</a> an
+        und übertragen Sie die folgenden Angaben.
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header"><strong>1. Unternehmensdaten</strong></div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-md-6"><small class="text-muted">Firmenname</small><div>{{ reg.company_name }}</div></div>
+            <div class="col-md-6"><small class="text-muted">Rechtsform</small><div>{{ reg.legal_form or '—' }}</div></div>
+            <div class="col-md-6"><small class="text-muted">HRB-Nummer</small><div>{{ reg.hrb_number or '—' }}</div></div>
+            <div class="col-md-6"><small class="text-muted">Registergericht</small><div>{{ reg.registry_court or '—' }}</div></div>
+            <div class="col-md-6"><small class="text-muted">USt-IdNr.</small><div>{{ reg.vat_id or '—' }}</div></div>
+            <div class="col-md-6"><small class="text-muted">Sektor</small><div>{{ reg.sector or '—' }}</div></div>
+            <div class="col-md-6"><small class="text-muted">Einstufung</small>
+              <div><span class="badge bg-{{ 'danger' if reg.entity_type == 'besonders_wichtig' else 'warning' }}">{{ reg.entity_type_label }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% set contacts = reg.get_contacts() %}
+      {% if contacts %}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header"><strong>2. Ansprechpartner</strong></div>
+        <div class="card-body">
+          {% for c in contacts %}
+          <div class="row g-2 mb-2 pb-2 border-bottom">
+            <div class="col-md-3"><small class="text-muted">Name</small><div>{{ c.get('name', '—') }}</div></div>
+            <div class="col-md-3"><small class="text-muted">Funktion</small><div>{{ c.get('role', '—') }}</div></div>
+            <div class="col-md-3"><small class="text-muted">E-Mail</small><div>{{ c.get('email', '—') }}</div></div>
+            <div class="col-md-3"><small class="text-muted">Telefon</small><div>{{ c.get('phone', '—') }}</div></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% set tech = reg.get_technical() %}
+      {% if tech %}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header"><strong>3. Technische Angaben</strong></div>
+        <div class="card-body">
+          <div class="row g-2">
+            {% for key, val in tech.items() %}
+            <div class="col-md-6">
+              <small class="text-muted">{{ key.replace('_', ' ')|title }}</small>
+              <div>{{ val if val else '—' }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('nis2.bsi_wizard_step', registration_id=reg.id, step=4) }}"
+           class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Zurück zum Wizard
+        </a>
+        <a href="{{ url_for('nis2.bsi_landing') }}" class="btn btn-outline-primary">
+          Zur BSI-Übersicht
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Monitoring Dashboard — NIS2{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1"><i class="bi bi-radar text-info"></i> Continuous Compliance Monitoring</h4>
+      <small class="text-muted">§30 Nr. 5/6 BSIG — Automatisches Schwachstellen-Monitoring</small>
+    </div>
+    <a href="{{ url_for('nis2.monitoring_add_target') }}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Domain hinzufügen
+    </a>
+  </div>
+
+  {% if targets %}
+  <div class="row g-3">
+    {% for target in targets %}
+    <div class="col-md-6 col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <a href="{{ url_for('nis2.monitoring_target_detail', target_id=target.id) }}"
+                 class="fw-bold text-decoration-none">{{ target.domain }}</a>
+              {% if target.label %}<div class="text-muted small">{{ target.label }}</div>{% endif %}
+            </div>
+            {% if target.last_score is not none %}
+            <span class="badge bg-{{ target.score_color }} fs-6 p-2">{{ target.last_score|round|int }}/100</span>
+            {% else %}
+            <span class="badge bg-secondary">Noch kein Scan</span>
+            {% endif %}
+          </div>
+
+          {% if target.last_score is not none %}
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-{{ target.score_color }}" style="width: {{ target.last_score }}%"></div>
+          </div>
+          {% endif %}
+
+          <div class="d-flex justify-content-between align-items-center small text-muted">
+            <span>
+              {% if target.score_trend == 'up' %}<i class="bi bi-arrow-up text-success"></i>
+              {% elif target.score_trend == 'down' %}<i class="bi bi-arrow-down text-danger"></i>
+              {% else %}<i class="bi bi-dash"></i>{% endif %}
+              {% if target.last_scan_at %}
+                Letzter Scan: {{ target.last_scan_at.strftime('%d.%m.%Y') }}
+              {% else %}Noch kein Scan{% endif %}
+            </span>
+            <div class="d-flex gap-1">
+              <form method="POST" action="{{ url_for('nis2.monitoring_scan_now', target_id=target.id) }}"
+                    style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-xs btn-outline-primary" style="padding:1px 6px;font-size:.75rem">
+                  <i class="bi bi-play-circle"></i> Scan
+                </button>
+              </form>
+              <a href="{{ url_for('nis2.monitoring_target_detail', target_id=target.id) }}"
+                 class="btn btn-xs btn-outline-secondary" style="padding:1px 6px;font-size:.75rem">
+                <i class="bi bi-eye"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-radar fs-1 text-muted mb-3"></i>
+    <h5 class="text-muted">Noch keine Domains überwacht</h5>
+    <p class="text-muted">Fügen Sie Ihre erste Domain hinzu, um automatische Sicherheitsscans zu starten.</p>
+    <a href="{{ url_for('nis2.monitoring_add_target') }}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Erste Domain hinzufügen
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

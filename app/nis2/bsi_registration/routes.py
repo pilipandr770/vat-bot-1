@@ -1,0 +1,370 @@
+"""
+BSI-Registrierungs-Assistent — Routes
+
+Wizard for §33 BSIG registration via BSI MUK-Portal.
+- Betroffenheits-Check (no login required)
+- 5-step registration wizard
+- PDF/JSON export
+"""
+
+import json
+import secrets
+from datetime import datetime
+
+from flask import render_template, request, jsonify, redirect, url_for, flash, send_file
+from flask_login import login_required, current_user
+from crm.models import db
+
+from ..models import BSIRegistration, NIS2_SECTORS, LEGAL_FORMS
+
+
+def register_bsi_routes(bp):
+
+    # ── Public: Betroffenheits-Check ─────────────────────────────────────
+
+    @bp.route('/bsi-registration/')
+    def bsi_registration_landing():
+        """Landing page — BSI registration overview."""
+        reg = None
+        if current_user.is_authenticated:
+            reg = BSIRegistration.query.filter_by(user_id=current_user.id).order_by(
+                BSIRegistration.created_at.desc()
+            ).first()
+        return render_template('nis2/bsi_registration/landing.html', registration=reg)
+
+    @bp.route('/bsi-registration/check', methods=['GET', 'POST'])
+    def bsi_check():
+        """
+        Public Betroffenheits-Check.
+        Determines if the company is subject to NIS2 without requiring login.
+        """
+        result = None
+        if request.method == 'POST':
+            data = request.get_json(silent=True) or request.form
+            sector = data.get('sector', '')
+            employees = _safe_int(data.get('employees', 0))
+            revenue = _safe_int(data.get('revenue', 0))
+            is_dns_tld = data.get('is_dns_tld') in (True, 'true', '1', 'on')
+
+            result = _determine_betroffenheit(sector, employees, revenue, is_dns_tld)
+
+            if request.is_json:
+                return jsonify(result)
+
+        return render_template(
+            'nis2/bsi_registration/check.html',
+            sectors=NIS2_SECTORS,
+            result=result,
+        )
+
+    # ── Wizard ────────────────────────────────────────────────────────────
+
+    @bp.route('/bsi-registration/wizard/start', methods=['POST'])
+    @login_required
+    def bsi_wizard_start():
+        """Create a new registration and redirect to step 1."""
+        # Reuse existing incomplete registration or create new
+        reg = BSIRegistration.query.filter_by(
+            user_id=current_user.id, is_complete=False
+        ).order_by(BSIRegistration.created_at.desc()).first()
+
+        if not reg:
+            reg = BSIRegistration(user_id=current_user.id)
+            db.session.add(reg)
+            db.session.commit()
+
+        return redirect(url_for('nis2.bsi_wizard_step', reg_id=reg.id, step=1))
+
+    @bp.route('/bsi-registration/wizard/<int:reg_id>/step/<int:step>',
+              methods=['GET', 'POST'])
+    @login_required
+    def bsi_wizard_step(reg_id, step):
+        """Handle individual wizard steps 1–5."""
+        reg = BSIRegistration.query.filter_by(
+            id=reg_id, user_id=current_user.id
+        ).first_or_404()
+
+        if step < 1 or step > 5:
+            return redirect(url_for('nis2.bsi_wizard_step', reg_id=reg_id, step=1))
+
+        if request.method == 'POST':
+            error = _save_wizard_step(reg, step, request.form)
+            if error:
+                flash(error, 'danger')
+                return redirect(url_for('nis2.bsi_wizard_step', reg_id=reg_id, step=step))
+
+            if step < 5:
+                reg.wizard_step = max(reg.wizard_step, step + 1)
+                db.session.commit()
+                return redirect(url_for('nis2.bsi_wizard_step', reg_id=reg_id, step=step + 1))
+            else:
+                # Step 5 = finish
+                reg.is_complete = True
+                reg.wizard_step = 5
+                db.session.commit()
+                flash('Registrierungsdaten erfolgreich gespeichert!', 'success')
+                return redirect(url_for('nis2.bsi_export', reg_id=reg_id))
+
+        return render_template(
+            f'nis2/bsi_registration/wizard_step{step}.html',
+            reg=reg,
+            step=step,
+            sectors=NIS2_SECTORS,
+            legal_forms=LEGAL_FORMS,
+            contacts=reg.get_contacts(),
+            technical=reg.get_technical(),
+        )
+
+    @bp.route('/bsi-registration/<int:reg_id>/export')
+    @login_required
+    def bsi_export(reg_id):
+        reg = BSIRegistration.query.filter_by(
+            id=reg_id, user_id=current_user.id
+        ).first_or_404()
+        return render_template(
+            'nis2/bsi_registration/export.html',
+            reg=reg,
+            contacts=reg.get_contacts(),
+            technical=reg.get_technical(),
+        )
+
+    @bp.route('/bsi-registration/<int:reg_id>/export/json')
+    @login_required
+    def bsi_export_json(reg_id):
+        reg = BSIRegistration.query.filter_by(
+            id=reg_id, user_id=current_user.id
+        ).first_or_404()
+        reg.exported_at = datetime.utcnow()
+        db.session.commit()
+
+        export_data = {
+            'export_format': 'NIS2-BSI-Registrierung-v1',
+            'exported_at': datetime.utcnow().isoformat(),
+            'company': {
+                'name': reg.company_name,
+                'legal_form': reg.legal_form,
+                'hrb_number': reg.hrb_number,
+                'registry_court': reg.registry_court,
+                'vat_id': reg.vat_id,
+                'address': {
+                    'street': reg.street,
+                    'postal_code': reg.postal_code,
+                    'city': reg.city,
+                },
+                'employees': reg.employee_count,
+                'annual_revenue_eur': reg.annual_revenue_eur,
+            },
+            'nis2_classification': {
+                'sector': reg.sector,
+                'subsector': reg.subsector,
+                'entity_type': reg.entity_type,
+                'entity_type_label': reg.entity_type_label,
+            },
+            'contacts': reg.get_contacts(),
+            'technical': reg.get_technical(),
+        }
+
+        from flask import make_response
+        resp = make_response(json.dumps(export_data, ensure_ascii=False, indent=2))
+        resp.headers['Content-Type'] = 'application/json; charset=utf-8'
+        resp.headers['Content-Disposition'] = \
+            f'attachment; filename="BSI-Registrierung-{reg.company_name}.json"'
+        return resp
+
+    @bp.route('/bsi-registration/<int:reg_id>/delete', methods=['POST'])
+    @login_required
+    def bsi_delete(reg_id):
+        reg = BSIRegistration.query.filter_by(
+            id=reg_id, user_id=current_user.id
+        ).first_or_404()
+        db.session.delete(reg)
+        db.session.commit()
+        flash('Registrierung gelöscht.', 'info')
+        return redirect(url_for('nis2.bsi_registration_landing'))
+
+
+# ─────────────────────────────────────────────────────────────────
+# Helpers
+# ─────────────────────────────────────────────────────────────────
+
+def _safe_int(value, default=0):
+    try:
+        return int(str(value).replace('.', '').replace(',', '').strip())
+    except (ValueError, TypeError):
+        return default
+
+
+def _determine_betroffenheit(sector, employees, revenue, is_dns_tld):
+    """
+    Returns entity classification per NIS2UmsuCG §28 BSIG:
+    - besonders_wichtig (highly critical entities)
+    - wichtig (important entities)
+    - nicht_betroffen (not affected)
+
+    Highly critical sectors (Anlage 1 BSIG):
+      energie, transport, bankwesen, finanzmarkt, gesundheit,
+      trinkwasser, abwasser, digitale_infrastruktur, ikt_management,
+      oeffentliche_verwaltung, weltraum
+
+    Important sectors (Anlage 2 BSIG):
+      post, abfallwirtschaft, chemie, lebensmittel,
+      verarbeitendes_gewerbe, digitale_dienste, forschung
+    """
+    if not sector:
+        return {
+            'affected': False,
+            'entity_type': 'nicht_betroffen',
+            'reason': 'Kein Sektor angegeben.',
+        }
+
+    # Automatically affected regardless of size
+    if is_dns_tld or sector in ('digitale_infrastruktur',):
+        return {
+            'affected': True,
+            'entity_type': 'besonders_wichtig',
+            'reason': (
+                'DNS-Anbieter, TLD-Registrare und qualifizierte Vertrauensdienstanbieter '
+                'sind unabhängig von Größe und Umsatz betroffen (§28 Abs. 3 BSIG).'
+            ),
+            'threshold_hit': 'Automatisch (Sonderregel)',
+            'fines': 'bis €10 Mio. oder 2% des weltweiten Jahresumsatzes',
+        }
+
+    HIGHLY_CRITICAL = {
+        'energie', 'transport', 'bankwesen', 'finanzmarkt', 'gesundheit',
+        'trinkwasser', 'abwasser', 'digitale_infrastruktur', 'ikt_management',
+        'oeffentliche_verwaltung', 'weltraum',
+    }
+    IMPORTANT = {
+        'post', 'abfallwirtschaft', 'chemie', 'lebensmittel',
+        'verarbeitendes_gewerbe', 'digitale_dienste', 'forschung',
+    }
+
+    meets_threshold = employees >= 50 or revenue >= 10_000_000
+
+    if not meets_threshold:
+        return {
+            'affected': False,
+            'entity_type': 'nicht_betroffen',
+            'reason': (
+                f'Ihr Unternehmen mit {employees} Mitarbeitern und '
+                f'€{revenue:,} Jahresumsatz liegt unterhalb der NIS2-Schwellenwerte '
+                '(≥50 Mitarbeiter ODER ≥€10 Mio. Jahresumsatz). '
+                'Beachten Sie: Ihre Kunden könnten Sie dennoch vertraglich zur NIS2-Compliance verpflichten.'
+            ),
+        }
+
+    if sector in HIGHLY_CRITICAL:
+        return {
+            'affected': True,
+            'entity_type': 'besonders_wichtig',
+            'reason': (
+                f'Ihr Unternehmen im Sektor „{sector}" ist als '
+                '„besonders wichtige Einrichtung" (Anlage 1 BSIG) eingestuft.'
+            ),
+            'threshold_hit': f'{employees} MA / €{revenue:,} Umsatz',
+            'fines': 'bis €10 Mio. oder 2% des weltweiten Jahresumsatzes',
+            'registration_deadline': '6. März 2026 (bereits abgelaufen — sofort registrieren!)',
+        }
+
+    if sector in IMPORTANT:
+        return {
+            'affected': True,
+            'entity_type': 'wichtig',
+            'reason': (
+                f'Ihr Unternehmen im Sektor „{sector}" ist als '
+                '„wichtige Einrichtung" (Anlage 2 BSIG) eingestuft.'
+            ),
+            'threshold_hit': f'{employees} MA / €{revenue:,} Umsatz',
+            'fines': 'bis €7 Mio. oder 1,4% des weltweiten Jahresumsatzes',
+            'registration_deadline': '6. März 2026 (bereits abgelaufen — sofort registrieren!)',
+        }
+
+    return {
+        'affected': False,
+        'entity_type': 'nicht_betroffen',
+        'reason': 'Ihr Sektor ist keiner der 18 NIS2-relevanten Sektoren zugeordnet.',
+    }
+
+
+def _save_wizard_step(reg: BSIRegistration, step: int, form) -> str:
+    """
+    Saves form data for the given wizard step.
+    Returns error message string or None on success.
+    """
+    try:
+        if step == 1:
+            reg.company_name = form.get('company_name', '').strip()
+            if not reg.company_name:
+                return 'Firmenname ist erforderlich.'
+            reg.legal_form = form.get('legal_form', '').strip()
+            reg.hrb_number = form.get('hrb_number', '').strip()
+            reg.registry_court = form.get('registry_court', '').strip()
+            reg.vat_id = form.get('vat_id', '').strip()
+            reg.street = form.get('street', '').strip()
+            reg.postal_code = form.get('postal_code', '').strip()
+            reg.city = form.get('city', '').strip()
+            reg.employee_count = _safe_int(form.get('employee_count'))
+            reg.annual_revenue_eur = _safe_int(form.get('annual_revenue_eur'))
+
+        elif step == 2:
+            sector = form.get('sector', '').strip()
+            if not sector:
+                return 'Bitte wählen Sie einen Sektor.'
+            reg.sector = sector
+            reg.subsector = form.get('subsector', '').strip()
+            is_dns = form.get('is_dns_tld') in ('on', '1', 'true')
+            result = _determine_betroffenheit(
+                sector,
+                reg.employee_count or 0,
+                reg.annual_revenue_eur or 0,
+                is_dns,
+            )
+            reg.entity_type = result['entity_type']
+            reg.is_affected = result['affected']
+
+        elif step == 3:
+            contacts = {
+                'gf': {
+                    'name': form.get('gf_name', '').strip(),
+                    'email': form.get('gf_email', '').strip(),
+                    'phone': form.get('gf_phone', '').strip(),
+                },
+                'it_security': {
+                    'name': form.get('it_name', '').strip(),
+                    'email': form.get('it_email', '').strip(),
+                    'phone': form.get('it_phone', '').strip(),
+                },
+                'meldestelle': {
+                    'name': form.get('ms_name', '').strip(),
+                    'email': form.get('ms_email', '').strip(),
+                    'phone': form.get('ms_phone', '').strip(),
+                    'available_24_7': form.get('ms_24h') in ('on', '1', 'true'),
+                },
+            }
+            reg.contacts_json = json.dumps(contacts, ensure_ascii=False)
+
+        elif step == 4:
+            ip_ranges_raw = form.get('ip_ranges', '')
+            domains_raw = form.get('domains', '')
+            cloud_raw = form.get('cloud_providers', '')
+
+            technical = {
+                'ip_ranges': [r.strip() for r in ip_ranges_raw.splitlines() if r.strip()],
+                'domains': [d.strip() for d in domains_raw.splitlines() if d.strip()],
+                'cloud_providers': [c.strip() for c in cloud_raw.splitlines() if c.strip()],
+                'it_services': form.get('it_services', '').strip(),
+                'employee_count_it': _safe_int(form.get('employee_count_it')),
+            }
+            reg.technical_json = json.dumps(technical, ensure_ascii=False)
+
+        elif step == 5:
+            # Step 5 is summary/confirmation — no data to save, just mark complete
+            pass
+
+        db.session.commit()
+        return None
+
+    except Exception as e:
+        db.session.rollback()
+        return f'Fehler beim Speichern: {str(e)}'

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Lieferketten-Management — NIS2{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1"><i class="bi bi-diagram-3 text-info"></i> Supply-Chain-Sicherheit</h4>
+      <small class="text-muted">§30 Nr. 4 BSIG — IT-Sicherheitsmaßnahmen in der Lieferkette</small>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('nis2.supply_chain_csv_template') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-download"></i> CSV-Template
+      </a>
+      <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+        <i class="bi bi-upload"></i> CSV-Import
+      </button>
+      <a href="{{ url_for('nis2.supply_chain_add') }}" class="btn btn-info text-white">
+        <i class="bi bi-plus-circle"></i> Lieferant hinzufügen
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  {% if stats %}
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <div class="h2 fw-bold">{{ stats.total }}</div>
+        <small class="text-muted">Lieferanten gesamt</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <div class="h2 fw-bold text-danger">{{ stats.high_risk }}</div>
+        <small class="text-muted">Hohes Risiko</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <div class="h2 fw-bold text-warning">{{ stats.avv_pending }}</div>
+        <small class="text-muted">AVV ausstehend</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <div class="h2 fw-bold text-success">{{ stats.iso27001 }}</div>
+        <small class="text-muted">ISO 27001 zertifiziert</small>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Supplier table -->
+  {% if suppliers %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Unternehmen</th>
+          <th>Kategorie</th>
+          <th>Kritikalität</th>
+          <th>Risiko</th>
+          <th>AVV</th>
+          <th>ISO 27001</th>
+          <th>Letzte Prüfung</th>
+          <th>Aktion</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in suppliers %}
+        <tr>
+          <td>
+            <a href="{{ url_for('nis2.supply_chain_detail', supplier_id=s.id) }}"
+               class="fw-semibold text-decoration-none">{{ s.company_name }}</a>
+            {% if s.contact_email %}<div class="text-muted small">{{ s.contact_email }}</div>{% endif %}
+          </td>
+          <td><span class="badge bg-secondary">{{ s.category }}</span></td>
+          <td>
+            <span class="badge bg-{{ 'danger' if s.criticality == 'critical' else 'warning' if s.criticality == 'high' else 'secondary' }}">
+              {{ s.criticality|upper if s.criticality else '—' }}
+            </span>
+          </td>
+          <td>
+            {% if s.risk_score is not none %}
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1" style="height:6px">
+                <div class="progress-bar bg-{{ 'danger' if s.risk_score >= 70 else 'warning' if s.risk_score >= 40 else 'success' }}"
+                     style="width:{{ s.risk_score }}%"></div>
+              </div>
+              <small class="fw-bold text-{{ 'danger' if s.risk_score >= 70 else 'warning' if s.risk_score >= 40 else 'success' }}">{{ s.risk_score }}</small>
+            </div>
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if s.avv_exists %}
+              <i class="bi bi-check-circle text-success"></i>
+              {% if s.avv_review_due %}<small class="text-muted">bis {{ s.avv_review_due.strftime('%m.%Y') }}</small>{% endif %}
+            {% else %}
+              <span class="badge bg-warning text-dark">Ausstehend</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if s.has_iso27001 %}
+              <i class="bi bi-shield-check text-success"></i>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {{ s.last_verification_at.strftime('%d.%m.%Y') if s.last_verification_at else '—' }}
+          </td>
+          <td>
+            <a href="{{ url_for('nis2.supply_chain_detail', supplier_id=s.id) }}"
+               class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-arrow-right-circle"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-diagram-3 fs-1 text-muted mb-3"></i>
+    <h5>Keine Lieferanten eingetragen</h5>
+    <p class="text-muted">Alle IT-Dienstleister und kritischen Lieferanten hier erfassen und überwachen.</p>
+    <a href="{{ url_for('nis2.supply_chain_add') }}" class="btn btn-info text-white">
+      <i class="bi bi-plus-circle"></i> Ersten Lieferanten hinzufügen
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- CSV Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('nis2.supply_chain_import') }}"
+            enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-header"><h5 class="modal-title">CSV-Import</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted">CSV-Datei mit Spalten: company_name, category, criticality, contact_email, vat_number</p>
+          <input type="file" name="file" class="form-control" accept=".csv" required>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Importieren</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

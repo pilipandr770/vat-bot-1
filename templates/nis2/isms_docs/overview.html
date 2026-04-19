@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}ISMS-Dokumente — NIS2{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1"><i class="bi bi-file-earmark-text text-success"></i> ISMS-Dokumenten-Generator</h4>
+      <small class="text-muted">§30 Abs. 2 BSIG — 10 Pflichtdokumente, erstellt von KI auf Basis Ihres Unternehmensprofils</small>
+    </div>
+    <form method="POST" action="{{ url_for('nis2.isms_start') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="company_name" id="quickStartCompany">
+      <button type="submit" class="btn btn-success" onclick="document.getElementById('quickStartCompany').value=prompt('Firmenname:')">
+        <i class="bi bi-plus-circle"></i> Neues Interview starten
+      </button>
+    </form>
+  </div>
+
+  {% if interviews %}
+    {% for interview in interviews %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ interview.company_name or 'Interview #' + interview.id|string }}</strong>
+            <div class="small text-muted">
+              Gestartet: {{ interview.created_at.strftime('%d.%m.%Y') }}
+              | Phase {{ interview.current_phase }}/4
+              {% if interview.completed_at %} | <span class="text-success"><i class="bi bi-check-circle"></i> Abgeschlossen</span>{% endif %}
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            {% set doc_count = interview.documents.count() %}
+            {% if doc_count > 0 %}
+              <a href="{{ url_for('nis2.isms_documents', interview_id=interview.id) }}" class="btn btn-sm btn-success">
+                <i class="bi bi-file-earmark"></i> {{ doc_count }} Dokument(e)
+              </a>
+            {% endif %}
+            <a href="{{ url_for('nis2.isms_phase', interview_id=interview.id, phase=interview.current_phase) }}"
+               class="btn btn-sm btn-outline-primary">
+              {% if interview.completed_at %}
+                <i class="bi bi-eye"></i> Ansehen
+              {% else %}
+                <i class="bi bi-arrow-right-circle"></i> Fortsetzen
+              {% endif %}
+            </a>
+            <form method="POST" action="{{ url_for('nis2.isms_delete_interview', interview_id=interview.id) }}"
+                  onsubmit="return confirm('Interview wirklich löschen?')">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-center py-5">
+      <i class="bi bi-file-earmark-text fs-1 text-muted mb-3"></i>
+      <h5>Noch keine Interviews gestartet</h5>
+      <p class="text-muted">Starten Sie ein neues Interview, um alle 10 ISMS-Pflichtdokumente für NIS2 zu erstellen.</p>
+    </div>
+  {% endif %}
+
+  <!-- What gets generated -->
+  <div class="card border-0 bg-light mt-4">
+    <div class="card-body">
+      <h6 class="fw-bold mb-3"><i class="bi bi-list-check text-primary"></i> Was wird generiert? (10 Dokumente)</h6>
+      <div class="row row-cols-2 row-cols-md-5 g-2 small">
+        {% for key, info in doc_types.items() %}
+        <div class="col">
+          <div class="p-2 bg-white rounded border text-center">
+            <div class="fw-semibold">{{ info.title }}</div>
+            <div class="text-muted">{{ info.paragraph }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ interview.company_name }} — ISMS Dokumente{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <a href="{{ url_for('nis2.isms_overview') }}" class="text-muted text-decoration-none small">
+        <i class="bi bi-arrow-left"></i> ISMS-Übersicht
+      </a>
+      <h4 class="mt-1 mb-0">
+        <i class="bi bi-folder2-open text-success"></i> 
+        {{ interview.company_name or 'ISMS-Dokumente' }}
+      </h4>
+    </div>
+    <a href="{{ url_for('nis2.isms_review', interview_id=interview.id) }}"
+       class="btn btn-outline-success btn-sm">
+      <i class="bi bi-magic"></i> Erneut generieren
+    </a>
+  </div>
+
+  <div class="row g-3">
+    {% for doc in docs %}
+    <div class="col-md-6 col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              <div class="fw-semibold">{{ doc.title or doc.type_info.get('title', doc.doc_type) }}</div>
+              <div class="text-muted small">{{ doc.type_info.get('paragraph', '') }}</div>
+            </div>
+            <span class="badge bg-success align-self-start">v{{ doc.version }}</span>
+          </div>
+          {% if doc.review_overdue %}
+          <div class="alert alert-warning py-1 px-2 small mb-2">
+            <i class="bi bi-clock"></i> Review überfällig
+          </div>
+          {% endif %}
+          <div class="d-flex gap-2 mt-2">
+            <a href="{{ url_for('nis2.isms_document_view', doc_id=doc.id) }}" 
+               class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-eye"></i> Ansehen
+            </a>
+            <a href="{{ url_for('nis2.isms_document_download', doc_id=doc.id) }}"
+               class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-download"></i> .md
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-4 text-muted">
+      Noch keine Dokumente generiert.
+      <a href="{{ url_for('nis2.isms_review', interview_id=interview.id) }}" class="btn btn-success ms-2">
+        <i class="bi bi-magic"></i> Jetzt generieren
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

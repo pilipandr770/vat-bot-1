@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}BSI-Meldungsentwurf — {{ draft.stage }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <a href="{{ url_for('nis2.incident_detail', incident_id=draft.incident_id) }}"
+         class="text-muted text-decoration-none small"><i class="bi bi-arrow-left"></i> Vorfall</a>
+      <h4 class="mt-1 mb-0">
+        <i class="bi bi-send text-danger"></i>
+        BSI-Meldungsentwurf: 
+        <span class="text-capitalize">{{ draft.stage|replace('_', ' ') }}</span>
+      </h4>
+      <small class="text-muted">
+        Version {{ draft.version }} | Generiert: {{ draft.created_at.strftime('%d.%m.%Y %H:%M') }}
+        {% if draft.is_approved %}| <span class="text-success"><i class="bi bi-check-circle"></i> Genehmigt</span>{% endif %}
+      </small>
+    </div>
+  </div>
+
+  {% if draft.generation_error %}
+  <div class="alert alert-danger">
+    <i class="bi bi-x-circle me-2"></i>{{ draft.generation_error }}
+  </div>
+  {% endif %}
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>Entwurfstext</strong>
+      <div class="form-check form-switch mb-0">
+        <input class="form-check-input" type="checkbox" id="editToggle" onchange="toggleEdit(this)">
+        <label class="form-check-label small" for="editToggle">Bearbeiten</label>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Read-only view -->
+      <div id="contentView" class="markdown-body bg-light p-3 rounded">{{ draft.content }}</div>
+      <!-- Editable form -->
+      <form id="editForm" style="display:none;" method="POST"
+            action="{{ url_for('nis2.incident_draft_save', draft_id=draft.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <textarea name="content" class="form-control font-monospace" rows="20">{{ draft.content }}</textarea>
+        <div class="mt-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Änderungen speichern
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    {% if not draft.is_approved %}
+    <form method="POST" action="{{ url_for('nis2.incident_draft_submit', draft_id=draft.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-danger" onclick="return confirm('BSI-Meldung als gesendet markieren?')">
+        <i class="bi bi-send-fill"></i> Als gesendet markieren
+      </button>
+    </form>
+    {% else %}
+    <span class="btn btn-outline-success disabled"><i class="bi bi-check-circle"></i> Bereits genehmigt</span>
+    {% endif %}
+    <a href="{{ url_for('nis2.incident_detail', incident_id=draft.incident_id) }}"
+       class="btn btn-outline-secondary">Zurück zum Vorfall</a>
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+function toggleEdit(checkbox) {
+  document.getElementById('contentView').style.display = checkbox.checked ? 'none' : 'block';
+  document.getElementById('editForm').style.display = checkbox.checked ? 'block' : 'none';
+}
+</script>
+{% endblock %}
+{% endblock %}

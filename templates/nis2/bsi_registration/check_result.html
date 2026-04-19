@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Betroffenheits-Ergebnis — NIS2{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card shadow border-0">
+        <div class="card-body p-5 text-center">
+          {% if result == 'besonders_wichtig' %}
+            <i class="bi bi-exclamation-triangle-fill fs-1 text-danger mb-3"></i>
+            <h2 class="h3 text-danger">Besonders wichtige Einrichtung</h2>
+            <p class="text-muted mt-2">Ihr Unternehmen fällt als <strong>„besonders wichtige Einrichtung"</strong> unter NIS2 (§28 Abs. 1 BSIG). Die Registrierungspflicht beim BSI gilt sofort.</p>
+            <div class="alert alert-danger mt-3 text-start">
+              <strong>Ihre Pflichten:</strong>
+              <ul class="mb-0 mt-1">
+                <li>BSI-Registrierung (§33 BSIG)</li>
+                <li>Alle 10 Sicherheitsmaßnahmen nach §30 BSIG</li>
+                <li>Meldepflicht bei Vorfällen §32 (24h / 72h / 30 Tage)</li>
+                <li>Regelmäßige Audits §39 BSIG</li>
+                <li>Geschäftsleitungs-Haftung §38 BSIG</li>
+              </ul>
+            </div>
+            <div class="alert alert-warning text-start">
+              <strong>Bußgeld-Risiko:</strong> bis <strong>€10 Mio.</strong> oder 2% des weltweiten Jahresumsatzes (§60 BSIG)
+            </div>
+          {% elif result == 'wichtig' %}
+            <i class="bi bi-exclamation-circle-fill fs-1 text-warning mb-3"></i>
+            <h2 class="h3 text-warning">Wichtige Einrichtung</h2>
+            <p class="text-muted mt-2">Ihr Unternehmen fällt als <strong>„wichtige Einrichtung"</strong> unter NIS2 (§28 Abs. 2 BSIG). Handlungsbedarf besteht.</p>
+            <div class="alert alert-warning mt-3 text-start">
+              <strong>Ihre Pflichten:</strong>
+              <ul class="mb-0 mt-1">
+                <li>BSI-Registrierung (§33 BSIG)</li>
+                <li>Sicherheitsmaßnahmen nach §30 BSIG</li>
+                <li>Meldepflicht bei Vorfällen §32</li>
+              </ul>
+            </div>
+            <div class="alert alert-info text-start">
+              <strong>Bußgeld-Risiko:</strong> bis <strong>€7 Mio.</strong> oder 1,4% des weltweiten Jahresumsatzes (§60 BSIG)
+            </div>
+          {% else %}
+            <i class="bi bi-check-circle-fill fs-1 text-success mb-3"></i>
+            <h2 class="h3 text-success">Wahrscheinlich nicht betroffen</h2>
+            <p class="text-muted mt-2">Basierend auf Ihren Angaben fällt Ihr Unternehmen <strong>voraussichtlich nicht</strong> unter NIS2. Diese Einschätzung ist nicht rechtsverbindlich.</p>
+            <div class="alert alert-info text-start">
+              <strong>Empfehlung:</strong> Auch wenn Sie nicht unmittelbar betroffen sind, können <em>Lieferantenpflichten</em> entstehen, wenn Ihre Kunden NIS2-pflichtig sind. Eine Basisabsicherung ist empfehlenswert.
+            </div>
+          {% endif %}
+
+          <div class="d-flex gap-2 justify-content-center mt-4">
+            {% if result in ('besonders_wichtig', 'wichtig') %}
+              {% if current_user.is_authenticated %}
+                <form method="POST" action="{{ url_for('nis2.bsi_wizard_start') }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="sector" value="{{ sector }}">
+                  <input type="hidden" name="entity_type" value="{{ result }}">
+                  <button class="btn btn-primary">
+                    <i class="bi bi-arrow-right-circle"></i> Registrierungs-Wizard starten
+                  </button>
+                </form>
+              {% else %}
+                <a href="{{ url_for('auth.register') }}?next=/nis2/bsi-registration/wizard/start" class="btn btn-primary">
+                  <i class="bi bi-person-plus"></i> Konto erstellen und Wizard starten
+                </a>
+              {% endif %}
+            {% endif %}
+            <a href="{{ url_for('nis2.bsi_landing') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Zurück
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

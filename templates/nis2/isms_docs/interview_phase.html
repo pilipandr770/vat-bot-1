@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Phase {{ phase }}: {{ phase_def.title }} — ISMS Interview{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <!-- Progress -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="fw-bold"><i class="bi bi-file-earmark-text"></i> ISMS-Interview</span>
+          <span class="text-muted small">Schritt {{ phase }} von {{ total_phases }}</span>
+        </div>
+        <div class="progress mb-2" style="height: 6px;">
+          <div class="progress-bar bg-success" style="width: {{ phase / total_phases * 100 }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between small text-muted">
+          {% for p, pd in phases.items() %}
+          <span class="{{ 'fw-bold text-success' if p == phase else '' }}">
+            <i class="bi {{ pd.icon }}"></i> {{ pd.title }}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-success bg-opacity-10">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi {{ phase_def.icon }} fs-5 text-success"></i>
+            <div>
+              <strong>{{ phase_def.title }}</strong>
+              <div class="text-muted small">{{ phase_def.subtitle }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% for q in phase_def.questions %}
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                {{ q.label }}{% if q.required %} <span class="text-danger">*</span>{% endif %}
+              </label>
+
+              {% if q.type == 'text' %}
+                <input type="text" name="{{ q.key }}" class="form-control"
+                       {{ 'required' if q.required }}
+                       placeholder="{{ q.get('placeholder', '') }}"
+                       value="{{ saved.get(q.key, '') }}">
+
+              {% elif q.type == 'textarea' %}
+                <textarea name="{{ q.key }}" class="form-control"
+                          rows="{{ q.get('rows', 3) }}"
+                          {{ 'required' if q.required }}
+                          placeholder="{{ q.get('placeholder', '') }}">{{ saved.get(q.key, '') }}</textarea>
+
+              {% elif q.type == 'select' %}
+                <select name="{{ q.key }}" class="form-select" {{ 'required' if q.required }}>
+                  <option value="">— Bitte wählen —</option>
+                  {% for opt in q.options %}
+                  <option value="{{ opt }}" {{ 'selected' if saved.get(q.key) == opt }}>{{ opt }}</option>
+                  {% endfor %}
+                </select>
+
+              {% elif q.type == 'checkboxes' %}
+                {% if q.get('select_all') %}
+                <div class="mb-2">
+                  <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="document.querySelectorAll('[name={{ q.key }}]').forEach(c=>c.checked=true)">
+                    Alle auswählen
+                  </button>
+                </div>
+                {% endif %}
+                <div class="row row-cols-1 row-cols-md-2 g-1">
+                  {% for opt in q.options %}
+                  {% set opt_val = opt.split('|')[0] if '|' in opt else opt %}
+                  {% set opt_label = opt.split('|')[1] if '|' in opt else opt %}
+                  {% set checked_vals = saved.get(q.key, []) %}
+                  {% if checked_vals is string %}{% set checked_vals = [checked_vals] %}{% endif %}
+                  <div class="col">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="{{ q.key }}"
+                             id="{{ q.key }}_{{ loop.index }}"
+                             value="{{ opt_val }}"
+                             {{ 'checked' if opt_val in checked_vals or opt in checked_vals }}>
+                      <label class="form-check-label" for="{{ q.key }}_{{ loop.index }}">
+                        {{ opt_label }}
+                      </label>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between mt-4">
+              {% if phase > 1 %}
+              <a href="{{ url_for('nis2.isms_phase', interview_id=interview.id, phase=phase-1) }}"
+                 class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Zurück
+              </a>
+              {% else %}<div></div>{% endif %}
+              <button type="submit" class="btn btn-success">
+                {% if phase < total_phases %}
+                Weiter <i class="bi bi-arrow-right"></i>
+                {% else %}
+                <i class="bi bi-check-circle"></i> Zusammenfassung ansehen
+                {% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

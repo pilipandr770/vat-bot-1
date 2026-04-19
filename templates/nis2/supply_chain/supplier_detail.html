@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}{{ supplier.company_name }} — Lieferant{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <a href="{{ url_for('nis2.supply_chain_dashboard') }}" class="text-muted text-decoration-none small">
+        <i class="bi bi-arrow-left"></i> Lieferkette
+      </a>
+      <h4 class="mt-1 mb-0"><i class="bi bi-building"></i> {{ supplier.company_name }}</h4>
+      <small class="text-muted">{{ supplier.category }} | Erstellt: {{ supplier.created_at.strftime('%d.%m.%Y') }}</small>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+        <i class="bi bi-pencil"></i> Bearbeiten
+      </button>
+      <form method="POST" action="{{ url_for('nis2.supply_chain_delete', supplier_id=supplier.id) }}"
+            onsubmit="return confirm('Lieferant wirklich löschen?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left: details + risk -->
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <small class="text-muted">Kritikalität</small>
+              <div><span class="badge bg-{{ 'danger' if supplier.criticality == 'critical' else 'warning' if supplier.criticality == 'high' else 'secondary' }}">
+                {{ supplier.criticality|upper if supplier.criticality else '—' }}
+              </span></div>
+            </div>
+            <div class="col-md-4">
+              <small class="text-muted">ISO 27001</small>
+              <div>{% if supplier.has_iso27001 %}<i class="bi bi-shield-check text-success fs-5"></i>{% else %}<span class="text-muted">Nicht zertifiziert</span>{% endif %}</div>
+            </div>
+            <div class="col-md-4">
+              <small class="text-muted">AVV-Status</small>
+              <div>
+                {% if supplier.avv_exists %}
+                  <i class="bi bi-check-circle text-success"></i> Unterzeichnet
+                  {% if supplier.avv_signed_at %}<small class="text-muted">({{ supplier.avv_signed_at.strftime('%d.%m.%Y') }})</small>{% endif %}
+                {% else %}
+                  <span class="badge bg-warning text-dark">Ausstehend</span>
+                {% endif %}
+              </div>
+            </div>
+            {% if supplier.contact_email %}
+            <div class="col-md-6">
+              <small class="text-muted">Kontakt</small>
+              <div>{{ supplier.contact_email }}</div>
+            </div>
+            {% endif %}
+            {% if supplier.vat_id %}
+            <div class="col-md-6">
+              <small class="text-muted">USt-IdNr.</small>
+              <div>{{ supplier.vat_id }}</div>
+            </div>
+            {% endif %}
+            {% if supplier.services_provided %}
+            <div class="col-12">
+              <small class="text-muted">Dienstleistungen</small>
+              <div>{{ supplier.services_provided }}</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Assessments -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header d-flex justify-content-between">
+          <strong>Risikobewertungen</strong>
+          <a href="{{ url_for('nis2.supply_chain_assess', supplier_id=supplier.id) }}"
+             class="btn btn-sm btn-outline-primary">+ Neues Assessment</a>
+        </div>
+        {% if assessments %}
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead class="table-light">
+              <tr><th>Datum</th><th>Typ</th><th>Risiko-Score</th><th>Notizen</th></tr>
+            </thead>
+            <tbody>
+              {% for a in assessments %}
+              <tr>
+                <td>{{ a.assessed_at.strftime('%d.%m.%Y') }}</td>
+                <td>{{ a.assessment_type }}</td>
+                <td>
+                  <span class="badge bg-{{ 'danger' if a.risk_score >= 70 else 'warning' if a.risk_score >= 40 else 'success' }}">
+                    {{ a.risk_score }}/100
+                  </span>
+                </td>
+                <td><small class="text-muted">{{ a.notes or '—' }}</small></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="card-body text-muted text-center">Noch keine Assessments</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right: risk gauge + verify -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm mb-3 text-center p-4">
+        <div class="h1 fw-bold text-{{ 'danger' if supplier.risk_score and supplier.risk_score >= 70 else 'warning' if supplier.risk_score and supplier.risk_score >= 40 else 'success' }}">
+          {{ supplier.risk_score if supplier.risk_score is not none else '?' }}
+        </div>
+        <small class="text-muted">Risiko-Score / 100</small>
+        <form method="POST" action="{{ url_for('nis2.supply_chain_verify', supplier_id=supplier.id) }}"
+              class="mt-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-outline-primary btn-sm w-100">
+            <i class="bi bi-arrow-repeat"></i> Verifizierung starten
+          </button>
+        </form>
+        {% if supplier.last_verification_at %}
+        <small class="text-muted mt-2">
+          Letzte Prüfung: {{ supplier.last_verification_at.strftime('%d.%m.%Y') }}
+        </small>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('nis2.supply_chain_update', supplier_id=supplier.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ supplier.company_name }} bearbeiten</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Firmenname</label>
+              <input type="text" name="company_name" class="form-control" value="{{ supplier.company_name }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Kritikalität</label>
+              <select name="criticality" class="form-select">
+                {% for c in ['low','medium','high','critical'] %}
+                <option {{ 'selected' if supplier.criticality == c }}>{{ c }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Kontakt-E-Mail</label>
+              <input type="email" name="contact_email" class="form-control" value="{{ supplier.contact_email or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">USt-IdNr.</label>
+              <input type="text" name="vat_number" class="form-control" value="{{ supplier.vat_id or '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Dienstleistungen</label>
+              <textarea name="services_provided" class="form-control" rows="2">{{ supplier.services_provided or '' }}</textarea>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" name="avv_signed" id="editAvv"
+                       {{ 'checked' if supplier.avv_exists }}>
+                <label class="form-check-label" for="editAvv">AVV unterzeichnet</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" name="iso27001_certified" id="editIso"
+                       {{ 'checked' if supplier.has_iso27001 }}>
+                <label class="form-check-label" for="editIso">ISO 27001 zertifiziert</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

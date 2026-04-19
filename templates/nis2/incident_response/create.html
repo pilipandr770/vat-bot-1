@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Vorfall melden — NIS2{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <i class="bi bi-exclamation-triangle-fill fs-2 text-danger"></i>
+        <div>
+          <h4 class="mb-0">Sicherheitsvorfall melden</h4>
+          <small class="text-muted">Die BSI-Meldepflichtuhr beginnt ab dem Erkennungszeitpunkt (§32 BSIG)</small>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <i class="bi bi-alarm me-2"></i>
+        <strong>Wichtig:</strong> Nach §32 BSIG gilt ab Kenntnisnahme:
+        <strong>24h Frühwarnung</strong> | <strong>72h Zwischenmeldung</strong> | <strong>30 Tage Abschlussbericht</strong>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Titel des Vorfalls*</label>
+              <input type="text" name="title" class="form-control" required
+                     placeholder="z.B. Ransomware-Angriff auf Produktionssysteme">
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kategorie*</label>
+                <select name="category" class="form-select" required>
+                  <option value="">— Kategorie wählen —</option>
+                  {% for val, label in categories %}
+                  <option value="{{ val }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Schweregrad*</label>
+                <select name="severity" class="form-select" required>
+                  <option value="low">Niedrig</option>
+                  <option value="medium" selected>Mittel</option>
+                  <option value="high">Hoch</option>
+                  <option value="critical">Kritisch</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Erkennungszeitpunkt*</label>
+                <input type="datetime-local" name="detected_at" class="form-control" required
+                       value="{{ now.strftime('%Y-%m-%dT%H:%M') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Geschätzter Beginn des Vorfalls</label>
+                <input type="datetime-local" name="occurred_at" class="form-control">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Beschreibung*</label>
+              <textarea name="description" class="form-control" rows="4" required
+                        placeholder="Was ist passiert? Erste Erkenntnisse..."></textarea>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Betroffene Systeme</label>
+                <textarea name="affected_systems" class="form-control" rows="2"
+                          placeholder="z.B. ERP-System, Webserver, AD..."></textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Betroffene Daten</label>
+                <textarea name="affected_data" class="form-control" rows="2"
+                          placeholder="z.B. Kundendaten, Mitarbeiterdaten..."></textarea>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-danger">
+                <i class="bi bi-check-circle"></i> Vorfall erfassen & Fristen starten
+              </button>
+              <a href="{{ url_for('nis2.incidents_list') }}" class="btn btn-outline-secondary">Abbrechen</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-set detected_at to now
+document.querySelector('[name=detected_at]').value = 
+  new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+</script>
+{% endblock %}
