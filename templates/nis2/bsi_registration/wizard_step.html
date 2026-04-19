@@ -102,8 +102,12 @@
                 <label class="form-label">NIS2-Sektor*</label>
                 <select name="sector" class="form-select" required>
                   <option value="">— Sektor wählen —</option>
-                  {% for value, label in sectors %}
-                  <option value="{{ value }}" {{ 'selected' if reg.sector == value }}>{{ label }}</option>
+                  {% for group_label, entries in sector_groups %}
+                  <optgroup label="{{ group_label }}">
+                    {% for value, label in entries %}
+                    <option value="{{ value }}" {{ 'selected' if reg.sector == value }}>{{ label }}</option>
+                    {% endfor %}
+                  </optgroup>
                   {% endfor %}
                 </select>
               </div>

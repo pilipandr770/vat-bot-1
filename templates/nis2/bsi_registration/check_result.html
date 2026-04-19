@@ -7,7 +7,7 @@
     <div class="col-md-7">
       <div class="card shadow border-0">
         <div class="card-body p-5 text-center">
-          {% if result == 'besonders_wichtig' %}
+          {% if result.entity_type == 'besonders_wichtig' %}
             <i class="bi bi-exclamation-triangle-fill fs-1 text-danger mb-3"></i>
             <h2 class="h3 text-danger">Besonders wichtige Einrichtung</h2>
             <p class="text-muted mt-2">Ihr Unternehmen fällt als <strong>„besonders wichtige Einrichtung"</strong> unter NIS2 (§28 Abs. 1 BSIG). Die Registrierungspflicht beim BSI gilt sofort.</p>
@@ -24,7 +24,7 @@
             <div class="alert alert-warning text-start">
               <strong>Bußgeld-Risiko:</strong> bis <strong>€10 Mio.</strong> oder 2% des weltweiten Jahresumsatzes (§60 BSIG)
             </div>
-          {% elif result == 'wichtig' %}
+          {% elif result.entity_type == 'wichtig' %}
             <i class="bi bi-exclamation-circle-fill fs-1 text-warning mb-3"></i>
             <h2 class="h3 text-warning">Wichtige Einrichtung</h2>
             <p class="text-muted mt-2">Ihr Unternehmen fällt als <strong>„wichtige Einrichtung"</strong> unter NIS2 (§28 Abs. 2 BSIG). Handlungsbedarf besteht.</p>
@@ -49,12 +49,12 @@
           {% endif %}
 
           <div class="d-flex gap-2 justify-content-center mt-4">
-            {% if result in ('besonders_wichtig', 'wichtig') %}
+            {% if result.entity_type in ('besonders_wichtig', 'wichtig') %}
               {% if current_user.is_authenticated %}
                 <form method="POST" action="{{ url_for('nis2.bsi_wizard_start') }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <input type="hidden" name="sector" value="{{ sector }}">
-                  <input type="hidden" name="entity_type" value="{{ result }}">
+                  <input type="hidden" name="sector" value="{{ result.sector or '' }}">
+                  <input type="hidden" name="entity_type" value="{{ result.entity_type }}">
                   <button class="btn btn-primary">
                     <i class="bi bi-arrow-right-circle"></i> Registrierungs-Wizard starten
                   </button>

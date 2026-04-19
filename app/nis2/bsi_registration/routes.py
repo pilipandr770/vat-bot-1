@@ -60,10 +60,11 @@ def register_bsi_routes(bp):
         if request.is_json:
             return jsonify(result)
 
+        # Add sector into result dict for template usage
+        result['sector'] = sector
         return render_template(
             'nis2/bsi_registration/check_result.html',
             result=result,
-            sectors=NIS2_SECTORS,
         )
 
     # ── Wizard ────────────────────────────────────────────────────────────
@@ -119,6 +120,7 @@ def register_bsi_routes(bp):
             reg=reg,
             step=step,
             sectors=NIS2_SECTORS,
+            sector_groups=NIS2_SECTOR_GROUPS,
             legal_forms=LEGAL_FORMS,
             contacts=reg.get_contacts(),
             technical=reg.get_technical(),
