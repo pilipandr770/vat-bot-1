@@ -44,6 +44,24 @@
         <p class="lead text-muted">{{ _('Transparent pricing. No hidden fees. Cancel anytime.') }}</p>
     </div>
 
+    <!-- NIS2 Urgency Banner -->
+    <div class="alert border-0 mb-4 p-4" style="background:linear-gradient(135deg,#f5f0ff,#ede8ff);border-left:5px solid #6f42c1!important;border-radius:.75rem;">
+        <div class="d-flex align-items-start gap-3">
+            <div class="fs-2 flex-shrink-0" style="color:#6f42c1;"><i class="bi bi-shield-lock-fill"></i></div>
+            <div>
+                <h5 class="fw-bold mb-1" style="color:#6f42c1;">NIS2UmsuCG — seit 6. Dez. 2025 in Kraft</h5>
+                <p class="mb-2 text-muted small">
+                    ~30.000 deutsche Unternehmen sind betroffen. Bußgeld bis zu <strong>€10 Mio. oder 2&nbsp;% Jahresumsatz</strong>.
+                    Der Professional-Plan enthält die vollständige <strong>NIS2 Compliance Plattform</strong>:
+                    BSI-Registrierung, KI-ISMS-Dokumente, Incident Response, Schulungen und Lieferkettensicherheit.
+                </p>
+                <a href="/nis2/" class="btn btn-sm fw-semibold" style="background:#6f42c1;color:white;">
+                    <i class="bi bi-arrow-right-circle me-1"></i> NIS2 Compliance ansehen
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Pricing Cards -->
     <div class="row g-4 justify-content-center">
         {% for plan in plans %}
@@ -206,6 +224,47 @@
                         <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
                             <div class="accordion-body">
                                 {{ _('For companies with special requirements, we offer customized Enterprise solutions. Contact us at') }} <a href="mailto:enterprise@vat-verification.de">enterprise@vat-verification.de</a> {{ _('for a custom quote.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 7: NIS2 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7nis2">
+                                Was ist im NIS2 Compliance Modul enthalten?
+                            </button>
+                        </h2>
+                        <div id="faq7nis2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Das NIS2 Compliance Modul (Professional Plan) deckt alle 10 Pflichtmaßnahmen nach §30 BSIG ab:
+                                <ul class="mt-2 mb-0">
+                                    <li><strong>BSI-Registrierungs-Assistent</strong> — Schritt-für-Schritt nach §33 BSIG</li>
+                                    <li><strong>KI-ISMS-Dokumentengenerator</strong> — 7 BSI-konforme Dokumente in Minuten (KI-generiert via Claude)</li>
+                                    <li><strong>Incident Response &amp; BSI-Meldungen</strong> — 24h/72h Fristen-Timer, Meldevorlagen</li>
+                                    <li><strong>Lieferkettensicherheit (§30 Nr. 4)</strong> — automatischer OSINT-Scan aller Lieferanten</li>
+                                    <li><strong>Kontinuierliches Monitoring (§30 Nr. 5/6)</strong> — wöchentliche Schwachstellenscans</li>
+                                    <li><strong>Awareness-Schulungen (§30 Nr. 7)</strong> — Erstellung, Versand, digitale Bestätigungen, Audit-Berichte</li>
+                                    <li><strong>NIS2 Compliance Dashboard</strong> — Ampelstatus für alle Maßnahmen, BSI-Auditbericht</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 8: NIS2 who is affected -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8nis2">
+                                Bin ich als Unternehmen von NIS2 betroffen?
+                            </button>
+                        </h2>
+                        <div id="faq8nis2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                NIS2 betrifft Unternehmen in 18 kritischen Sektoren (Energie, Transport, Gesundheit, IT-Dienstleistungen,
+                                Produktion, Lebensmittel, Entsorgung u.v.m.) mit <strong>50+ Mitarbeitern oder >10 Mio. € Jahresumsatz</strong>.
+                                In Deutschland sind ca. 30.000 Unternehmen betroffen. Überprüfen Sie Ihre Betroffenheit direkt im
+                                <a href="/nis2/bsi-registration/" style="color:#6f42c1;">BSI-Registrierungs-Assistent</a>.
+                                Bußgeld bei Nichteinhaltung: bis zu €10 Mio. oder 2 % des globalen Jahresumsatzes.
                             </div>
                         </div>
                     </div>
