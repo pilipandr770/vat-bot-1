@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}NIS2 Sicherheits-Audits{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-xl-10">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="mb-1">🔍 NIS2 Web-Security-Audit</h2>
+          <p class="text-muted mb-0">
+            Automatisierter NIS2 / DSGVO Compliance-Check für Ihre Web-Präsenz
+          </p>
+        </div>
+        <a href="{{ url_for('nis2.site_audit_new') }}" class="btn btn-primary btn-lg">
+          <i class="bi bi-plus-circle"></i> Neuer Audit
+        </a>
+      </div>
+
+      <!-- Info banner -->
+      <div class="alert alert-info d-flex align-items-start mb-4">
+        <i class="bi bi-info-circle-fill fs-5 me-3 mt-1"></i>
+        <div>
+          <strong>Was wird geprüft?</strong><br>
+          HTTP-Sicherheits-Header, TLS/SSL-Zertifikat, Cookie-Flags, DNS-Sicherheit (SPF, DMARC, DNSSEC)
+          + KI-gestützte NIS2/DSGVO-Analyse mit 26-Punkte-Checkliste.
+          Der Bericht kann als HTML gespeichert und als PDF gedruckt werden.
+        </div>
+      </div>
+
+      {% if jobs %}
+      <!-- Jobs table -->
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0">Letzte Audits</h5>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Ziel</th>
+                <th>Status</th>
+                <th>Gestartet</th>
+                <th>Abgeschlossen</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for job in jobs %}
+              <tr>
+                <td class="text-muted">{{ job.id }}</td>
+                <td>
+                  <code class="text-break">{{ job.target }}</code>
+                </td>
+                <td>
+                  {% if job.status == 'done' %}
+                    <span class="badge bg-success">✅ Fertig</span>
+                  {% elif job.status == 'running' %}
+                    <span class="badge bg-warning text-dark">
+                      <span class="spinner-border spinner-border-sm" role="status"></span>
+                      Läuft …
+                    </span>
+                  {% elif job.status == 'pending' %}
+                    <span class="badge bg-secondary">⏳ Ausstehend</span>
+                  {% else %}
+                    <span class="badge bg-danger">❌ Fehler</span>
+                  {% endif %}
+                </td>
+                <td class="text-muted">
+                  <small>{{ job.created_at.strftime('%d.%m.%Y %H:%M') if job.created_at else '—' }}</small>
+                </td>
+                <td class="text-muted">
+                  <small>{{ job.completed_at.strftime('%d.%m.%Y %H:%M') if job.completed_at else '—' }}</small>
+                </td>
+                <td>
+                  <a href="{{ url_for('nis2.site_audit_detail', job_id=job.id) }}"
+                     class="btn btn-sm btn-outline-primary me-1">Details</a>
+                  {% if job.status == 'done' %}
+                  <a href="{{ url_for('nis2.site_audit_report', job_id=job.id) }}"
+                     class="btn btn-sm btn-outline-success me-1" target="_blank">Bericht</a>
+                  <a href="{{ url_for('nis2.site_audit_download', job_id=job.id) }}"
+                     class="btn btn-sm btn-outline-secondary me-1">⬇ HTML</a>
+                  {% endif %}
+                  <form method="post"
+                        action="{{ url_for('nis2.site_audit_delete', job_id=job.id) }}"
+                        class="d-inline"
+                        onsubmit="return confirm('Audit löschen?')">
+                    <button class="btn btn-sm btn-outline-danger">🗑</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {% else %}
+      <!-- Empty state -->
+      <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+          <div class="fs-1 mb-3">🔍</div>
+          <h4>Noch keine Audits</h4>
+          <p class="text-muted">
+            Starten Sie Ihren ersten NIS2 Web-Security-Audit.<br>
+            Die Analyse dauert typischerweise 1–3 Minuten.
+          </p>
+          <a href="{{ url_for('nis2.site_audit_new') }}" class="btn btn-primary btn-lg mt-2">
+            <i class="bi bi-plus-circle"></i> Ersten Audit starten
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

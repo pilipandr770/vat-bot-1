@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Audit #{{ job.id }} — {{ job.target }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-xl-10">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h4 class="mb-0">
+            🔍 Audit #{{ job.id }}
+            {% if job.status == 'done' %}
+              <span class="badge bg-success ms-2">✅ Abgeschlossen</span>
+            {% elif job.status == 'running' %}
+              <span class="badge bg-warning text-dark ms-2">
+                <span class="spinner-border spinner-border-sm"></span> Läuft …
+              </span>
+            {% elif job.status == 'failed' %}
+              <span class="badge bg-danger ms-2">❌ Fehler</span>
+            {% else %}
+              <span class="badge bg-secondary ms-2">⏳ Ausstehend</span>
+            {% endif %}
+          </h4>
+          <p class="text-muted mb-0 small mt-1">
+            <code>{{ job.target }}</code>
+            &nbsp;|&nbsp;
+            Gestartet: {{ job.created_at.strftime('%d.%m.%Y %H:%M:%S') if job.created_at else '—' }}
+          </p>
+        </div>
+        <div class="d-flex gap-2">
+          {% if job.status == 'done' %}
+          <a href="{{ url_for('nis2.site_audit_report', job_id=job.id) }}"
+             target="_blank" class="btn btn-success">
+            📄 Bericht ansehen
+          </a>
+          <a href="{{ url_for('nis2.site_audit_download', job_id=job.id) }}"
+             class="btn btn-outline-secondary">
+            ⬇ HTML herunterladen
+          </a>
+          {% endif %}
+          <a href="{{ url_for('nis2.site_audit_index') }}" class="btn btn-outline-secondary">
+            ← Übersicht
+          </a>
+        </div>
+      </div>
+
+      <!-- Summary stats (shown when done) -->
+      {% if job.status == 'done' %}
+      {% set findings_list = job.findings.all() %}
+      {% set tasks_list = job.tasks.all() %}
+      {% set critical_count = findings_list | selectattr('severity', 'equalto', 'critical') | list | length %}
+      {% set high_count = findings_list | selectattr('severity', 'equalto', 'high') | list | length %}
+      {% set done_tasks = tasks_list | selectattr('done') | list | length %}
+
+      <div class="row g-3 mb-4">
+        <div class="col-sm-3">
+          <div class="card text-center {{ 'border-danger' if critical_count > 0 else 'border-success' }}">
+            <div class="card-body py-3">
+              <div class="fs-2 fw-bold {{ 'text-danger' if critical_count > 0 else 'text-success' }}">
+                {{ critical_count }}
+              </div>
+              <div class="small text-muted">Kritisch</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="card text-center {{ 'border-warning' if high_count > 0 else '' }}">
+            <div class="card-body py-3">
+              <div class="fs-2 fw-bold {{ 'text-warning' if high_count > 0 else 'text-muted' }}">
+                {{ high_count }}
+              </div>
+              <div class="small text-muted">Hoch</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="card text-center">
+            <div class="card-body py-3">
+              <div class="fs-2 fw-bold text-primary">{{ findings_list | length }}</div>
+              <div class="small text-muted">Findings gesamt</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="card text-center">
+            <div class="card-body py-3">
+              <div class="fs-2 fw-bold text-success">{{ done_tasks }}/{{ tasks_list | length }}</div>
+              <div class="small text-muted">Tasks erfüllt</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top findings preview -->
+      {% if findings_list %}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0">Findings ({{ findings_list | length }})</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for f in findings_list[:10] %}
+          <div class="list-group-item">
+            <div class="d-flex align-items-start gap-2">
+              <span class="badge
+                {% if f.severity == 'critical' %}bg-danger
+                {% elif f.severity == 'high' %}bg-warning text-dark
+                {% elif f.severity == 'medium' %}bg-info text-dark
+                {% elif f.severity == 'low' %}bg-primary
+                {% else %}bg-secondary{% endif %}
+                flex-shrink-0 mt-1">
+                {{ f.severity | upper }}
+              </span>
+              <div>
+                <strong>{{ f.title }}</strong>
+                {% if f.dsgvo_article %}<small class="text-muted ms-2">{{ f.dsgvo_article }}</small>{% endif %}
+                {% if f.recommendation %}
+                <div class="small text-muted mt-1">🛠 {{ f.recommendation }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% if findings_list | length > 10 %}
+          <div class="list-group-item text-center text-muted small">
+            + {{ findings_list | length - 10 }} weitere Findings im Bericht
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- View full report CTA -->
+      <div class="alert alert-success d-flex align-items-center gap-3 mb-4">
+        <div class="fs-3">📄</div>
+        <div>
+          <strong>Vollständiger NIS2-Bericht verfügbar!</strong><br>
+          9 Abschnitte: Executive Summary, Live-Check, Findings, Compliance-Checkliste,
+          DSGVO-Analyse, Empfehlungen, Audit-Protokoll.
+        </div>
+        <a href="{{ url_for('nis2.site_audit_report', job_id=job.id) }}"
+           target="_blank" class="btn btn-success btn-lg ms-auto flex-shrink-0">
+          📄 Bericht öffnen
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- Live log -->
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Audit-Protokoll</h5>
+          <span id="statusBadge" class="badge
+            {% if job.status == 'done' %}bg-success
+            {% elif job.status == 'running' %}bg-warning text-dark
+            {% elif job.status == 'failed' %}bg-danger
+            {% else %}bg-secondary{% endif %}">
+            {{ job.status | upper }}
+          </span>
+        </div>
+        <div class="card-body p-0">
+          <div id="logContainer"
+               style="max-height:400px; overflow-y:auto; font-family:monospace;
+                      font-size:0.82em; background:#1a1a2e; color:#e0e0e0; padding:16px;">
+            <div id="logLines">
+              <!-- Populated by JS polling -->
+              <div class="text-muted">Lade Protokoll …</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const jobId     = {{ job.id }};
+  const jobStatus = "{{ job.status }}";
+  let lastId = 0;
+  let polling = null;
+
+  const _LEVEL_COLORS = {
+    ERROR:      "#ff6b6b",
+    FINDING:    "#ffd93d",
+    AGENT:      "#c77dff",
+    CMD:        "#74c0fc",
+    TOOLS_USED: "#adb5bd",
+    INFO:       "#a8dadc",
+  };
+
+  function appendLogs(logs) {
+    const container = document.getElementById("logLines");
+    logs.forEach(function(lg) {
+      const color = _LEVEL_COLORS[lg.level] || "#e0e0e0";
+      const div = document.createElement("div");
+      div.innerHTML =
+        '<span style="color:#6c757d;">[' + lg.ts + ']</span> ' +
+        '<span style="color:' + color + ';font-weight:600;">[' + lg.level + ']</span> ' +
+        escapeHtml(lg.message);
+      container.appendChild(div);
+    });
+    if (logs.length > 0) {
+      lastId = logs[logs.length - 1].id;
+      const c = document.getElementById("logContainer");
+      c.scrollTop = c.scrollHeight;
+    }
+  }
+
+  function escapeHtml(text) {
+    const d = document.createElement("div");
+    d.appendChild(document.createTextNode(text));
+    return d.innerHTML;
+  }
+
+  function updateStatusBadge(status) {
+    const badge = document.getElementById("statusBadge");
+    const classes = {
+      done:    "bg-success",
+      running: "bg-warning text-dark",
+      failed:  "bg-danger",
+      pending: "bg-secondary",
+    };
+    badge.className = "badge " + (classes[status] || "bg-secondary");
+    badge.textContent = status.toUpperCase();
+  }
+
+  function pollLogs() {
+    fetch("{{ url_for('nis2.site_audit_logs', job_id=job.id) }}?since=" + lastId)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.logs && data.logs.length > 0) {
+          // Clear placeholder text on first real logs
+          const container = document.getElementById("logLines");
+          if (container.firstChild && container.firstChild.classList &&
+              container.firstChild.classList.contains("text-muted")) {
+            container.innerHTML = "";
+          }
+          appendLogs(data.logs);
+        }
+        updateStatusBadge(data.status);
+
+        if (data.status === "done" || data.status === "failed") {
+          clearInterval(polling);
+          if (data.status === "done") {
+            setTimeout(function() { location.reload(); }, 1500);
+          }
+        }
+      })
+      .catch(function() {});
+  }
+
+  // Start polling if job is not yet done
+  if (jobStatus === "pending" || jobStatus === "running") {
+    pollLogs(); // immediate first call
+    polling = setInterval(pollLogs, 2000);
+  } else {
+    // Just load existing logs once
+    fetch("{{ url_for('nis2.site_audit_logs', job_id=job.id) }}?since=0")
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        const container = document.getElementById("logLines");
+        container.innerHTML = "";
+        appendLogs(data.logs);
+      });
+  }
+</script>
+{% endblock %}

@@ -908,3 +908,128 @@ class TrainingAcknowledgment(db.Model):
     def __repr__(self):
         return (f'<TrainingAck training={self.training_id} '
                 f'email={self.recipient_email} ack={self.acknowledged}>')
+
+
+# ─────────────────────────────────────────────────────────────────
+# NIS2 SITE AUDIT  (§30 Nr. 3, 5 BSIG — Web-Security-Check)
+# ─────────────────────────────────────────────────────────────────
+
+class NIS2AuditJob(db.Model):
+    """One full NIS2/DSGVO audit run per user per target domain."""
+
+    __tablename__ = 'nis2_audit_jobs'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey(f'{_sp}users.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+    )
+    target = db.Column(db.String(500), nullable=False)
+
+    # pending | running | done | failed
+    status = db.Column(db.String(20), default='pending', nullable=False)
+
+    # Stored HTML report (generated when status → done)
+    report_html = db.Column(db.Text)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    completed_at = db.Column(db.DateTime)
+
+    # relationships
+    findings = db.relationship(
+        'NIS2Finding', backref='job', lazy='dynamic',
+        cascade='all, delete-orphan',
+        order_by='NIS2Finding.severity_rank',
+    )
+    logs = db.relationship(
+        'NIS2AuditLog', backref='job', lazy='dynamic',
+        cascade='all, delete-orphan',
+        order_by='NIS2AuditLog.id',
+    )
+    tasks = db.relationship(
+        'NIS2AuditTask', backref='job', lazy='dynamic',
+        cascade='all, delete-orphan',
+        order_by='NIS2AuditTask.id',
+    )
+
+    def __repr__(self):
+        return f'<NIS2AuditJob id={self.id} target={self.target} status={self.status}>'
+
+
+class NIS2Finding(db.Model):
+    """Security / compliance finding from an audit run."""
+
+    __tablename__ = 'nis2_audit_findings'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    id = db.Column(db.Integer, primary_key=True)
+    job_id = db.Column(
+        db.Integer,
+        db.ForeignKey(f'{_sp}nis2_audit_jobs.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+    )
+    title = db.Column(db.String(300), nullable=False)
+    description = db.Column(db.Text)
+    severity = db.Column(db.String(20), default='info')   # critical/high/medium/low/info
+    severity_rank = db.Column(db.Integer, default=5)       # 1=critical … 5=info
+    cvss = db.Column(db.String(30))
+    dsgvo_article = db.Column(db.String(200))
+    recommendation = db.Column(db.Text)
+    target_url = db.Column(db.String(500))
+    tool = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<NIS2Finding [{self.severity.upper()}] {self.title[:60]}>'
+
+
+class NIS2AuditLog(db.Model):
+    """Real-time log line for a running audit (polled by frontend)."""
+
+    __tablename__ = 'nis2_audit_logs'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    id = db.Column(db.Integer, primary_key=True)
+    job_id = db.Column(
+        db.Integer,
+        db.ForeignKey(f'{_sp}nis2_audit_jobs.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+    )
+    level = db.Column(db.String(20), default='INFO')   # INFO|CMD|FINDING|AGENT|ERROR|TOOLS_USED
+    message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<NIS2AuditLog [{self.level}] {(self.message or "")[:60]}>'
+
+
+class NIS2AuditTask(db.Model):
+    """NIS2/DSGVO compliance checklist task linked to one audit job."""
+
+    __tablename__ = 'nis2_audit_tasks'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    id = db.Column(db.Integer, primary_key=True)
+    job_id = db.Column(
+        db.Integer,
+        db.ForeignKey(f'{_sp}nis2_audit_jobs.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+    )
+    category = db.Column(db.String(50))        # Technisch | Organisatorisch | DSGVO
+    title = db.Column(db.String(200))
+    description = db.Column(db.Text)
+    nis2_ref = db.Column(db.String(100))
+    dsgvo_ref = db.Column(db.String(100))
+    required = db.Column(db.Boolean, default=True)
+    done = db.Column(db.Boolean, default=False)
+    done_at = db.Column(db.DateTime)
+    notes = db.Column(db.String(500))
+
+    def __repr__(self):
+        return f'<NIS2AuditTask [{self.category}] {self.title[:50]} done={self.done}>'

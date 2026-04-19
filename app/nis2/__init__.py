@@ -78,3 +78,6 @@ register_supply_chain_routes(nis2_bp)
 
 from .training.routes import register_training_routes
 register_training_routes(nis2_bp)
+
+from .site_audit.routes import register_site_audit_routes
+register_site_audit_routes(nis2_bp)
