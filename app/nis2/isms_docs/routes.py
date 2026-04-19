@@ -122,7 +122,8 @@ def register_isms_routes(bp):
         errors = []
 
         for doc_type_key in selected_docs:
-            doc_name = ISMS_DOC_TYPES_MAP.get(doc_type_key, doc_type_key)
+            doc_meta = ISMS_DOC_TYPES_MAP.get(doc_type_key, {})
+            doc_name = doc_meta.get('title', doc_type_key) if isinstance(doc_meta, dict) else str(doc_meta)
 
             # Skip if already generated and not regenerating
             existing = ISMSDocument.query.filter_by(
