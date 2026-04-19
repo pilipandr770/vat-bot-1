@@ -3,14 +3,152 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
       <h4 class="mb-1"><i class="bi bi-exclamation-triangle text-danger"></i> Incident Response</h4>
       <small class="text-muted">§30 Nr. 2 + §32 BSIG — BSI-Meldepflichten: 24h / 72h / 30 Tage</small>
     </div>
-    <a href="{{ url_for('nis2.incident_create') }}" class="btn btn-danger">
-      <i class="bi bi-plus-circle"></i> Vorfall melden
-    </a>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" type="button"
+              data-bs-toggle="collapse" data-bs-target="#incidentGuide" aria-expanded="false">
+        <i class="bi bi-question-circle"></i> Anleitung
+      </button>
+      <a href="{{ url_for('nis2.incident_create') }}" class="btn btn-danger">
+        <i class="bi bi-plus-circle"></i> Vorfall melden
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Schritt-für-Schritt-Anleitung ── -->
+  <div class="collapse mb-4" id="incidentGuide">
+    <div class="card border-info shadow-sm">
+      <div class="card-header bg-info bg-opacity-10 border-info">
+        <strong><i class="bi bi-book text-info me-2"></i>Schritt-für-Schritt: Was tun bei einem Sicherheitsvorfall?</strong>
+      </div>
+      <div class="card-body p-0">
+        <div class="accordion accordion-flush" id="guideAccordion">
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#step1">
+                <span class="badge bg-danger me-2">Schritt 1</span> Vorfall sofort erfassen — Uhr läuft ab Jetzt
+              </button>
+            </h2>
+            <div id="step1" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body small">
+                <p>Sobald ein Sicherheitsvorfall <strong>bekannt wird</strong>, beginnen die gesetzlichen Fristen nach §32 BSIG.
+                Auch wenn noch nicht alle Details bekannt sind — sofort erfassen!</p>
+                <ul class="mb-2">
+                  <li>Klicken Sie auf <strong>„Vorfall melden"</strong></li>
+                  <li>Tragen Sie den <strong>Erkennungszeitpunkt</strong> so genau wie möglich ein (ab diesem Zeitpunkt läuft die 24h-Frist)</li>
+                  <li>Kategorie und Schweregrad nach bestem Wissen wählen — kann später angepasst werden</li>
+                  <li>Betroffene Systeme und erste Erkenntnisse notieren</li>
+                </ul>
+                <div class="alert alert-warning py-2 mb-0">
+                  <i class="bi bi-alarm me-1"></i>
+                  <strong>24h ab Kenntnisnahme</strong> — Frühwarnung an BSI.<br>
+                  <strong>72h</strong> — Zwischenmeldung mit erster Bewertung.<br>
+                  <strong>30 Tage</strong> — Abschlussbericht.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#step2">
+                <span class="badge bg-warning text-dark me-2">Schritt 2</span> KI-Entwurf für BSI-Meldung generieren
+              </button>
+            </h2>
+            <div id="step2" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body small">
+                <p>Im Vorfall-Detail gibt es für jede Meldestufe den Button <strong>„KI-Entwurf"</strong>:</p>
+                <ul class="mb-2">
+                  <li><strong>Frühwarnung (24h)</strong>: Erste Benachrichtigung, nicht alle Details nötig</li>
+                  <li><strong>Zwischenmeldung (72h)</strong>: Art des Vorfalls, Umfang, erste Maßnahmen</li>
+                  <li><strong>Abschlussbericht (30 Tage)</strong>: Vollständige Analyse und Root-Cause</li>
+                  <li><strong>DSGVO Art. 33</strong>: Falls personenbezogene Daten betroffen</li>
+                </ul>
+                <p class="mb-0">Claude AI generiert einen gesetzeskonformen deutschen Text. Sie können den Entwurf bearbeiten und anpassen.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#step3">
+                <span class="badge bg-primary me-2">Schritt 3</span> Meldung im BSI-Portal einreichen
+              </button>
+            </h2>
+            <div id="step3" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body small">
+                <p>Das BSI stellt kein öffentliches API bereit — Meldungen gehen über das <strong>BSI MUK-Portal</strong>:</p>
+                <ol class="mb-2">
+                  <li>Entwurf hier im System fertigstellen und prüfen</li>
+                  <li>BSI MUK-Portal öffnen:
+                    <a href="https://muk.bsi.bund.de" target="_blank" rel="noopener" class="fw-semibold">
+                      muk.bsi.bund.de <i class="bi bi-box-arrow-up-right small"></i>
+                    </a>
+                  </li>
+                  <li>Meldungstext aus dem Entwurf kopieren und in das Portal einfügen</li>
+                  <li>BSI-Referenznummer notieren</li>
+                  <li>Zurück hier: Meldung als „eingereicht" markieren und BSI-Referenz eintragen</li>
+                </ol>
+                <div class="alert alert-info py-2 mb-0">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Für die Registrierung am BSI-Portal gehen Sie zu
+                  <a href="{{ url_for('nis2.bsi_registration_landing') }}">BSI-Registrierungs-Assistent</a>.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#step4">
+                <span class="badge bg-secondary me-2">Schritt 4</span> DSGVO Art. 33 — Datenpanne melden?
+              </button>
+            </h2>
+            <div id="step4" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body small">
+                <p>Zusätzlich zur BSI-Meldung kann eine Meldung an die <strong>Datenschutz-Aufsichtsbehörde</strong> nötig sein:</p>
+                <ul class="mb-2">
+                  <li>Pflicht wenn: personenbezogene Daten betroffen sind oder betroffen sein könnten</li>
+                  <li>Frist: <strong>72 Stunden</strong> nach Kenntnisnahme (DSGVO Art. 33)</li>
+                  <li>Zuständige Behörde: Landesdatenschutzbeauftragter Ihres Bundeslandes</li>
+                </ul>
+                <p class="mb-0">Im Vorfall-Detail den Button „DSGVO Art. 33" nutzen — KI generiert das Schreiben automatisch.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#step5">
+                <span class="badge bg-success me-2">Schritt 5</span> Abschluss und Lessons Learned
+              </button>
+            </h2>
+            <div id="step5" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body small">
+                <ul class="mb-0">
+                  <li>Status auf <strong>„closed"</strong> setzen sobald der Vorfall vollständig behoben ist</li>
+                  <li>Abschlussbericht ans BSI senden (innerhalb 30 Tage)</li>
+                  <li>Root-Cause-Analyse dokumentieren — was war die Ursache?</li>
+                  <li>Präventivmaßnahmen definieren und im NIS2-Audit-Modul umsetzen</li>
+                  <li>Zeitlinie vollständig ausfüllen — wichtig für spätere Audits und Versicherungsfragen</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 
   {% if incidents %}

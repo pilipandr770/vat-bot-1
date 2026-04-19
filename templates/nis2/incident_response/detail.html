@@ -150,6 +150,98 @@
           <button class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-trash"></i> Löschen</button>
         </form>
       </div>
+
+      <!-- ── Nächste Schritte Anleitung ── -->
+      <div class="card border-info shadow-sm mt-3">
+        <div class="card-header bg-info bg-opacity-10 border-info py-2">
+          <strong class="small"><i class="bi bi-lightbulb text-info me-1"></i> Nächste Schritte</strong>
+        </div>
+        <div class="card-body p-3 small">
+
+          {% if not incident.fruehwarnung_sent %}
+          <div class="d-flex gap-2 mb-3">
+            <div class="flex-shrink-0 mt-1">
+              <span class="badge bg-danger rounded-circle" style="width:22px;height:22px;line-height:14px">1</span>
+            </div>
+            <div>
+              <div class="fw-semibold">Frühwarnung ans BSI (24h)</div>
+              {% if incident.fruehwarnung_deadline and now > incident.fruehwarnung_deadline %}
+                <span class="text-danger"><i class="bi bi-alarm"></i> ÜBERFÄLLIG — sofort handeln!</span>
+              {% else %}
+                <span class="text-warning">Frist: {{ incident.fruehwarnung_deadline.strftime('%d.%m.%Y %H:%M') if incident.fruehwarnung_deadline else '—' }}</span>
+              {% endif %}
+              <div class="text-muted mt-1">Klicken Sie auf <strong>„KI-Entwurf"</strong> bei der Frühwarnung, dann Text ins
+                <a href="https://muk.bsi.bund.de" target="_blank" rel="noopener">BSI MUK-Portal</a> kopieren.</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="d-flex gap-2 mb-3 text-success">
+            <i class="bi bi-check-circle-fill mt-1"></i>
+            <div><div class="fw-semibold">Frühwarnung eingereicht</div></div>
+          </div>
+          {% endif %}
+
+          {% if not incident.zwischenmeldung_sent %}
+          <div class="d-flex gap-2 mb-3">
+            <div class="flex-shrink-0 mt-1">
+              <span class="badge bg-warning text-dark rounded-circle" style="width:22px;height:22px;line-height:14px">2</span>
+            </div>
+            <div>
+              <div class="fw-semibold">Zwischenmeldung (72h)</div>
+              <span class="text-muted">Frist: {{ incident.zwischenmeldung_deadline.strftime('%d.%m.%Y %H:%M') if incident.zwischenmeldung_deadline else '—' }}</span>
+              <div class="text-muted mt-1">Erste Bewertung: Art des Vorfalls, Umfang, ergriffene Maßnahmen.</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="d-flex gap-2 mb-3 text-success">
+            <i class="bi bi-check-circle-fill mt-1"></i>
+            <div><div class="fw-semibold">Zwischenmeldung eingereicht</div></div>
+          </div>
+          {% endif %}
+
+          {% if not incident.abschlussbericht_sent %}
+          <div class="d-flex gap-2 mb-3">
+            <div class="flex-shrink-0 mt-1">
+              <span class="badge bg-secondary rounded-circle" style="width:22px;height:22px;line-height:14px">3</span>
+            </div>
+            <div>
+              <div class="fw-semibold">Abschlussbericht (30 Tage)</div>
+              <span class="text-muted">Frist: {{ incident.abschlussbericht_deadline.strftime('%d.%m.%Y') if incident.abschlussbericht_deadline else '—' }}</span>
+              <div class="text-muted mt-1">Root-Cause, alle Maßnahmen, Lessons Learned.</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="d-flex gap-2 mb-3 text-success">
+            <i class="bi bi-check-circle-fill mt-1"></i>
+            <div><div class="fw-semibold">Abschlussbericht eingereicht</div></div>
+          </div>
+          {% endif %}
+
+          {% if incident.dsgvo_relevant %}
+          <hr class="my-2">
+          <div class="d-flex gap-2 mb-2">
+            <div class="flex-shrink-0 mt-1">
+              <span class="badge bg-info rounded-circle" style="width:22px;height:22px;line-height:14px">4</span>
+            </div>
+            <div>
+              <div class="fw-semibold">DSGVO Art. 33 (72h)</div>
+              {% if incident.dpa_notification_sent %}
+                <span class="text-success"><i class="bi bi-check-circle"></i> Eingereicht</span>
+              {% else %}
+                <span class="text-danger">Aufsichtsbehörde benachrichtigen!</span>
+              {% endif %}
+              <div class="text-muted mt-1">Personenbezogene Daten betroffen — KI-Entwurf nutzen.</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <hr class="my-2">
+          <div class="text-muted" style="font-size:0.75rem">
+            <i class="bi bi-info-circle me-1"></i>
+            Nach jeder BSI-Einreichung bitte die <strong>BSI-Referenznummer</strong> im Entwurf eintragen und als „eingereicht" markieren.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
