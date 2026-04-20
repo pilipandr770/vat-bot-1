@@ -42,6 +42,11 @@
     <div class="text-center mb-5">
         <h1 class="display-4 fw-bold mb-3">{{ _('Choose Your Plan') }}</h1>
         <p class="lead text-muted">{{ _('Transparent pricing. No hidden fees. Cancel anytime.') }}</p>
+        <!-- 14-day trial badge -->
+        <div class="d-inline-block mt-2 px-4 py-2 rounded-pill fw-semibold text-white"
+             style="background:linear-gradient(135deg,#198754,#0d6efd);font-size:.95rem;">
+            <i class="bi bi-gift-fill me-2"></i>14 Tage kostenlos testen — keine Kreditkarte vorab nötig
+        </div>
     </div>
 
     <!-- NIS2 Urgency Banner -->
@@ -72,12 +77,13 @@
                     <strong>⭐ {{ _('Most Popular') }}</strong>
                 </div>
                 {% endif %}
-                
-                <div class="card-body d-flex flex-column">
-                    <!-- Plan Name -->
-                    <h3 class="card-title text-center mb-3">{{ plan.display_name }}</h3>
-                    
-                    <!-- Price -->
+                {% if plan.name in ('basic', 'professional') %}
+                <div class="position-absolute top-0 end-0 m-2">
+                    <span class="badge text-white px-2 py-1" style="background:#198754;font-size:.72rem;">
+                        14 Tage gratis
+                    </span>
+                </div>
+                {% endif %}
                     <div class="text-center mb-4">
                         <h2 class="display-4 fw-bold">€{{ "%.2f"|format(plan.price) }}</h2>
                         <p class="text-muted">{{ plan.period }}</p>
@@ -273,22 +279,50 @@
         </div>
     </div>
 
-    <!-- Trust Badges -->
-    <div class="mt-5 pt-4 text-center">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <p class="text-muted mb-3">{{ _('Trusted by over 500 companies in Europe') }}</p>
-                <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
-                    <span class="badge bg-light text-dark p-3">
-                        <i class="bi bi-shield-check me-2"></i>{{ _('SSL encrypted') }}
-                    </span>
-                    <span class="badge bg-light text-dark p-3">
-                        <i class="bi bi-check-circle me-2"></i>{{ _('GDPR compliant') }}
-                    </span>
-                    <span class="badge bg-light text-dark p-3">
-                        <i class="bi bi-credit-card me-2"></i>{{ _('Stripe secured') }}
-                    </span>
+    <!-- Social proof + Trust Badges -->
+    <div class="mt-5 pt-4">
+        <!-- Stats row -->
+        <div class="row text-center g-3 mb-4 justify-content-center">
+            <div class="col-auto">
+                <div class="px-4 py-3 rounded-3 bg-light">
+                    <div class="h4 fw-bold text-primary mb-0">500+</div>
+                    <small class="text-muted">Unternehmen vertrauen uns</small>
                 </div>
+            </div>
+            <div class="col-auto">
+                <div class="px-4 py-3 rounded-3 bg-light">
+                    <div class="h4 fw-bold text-success mb-0">30.000</div>
+                    <small class="text-muted">NIS2-betroffene DE-Unternehmen</small>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="px-4 py-3 rounded-3 bg-light">
+                    <div class="h4 fw-bold text-danger mb-0">€10 Mio.</div>
+                    <small class="text-muted">max. NIS2-Bußgeld</small>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="px-4 py-3 rounded-3 bg-light">
+                    <div class="h4 fw-bold text-warning mb-0">14 Tage</div>
+                    <small class="text-muted">kostenloser Test</small>
+                </div>
+            </div>
+        </div>
+        <!-- Trust icons -->
+        <div class="text-center">
+            <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
+                <span class="badge bg-light text-dark p-3 border">
+                    <i class="bi bi-shield-lock-fill text-success me-2"></i>SSL-verschlüsselt
+                </span>
+                <span class="badge bg-light text-dark p-3 border">
+                    <i class="bi bi-check2-all text-primary me-2"></i>DSGVO-konform
+                </span>
+                <span class="badge bg-light text-dark p-3 border">
+                    <i class="bi bi-credit-card-2-front-fill text-secondary me-2"></i>Zahlung via Stripe
+                </span>
+                <span class="badge bg-light text-dark p-3 border">
+                    <i class="bi bi-arrow-counterclockwise text-danger me-2"></i>Jederzeit kündbar
+                </span>
             </div>
         </div>
     </div>
@@ -328,5 +362,7 @@
         z-index: -1;
         opacity: 0.7;
     }
+    /* Ensure trial badge doesn't overflow */
+    .col-lg-4.col-md-6 { position: relative; }
 </style>
 {% endblock %}

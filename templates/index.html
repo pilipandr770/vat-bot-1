@@ -219,9 +219,195 @@
 <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 <script>
-// Initialize CounterpartyVerification class when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     const verification = new CounterpartyVerification();
+
+    // ── Onboarding Wizard ──────────────────────────────────────────────────
+    const OB_KEY = 'vv_onboarding_done_{{ current_user.id }}';
+    if (!localStorage.getItem(OB_KEY)) {
+        showOnboarding();
+    }
+
+    function showOnboarding() {
+        const modal = new bootstrap.Modal(document.getElementById('onboardingModal'), {backdrop: 'static'});
+        modal.show();
+    }
+
+    // Step navigation
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    window.obNext = function() {
+        if (currentStep < totalSteps) {
+            document.getElementById('ob-step-' + currentStep).classList.add('d-none');
+            currentStep++;
+            document.getElementById('ob-step-' + currentStep).classList.remove('d-none');
+            updateObProgress();
+        }
+    };
+    window.obBack = function() {
+        if (currentStep > 1) {
+            document.getElementById('ob-step-' + currentStep).classList.add('d-none');
+            currentStep--;
+            document.getElementById('ob-step-' + currentStep).classList.remove('d-none');
+            updateObProgress();
+        }
+    };
+    window.obFinish = function() {
+        localStorage.setItem(OB_KEY, '1');
+        bootstrap.Modal.getInstance(document.getElementById('onboardingModal')).hide();
+    };
+    window.obGoTo = function(url) {
+        localStorage.setItem(OB_KEY, '1');
+        window.location.href = url;
+    };
+
+    function updateObProgress() {
+        document.querySelectorAll('.ob-dot').forEach((dot, i) => {
+            dot.classList.toggle('bg-primary', i + 1 <= currentStep);
+            dot.classList.toggle('bg-secondary', i + 1 > currentStep);
+        });
+        document.getElementById('ob-step-label').textContent = currentStep + ' / ' + totalSteps;
+    }
 });
 </script>
+
+<!-- ── Onboarding Modal ──────────────────────────────────────────────────── -->
+<div class="modal fade" id="onboardingModal" tabindex="-1" aria-labelledby="onboardingModalLabel">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+
+      <!-- Header -->
+      <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#0d6efd,#6f42c1);border-radius:.5rem .5rem 0 0;">
+        <div class="w-100 text-center py-3">
+          <div class="text-white fs-4 fw-bold mb-1">
+            <i class="bi bi-shield-check-fill me-2"></i>Willkommen bei VAT-Verifizierung!
+          </div>
+          <!-- Progress dots -->
+          <div class="d-flex justify-content-center gap-2 align-items-center mt-2">
+            <span class="ob-dot rounded-circle bg-primary" style="width:12px;height:12px;display:inline-block;transition:.3s;"></span>
+            <span class="ob-dot rounded-circle bg-secondary" style="width:12px;height:12px;display:inline-block;transition:.3s;"></span>
+            <span class="ob-dot rounded-circle bg-secondary" style="width:12px;height:12px;display:inline-block;transition:.3s;"></span>
+            <span id="ob-step-label" class="text-white-50 ms-2 small">1 / 3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body p-4">
+
+        <!-- Step 1: Was kann die Plattform? -->
+        <div id="ob-step-1">
+          <h5 class="fw-bold mb-3 text-center">🚀 Was kann diese Plattform?</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="d-flex gap-3 p-3 rounded-3 border h-100">
+                <div class="fs-3">🔍</div>
+                <div><strong>Geschäftspartner prüfen</strong><br><small class="text-muted">VAT, Sanktionen, OSINT — alles in einer Prüfung</small></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex gap-3 p-3 rounded-3 border h-100">
+                <div class="fs-3">🛡️</div>
+                <div><strong>NIS2 Compliance</strong><br><small class="text-muted">Pflichtmaßnahmen nach §30 BSIG — automatisiert</small></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex gap-3 p-3 rounded-3 border h-100">
+                <div class="fs-3">👥</div>
+                <div><strong>TeamGuard</strong><br><small class="text-muted">Passwort-Rotation, Phishing-Tests, Awareness</small></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex gap-3 p-3 rounded-3 border h-100">
+                <div class="fs-3">📧</div>
+                <div><strong>MailGuard</strong><br><small class="text-muted">KI-gestützte E-Mail-Sicherheit und Auto-Antworten</small></div>
+              </div>
+            </div>
+          </div>
+          <div class="text-end mt-4">
+            <button class="btn btn-primary px-4" onclick="obNext()">Weiter <i class="bi bi-arrow-right ms-1"></i></button>
+          </div>
+        </div>
+
+        <!-- Step 2: Womit anfangen? -->
+        <div id="ob-step-2" class="d-none">
+          <h5 class="fw-bold mb-3 text-center">⚡ Womit möchtest du starten?</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <button class="btn btn-outline-primary w-100 h-100 p-3 text-start" onclick="obGoTo('/dashboard')">
+                <div class="fs-4 mb-1">🔍</div>
+                <strong>Geschäftspartner prüfen</strong>
+                <div class="text-muted small mt-1">VAT-ID eingeben → sofortiger Report</div>
+              </button>
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-outline-purple w-100 h-100 p-3 text-start" style="border-color:#6f42c1;color:#6f42c1;" onclick="obGoTo('/nis2/')">
+                <div class="fs-4 mb-1">🛡️</div>
+                <strong>NIS2 Compliance starten</strong>
+                <div class="text-muted small mt-1">BSI-Registrierung, ISMS-Dokumente</div>
+              </button>
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-outline-secondary w-100 h-100 p-3 text-start" onclick="obGoTo('/teamguard/')">
+                <div class="fs-4 mb-1">👥</div>
+                <strong>TeamGuard einrichten</strong>
+                <div class="text-muted small mt-1">Mitarbeiter hinzufügen, Passwörter verwalten</div>
+              </button>
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-outline-secondary w-100 h-100 p-3 text-start" onclick="obGoTo('/mailguard/')">
+                <div class="fs-4 mb-1">📧</div>
+                <strong>MailGuard verbinden</strong>
+                <div class="text-muted small mt-1">E-Mail-Konto mit IMAP verbinden</div>
+              </button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-secondary" onclick="obBack()"><i class="bi bi-arrow-left me-1"></i> Zurück</button>
+            <button class="btn btn-primary px-4" onclick="obNext()">Weiter <i class="bi bi-arrow-right ms-1"></i></button>
+          </div>
+        </div>
+
+        <!-- Step 3: Plan & Abschluss -->
+        <div id="ob-step-3" class="d-none">
+          <h5 class="fw-bold mb-3 text-center">🎯 Dein Plan</h5>
+          <div class="text-center mb-4">
+            <div class="d-inline-block px-4 py-2 rounded-pill text-white fw-semibold mb-3"
+                 style="background:linear-gradient(135deg,#198754,#0d6efd);">
+              <i class="bi bi-gift-fill me-2"></i>14 Tage Professional kostenlos testen
+            </div>
+            <p class="text-muted small">Alle Features ohne Einschränkung — Kreditkarte erst nach dem Test</p>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-12">
+              <div class="p-3 rounded-3" style="background:#f8f0ff;border-left:4px solid #6f42c1;">
+                <strong>Professional-Plan enthält:</strong>
+                <ul class="mb-0 mt-2 small">
+                  <li>500 Prüfungen/Monat</li>
+                  <li>NIS2 Compliance Plattform (BSI §30, §33)</li>
+                  <li>TeamGuard + Phishing-Simulation</li>
+                  <li>MailGuard AI (3 E-Mail-Konten)</li>
+                  <li>API-Zugang + PDF-Berichte</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+            <a href="/pricing" class="btn btn-primary px-4" onclick="localStorage.setItem('{{ 'vv_onboarding_done_' + current_user.id|string }}', '1')">
+              <i class="bi bi-rocket-takeoff me-1"></i> 14 Tage gratis starten
+            </a>
+            <button class="btn btn-outline-secondary px-4" onclick="obFinish()">
+              Kostenlos weiter nutzen
+            </button>
+          </div>
+          <div class="d-flex justify-content-start mt-3">
+            <button class="btn btn-link btn-sm text-muted p-0" onclick="obBack()"><i class="bi bi-arrow-left me-1"></i> Zurück</button>
+          </div>
+        </div>
+
+      </div><!-- /modal-body -->
+    </div>
+  </div>
+</div>
+<!-- ── /Onboarding Modal ──────────────────────────────────────────────────── -->
 {% endblock %}

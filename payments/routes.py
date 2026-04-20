@@ -50,16 +50,16 @@ def subscribe(plan_name):
         return redirect(url_for('landing'))
 
     try:
-        # Create Stripe Checkout Session with Stripe price IDs
-        # 3-day free trial included automatically in product config
+        # Create Stripe Checkout Session with 14-day free trial
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
-                'price': price_id,  # Use Stripe-managed price ID
+                'price': price_id,
                 'quantity': 1,
             }],
             mode='subscription',
-            allow_promotion_codes=True,  # Show promo code field in checkout
+            allow_promotion_codes=True,
+            subscription_data={'trial_period_days': 14},
             success_url=url_for('payments.success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=url_for('payments.cancel', _external=True),
             customer_email=current_user.email,
