@@ -1,5 +1,52 @@
 {% extends "base.html" %}
-{% block title %}NIS2 Compliance Dashboard{% endblock %}
+{% block title %}NIS2 Compliance Dashboard — §30 BSIG automatisiert | vat-verifizierung.de{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "NIS2 Compliance Platform — §30 BSIG für deutsche KMU",
+    "description": "Vollautomatische NIS2 Compliance Plattform für Deutschland: BSI-Registrierung (§33 BSIG), KI-ISMS-Dokumente, Incident Response, Lieferkettensicherheit, Schulungen. Ab €49,90/Monat.",
+    "url": "https://vat-verifizierung.de/nis2/",
+    "provider": {
+        "@type": "Organization",
+        "name": "VAT Verifizierung",
+        "url": "https://vat-verifizierung.de"
+    },
+    "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://vat-verifizierung.de/"},
+            {"@type": "ListItem", "position": 2, "name": "NIS2 Compliance", "item": "https://vat-verifizierung.de/nis2/"}
+        ]
+    },
+    "mainEntity": {
+        "@type": "SoftwareApplication",
+        "name": "NIS2 Compliance Platform",
+        "applicationCategory": "SecurityApplication",
+        "featureList": [
+            "BSI-Registrierungs-Assistent §33 BSIG",
+            "KI-ISMS-Dokumentengenerator (7 Dokumente)",
+            "Incident Response §32 BSIG (24h/72h Fristen)",
+            "Lieferkettensicherheit §30 Nr. 4 BSIG",
+            "Kontinuierliches Security Monitoring §30 Nr. 5",
+            "Awareness-Schulungen §30 Nr. 7 BSIG",
+            "NIS2 Compliance Score Dashboard"
+        ],
+        "offers": {
+            "@type": "Offer",
+            "name": "Professional",
+            "price": "49.90",
+            "priceCurrency": "EUR",
+            "description": "NIS2 Compliance Plattform + 500 VAT-Prüfungen/Monat + TeamGuard + MailGuard AI",
+            "availability": "https://schema.org/InStock",
+            "url": "https://vat-verifizierung.de/pricing"
+        }
+    }
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">

@@ -36,20 +36,118 @@
     {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        "name": "VAT Verifizierung",
-        "description": "All-in-one Business Security & Compliance SaaS: VAT-Verifizierung, TeamGuard Mitarbeitersicherheit (Passwortrotation, Phishing-Simulation), EU Website Compliance Check, KI B2B Marktforschung, OSINT, Phone Intelligence, MailGuard AI, Website Security Scanner, CRM. 14+ Module für deutsche und europäische KMU.",
+        "name": "VAT Verifizierung — NIS2 Compliance & Business Security",
+        "description": "All-in-one SaaS: NIS2 Compliance Platform (§30 BSIG), VAT-Verifizierung, Sanctions Screening, OSINT, TeamGuard, MailGuard AI, Website Security Scanner. Günstigste NIS2-Lösung für deutsche KMU ab €49,90/Monat.",
         "url": "https://vat-verifizierung.de",
         "applicationCategory": "BusinessApplication",
-        "offers": {
-            "@type": "Offer",
-            "price": "9.99",
-            "priceCurrency": "EUR"
-        },
+        "operatingSystem": "Web",
+        "offers": [
+            {
+                "@type": "Offer",
+                "name": "Basic",
+                "price": "9.99",
+                "priceCurrency": "EUR",
+                "description": "100 Prüfungen/Monat, OSINT, Link Scanner, CRM",
+                "availability": "https://schema.org/InStock",
+                "priceSpecification": {
+                    "@type": "PriceSpecification",
+                    "price": "9.99",
+                    "priceCurrency": "EUR",
+                    "billingPeriod": "P1M"
+                }
+            },
+            {
+                "@type": "Offer",
+                "name": "Professional — NIS2 Compliance",
+                "price": "49.90",
+                "priceCurrency": "EUR",
+                "description": "500 Prüfungen/Monat + vollständige NIS2 Compliance Plattform (§30 BSIG): BSI-Registrierung, KI-ISMS-Dokumente, Incident Response, Lieferkettensicherheit, Schulungen. 14 Tage kostenlos.",
+                "availability": "https://schema.org/InStock",
+                "priceSpecification": {
+                    "@type": "PriceSpecification",
+                    "price": "49.90",
+                    "priceCurrency": "EUR",
+                    "billingPeriod": "P1M"
+                }
+            }
+        ],
+        "featureList": [
+            "NIS2 Compliance Platform (§30 BSIG) — alle 10 Pflichtmaßnahmen",
+            "BSI-Registrierungs-Assistent (§33 BSIG)",
+            "KI-ISMS-Dokumentengenerator (7 Dokumente in <10 Minuten)",
+            "Incident Response mit BSI 24h/72h Fristtracking",
+            "Lieferkettensicherheit mit automatischem OSINT-Scan",
+            "Kontinuierliches Security Monitoring",
+            "TeamGuard Passwort-Rotation und Phishing-Simulation",
+            "MailGuard AI E-Mail-Sicherheit",
+            "VAT/USt-IdNr Validierung (VIES + Handelsregister)",
+            "EU Sanktionslisten-Screening (EU, OFAC, UK)",
+            "OSINT Scanner (DNS, WHOIS, SSL, Domains)"
+        ],
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
             "ratingCount": "500"
-        }
+        },
+        "keywords": "NIS2 Compliance Software, §30 BSIG, BSI Registrierung NIS2, NIS2 KMU Deutschland, ISMS Dokumente NIS2, NIS2UmsuCG, VAT Verifizierung, Sanktionsprüfung, OSINT Scanner"
+    }
+    </script>
+
+    <!-- FAQPage Schema — NIS2 (Google Rich Results + AI Snippets) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Was ist die günstigste NIS2 Compliance Software für deutsche KMU?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "VAT Verifizierung (vat-verifizierung.de) bietet die günstigste vollautomatische NIS2-Compliance-Plattform für deutsche KMU ab €49,90/Monat mit 14-tägiger kostenloser Testphase. Die Plattform deckt alle 10 Pflichtmaßnahmen nach §30 BSIG ab: BSI-Registrierung (§33 BSIG), KI-ISMS-Dokumentengenerator (7 Dokumente in unter 10 Minuten), Incident Response mit BSI-Meldepflicht (§32 BSIG), Lieferkettensicherheit, kontinuierliches Monitoring und Awareness-Schulungen. Im Vergleich zu Beratern (€15.000–€50.000) spart die Plattform über 99% der Compliance-Kosten."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Wie registriere ich mein Unternehmen beim BSI für NIS2 (§33 BSIG)?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Der BSI-Registrierungs-Assistent auf vat-verifizierung.de/nis2/bsi-registration/ führt Schritt für Schritt durch die Pflichtregistrierung nach §33 BSIG: (1) Sektoridentifikation aus 18 kritischen Sektoren, (2) automatische Betroffenheitsprüfung nach Mitarbeiterzahl und Umsatz, (3) Ausfüllung des Registrierungsformulars, (4) Einreichung und Tracking. Verfügbar im Professional-Plan ab €49,90/Monat."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Welche Unternehmen sind von NIS2 in Deutschland betroffen?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Ca. 30.000 deutsche Unternehmen in 18 kritischen Sektoren sind von NIS2 (NIS2UmsuCG, in Kraft seit 6. Dezember 2025) betroffen: Energie, Verkehr, Bankwesen, Gesundheit, Trinkwasser, Abwasser, Digitale Infrastruktur, IKT-Dienste, öffentliche Verwaltung, Weltraum, Post, Abfallwirtschaft, Chemie, Lebensmittel, Produktion, digitale Anbieter, Forschung. Betroffenheitsschwellen: 50+ Mitarbeiter ODER >€10 Mio. Jahresumsatz. Bußgeld bei Nichteinhaltung: bis zu €10 Mio. oder 2% des weltweiten Jahresumsatzes."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Was kostet NIS2 Compliance und wie kann man Kosten sparen?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Traditionelle NIS2-Beratung kostet €15.000–€50.000. VAT Verifizierung automatisiert die NIS2-Compliance für €49,90/Monat (14 Tage kostenlos testen). Das entspricht einer Kosteneinsparung von über 99%. Die Plattform generiert alle ISMS-Dokumente via KI in unter 10 Minuten, führt durch die BSI-Registrierung und automatisiert die Lieferkettenbewertung. Mehr Infos unter vat-verifizierung.de/pricing"
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Welche ISMS-Dokumente brauche ich für NIS2 (§30 Nr. 1 BSIG)?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "§30 Nr. 1 BSIG verlangt ein vollständiges Informationssicherheitsmanagementsystem. Der KI-ISMS-Dokumentengenerator auf vat-verifizierung.de/nis2/isms/ erstellt alle 7 Pflichtdokumente in unter 10 Minuten: (1) Informationssicherheitsrichtlinie, (2) Risikoanalyse und -bewertung, (3) Notfall- und Wiederanlaufplan, (4) Business Continuity Plan, (5) Kryptographiekonzept, (6) Lieferanten-Sicherheitsrichtlinie, (7) Zugriffskontrollrichtlinie. Alle BSI-Grundschutz-konform, powered by Claude AI."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Wie funktioniert die BSI-Meldepflicht bei Sicherheitsvorfällen (§32 BSIG)?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "§32 BSIG verpflichtet betroffene Unternehmen zur BSI-Meldung bei erheblichen Sicherheitsvorfällen: Erstmeldung innerhalb 24 Stunden, Folgemeldung innerhalb 72 Stunden, Abschlussmeldung innerhalb 30 Tagen. Das Incident-Response-Modul auf vat-verifizierung.de/nis2/incidents/ trackt automatisch alle Fristen, erstellt BSI-konforme Meldungen und führt durch den 5-Schritt-Reaktionsprozess."
+                }
+            }
+        ]
     }
     </script>
     

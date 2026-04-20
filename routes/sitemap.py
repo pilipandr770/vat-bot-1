@@ -37,6 +37,18 @@ def generate_sitemap():
         ('/legal/datenschutz', 'monthly', 0.5),
         ('/legal/impressum', 'monthly', 0.5),
     ]
+
+    # NIS2 Compliance Platform pages (high-priority for SEO)
+    nis2_pages = [
+        ('/nis2/', 'weekly', 0.95),
+        ('/nis2/bsi-registration/', 'weekly', 0.9),
+        ('/nis2/isms/', 'weekly', 0.9),
+        ('/nis2/incidents/', 'weekly', 0.85),
+        ('/nis2/supply-chain/', 'weekly', 0.85),
+        ('/nis2/monitoring/', 'weekly', 0.85),
+        ('/nis2/training/', 'weekly', 0.85),
+    ]
+    static_pages = static_pages + nis2_pages
     
     for url, changefreq, priority in static_pages:
         urls.append({
