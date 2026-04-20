@@ -169,9 +169,9 @@ def register_supply_chain_routes(bp):
 
         # Sanctions screening via existing service
         try:
-            from services.sanctions import SanctionsChecker
-            sanctions = SanctionsChecker()
-            sanctions_result = sanctions.check(supplier.name, supplier.country)
+            from services.sanctions import SanctionsService
+            sanctions = SanctionsService()
+            sanctions_result = sanctions.check_sanctions(supplier.company_name)
             results['sanctions'] = sanctions_result
         except Exception as exc:
             results['sanctions'] = {'status': 'error', 'error': str(exc)}
