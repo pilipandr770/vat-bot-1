@@ -48,7 +48,7 @@ def register_supply_chain_routes(bp):
         if request.method == 'POST':
             supplier = Supplier(
                 user_id=current_user.id,
-                company_name=request.form['name'],
+                company_name=request.form['company_name'],
                 category=request.form['category'],
                 criticality=request.form.get('criticality', 'medium'),
                 country=request.form.get('country', ''),
