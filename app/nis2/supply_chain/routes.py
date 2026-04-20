@@ -48,19 +48,18 @@ def register_supply_chain_routes(bp):
         if request.method == 'POST':
             supplier = Supplier(
                 user_id=current_user.id,
-                name=request.form['name'],
+                company_name=request.form['name'],
                 category=request.form['category'],
                 criticality=request.form.get('criticality', 'medium'),
                 country=request.form.get('country', ''),
-                vat_number=request.form.get('vat_number', ''),
+                vat_id=request.form.get('vat_number', ''),
                 contact_email=request.form.get('contact_email', ''),
                 services_provided=request.form.get('services_provided', ''),
                 contract_start=_parse_date(request.form.get('contract_start')),
-                avv_signed=request.form.get('avv_signed') == 'on',
-                avv_date=_parse_date(request.form.get('avv_date')),
-                iso27001_certified=request.form.get('iso27001_certified') == 'on',
+                avv_exists=request.form.get('avv_signed') == 'on',
+                avv_signed_at=_parse_date(request.form.get('avv_date')),
+                has_iso27001=request.form.get('iso27001_certified') == 'on',
                 notes=request.form.get('notes', ''),
-                added_at=datetime.utcnow(),
             )
             db.session.add(supplier)
             db.session.commit()
