@@ -19,6 +19,7 @@
       </a>
       {% if current_user.is_admin %}
       <form method="post" action="{{ url_for('teamguard.smtp_test') }}" class="d-inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="btn btn-outline-warning" title="Test-E-Mail zur SMTP-Verifikation senden">
           <i class="bi bi-gear"></i> SMTP-Test
         </button>
