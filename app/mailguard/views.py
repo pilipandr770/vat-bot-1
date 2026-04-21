@@ -12,6 +12,7 @@ from werkzeug.utils import secure_filename
 import json
 import os
 import requests
+import threading
 from datetime import datetime, timedelta
 
 from . import mailguard_bp
@@ -440,26 +441,31 @@ def add_imap_account():
 @mailguard_bp.route('/accounts/<int:account_id>/sync', methods=['POST', 'GET'])
 @login_required
 def sync_account(account_id):
-    """Синхронизировать аккаунт вручную"""
+    """Синхронизировать аккаунт вручную — запускает в фоновом потоке."""
     account = MailAccount.query.filter_by(id=account_id, user_id=current_user.id).first_or_404()
-    
-    try:
-        processed = 0
 
-        if account.provider == 'imap':
-            processed = sync_imap_account(account)
-        else:
-            flash('Anbieter unterstützt keine manuelle Synchronisierung', 'warning')
-            return redirect(url_for('mailguard.accounts'))
+    if account.provider != 'imap':
+        flash('Anbieter unterstützt keine manuelle Synchronisierung', 'warning')
+        return redirect(url_for('mailguard.accounts'))
 
-        flash(
-            f'Synchronisierung von {account.email} abgeschlossen. Neue Nachrichten: {processed}',
-            'success'
-        )
-    except Exception as e:
-        current_app.logger.error(f"Sync error: {e}")
-        flash('Synchronisierungsfehler', 'error')
-    
+    app = current_app._get_current_object()
+
+    def _sync_bg(app, account_id):
+        with app.app_context():
+            try:
+                acc = MailAccount.query.get(account_id)
+                if acc:
+                    sync_imap_account(acc)
+            except Exception as e:
+                current_app.logger.error(f"Background IMAP sync error: {e}")
+
+    threading.Thread(target=_sync_bg, args=(app, account_id), daemon=True).start()
+
+    flash(
+        f'Synchronisierung von {account.email} wurde gestartet. '
+        'Die Ergebnisse erscheinen in Kürze.',
+        'info'
+    )
     return redirect(url_for('mailguard.accounts'))
 
 @mailguard_bp.route('/accounts/<int:account_id>/toggle', methods=['POST', 'GET'])
