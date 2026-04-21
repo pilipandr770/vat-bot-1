@@ -51,11 +51,21 @@ def _get_client_info() -> dict:
 
 
 def _run_audit_in_thread(app, job_id: int, target: str) -> None:
-    """Run the audit agent in a background thread with proper app context."""
+    """Run the audit agent in a background thread with proper app context.
+
+    Priority:
+      1. If NIS2_MICROSERVICE_URL + NIS2_MICROSERVICE_API_KEY are set
+         → use the Docker-based full pentest microservice (nmap, nuclei,
+           testssl, nikto, subfinder, httpx, dns_audit, cookie_check)
+      2. Otherwise fall back to the built-in Python-only agent.
+    """
     with app.app_context():
         from app.nis2.models import NIS2AuditJob, NIS2Finding, NIS2AuditLog, NIS2AuditTask
-        from app.nis2.site_audit.audit_agent import run_audit
         from app.nis2.site_audit.report_generator import generate_report_html
+        from app.nis2.site_audit.microservice_client import (
+            is_configured as ms_is_configured,
+            run_audit_with_polling,
+        )
 
         def log_fn(level: str, message: str) -> None:
             try:
@@ -73,122 +83,197 @@ def _run_audit_in_thread(app, job_id: int, target: str) -> None:
             job.status = "running"
             db.session.commit()
 
-            # Run audit
-            result = run_audit(job_id=job_id, target=target, log_fn=log_fn)
+            # ── Choose audit backend ──────────────────────────────────────
+            if ms_is_configured():
+                # ── Path A: Docker microservice (full pentest) ────────────
+                from auth.models import User
+                user = db.session.get(User, job.user_id)
+                company = (
+                    getattr(user, "company_name", None) or user.email
+                    if user else "API-Client"
+                )
 
-            if "error" in result:
-                job.status = "failed"
-                log_fn("ERROR", result["error"])
+                ms_status, findings_raw = run_audit_with_polling(
+                    target=target,
+                    company=company,
+                    log_fn=log_fn,
+                )
+
+                if ms_status in ("failed", "timeout"):
+                    job.status = "failed"
+                    db.session.commit()
+                    return
+
+                # Persist findings from microservice
+                for f in findings_raw:
+                    finding = NIS2Finding(
+                        job_id=job_id,
+                        title=f.get("title", ""),
+                        description=f.get("description", ""),
+                        severity=f.get("severity", "info"),
+                        severity_rank=f.get("severity_rank", 5),
+                        cvss=f.get("cvss", ""),
+                        dsgvo_article=f.get("dsgvo_article", ""),
+                        recommendation=f.get("recommendation", ""),
+                        target_url=f.get("target", target),
+                        tool=f.get("tool", ""),
+                    )
+                    db.session.add(finding)
                 db.session.commit()
-                return
 
-            # Persist findings
-            for f in result.get("findings", []):
-                finding = NIS2Finding(
-                    job_id=job_id,
-                    title=f.get("title", ""),
-                    description=f.get("description", ""),
-                    severity=f.get("severity", "info"),
-                    severity_rank=f.get("severity_rank", 5),
-                    cvss=f.get("cvss", ""),
-                    dsgvo_article=f.get("dsgvo_article", ""),
-                    recommendation=f.get("recommendation", ""),
-                    target_url=target,
-                    tool=f.get("tool", ""),
+                # Generate report
+                findings_for_report = [
+                    {
+                        "title": fn.title, "description": fn.description,
+                        "severity": fn.severity, "severity_rank": fn.severity_rank,
+                        "cvss": fn.cvss, "dsgvo_article": fn.dsgvo_article,
+                        "recommendation": fn.recommendation, "tool": fn.tool,
+                    }
+                    for fn in NIS2Finding.query.filter_by(job_id=job_id)
+                                                .order_by(NIS2Finding.severity_rank).all()
+                ]
+                logs_for_report = [
+                    {"level": lg.level, "message": lg.message, "created_at": lg.created_at}
+                    for lg in NIS2AuditLog.query.filter_by(job_id=job_id)
+                                               .order_by(NIS2AuditLog.id).all()
+                ]
+                client_info = {}
+                if user:
+                    vat_id = getattr(user, "company_vat_number", None) or ""
+                    client_info = {
+                        "company": getattr(user, "company_name", None) or user.email,
+                        "address": getattr(user, "company_address", None) or "",
+                        "email": getattr(user, "company_email", None) or user.email,
+                        "phone": getattr(user, "company_phone", None) or getattr(user, "phone", None) or "",
+                        "ust_id": f"USt-IdNr.: {vat_id}" if vat_id else "",
+                    }
+
+                report_html = generate_report_html(
+                    target=target,
+                    client_info=client_info,
+                    findings=findings_for_report,
+                    live={},
+                    tasks=[],
+                    logs=logs_for_report,
+                    tools_used=["nmap", "nuclei", "testssl", "nikto", "subfinder",
+                                "httpx", "dns_audit", "cookie_check"],
+                    inline=False,
                 )
-                db.session.add(finding)
+                job.report_html = report_html
+                job.status = "done"
+                job.completed_at = datetime.utcnow()
+                db.session.commit()
+                log_fn("INFO", "✅ Pentest-Bericht gespeichert")
 
-            # Persist tasks
-            for t in result.get("tasks", []):
-                done_at = None
-                if t.get("done") and t.get("done_at"):
-                    try:
-                        done_at = datetime.fromisoformat(t["done_at"])
-                    except (ValueError, TypeError):
-                        done_at = datetime.utcnow()
+            else:
+                # ── Path B: built-in Python-only agent (fallback) ─────────
+                from app.nis2.site_audit.audit_agent import run_audit
 
-                task = NIS2AuditTask(
-                    job_id=job_id,
-                    category=t.get("category", ""),
-                    title=t.get("title", ""),
-                    description=t.get("description", ""),
-                    nis2_ref=t.get("nis2_ref", ""),
-                    dsgvo_ref=t.get("dsgvo_ref", ""),
-                    required=t.get("required", True),
-                    done=t.get("done", False),
-                    done_at=done_at,
-                    notes=t.get("notes", ""),
+                result = run_audit(job_id=job_id, target=target, log_fn=log_fn)
+
+                if "error" in result:
+                    job.status = "failed"
+                    log_fn("ERROR", result["error"])
+                    db.session.commit()
+                    return
+
+                # Persist findings
+                for f in result.get("findings", []):
+                    finding = NIS2Finding(
+                        job_id=job_id,
+                        title=f.get("title", ""),
+                        description=f.get("description", ""),
+                        severity=f.get("severity", "info"),
+                        severity_rank=f.get("severity_rank", 5),
+                        cvss=f.get("cvss", ""),
+                        dsgvo_article=f.get("dsgvo_article", ""),
+                        recommendation=f.get("recommendation", ""),
+                        target_url=target,
+                        tool=f.get("tool", ""),
+                    )
+                    db.session.add(finding)
+
+                # Persist tasks
+                for t in result.get("tasks", []):
+                    done_at = None
+                    if t.get("done") and t.get("done_at"):
+                        try:
+                            done_at = datetime.fromisoformat(t["done_at"])
+                        except (ValueError, TypeError):
+                            done_at = datetime.utcnow()
+
+                    task = NIS2AuditTask(
+                        job_id=job_id,
+                        category=t.get("category", ""),
+                        title=t.get("title", ""),
+                        description=t.get("description", ""),
+                        nis2_ref=t.get("nis2_ref", ""),
+                        dsgvo_ref=t.get("dsgvo_ref", ""),
+                        required=t.get("required", True),
+                        done=t.get("done", False),
+                        done_at=done_at,
+                        notes=t.get("notes", ""),
+                    )
+                    db.session.add(task)
+
+                db.session.commit()
+
+                # Build report
+                logs_for_report = [
+                    {"level": lg.level, "message": lg.message, "created_at": lg.created_at}
+                    for lg in NIS2AuditLog.query.filter_by(job_id=job_id).order_by(NIS2AuditLog.id).all()
+                ]
+                findings_for_report = [
+                    {
+                        "title": fn.title, "description": fn.description,
+                        "severity": fn.severity, "severity_rank": fn.severity_rank,
+                        "cvss": fn.cvss, "dsgvo_article": fn.dsgvo_article,
+                        "recommendation": fn.recommendation, "tool": fn.tool,
+                    }
+                    for fn in NIS2Finding.query.filter_by(job_id=job_id).order_by(NIS2Finding.severity_rank).all()
+                ]
+                tasks_for_report = [
+                    {
+                        "category": tk.category, "title": tk.title,
+                        "description": tk.description, "nis2_ref": tk.nis2_ref,
+                        "dsgvo_ref": tk.dsgvo_ref, "required": tk.required,
+                        "done": tk.done,
+                        "done_at": tk.done_at.isoformat() if tk.done_at else None,
+                        "notes": tk.notes,
+                    }
+                    for tk in NIS2AuditTask.query.filter_by(job_id=job_id).order_by(NIS2AuditTask.id).all()
+                ]
+                from auth.models import User
+                user = db.session.get(User, job.user_id)
+                client_info = {}
+                if user:
+                    company = getattr(user, "company_name", None) or user.email
+                    address = getattr(user, "company_address", None) or ""
+                    email   = getattr(user, "company_email", None) or user.email
+                    phone   = getattr(user, "company_phone", None) or getattr(user, "phone", None) or ""
+                    vat_id  = getattr(user, "company_vat_number", None) or ""
+                    ust_id  = f"USt-IdNr.: {vat_id}" if vat_id else ""
+                    client_info = {
+                        "company": company, "address": address,
+                        "email": email, "phone": phone, "ust_id": ust_id,
+                    }
+
+                report_html = generate_report_html(
+                    target=target,
+                    client_info=client_info,
+                    findings=findings_for_report,
+                    live=result["live"],
+                    tasks=tasks_for_report,
+                    logs=logs_for_report,
+                    tools_used=result.get("tools_used", []),
+                    inline=False,
                 )
-                db.session.add(task)
 
-            db.session.commit()
-
-            # Generate HTML report
-            # Retrieve all log rows for report
-            logs_for_report = [
-                {"level": lg.level, "message": lg.message, "created_at": lg.created_at}
-                for lg in NIS2AuditLog.query.filter_by(job_id=job_id).order_by(NIS2AuditLog.id).all()
-            ]
-            findings_for_report = [
-                {
-                    "title": fn.title,
-                    "description": fn.description,
-                    "severity": fn.severity,
-                    "severity_rank": fn.severity_rank,
-                    "cvss": fn.cvss,
-                    "dsgvo_article": fn.dsgvo_article,
-                    "recommendation": fn.recommendation,
-                    "tool": fn.tool,
-                }
-                for fn in NIS2Finding.query.filter_by(job_id=job_id).order_by(NIS2Finding.severity_rank).all()
-            ]
-            tasks_for_report = [
-                {
-                    "category": tk.category,
-                    "title": tk.title,
-                    "description": tk.description,
-                    "nis2_ref": tk.nis2_ref,
-                    "dsgvo_ref": tk.dsgvo_ref,
-                    "required": tk.required,
-                    "done": tk.done,
-                    "done_at": tk.done_at.isoformat() if tk.done_at else None,
-                    "notes": tk.notes,
-                }
-                for tk in NIS2AuditTask.query.filter_by(job_id=job_id).order_by(NIS2AuditTask.id).all()
-            ]
-
-            # We need client_info — load user
-            from auth.models import User
-            user = db.session.get(User, job.user_id)
-            client_info = {}
-            if user:
-                company = getattr(user, "company_name", None) or user.email
-                address = getattr(user, "company_address", None) or ""
-                email   = getattr(user, "company_email", None) or user.email
-                phone   = getattr(user, "company_phone", None) or getattr(user, "phone", None) or ""
-                vat_id  = getattr(user, "company_vat_number", None) or ""
-                ust_id  = f"USt-IdNr.: {vat_id}" if vat_id else ""
-                client_info = {
-                    "company": company, "address": address,
-                    "email": email, "phone": phone, "ust_id": ust_id,
-                }
-
-            report_html = generate_report_html(
-                target=target,
-                client_info=client_info,
-                findings=findings_for_report,
-                live=result["live"],
-                tasks=tasks_for_report,
-                logs=logs_for_report,
-                tools_used=result.get("tools_used", []),
-                inline=False,
-            )
-
-            job.report_html = report_html
-            job.status = "done"
-            job.completed_at = datetime.utcnow()
-            db.session.commit()
-            log_fn("INFO", "✅ Audit abgeschlossen — Bericht gespeichert")
+                job.report_html = report_html
+                job.status = "done"
+                job.completed_at = datetime.utcnow()
+                db.session.commit()
+                log_fn("INFO", "✅ Audit abgeschlossen — Bericht gespeichert")
 
         except Exception as exc:
             db.session.rollback()
@@ -221,7 +306,11 @@ def register_site_audit_routes(bp) -> None:
     # ── New (form) ─────────────────────────────────────────────────────────
     @bp.route("/audit/new")
     def site_audit_new():
-        return render_template("nis2/site_audit/new.html")
+        from app.nis2.site_audit.microservice_client import is_configured
+        return render_template(
+            "nis2/site_audit/new.html",
+            microservice_active=is_configured(),
+        )
 
     # ── Start ──────────────────────────────────────────────────────────────
     @bp.route("/audit/start", methods=["POST"])

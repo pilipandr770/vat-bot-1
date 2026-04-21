@@ -19,6 +19,20 @@
             und erstellt einen professionellen NIS2/DSGVO-Bericht.
           </p>
 
+          {% if microservice_active %}
+          <div class="alert alert-success border-0 mb-4 py-2 px-3">
+            <i class="bi bi-cpu-fill text-success"></i>
+            <strong>Vollständiger Pentest aktiv</strong> —
+            nmap · nuclei · testssl · nikto · subfinder · httpx · dns_audit · cookie_check
+            <span class="badge bg-success ms-1">Pro</span>
+          </div>
+          {% else %}
+          <div class="alert alert-info border-0 mb-4 py-2 px-3">
+            <i class="bi bi-shield-check text-info"></i>
+            <strong>Schnell-Scan</strong> — HTTP-Header, TLS, Cookies, DNS (Python-Analyse)
+          </div>
+          {% endif %}
+
           <form method="post" action="{{ url_for('nis2.site_audit_start') }}" id="auditForm">
             <div class="mb-4">
               <label for="target" class="form-label fw-semibold">
@@ -45,7 +59,28 @@
             <!-- What will be checked -->
             <div class="card bg-light mb-4">
               <div class="card-body py-3 px-4">
-                <h6 class="mb-2">✅ Was wird geprüft:</h6>
+                {% if microservice_active %}
+                <h6 class="mb-2">🔧 Vollständiger Pentest (Docker-Microservice):</h6>
+                <div class="row g-1">
+                  <div class="col-sm-6">
+                    <ul class="list-unstyled mb-0 small">
+                      <li>🔍 nmap — Port-Scan (21 Ports)</li>
+                      <li>💥 nuclei — CVE & Schwachstellen-Scan</li>
+                      <li>🔒 testssl — TLS/SSL Deep Analysis</li>
+                      <li>🕵️ nikto — OWASP Web-Vulnerabilities</li>
+                    </ul>
+                  </div>
+                  <div class="col-sm-6">
+                    <ul class="list-unstyled mb-0 small">
+                      <li>🌐 subfinder — Subdomain-Enumeration</li>
+                      <li>📡 httpx — HTTP Tech-Stack</li>
+                      <li>📧 dns_audit — SPF, DMARC, DKIM, DNSSEC</li>
+                      <li>🍪 cookie_check — Cookie-Flags</li>
+                    </ul>
+                  </div>
+                </div>
+                {% else %}
+                <h6 class="mb-2">✅ Was wird geprüft (Schnell-Scan):</h6>
                 <div class="row g-1">
                   <div class="col-sm-6">
                     <ul class="list-unstyled mb-0 small">
@@ -62,6 +97,7 @@
                     </ul>
                   </div>
                 </div>
+                {% endif %}
               </div>
             </div>
 
