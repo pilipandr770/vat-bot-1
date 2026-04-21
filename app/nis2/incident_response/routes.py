@@ -6,15 +6,38 @@ Incident management with BSI Meldepflicht tracking.
 
 import json
 import logging
+import threading
 from datetime import datetime
 
-from flask import (abort, flash, jsonify, redirect, render_template,
-                   request, url_for)
+from flask import (abort, current_app, flash, jsonify, redirect,
+                   render_template, request, url_for)
 from flask_login import current_user, login_required
 
 from crm.models import db
 from ..models import Incident, IncidentDraft, IncidentTimeline, INCIDENT_CATEGORIES
 from .bsi_draft import generate_bsi_draft, STAGE_META
+
+BSI_PORTAL_URL = "https://muk.bsi.bund.de"
+BSI_EMAIL = "meldestelle@bsi.bund.de"
+
+_STAGE_SENT_FIELD = {
+    'fruehwarnung': 'fruehwarnung_sent',
+    'zwischenmeldung': 'zwischenmeldung_sent',
+    'abschlussbericht': 'abschlussbericht_sent',
+    'dsgvo_art33': 'dpa_notification_sent',
+}
+
+
+def _send_submission_email_bg(app, recipient: str, subject: str,
+                              text_body: str, html_body: str) -> None:
+    with app.app_context():
+        try:
+            from notifications.alerts import send_email
+            send_email(subject, recipient, text_body, html_body)
+        except Exception as exc:
+            logging.getLogger(__name__).error(
+                f"BSI submission email failed: {exc}"
+            )
 
 logger = logging.getLogger(__name__)
 
@@ -74,8 +97,10 @@ def register_incident_routes(bp):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
             abort(403)
-        drafts = IncidentDraft.query.filter_by(incident_id=incident_id)\
+        # Build a dict keyed by stage so templates can do drafts[stage_key]
+        drafts_list = IncidentDraft.query.filter_by(incident_id=incident_id)\
             .order_by(IncidentDraft.created_at.asc()).all()
+        drafts = {d.stage: d for d in drafts_list}
         timeline = IncidentTimeline.query.filter_by(incident_id=incident_id)\
             .order_by(IncidentTimeline.timestamp.asc()).all()
         return render_template(
@@ -196,15 +221,60 @@ def register_incident_routes(bp):
         if incident.user_id != current_user.id:
             abort(403)
         draft = IncidentDraft.query.get_or_404(draft_id)
+
         draft.submitted_at = datetime.utcnow()
-        draft.bsi_reference = request.form.get('bsi_reference', '')
+        draft.is_approved = True
+        draft.bsi_reference = request.form.get('bsi_reference', '').strip()
+
+        # Mark corresponding sent flag on the incident
+        sent_field = _STAGE_SENT_FIELD.get(draft.stage)
+        if sent_field and hasattr(incident, sent_field):
+            setattr(incident, sent_field, True)
+
+        stage_label = STAGE_META.get(draft.stage, {}).get('label', draft.stage)
         incident.log(
-            f'BSI-Meldung eingereicht: {STAGE_META.get(draft.stage, {}).get("label", draft.stage)} '
+            f'BSI-Meldung eingereicht: {stage_label} '
             f'(Referenz: {draft.bsi_reference or "unbekannt"})',
             performed_by=str(current_user.id),
         )
         db.session.commit()
-        flash('Meldung als eingereicht markiert.', 'success')
+
+        # Send email copy to user in background thread
+        ref_line = f"BSI-Referenznummer: {draft.bsi_reference}" if draft.bsi_reference else ""
+        text_body = (
+            f"Ihre BSI-Meldung wurde als eingereicht markiert.\n\n"
+            f"Vorfall: {incident.title}\n"
+            f"Meldungsart: {stage_label}\n"
+            f"{ref_line}\n\n"
+            f"--- Meldungstext ---\n{draft.content}\n\n"
+            f"BSI MUK-Portal: {BSI_PORTAL_URL}\n"
+            f"BSI E-Mail: {BSI_EMAIL}\n"
+        )
+        html_body = (
+            f"<p>Ihre BSI-Meldung wurde als eingereicht markiert.</p>"
+            f"<ul>"
+            f"<li><strong>Vorfall:</strong> {incident.title}</li>"
+            f"<li><strong>Meldungsart:</strong> {stage_label}</li>"
+            f"{'<li><strong>BSI-Referenznummer:</strong> ' + draft.bsi_reference + '</li>' if draft.bsi_reference else ''}"
+            f"</ul>"
+            f"<h4>Meldungstext</h4>"
+            f"<pre style='background:#f8f9fa;padding:16px;border-radius:6px;"
+            f"font-size:0.85rem;white-space:pre-wrap'>{draft.content}</pre>"
+            f"<hr>"
+            f"<p><a href='{BSI_PORTAL_URL}' target='_blank'>"
+            f"➜ BSI MUK-Portal öffnen</a> &nbsp;|&nbsp; "
+            f"<a href='mailto:{BSI_EMAIL}'>{BSI_EMAIL}</a></p>"
+        )
+        app = current_app._get_current_object()
+        threading.Thread(
+            target=_send_submission_email_bg,
+            args=(app, current_user.email,
+                  f"BSI-Meldung: {incident.title} — {stage_label}",
+                  text_body, html_body),
+            daemon=True,
+        ).start()
+
+        flash('Meldung als eingereicht markiert. Eine Kopie wurde an Ihre E-Mail gesendet.', 'success')
         return redirect(url_for('nis2.incident_detail', incident_id=incident_id))
 
     # ── Add timeline entry ────────────────────────────────────────

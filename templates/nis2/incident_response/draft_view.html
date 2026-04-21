@@ -5,17 +5,28 @@
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <a href="{{ url_for('nis2.incident_detail', incident_id=draft.incident_id) }}"
+      <a href="{{ url_for('nis2.incident_detail', incident_id=incident.id) }}"
          class="text-muted text-decoration-none small"><i class="bi bi-arrow-left"></i> Vorfall</a>
       <h4 class="mt-1 mb-0">
         <i class="bi bi-send text-danger"></i>
-        BSI-Meldungsentwurf: 
-        <span class="text-capitalize">{{ draft.stage|replace('_', ' ') }}</span>
+        BSI-Meldungsentwurf:
+        <span class="text-capitalize">{{ draft.stage_label }}</span>
       </h4>
       <small class="text-muted">
         Version {{ draft.version }} | Generiert: {{ draft.created_at.strftime('%d.%m.%Y %H:%M') }}
-        {% if draft.is_approved %}| <span class="text-success"><i class="bi bi-check-circle"></i> Genehmigt</span>{% endif %}
+        {% if draft.is_approved %}| <span class="text-success"><i class="bi bi-check-circle"></i> Eingereicht</span>{% endif %}
+        {% if draft.bsi_reference %}| <span class="text-muted">Ref: {{ draft.bsi_reference }}</span>{% endif %}
       </small>
+    </div>
+    <!-- BSI Portal quick-access -->
+    <div class="d-flex gap-2">
+      <a href="https://muk.bsi.bund.de" target="_blank" rel="noopener"
+         class="btn btn-sm btn-outline-danger">
+        <i class="bi bi-box-arrow-up-right me-1"></i> BSI MUK-Portal
+      </a>
+      <a href="mailto:meldestelle@bsi.bund.de" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-envelope me-1"></i> meldestelle@bsi.bund.de
+      </a>
     </div>
   </div>
 
@@ -35,10 +46,10 @@
     </div>
     <div class="card-body">
       <!-- Read-only view -->
-      <div id="contentView" class="markdown-body bg-light p-3 rounded">{{ draft.content }}</div>
+      <div id="contentView" class="markdown-body bg-light p-3 rounded" style="white-space:pre-wrap">{{ draft.content }}</div>
       <!-- Editable form -->
       <form id="editForm" style="display:none;" method="POST"
-            action="{{ url_for('nis2.incident_draft_save', draft_id=draft.id) }}">
+            action="{{ url_for('nis2.incident_draft_save', incident_id=incident.id, draft_id=draft.id) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <textarea name="content" class="form-control font-monospace" rows="20">{{ draft.content }}</textarea>
         <div class="mt-2 d-flex gap-2">
@@ -50,20 +61,56 @@
     </div>
   </div>
 
-  <div class="d-flex gap-2">
-    {% if not draft.is_approved %}
-    <form method="POST" action="{{ url_for('nis2.incident_draft_submit', draft_id=draft.id) }}">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button class="btn btn-danger" onclick="return confirm('BSI-Meldung als gesendet markieren?')">
-        <i class="bi bi-send-fill"></i> Als gesendet markieren
-      </button>
-    </form>
-    {% else %}
-    <span class="btn btn-outline-success disabled"><i class="bi bi-check-circle"></i> Bereits genehmigt</span>
-    {% endif %}
-    <a href="{{ url_for('nis2.incident_detail', incident_id=draft.incident_id) }}"
-       class="btn btn-outline-secondary">Zurück zum Vorfall</a>
+  <!-- Submit / status section -->
+  {% if not draft.is_approved %}
+  <div class="card border-warning border-2 shadow-sm mb-4">
+    <div class="card-header bg-warning bg-opacity-10">
+      <strong><i class="bi bi-send-fill text-danger me-1"></i> Meldung beim BSI einreichen</strong>
+    </div>
+    <div class="card-body">
+      <ol class="small mb-3">
+        <li class="mb-2">Text oben kopieren und im
+          <a href="https://muk.bsi.bund.de" target="_blank" rel="noopener"
+             class="fw-semibold text-danger">BSI MUK-Portal <i class="bi bi-box-arrow-up-right"></i></a>
+          einreichen <em>oder</em> an
+          <a href="mailto:meldestelle@bsi.bund.de">meldestelle@bsi.bund.de</a> senden.
+        </li>
+        <li class="mb-2">BSI-Referenznummer unten eintragen.</li>
+        <li>Auf <strong>„Als eingereicht markieren"</strong> klicken.</li>
+      </ol>
+      <form method="POST"
+            action="{{ url_for('nis2.incident_draft_submit', incident_id=incident.id, draft_id=draft.id) }}"
+            onsubmit="return confirm('BSI-Meldung als gesendet markieren?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">BSI-Referenznummer (nach Einreichung)</label>
+          <input type="text" name="bsi_reference" class="form-control form-control-sm"
+                 placeholder="z. B. BSI-2024-12345" maxlength="100">
+          <div class="form-text">Kann leer bleiben, falls noch keine Referenz vorliegt.</div>
+        </div>
+        <button class="btn btn-danger">
+          <i class="bi bi-send-fill me-1"></i> Als eingereicht markieren
+        </button>
+        <small class="text-muted ms-3">
+          Eine Kopie wird an Ihre E-Mail gesendet.
+        </small>
+      </form>
+    </div>
   </div>
+  {% else %}
+  <div class="alert alert-success d-flex align-items-center gap-2">
+    <i class="bi bi-check-circle-fill fs-5"></i>
+    <div>
+      <strong>Meldung eingereicht</strong> am {{ draft.submitted_at.strftime('%d.%m.%Y %H:%M') }}
+      {% if draft.bsi_reference %} — Referenz: <strong>{{ draft.bsi_reference }}</strong>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <a href="{{ url_for('nis2.incident_detail', incident_id=incident.id) }}"
+     class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Zurück zum Vorfall
+  </a>
 </div>
 
 {% block scripts %}

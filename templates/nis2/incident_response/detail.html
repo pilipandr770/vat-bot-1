@@ -76,7 +76,7 @@
                 <td>
                   {% set draft = drafts.get(stage_key) %}
                   {% if draft %}
-                    <a href="{{ url_for('nis2.incident_draft_view', draft_id=draft.id) }}"
+                    <a href="{{ url_for('nis2.incident_draft_view', incident_id=incident.id, draft_id=draft.id) }}"
                        class="btn btn-sm btn-outline-primary me-1">
                       <i class="bi bi-eye"></i> Entwurf
                     </a>
@@ -240,6 +240,16 @@
             <i class="bi bi-info-circle me-1"></i>
             Nach jeder BSI-Einreichung bitte die <strong>BSI-Referenznummer</strong> im Entwurf eintragen und als „eingereicht" markieren.
           </div>
+          <div class="mt-3 d-grid gap-2">
+            <a href="https://muk.bsi.bund.de" target="_blank" rel="noopener"
+               class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-box-arrow-up-right me-1"></i> BSI MUK-Portal öffnen
+            </a>
+            <a href="mailto:meldestelle@bsi.bund.de"
+               class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-envelope me-1"></i> meldestelle@bsi.bund.de
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -283,13 +293,18 @@ function generateDraft(btn) {
   })
   .then(r => r.json())
   .then(d => {
-    if (d.success) {
-      window.location.href = d.draft_url;
+    if (d.draft_id) {
+      window.location.href = '{{ url_for("nis2.incident_detail", incident_id=incident.id) }}';
     } else {
-      alert('Fehler: ' + d.error);
+      alert('Fehler: ' + (d.error || 'Unbekannter Fehler'));
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-magic"></i> KI-Entwurf';
     }
+  })
+  .catch(() => {
+    alert('Netzwerkfehler — bitte erneut versuchen.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-magic"></i> KI-Entwurf';
   });
 }
 </script>
