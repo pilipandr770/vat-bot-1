@@ -96,9 +96,10 @@ body {
 }
 
 .navbar .dropdown-menu {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
     box-shadow: var(--shadow-medium) !important;
+    z-index: 1055 !important;
 }
 
 .navbar .dropdown-item {
