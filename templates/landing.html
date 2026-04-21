@@ -236,46 +236,71 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-3">
-                        Business Security<br><span class="text-primary">in drei Modulen</span>
+                    <!-- Fear-driven headline -->
+                    <div class="hero-eyebrow mb-3">
+                        <span class="hero-tag"><i class="bi bi-exclamation-triangle-fill me-1"></i>NIS2 · DSGVO · Cyberkriminalität</span>
+                    </div>
+                    <h1 class="hero-h1 mb-3">
+                        Betrug. Hackerangriffe.<br>
+                        <span class="hero-accent">Bußgelder bis 10&nbsp;Mio.&nbsp;€.</span><br>
+                        Wir schützen Sie — lückenlos.
                     </h1>
-                    <p class="lead mb-4">
-                        Die All-in-One-Plattform für KMU: Geschäftspartner prüfen,
-                        digitale Ressourcen schützen und Compliance-Anforderungen lückenlos erfüllen.
+                    <p class="hero-lead mb-4">
+                        91&nbsp;% aller Cyberangriffe auf KMU beginnen mit einer manipulierten E-Mail.
+                        Gefälschte Geschäftspartner verursachen Millionenschäden.
+                        NIS2-Verstöße kosten bis zu <strong>10&nbsp;Mio.&nbsp;€</strong>.
+                        Unsere Plattform schließt alle drei Lücken — automatisch.
                     </p>
-                    <div class="d-flex gap-3 mb-4">
-                        <div class="text-center flex-fill">
-                            <i class="bi bi-person-check-fill text-primary fs-4 d-block mb-1"></i>
-                            <small class="fw-semibold" style="font-size:.78rem;">Partner<br>prüfen</small>
+
+                    <!-- Fear → Solution pillars -->
+                    <div class="hero-pillars mb-4">
+                        <div class="hero-pillar">
+                            <div class="hero-pillar-icon hero-pillar-icon--red">
+                                <i class="bi bi-person-x-fill"></i>
+                            </div>
+                            <div>
+                                <div class="hero-pillar-label">Geschäftspartner-Betrug</div>
+                                <div class="hero-pillar-solution"><i class="bi bi-check2"></i> Echtzeit-Prüfung</div>
+                            </div>
                         </div>
-                        <div class="text-center flex-fill">
-                            <i class="bi bi-shield-fill-check text-danger fs-4 d-block mb-1"></i>
-                            <small class="fw-semibold" style="font-size:.78rem;">Ressourcen<br>schützen</small>
+                        <div class="hero-pillar">
+                            <div class="hero-pillar-icon hero-pillar-icon--orange">
+                                <i class="bi bi-bug-fill"></i>
+                            </div>
+                            <div>
+                                <div class="hero-pillar-label">Hackerangriffe & Phishing</div>
+                                <div class="hero-pillar-solution"><i class="bi bi-check2"></i> KI-Abwehr aktiv</div>
+                            </div>
                         </div>
-                        <div class="text-center flex-fill">
-                            <i class="bi bi-clipboard2-check-fill text-success fs-4 d-block mb-1"></i>
-                            <small class="fw-semibold" style="font-size:.78rem;">Compliance<br>erfüllen</small>
+                        <div class="hero-pillar">
+                            <div class="hero-pillar-icon hero-pillar-icon--yellow">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                            </div>
+                            <div>
+                                <div class="hero-pillar-label">NIS2 / DSGVO-Bußgelder</div>
+                                <div class="hero-pillar-solution"><i class="bi bi-check2"></i> Compliance gesichert</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex gap-3">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-rocket"></i> Jetzt starten (3 Tage gratis)
+
+                    <!-- CTAs -->
+                    <div class="d-flex gap-3 flex-wrap mb-3">
+                        <a href="{{ url_for('auth.register') }}" class="btn hero-cta-primary btn-lg">
+                            <i class="bi bi-shield-check me-1"></i> Jetzt kostenlos schützen
                         </a>
-                        <a href="#features" class="btn btn-outline-secondary btn-lg">
-                            <i class="bi bi-stars"></i> Alle Features
+                        <a href="#features" class="btn hero-cta-secondary btn-lg">
+                            Alle Features <i class="bi bi-arrow-down ms-1"></i>
                         </a>
                     </div>
-                    <div class="mt-4">
-                        <small class="text-muted">
-                            <i class="bi bi-check-circle text-success"></i> 3 Tage kostenlos testen
-                            <i class="bi bi-check-circle text-success ms-3"></i> Keine Kreditkarte erforderlich
-                            <i class="bi bi-check-circle text-success ms-3"></i> 3 Kernmodule · 14+ Funktionen
-                        </small>
+                    <div class="hero-reassurance">
+                        <span><i class="bi bi-check-circle-fill"></i> 14 Tage gratis</span>
+                        <span><i class="bi bi-check-circle-fill"></i> Keine Kreditkarte</span>
+                        <span><i class="bi bi-check-circle-fill"></i> DSGVO-konform</span>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <img src="{{ url_for('static', filename='images/hero-illustration.svg') }}" 
-                         alt="VAT Verification Dashboard" class="img-fluid">
+                    <img src="{{ url_for('static', filename='images/hero-illustration.svg') }}"
+                         alt="VAT Verification Dashboard" class="img-fluid hero-image">
                 </div>
             </div>
         </div>

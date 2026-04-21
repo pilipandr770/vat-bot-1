@@ -44,6 +44,20 @@ body {
     pointer-events: none;
 }
 
+/* Force white text inside hero — overrides global color: #000 !important from style.css */
+.hero-section,
+.hero-section h1,
+.hero-section h2,
+.hero-section p,
+.hero-section span,
+.hero-section small,
+.hero-section div,
+.hero-section a,
+.hero-section strong,
+.hero-section label {
+    color: #ffffff !important;
+}
+
 .hero-content {
     position: relative;
     z-index: 2;
@@ -52,6 +66,155 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
+}
+
+/* Hero eyebrow tag */
+.hero-eyebrow { position: relative; z-index: 2; }
+.hero-tag {
+    display: inline-block;
+    background: rgba(255, 82, 82, 0.18);
+    border: 1px solid rgba(255, 120, 120, 0.4);
+    color: #ffb3b3 !important;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .35rem .85rem;
+    border-radius: 20px;
+}
+
+/* Hero heading */
+.hero-h1 {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #ffffff !important;
+}
+.hero-accent {
+    color: #ffcc00 !important;
+}
+
+/* Hero lead paragraph */
+.hero-lead {
+    position: relative;
+    z-index: 2;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.88) !important;
+    max-width: 520px;
+}
+.hero-lead strong {
+    color: #ffcc00 !important;
+    font-weight: 700;
+}
+
+/* Fear → Solution pillars */
+.hero-pillars {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+}
+.hero-pillar {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: .6rem 1rem;
+}
+.hero-pillar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.hero-pillar-icon--red    { background: rgba(220, 53, 69, 0.25);  color: #ff8080 !important; }
+.hero-pillar-icon--orange { background: rgba(253, 126, 20, 0.25); color: #ffb347 !important; }
+.hero-pillar-icon--yellow { background: rgba(255, 193, 7, 0.2);   color: #ffdd57 !important; }
+
+.hero-pillar-label {
+    font-size: .85rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75) !important;
+    line-height: 1.2;
+}
+.hero-pillar-solution {
+    font-size: .8rem;
+    font-weight: 700;
+    color: #7dffb3 !important;
+    margin-top: .1rem;
+}
+.hero-pillar-solution i { margin-right: .2rem; }
+
+/* Hero CTAs */
+.hero-cta-primary {
+    background: #ffcc00;
+    color: #0f2744 !important;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: .75rem 1.75rem;
+    font-size: 1rem;
+    box-shadow: 0 4px 20px rgba(255, 204, 0, 0.35);
+    transition: var(--transition-smooth);
+    animation: none !important;
+}
+.hero-cta-primary:hover {
+    background: #f5c300;
+    color: #0f2744 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(255, 204, 0, 0.5);
+}
+
+.hero-cta-secondary {
+    background: transparent;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: .75rem 1.5rem;
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+}
+.hero-cta-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.8);
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Hero reassurance strip */
+.hero-reassurance {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    font-size: .8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65) !important;
+}
+.hero-reassurance span { color: rgba(255, 255, 255, 0.65) !important; }
+.hero-reassurance i {
+    color: #7dffb3 !important;
+    margin-right: .3rem;
+}
+
+/* Hero image */
+.hero-image {
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    position: relative;
+    z-index: 2;
 }
 
 .hero-title {
@@ -583,9 +746,14 @@ html {
         padding-bottom: 2rem;
     }
 
-    .hero-title {
-        font-size: 2.5rem;
-    }
+    .hero-h1 { font-size: 1.75rem; }
+    .hero-lead { font-size: .95rem; }
+
+    .hero-pillars { gap: .5rem; }
+    .hero-pillar { padding: .5rem .75rem; }
+
+    .hero-cta-primary,
+    .hero-cta-secondary { width: 100%; text-align: center; }
 
     .hero-buttons {
         flex-direction: column;
