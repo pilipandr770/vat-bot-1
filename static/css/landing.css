@@ -44,19 +44,8 @@ body {
     pointer-events: none;
 }
 
-/* Force white text inside hero — overrides global color: #000 !important from style.css */
-.hero-section,
-.hero-section h1,
-.hero-section h2,
-.hero-section p,
-.hero-section span,
-.hero-section small,
-.hero-section div,
-.hero-section a,
-.hero-section strong,
-.hero-section label {
-    color: #ffffff !important;
-}
+/* Force white text inside hero — universal override */
+.hero-section * { color: #ffffff !important; }
 
 .hero-content {
     position: relative;
