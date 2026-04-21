@@ -341,11 +341,11 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #00ff00;
+    color: #1e293b;
 }
 
 .feature-description {
-    color: #00ff00;
+    color: #475569;
     line-height: 1.6;
 }
 
@@ -360,14 +360,14 @@ select {
 .form-control::placeholder,
 input::placeholder,
 textarea::placeholder {
-    color: #00ff00 !important;
+    color: #6c757d !important;
     opacity: 0.8;
 }
 
 .form-text,
 .text-muted,
 small {
-    color: #00ff00 !important;
+    color: #6c757d !important;
 }
 
 /* Stats Section */

@@ -14,6 +14,9 @@
     --border-radius: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    --warning-gradient: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+    --danger-gradient: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
     --glass-bg: rgba(255, 255, 255, 0.9);
     --glass-border: rgba(0, 0, 0, 0.1);
 }
@@ -199,7 +202,8 @@ textarea.autofill-highlight {
 
 .btn-success {
     background: var(--success-gradient);
-    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.35);
 }
 
 .btn-success:hover {
