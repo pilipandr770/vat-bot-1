@@ -1,110 +1,325 @@
 <!-- FILE: templates/admin/osint_scan.html -->
 {% extends "base.html" %}
-
 {% block title %}{{ _('OSINT Scanner') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h2 class="mb-4">
-                <i class="bi bi-shield-check"></i> {{ _('OSINT Scanner') }}
-            </h2>
-            <p class="text-muted">{{ _('Passive data collection about the counterparty\'s domain, website, or email.') }}</p>
-            <form method="post" class="card p-4 shadow-sm">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ _('URL (optional)') }}</label>
-                    <input class="form-control" type="url" name="url" placeholder="{{ _('https://example.com') }}" />
-                    <small class="form-text text-muted">{{ _('Complete website URL for header and social media analysis.') }}</small>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ _('Domain') }} <span class="text-danger">*</span></label>
-                    <input class="form-control" type="text" name="domain" placeholder="{{ _('example.com') }}" required />
-                    <small class="form-text text-muted">{{ _('Primary company domain for WHOIS, DNS, and SSL checks.') }}</small>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ _('Email (optional)') }}</label>
-                    <input class="form-control" type="email" name="email" placeholder="{{ _('info@example.com') }}" />
-                    <small class="form-text text-muted">{{ _('Email for basic format validation.') }}</small>
-                </div>
+<div class="container mt-4" style="max-width:860px">
 
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary btn-lg" type="submit">
-                        <i class="bi bi-search"></i> {{ _('Start Scan') }}
-                    </button>
-                </div>
-            </form>
+  <h2 class="mb-1">
+    <i class="bi bi-search"></i> {{ _('OSINT Scanner') }}
+  </h2>
+  <p class="text-muted mb-4">
+    Passive Intelligence-Erhebung aus öffentlich zugänglichen Quellen.
+  </p>
 
-            <div id="result" class="mt-4"></div>
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4" id="osintTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="domain-tab" data-bs-toggle="tab"
+              data-bs-target="#domain-panel" type="button" role="tab">
+        <i class="bi bi-globe2 me-1"></i> Domain-Analyse
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="username-tab" data-bs-toggle="tab"
+              data-bs-target="#username-panel" type="button" role="tab">
+        <i class="bi bi-person-search me-1"></i> Username-Suche
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+    <!-- ── TAB 1: Domain Scan ──────────────────────────────────────────── -->
+    <div class="tab-pane fade show active" id="domain-panel" role="tabpanel">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <p class="text-muted small mb-3">
+            WHOIS · DNS · SSL · Security-Headers · Robots.txt · Social Links · E-Mail-Validierung
+          </p>
+          <form id="domainForm">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">URL <span class="text-muted fw-normal">(optional)</span></label>
+              <input class="form-control" type="url" name="url"
+                     placeholder="https://example.com" />
+              <div class="form-text">Für Header- und Social-Link-Analyse.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Domain <span class="text-danger">*</span></label>
+              <input class="form-control" type="text" name="domain"
+                     placeholder="example.com" required />
+              <div class="form-text">Für WHOIS, DNS und SSL.</div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-semibold">E-Mail <span class="text-muted fw-normal">(optional)</span></label>
+              <input class="form-control" type="email" name="email"
+                     placeholder="info@example.com" />
+            </div>
+            <button class="btn btn-primary px-4" type="submit" id="domainScanBtn">
+              <i class="bi bi-search me-1"></i> Scan starten
+            </button>
+          </form>
         </div>
+      </div>
+      <div id="domainResult" class="mt-3"></div>
     </div>
+
+    <!-- ── TAB 2: Username Search ──────────────────────────────────────── -->
+    <div class="tab-pane fade" id="username-panel" role="tabpanel">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <p class="text-muted small mb-3">
+            Durchsucht ~30 Plattformen gleichzeitig nach einem Benutzernamen.
+            Ergebnis in ca. 10–15 Sekunden.
+          </p>
+          <div class="input-group mb-4" style="max-width:480px">
+            <span class="input-group-text"><i class="bi bi-at"></i></span>
+            <input type="text" id="usernameInput" class="form-control form-control-lg"
+                   placeholder="benutzername" maxlength="50"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <button class="btn btn-primary px-4" id="usernameSearchBtn" onclick="startUsernameSearch()">
+              <i class="bi bi-search me-1"></i> Suchen
+            </button>
+          </div>
+
+          <!-- Progress -->
+          <div id="usernameProgress" style="display:none" class="mb-3">
+            <div class="d-flex align-items-center gap-2 text-muted mb-2">
+              <div class="spinner-border spinner-border-sm text-primary"></div>
+              <span id="usernameProgressText">Suche läuft…</span>
+            </div>
+            <div class="progress" style="height:6px">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                   style="width:100%"></div>
+            </div>
+          </div>
+
+          <!-- Summary bar (shown after results) -->
+          <div id="usernameSummary" style="display:none" class="mb-3">
+            <div class="d-flex gap-3 align-items-center flex-wrap">
+              <span class="fs-5 fw-bold" id="summaryFound"></span>
+              <span class="text-muted small" id="summaryTotal"></span>
+              <div class="ms-auto">
+                <button class="btn btn-sm btn-outline-secondary" onclick="filterResults('all')">Alle</button>
+                <button class="btn btn-sm btn-success ms-1" onclick="filterResults('found')">Gefunden</button>
+                <button class="btn btn-sm btn-outline-secondary ms-1" onclick="filterResults('not_found')">Nicht gefunden</button>
+                <button class="btn btn-sm btn-outline-warning ms-1" onclick="filterResults('unknown')">Unbekannt</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results table -->
+          <div id="usernameResults"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-content -->
 </div>
 
 <script>
-const osintTranslations = {
-  scanning: "{{ _('Scanning...') }}",
-  invalidResponse: "{{ _('Server returned invalid response. Please try again later.') }}",
-  scanCompleted: "{{ _('Scan completed') }}",
-  results: "{{ _('Results') }}",
-  viewFullResults: "{{ _('View full results') }}",
-  scanError: "{{ _('Scan error') }}",
-  contactSupport: "{{ _('If the error persists, please contact support.') }}"
-};
-
-document.querySelector('form').addEventListener('submit', async (e) => {
+// ── Domain Scan ──────────────────────────────────────────────────────────────
+document.getElementById('domainForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const btn = e.target.querySelector('button[type="submit"]');
-  const originalText = btn.innerHTML;
+  const btn = document.getElementById('domainScanBtn');
+  const orig = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' + osintTranslations.scanning;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Scanning…';
+
   try {
     const fd = new FormData(e.target);
-    const res = await fetch("", { method: "POST", body: fd });
-
-    // Überprüfung auf JSON
-    const contentType = res.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      throw new Error(osintTranslations.invalidResponse);
-    }
-
+    const res = await fetch("{{ url_for('osint.scan') }}", { method: "POST", body: fd });
+    const ct = res.headers.get("content-type") || '';
+    if (!ct.includes("application/json")) throw new Error("Ungültige Server-Antwort");
     const data = await res.json();
-
-    // Überprüfung auf Fehler vom Server
-    if (!res.ok || data.error) {
-      throw new Error(data.error || `HTTP ${res.status}: ${res.statusText}`);
-    }
+    if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
 
     let html = '<div class="card shadow-sm"><div class="card-body">';
-    html += '<h5 class="card-title text-success"><i class="bi bi-check-circle"></i> ' + osintTranslations.scanCompleted + '</h5>';
-    html += '<div class="alert alert-info mt-3">';
-    html += '<strong>' + osintTranslations.results + ':</strong>';
-    html += '<ul class="mb-0 mt-2">';
-
+    html += '<h6 class="text-success mb-3"><i class="bi bi-check-circle-fill me-1"></i>Scan abgeschlossen</h6>';
+    html += '<ul class="list-group list-group-flush mb-3">';
     data.results.forEach(r => {
-      const icon = r.status === 'ok' ? 'check-circle text-success' :
-                   r.status === 'warn' ? 'exclamation-triangle text-warning' :
-                   'x-circle text-danger';
-      html += `<li><i class="bi bi-${icon}"></i> <strong>${r.service}:</strong> ${r.status} ${r.notes ? '(' + r.notes + ')' : ''}</li>`;
+      const icon = r.status === 'ok'   ? 'check-circle-fill text-success' :
+                   r.status === 'warn' ? 'exclamation-triangle-fill text-warning' :
+                                         'x-circle-fill text-danger';
+      html += `<li class="list-group-item px-0 py-1 small">
+        <i class="bi bi-${icon} me-1"></i>
+        <strong>${r.service}:</strong> ${r.notes || r.status}
+      </li>`;
     });
-
-    html += '</ul></div>';
-    html += `<a class="btn btn-primary mt-3" href="/osint/scan/${data.scan_id}">`;
-    html += '<i class="bi bi-eye"></i> ' + osintTranslations.viewFullResults + '</a>';
+    html += `</ul><a class="btn btn-sm btn-outline-primary" href="{{ url_for('osint.scan_view', scan_id=0) }}".replace('0','${data.scan_id}')>
+      <i class="bi bi-eye me-1"></i>Vollständige Ergebnisse</a>`;
     html += '</div></div>';
-
-    document.getElementById('result').innerHTML = html;
-  } catch (error) {
-    console.error('OSINT scan error:', error);
-    document.getElementById('result').innerHTML =
-      `<div class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle"></i>
-        <strong>${osintTranslations.scanError}:</strong> ${error.message}
-        <br><small>${osintTranslations.contactSupport}</small>
-      </div>`;
+    document.getElementById('domainResult').innerHTML = html;
+  } catch (err) {
+    document.getElementById('domainResult').innerHTML =
+      `<div class="alert alert-danger mt-2"><i class="bi bi-exclamation-triangle me-1"></i>${err.message}</div>`;
   } finally {
     btn.disabled = false;
-    btn.innerHTML = originalText;
+    btn.innerHTML = orig;
   }
+});
+
+// ── Username Search ───────────────────────────────────────────────────────────
+let _allResults = [];
+let _pollInterval = null;
+
+async function startUsernameSearch() {
+  const username = document.getElementById('usernameInput').value.trim().replace(/^@/, '');
+  if (!username) {
+    document.getElementById('usernameInput').focus();
+    return;
+  }
+
+  // Reset UI
+  document.getElementById('usernameResults').innerHTML = '';
+  document.getElementById('usernameSummary').style.display = 'none';
+  document.getElementById('usernameProgress').style.display = 'block';
+  document.getElementById('usernameProgressText').textContent = `Durchsuche 30 Plattformen nach "@${username}" …`;
+  document.getElementById('usernameSearchBtn').disabled = true;
+  _allResults = [];
+
+  try {
+    const res = await fetch("{{ url_for('osint.username_scan_start') }}", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Start fehlgeschlagen');
+    pollUsernameResult(data.task_id, username);
+  } catch (err) {
+    showUsernameError(err.message);
+  }
+}
+
+function pollUsernameResult(taskId, username) {
+  let attempts = 0;
+  const maxAttempts = 60; // 60 × 2s = 2 min
+
+  const poll = async () => {
+    attempts++;
+    try {
+      const res = await fetch(`/osint/username-scan/result/${taskId}`);
+      const data = await res.json();
+
+      if (data.status === 'done') {
+        stopPolling();
+        showUsernameResults(data);
+      } else if (data.status === 'failed') {
+        stopPolling();
+        showUsernameError(data.error || 'Suche fehlgeschlagen');
+      } else if (attempts >= maxAttempts) {
+        stopPolling();
+        showUsernameError('Timeout — bitte erneut versuchen.');
+      } else {
+        _pollInterval = setTimeout(poll, 2000);
+      }
+    } catch (err) {
+      stopPolling();
+      showUsernameError('Netzwerkfehler');
+    }
+  };
+
+  _pollInterval = setTimeout(poll, 2000);
+}
+
+function stopPolling() {
+  if (_pollInterval) { clearTimeout(_pollInterval); _pollInterval = null; }
+  document.getElementById('usernameProgress').style.display = 'none';
+  document.getElementById('usernameSearchBtn').disabled = false;
+}
+
+function showUsernameResults(data) {
+  _allResults = data.results || [];
+
+  // Summary bar
+  const summaryEl = document.getElementById('usernameSummary');
+  summaryEl.style.display = 'flex';
+  document.getElementById('summaryFound').innerHTML =
+    `<i class="bi bi-person-check-fill text-success me-1"></i>${data.found_count} gefunden`;
+  document.getElementById('summaryTotal').textContent =
+    `von ${data.total} Plattformen für "@${data.username}"`;
+
+  renderTable(_allResults);
+}
+
+function filterResults(filter) {
+  const filtered = filter === 'all' ? _allResults : _allResults.filter(r => r.status === filter);
+  renderTable(filtered);
+}
+
+function renderTable(results) {
+  if (!results.length) {
+    document.getElementById('usernameResults').innerHTML =
+      '<p class="text-muted small mt-2">Keine Ergebnisse.</p>';
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  results.forEach(r => {
+    if (!grouped[r.category]) grouped[r.category] = [];
+    grouped[r.category].push(r);
+  });
+
+  let html = '';
+  const catIcons = {
+    'Business': 'briefcase-fill', 'Tech': 'code-slash', 'Social': 'people-fill',
+    'Creative': 'palette-fill', 'Messaging': 'chat-dots-fill', 'Other': 'three-dots'
+  };
+
+  for (const [cat, rows] of Object.entries(grouped)) {
+    const icon = catIcons[cat] || 'circle';
+    const foundInCat = rows.filter(r => r.status === 'found').length;
+    html += `<div class="mb-3">
+      <h6 class="text-muted small fw-bold text-uppercase mb-1">
+        <i class="bi bi-${icon} me-1"></i>${cat}
+        ${foundInCat > 0 ? `<span class="badge bg-success ms-1">${foundInCat}</span>` : ''}
+      </h6>
+      <div class="list-group list-group-flush">`;
+
+    rows.forEach(r => {
+      const [statusClass, statusIcon, statusLabel] =
+        r.status === 'found'     ? ['success', 'check-circle-fill',  'Gefunden']    :
+        r.status === 'not_found' ? ['secondary','x-circle',          'Nicht gefunden'] :
+                                   ['warning',  'question-circle',   'Unbekannt'];
+
+      html += `<div class="list-group-item list-group-item-action px-2 py-2 d-flex align-items-center gap-2"
+                    style="border-left:3px solid var(--bs-${statusClass})">
+        <i class="bi bi-${statusIcon} text-${statusClass} flex-shrink-0"></i>
+        <div class="flex-grow-1 overflow-hidden">
+          <span class="fw-semibold small">${r.platform}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+          ${r.status === 'found'
+            ? `<a href="${r.url}" target="_blank" rel="noopener noreferrer"
+                  class="btn btn-sm btn-outline-success py-0 px-2" style="font-size:.75rem">
+                 <i class="bi bi-box-arrow-up-right me-1"></i>Profil öffnen
+               </a>`
+            : `<span class="text-muted" style="font-size:.75rem">${statusLabel}</span>`
+          }
+        </div>
+      </div>`;
+    });
+
+    html += '</div></div>';
+  }
+
+  document.getElementById('usernameResults').innerHTML = html;
+}
+
+function showUsernameError(msg) {
+  document.getElementById('usernameProgress').style.display = 'none';
+  document.getElementById('usernameSearchBtn').disabled = false;
+  document.getElementById('usernameResults').innerHTML =
+    `<div class="alert alert-danger mt-2 small">
+      <i class="bi bi-exclamation-triangle me-1"></i>${msg}
+    </div>`;
+}
+
+// Allow Enter key in username input
+document.getElementById('usernameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startUsernameSearch();
 });
 </script>
 {% endblock %}
