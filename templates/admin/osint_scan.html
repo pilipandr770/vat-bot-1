@@ -202,7 +202,10 @@ function pollUsernameResult(taskId, username) {
       const res = await fetch(`/osint/username-scan/result/${taskId}`);
       if (res.status === 404) {
         stopPolling();
-        showUsernameError('Aufgabe nicht gefunden — bitte erneut versuchen.');
+        // Only show error if we haven't already displayed results
+        if (_allResults.length === 0) {
+          showUsernameError('Aufgabe nicht gefunden — bitte erneut versuchen.');
+        }
         return;
       }
       const data = await res.json();
