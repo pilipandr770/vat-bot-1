@@ -223,7 +223,7 @@ _HEADERS = {
     ),
     "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
 }
-_TIMEOUT = 8  # seconds per request
+_TIMEOUT = 4  # seconds per request (cloud IPs often blocked; 4s avoids 30×8=240s worst case)
 
 
 class PlatformResult(TypedDict):

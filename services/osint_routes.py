@@ -68,16 +68,40 @@ def scan_view(scan_id: int):
 # ── Username OSINT ────────────────────────────────────────────────────────────
 
 def _run_username_scan(task_id: str, username: str) -> None:
-    """Background thread: check username on all platforms, store result in task dict."""
-    from .osint.adapters.username_adapter import check_username
-    _username_tasks[task_id]["status"] = "running"
+    """Background thread: check username progressively, writing each result as it arrives."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from .osint.adapters.username_adapter import PLATFORMS, _check_one, _TIMEOUT
+
+    task = _username_tasks[task_id]
+    task["status"] = "running"
+    task["total"] = len(PLATFORMS)
+
     try:
-        results = check_username(username)
-        _username_tasks[task_id]["status"] = "done"
-        _username_tasks[task_id]["results"] = results
+        with ThreadPoolExecutor(max_workers=15) as pool:
+            futures = {pool.submit(_check_one, username, p): p for p in PLATFORMS}
+            for future in as_completed(futures):
+                try:
+                    result = future.result()
+                except Exception as exc:
+                    p = futures[future]
+                    result = {
+                        "platform": p["name"],
+                        "category": p["category"],
+                        "url": p["url"].format(username=username),
+                        "status": "unknown",
+                    }
+                task["results"].append(result)
+                task["checked"] = len(task["results"])
+
+        # Sort final results: found first, then category, then name
+        order = {"found": 0, "not_found": 1, "unknown": 2}
+        task["results"].sort(
+            key=lambda r: (order.get(r["status"], 9), r["category"], r["platform"])
+        )
+        task["status"] = "done"
     except Exception as exc:
-        _username_tasks[task_id]["status"] = "failed"
-        _username_tasks[task_id]["error"] = str(exc)
+        task["status"] = "failed"
+        task["error"] = str(exc)
 
 
 @osint_bp.route("/username-scan", methods=["POST"])
@@ -96,6 +120,8 @@ def username_scan_start():
         "status": "pending",
         "username": username,
         "results": [],
+        "checked": 0,
+        "total": 0,
         "error": None,
         "started_at": datetime.utcnow().isoformat(),
     }
@@ -119,7 +145,14 @@ def username_scan_result(task_id: str):
         return jsonify({"error": "Task not found"}), 404
 
     if task["status"] in ("pending", "running"):
-        return jsonify({"status": task["status"]}), 200
+        found_so_far = [r for r in task["results"] if r["status"] == "found"]
+        return jsonify({
+            "status": task["status"],
+            "checked": task.get("checked", 0),
+            "total": task.get("total", 0),
+            "results": task["results"],
+            "found_count": len(found_so_far),
+        }), 200
 
     if task["status"] == "done":
         found = [r for r in task["results"] if r["status"] == "found"]
