@@ -110,11 +110,11 @@ def create_app(config_name=None):
         except ImportError:
             app.logger.warning('sentry-sdk not installed; skipping Sentry init.')
 
-    if not app.config.get('FILE_SCANNER_URL') or not app.config.get('FILE_SCANNER_ENABLED', True):
+    if app.config.get('FILE_SCANNER_ENABLED', True) and not app.config.get('FILE_SCANNER_URL'):
         app.logger.warning(
-            'FILE_SCANNER_URL not configured or scanner disabled; MailGuard will rely on local heuristics.'
+            'FILE_SCANNER_URL not configured; MailGuard will rely on local heuristics.'
         )
-    
+
     # Initialize extensions
     db.init_app(app)
     ensure_schema(app)
