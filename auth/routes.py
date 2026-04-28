@@ -19,6 +19,7 @@ from auth.forms import (LoginForm, RegistrationForm, PasswordResetRequestForm,
 from auth.models import User, Subscription
 from crm.models import db
 from services.rate_limiter import auth_rate_limit
+from notifications.alerts import send_email
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -44,13 +45,11 @@ def register():
                 country=form.country.data
             )
             user.set_password(form.password.data)
-            # TEST MODE: Email confirmation disabled - automatically confirm email
-            user.is_email_confirmed = True
-            # user.generate_confirmation_token()  # Disabled for testing
-            
+            user.generate_confirmation_token()
+
             db.session.add(user)
             db.session.commit()
-            
+
             # Create basic (trial) subscription for new user
             # User gets 30-day free trial
             trial_subscription = Subscription(
@@ -65,9 +64,9 @@ def register():
             )
             db.session.add(trial_subscription)
             db.session.commit()
-            # send_confirmation_email(user)  # Disabled for testing
-            
-            flash('Registrierung erfolgreich! Sie können sich jetzt anmelden.', 'success')
+            send_confirmation_email(user)
+
+            flash('Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail-Adresse.', 'success')
             return redirect(url_for('auth.login'))
             
         except Exception as e:
@@ -98,14 +97,21 @@ def login():
             flash('Ihr Konto wurde deaktiviert. Bitte kontaktieren Sie den Support.', 'error')
             return redirect(url_for('auth.login'))
         
-        # KNOWN_ISSUE: Email confirmation intentionally disabled until MAIL_SERVER
-        # is configured in production. Re-enable by uncommenting the block below
-        # and ensuring send_confirmation_email() is imported and MAIL_* env vars are set.
-        # if not user.is_email_confirmed:
-        #     flash('Bitte bestätigen Sie Ihre E-Mail-Adresse.', 'warning')
-        #     send_confirmation_email(user)
-        #     return redirect(url_for('auth.login'))
-        
+        # Check email confirmation
+        if not user.is_email_confirmed:
+            flash('Bitte bestätigen Sie Ihre E-Mail-Adresse. E-Mail erneut gesendet.', 'warning')
+            send_confirmation_email(user)
+            return redirect(url_for('auth.login'))
+
+        # 2FA check — redirect to TOTP verification before logging in
+        if user.totp_enabled:
+            remember = '1' if form.remember_me.data else '0'
+            next_page = request.args.get('next') or url_for('dashboard')
+            return redirect(url_for('auth.totp_verify',
+                                    uid=user.id,
+                                    next=next_page,
+                                    remember=remember))
+
         # Login successful
         login_user(user, remember=form.remember_me.data)
         user.last_login = datetime.utcnow()
@@ -397,6 +403,86 @@ def company_profile():
         return redirect(url_for('auth.company_profile'))
     
     return render_template('auth/company_profile.html')
+
+
+# ── 2FA / TOTP routes ────────────────────────────────────────────
+
+@auth_bp.route('/2fa/setup', methods=['GET', 'POST'])
+@login_required
+def totp_setup():
+    """Enable TOTP two-factor authentication."""
+    import pyotp, qrcode, io, base64
+
+    if request.method == 'POST':
+        code = request.form.get('code', '').strip()
+        secret = request.form.get('secret', '').strip()
+        totp = pyotp.TOTP(secret)
+        if totp.verify(code, valid_window=1):
+            current_user.totp_secret = secret
+            current_user.totp_enabled = True
+            db.session.commit()
+            flash('Zwei-Faktor-Authentifizierung wurde aktiviert.', 'success')
+            return redirect(url_for('auth.profile'))
+        flash('Ungültiger Code. Bitte versuchen Sie es erneut.', 'danger')
+
+    secret = pyotp.random_base32()
+    totp = pyotp.TOTP(secret)
+    issuer = 'VAT Verifizierung'
+    otp_uri = totp.provisioning_uri(name=current_user.email, issuer_name=issuer)
+
+    # Generate QR code as base64 PNG
+    qr = qrcode.make(otp_uri)
+    buf = io.BytesIO()
+    qr.save(buf, format='PNG')
+    qr_b64 = base64.b64encode(buf.getvalue()).decode()
+
+    return render_template('auth/2fa_setup.html', secret=secret, qr_b64=qr_b64)
+
+
+@auth_bp.route('/2fa/verify', methods=['GET', 'POST'])
+def totp_verify():
+    """Verify TOTP code after password login (second step)."""
+    import pyotp
+    user_id = request.args.get('uid') or request.form.get('uid')
+    next_url = request.args.get('next') or request.form.get('next') or url_for('dashboard')
+
+    if not user_id:
+        return redirect(url_for('auth.login'))
+
+    user = User.query.get(int(user_id))
+    if not user or not user.totp_enabled:
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        code = request.form.get('code', '').strip()
+        totp = pyotp.TOTP(user.totp_secret)
+        if totp.verify(code, valid_window=1):
+            login_user(user, remember=request.form.get('remember') == '1')
+            user.last_login = datetime.utcnow()
+            db.session.commit()
+            flash(f'Willkommen zurück, {user.first_name}!', 'success')
+            return redirect(next_url)
+        flash('Ungültiger Authenticator-Code.', 'danger')
+
+    return render_template('auth/2fa_verify.html', uid=user_id, next=next_url)
+
+
+@auth_bp.route('/2fa/disable', methods=['POST'])
+@login_required
+def totp_disable():
+    """Disable TOTP two-factor authentication."""
+    import pyotp
+    code = request.form.get('code', '').strip()
+    if current_user.totp_enabled and current_user.totp_secret:
+        totp = pyotp.TOTP(current_user.totp_secret)
+        if totp.verify(code, valid_window=1):
+            current_user.totp_secret = None
+            current_user.totp_enabled = False
+            db.session.commit()
+            flash('Zwei-Faktor-Authentifizierung wurde deaktiviert.', 'info')
+            return redirect(url_for('auth.profile'))
+    flash('Ungültiger Code. 2FA wurde nicht deaktiviert.', 'danger')
+    return redirect(url_for('auth.profile'))
 
 
 # Helper functions

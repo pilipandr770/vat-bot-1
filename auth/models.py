@@ -47,6 +47,10 @@ class User(UserMixin, db.Model):
     # Password reset
     password_reset_token = db.Column(db.String(100), unique=True)
     password_reset_expires = db.Column(db.DateTime)
+
+    # Two-Factor Authentication (TOTP)
+    totp_secret = db.Column(db.String(64))
+    totp_enabled = db.Column(db.Boolean, default=False)
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)

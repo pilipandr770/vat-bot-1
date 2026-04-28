@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Zwei-Faktor-Authentifizierung einrichten{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:520px">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h4 class="fw-bold mb-1"><i class="bi bi-shield-lock me-2 text-primary"></i>2FA einrichten</h4>
+      <p class="text-muted small mb-4">
+        Scannen Sie den QR-Code mit Ihrer Authenticator-App (z.B. Google Authenticator, Authy)
+        und geben Sie dann den 6-stelligen Code ein, um die Einrichtung abzuschließen.
+      </p>
+
+      <div class="text-center mb-4">
+        <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR-Code" style="width:200px;height:200px;border:4px solid #e5e7eb;border-radius:8px;">
+      </div>
+
+      <div class="bg-light rounded p-3 mb-4 text-center">
+        <div class="text-muted small mb-1">Manueller Schlüssel (falls QR-Code nicht funktioniert)</div>
+        <code class="user-select-all fw-bold" style="letter-spacing:2px">{{ secret }}</code>
+      </div>
+
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="secret" value="{{ secret }}">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Bestätigungscode</label>
+          <input type="text" name="code" class="form-control form-control-lg text-center"
+                 inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"
+                 placeholder="000000" autofocus required>
+          <div class="form-text">6-stelliger Code aus Ihrer Authenticator-App</div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-shield-check me-1"></i> 2FA aktivieren
+        </button>
+        <a href="{{ url_for('auth.profile') }}" class="btn btn-link w-100 mt-2 text-muted">Abbrechen</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

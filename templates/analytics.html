@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Analytics — VAT Verification{% endblock %}
+
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  .stat-card { border-left: 4px solid; }
+  .stat-card.primary  { border-color: #0d6efd; }
+  .stat-card.success  { border-color: #198754; }
+  .stat-card.warning  { border-color: #ffc107; }
+  .stat-card.danger   { border-color: #dc3545; }
+  .chart-container { position: relative; height: 280px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <div class="d-flex align-items-center mb-4">
+    <i class="bi bi-bar-chart-line-fill text-primary me-2" style="font-size:1.6rem"></i>
+    <div>
+      <h4 class="mb-0 fw-bold">Analytics</h4>
+      <div class="text-muted small">Verification trends and usage overview</div>
+    </div>
+  </div>
+
+  {# ── Summary cards ── #}
+  <div class="row g-3 mb-4" id="summary-cards">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm stat-card primary h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Total Checks</div>
+          <div class="fw-bold fs-4" id="stat-total">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm stat-card success h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">This Month</div>
+          <div class="fw-bold fs-4" id="stat-used">—</div>
+          <div class="text-muted" style="font-size:11px">of <span id="stat-limit">—</span> allowed</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm stat-card warning h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">High Risk</div>
+          <div class="fw-bold fs-4" id="stat-highrisk">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm stat-card danger h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Usage</div>
+          <div class="progress mt-2" style="height:10px">
+            <div class="progress-bar bg-primary" id="usage-bar" role="progressbar" style="width:0%"></div>
+          </div>
+          <div class="text-muted mt-1" style="font-size:11px" id="usage-label">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Charts ── #}
+  <div class="row g-3">
+
+    {# Daily activity bar chart #}
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3"><i class="bi bi-calendar3 me-1 text-primary"></i>Verifications — last 30 days</h6>
+          <div class="chart-container">
+            <canvas id="dailyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Risk distribution doughnut #}
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3"><i class="bi bi-pie-chart-fill me-1 text-primary"></i>Risk Distribution</h6>
+          <div class="chart-container">
+            <canvas id="riskChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Monthly usage gauge (simple progress + numbers) #}
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3"><i class="bi bi-speedometer2 me-1 text-primary"></i>Monthly Quota</h6>
+          <div class="d-flex align-items-center gap-3">
+            <div class="flex-grow-1">
+              <div class="progress" style="height:18px;border-radius:9px">
+                <div class="progress-bar progress-bar-striped" id="quota-bar" role="progressbar"
+                     style="width:0%;border-radius:9px" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+            </div>
+            <div class="text-muted small text-nowrap" id="quota-label">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const RISK_COLORS = {
+  low:     '#198754',
+  medium:  '#ffc107',
+  high:    '#fd7e14',
+  critical:'#dc3545',
+  unknown: '#adb5bd',
+};
+
+function riskColor(label) {
+  return RISK_COLORS[label] || '#0d6efd';
+}
+
+async function loadAnalytics() {
+  let data;
+  try {
+    const r = await fetch('/analytics/api', {
+      headers: {'X-CSRFToken': document.querySelector('meta[name=csrf-token]').content}
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    data = await r.json();
+  } catch (e) {
+    document.getElementById('stat-total').textContent = 'Error';
+    console.error('Analytics load failed:', e);
+    return;
+  }
+
+  // ── Summary cards ─────────────────────────────
+  document.getElementById('stat-total').textContent = data.total ?? 0;
+  document.getElementById('stat-used').textContent  = data.usage.used ?? 0;
+  const limit = data.usage.limit;
+  document.getElementById('stat-limit').textContent = limit === -1 ? '∞' : limit;
+
+  const highRisk = (data.risk.labels || []).reduce((acc, lbl, i) => {
+    return (lbl === 'high' || lbl === 'critical') ? acc + data.risk.data[i] : acc;
+  }, 0);
+  document.getElementById('stat-highrisk').textContent = highRisk;
+
+  const pct = limit > 0 && limit !== -1 ? Math.min(100, Math.round((data.usage.used / limit) * 100)) : 0;
+  const usageBar = document.getElementById('usage-bar');
+  usageBar.style.width = pct + '%';
+  usageBar.className = 'progress-bar ' + (pct > 80 ? 'bg-danger' : pct > 50 ? 'bg-warning' : 'bg-primary');
+  document.getElementById('usage-label').textContent = pct + '% used';
+
+  // ── Daily bar chart ────────────────────────────
+  new Chart(document.getElementById('dailyChart'), {
+    type: 'bar',
+    data: {
+      labels: data.daily.labels,
+      datasets: [{
+        label: 'Verifications',
+        data: data.daily.data,
+        backgroundColor: 'rgba(13,110,253,0.7)',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+      }
+    }
+  });
+
+  // ── Risk doughnut ──────────────────────────────
+  const riskLabels = data.risk.labels.length ? data.risk.labels : ['No data'];
+  const riskData   = data.risk.data.length   ? data.risk.data   : [1];
+  new Chart(document.getElementById('riskChart'), {
+    type: 'doughnut',
+    data: {
+      labels: riskLabels,
+      datasets: [{
+        data: riskData,
+        backgroundColor: riskLabels.map(riskColor),
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } },
+      }
+    }
+  });
+
+  // ── Quota bar ──────────────────────────────────
+  const qBar = document.getElementById('quota-bar');
+  qBar.style.width = pct + '%';
+  qBar.setAttribute('aria-valuenow', pct);
+  qBar.className = 'progress-bar progress-bar-striped ' +
+    (pct > 80 ? 'bg-danger' : pct > 50 ? 'bg-warning' : 'bg-success');
+  document.getElementById('quota-label').textContent =
+    `${data.usage.used} / ${limit === -1 ? '∞' : limit} (${pct}%)`;
+}
+
+document.addEventListener('DOMContentLoaded', loadAnalytics);
+</script>
+{% endblock %}

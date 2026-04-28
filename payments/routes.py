@@ -25,6 +25,7 @@ def subscribe(plan_name):
     stripe_price_ids = {
         'basic': current_app.config.get('STRIPE_PRICE_BASIC'),
         'professional': current_app.config.get('STRIPE_PRICE_PROFESSIONAL'),
+        'enterprise': current_app.config.get('STRIPE_PRICE_ENTERPRISE'),
     }
     
     # Validate plan
@@ -109,6 +110,7 @@ def success():
         plan_limits = {
             'basic': 100,           # 100 checks/month for €9.99
             'professional': 500,    # 500 checks/month for €49.90
+            'enterprise': 999999,   # Unlimited for €149.99
         }
 
         # Update or create subscription
@@ -264,6 +266,30 @@ def pricing():
             'cta_url': 'payments.subscribe',
             'cta_params': {'plan_name': 'professional'},
             'featured': True
+        },
+        {
+            'name': 'enterprise',
+            'display_name': 'Enterprise',
+            'price': 149.99,
+            'period': 'pro Monat',
+            'api_calls': -1,
+            'features': [
+                'Unbegrenzte Prüfungen',
+                'Alle Professional Features',
+                'White-Label Lösung',
+                'Custom API Integration',
+                'Dedizierter Account Manager',
+                '24/7 Premium Support',
+                'SLA Garantie',
+                '🛡️ NIS2 Enterprise Compliance',
+                '   → Unbegrenzte Monitoring-Targets',
+                '   → Multi-Tenant Verwaltung',
+                '   → Custom Branding',
+            ],
+            'cta': 'Enterprise wählen',
+            'cta_url': 'payments.subscribe',
+            'cta_params': {'plan_name': 'enterprise'},
+            'featured': False
         }
     ]
     

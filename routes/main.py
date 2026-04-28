@@ -18,6 +18,8 @@ from flask import (
     session,
     url_for,
     flash,
+    Response,
+)
 )
 from flask_login import current_user, login_required
 
@@ -27,6 +29,7 @@ from services.sanctions import SanctionsService
 from crm.save_results import ResultsSaver
 from services.business_registry import BusinessRegistryManager
 from services.rate_limiter import rate_limiter
+from sqlalchemy import func
 
 logger = logging.getLogger(__name__)
 
@@ -405,6 +408,73 @@ def _run_verification_services(counterparty_data: dict) -> dict:
 
 # ── Registration helper ───────────────────────────────────────────────────────
 
+@login_required
+def analytics():
+    """Analytics dashboard — verification trends and usage stats."""
+    return render_template('analytics.html')
+
+
+@login_required
+def analytics_api():
+    """JSON API for analytics charts."""
+    from datetime import date, timedelta
+    uid = current_user.id
+    today = date.today()
+
+    # Verifications per day — last 30 days
+    days = [(today - timedelta(days=i)) for i in range(29, -1, -1)]
+    daily_counts = {d: 0 for d in days}
+    rows = (
+        db.session.query(
+            func.date(VerificationCheck.check_date).label('day'),
+            func.count().label('cnt')
+        )
+        .filter(
+            VerificationCheck.user_id == uid,
+            VerificationCheck.check_date >= today - timedelta(days=29)
+        )
+        .group_by(func.date(VerificationCheck.check_date))
+        .all()
+    )
+    for row in rows:
+        d = row.day if isinstance(row.day, date) else date.fromisoformat(str(row.day))
+        if d in daily_counts:
+            daily_counts[d] = row.cnt
+
+    # Risk distribution
+    risk_rows = (
+        db.session.query(
+            VerificationCheck.overall_risk_level,
+            func.count().label('cnt')
+        )
+        .filter(VerificationCheck.user_id == uid)
+        .group_by(VerificationCheck.overall_risk_level)
+        .all()
+    )
+    risk_dist = {r.overall_risk_level or 'unknown': r.cnt for r in risk_rows}
+
+    # Monthly usage vs limit
+    sub = current_user.active_subscription
+    monthly_used = sub.api_calls_used if sub else 0
+    monthly_limit = sub.api_calls_limit if sub else 5
+
+    return jsonify({
+        'daily': {
+            'labels': [d.strftime('%d.%m') for d in days],
+            'data': [daily_counts[d] for d in days],
+        },
+        'risk': {
+            'labels': list(risk_dist.keys()),
+            'data': list(risk_dist.values()),
+        },
+        'usage': {
+            'used': monthly_used,
+            'limit': monthly_limit,
+        },
+        'total': VerificationCheck.query.filter_by(user_id=uid).count(),
+    })
+
+
 def register_routes(app):
     """Register all main routes on the Flask app, preserving original endpoint names."""
     rules = [
@@ -420,6 +490,8 @@ def register_routes(app):
         ('/api/vat-lookup',                   'api_vat_lookup',       api_vat_lookup,       ['POST']),
         ('/robots.txt',                       'robots',               robots_txt,           ['GET']),
         ('/ads.txt',                          'ads_txt',              ads_txt,              ['GET']),
+        ('/analytics',                        'analytics',            analytics,            ['GET']),
+        ('/analytics/api',                    'analytics_api',        analytics_api,        ['GET']),
     ]
     for rule, endpoint, view_func, methods in rules:
         app.add_url_rule(rule, endpoint=endpoint, view_func=view_func, methods=methods)

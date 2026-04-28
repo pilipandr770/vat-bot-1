@@ -44,4 +44,4 @@ def make_celery(app) -> Celery:
 celery = make_celery(flask_app)
 
 # Auto-discover tasks from registered packages
-celery.autodiscover_tasks(['app.pentesting'])
+celery.autodiscover_tasks(['app.pentesting', 'app.mailguard'])
