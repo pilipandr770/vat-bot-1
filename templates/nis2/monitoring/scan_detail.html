@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}Scan-Bericht {{ target.domain }} — {{ scan.scanned_at.strftime('%d.%m.%Y') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  {# ── Breadcrumb ── #}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <a href="{{ url_for('nis2.monitoring_target_detail', target_id=target.id) }}"
+         class="text-muted text-decoration-none small">
+        <i class="bi bi-arrow-left"></i> {{ target.domain }}
+      </a>
+      <h4 class="mb-0 mt-1">
+        <i class="bi bi-file-earmark-bar-graph"></i>
+        Scan-Bericht — {{ scan.scanned_at.strftime('%d.%m.%Y %H:%M') }}
+      </h4>
+      <small class="text-muted">{{ target.label or target.domain }}</small>
+    </div>
+    <a href="{{ url_for('nis2.monitoring_scan_report', scan_id=scan.id) }}"
+       class="btn btn-success">
+      <i class="bi bi-download"></i> Bericht herunterladen (HTML)
+    </a>
+  </div>
+
+  {# ── Score + Kurzübersicht ── #}
+  <div class="row mb-4 g-3">
+    <div class="col-6 col-md-2">
+      <div class="card border-0 shadow-sm text-center p-3 h-100">
+        <div class="display-5 fw-bold text-{{ scan.score_color }}">{{ scan.score|round|int }}</div>
+        <small class="text-muted">/100 Score</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="card border-0 shadow-sm text-center p-3 h-100 {% if scan.critical_count > 0 %}border-danger{% endif %}">
+        <div class="display-5 fw-bold text-danger">{{ scan.critical_count }}</div>
+        <small class="text-muted">Kritisch</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="card border-0 shadow-sm text-center p-3 h-100 {% if scan.high_count > 0 %}border-warning{% endif %}">
+        <div class="display-5 fw-bold text-warning">{{ scan.high_count }}</div>
+        <small class="text-muted">Hoch</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="card border-0 shadow-sm text-center p-3 h-100">
+        <div class="display-5 fw-bold text-info">{{ scan.medium_count }}</div>
+        <small class="text-muted">Mittel</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="card border-0 shadow-sm text-center p-3 h-100">
+        <div class="display-5 fw-bold text-secondary">{{ scan.low_count }}</div>
+        <small class="text-muted">Niedrig</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="card border-0 shadow-sm text-center p-3 h-100">
+        <div class="fw-bold text-muted small mt-2">Ausgelöst von</div>
+        <span class="badge bg-light text-dark mt-1">{{ scan.triggered_by }}</span>
+        <div class="text-muted small mt-2">{{ scan.scanned_at.strftime('%d.%m.%Y %H:%M') }}</div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Änderungen vs. vorheriger Scan ── #}
+  {% if diff and not diff.get('new_scan') %}
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="fw-bold mb-3"><i class="bi bi-arrow-left-right"></i> Änderungen seit letztem Scan
+        <span class="text-muted fw-normal small">(Score {{ '%+.0f'|format(diff.get('score_delta', 0)) }} Punkte)</span>
+      </h6>
+      <div class="row g-3">
+        {% if diff.get('new_issues') %}
+        <div class="col-md-6">
+          <div class="alert alert-danger mb-0">
+            <strong><i class="bi bi-plus-circle"></i> Neue Probleme ({{ diff.new_issues|length }})</strong>
+            <ul class="mb-0 mt-2 small">
+              {% for issue in diff.new_issues %}
+              <li><code>{{ issue.check }}</code>: {{ issue.prev }} &rarr; <strong>{{ issue.now }}</strong></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+        {% if diff.get('resolved_issues') %}
+        <div class="col-md-6">
+          <div class="alert alert-success mb-0">
+            <strong><i class="bi bi-check-circle"></i> Behobene Probleme ({{ diff.resolved_issues|length }})</strong>
+            <ul class="mb-0 mt-2 small">
+              {% for issue in diff.resolved_issues %}
+              <li><code>{{ issue.check }}</code>: {{ issue.prev }} &rarr; <strong class="text-success">{{ issue.now }}</strong></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+        {% if not diff.get('new_issues') and not diff.get('resolved_issues') %}
+        <div class="col-12"><span class="text-muted">Keine Änderungen gegenüber dem vorherigen Scan.</span></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── Detaillierte Prüfungen ── #}
+  <h5 class="fw-bold mb-3"><i class="bi bi-shield-exclamation"></i> Sicherheitsprüfungen</h5>
+
+  {% set check_labels = {
+    'ssl_tls': ('SSL/TLS-Zertifikat', 'bi-lock', 'danger'),
+    'security_headers': ('HTTP-Security-Headers', 'bi-shield-check', 'warning'),
+    'sql_injection': ('SQL-Injection', 'bi-database-exclamation', 'danger'),
+    'xss': ('Cross-Site Scripting (XSS)', 'bi-code-slash', 'danger'),
+    'csrf': ('CSRF-Schutz', 'bi-arrow-repeat', 'warning'),
+    'open_ports': ('Offene Ports', 'bi-ethernet', 'info'),
+    'dnssec': ('DNSSEC', 'bi-diagram-2', 'info'),
+  } %}
+
+  {% for check_key, check_data in results.get('checks', {}).items() %}
+  {% set label_info = check_labels.get(check_key, (check_key, 'bi-gear', 'secondary')) %}
+  {% set status = check_data.get('status', 'UNKNOWN') %}
+  {% set issues = check_data.get('issues', []) %}
+  {% set details = check_data.get('details', {}) %}
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+      <span class="fw-semibold">
+        <i class="bi {{ label_info[1] }} me-1"></i> {{ label_info[0] }}
+      </span>
+      {% if status == 'PASSED' %}
+        <span class="badge bg-success">BESTANDEN</span>
+      {% elif status == 'WARNING' %}
+        <span class="badge bg-warning text-dark">WARNUNG</span>
+      {% elif status == 'CRITICAL' %}
+        <span class="badge bg-danger">KRITISCH</span>
+      {% elif status == 'FAILED' %}
+        <span class="badge bg-danger">FEHLER</span>
+      {% else %}
+        <span class="badge bg-secondary">{{ status }}</span>
+      {% endif %}
+    </div>
+
+    {% if issues or details %}
+    <div class="card-body pt-2">
+
+      {# Findings list #}
+      {% if issues %}
+      <table class="table table-sm table-borderless mb-3">
+        <thead class="table-light">
+          <tr>
+            <th style="width:110px">Schwere</th>
+            <th>Beschreibung</th>
+            <th>Empfehlung</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for issue in issues %}
+          {% set sev = issue.get('severity', 'info') if issue is mapping else 'info' %}
+          <tr>
+            <td>
+              {% if sev == 'critical' %}<span class="badge bg-danger">Kritisch</span>
+              {% elif sev == 'high' %}<span class="badge bg-danger">Hoch</span>
+              {% elif sev == 'medium' %}<span class="badge bg-warning text-dark">Mittel</span>
+              {% elif sev == 'low' %}<span class="badge bg-secondary">Niedrig</span>
+              {% else %}<span class="badge bg-light text-dark">Info</span>{% endif %}
+            </td>
+            <td class="small">
+              {% if issue is mapping %}
+                <strong>{{ issue.get('title', issue.get('check', '')) }}</strong>
+                {% if issue.get('description') %}<br><span class="text-muted">{{ issue.description }}</span>{% endif %}
+                {% if issue.get('detail') %}<br><code class="small">{{ issue.detail }}</code>{% endif %}
+                {% if issue.get('value') %}<br><code class="small">{{ issue.value }}</code>{% endif %}
+              {% else %}
+                {{ issue }}
+              {% endif %}
+            </td>
+            <td class="small text-muted">
+              {% if issue is mapping %}{{ issue.get('recommendation', issue.get('fix', '')) }}{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+      {# Technical details — collapsible #}
+      {% if details %}
+      <details class="small">
+        <summary class="text-muted" style="cursor:pointer">Technische Details</summary>
+        <div class="mt-2 bg-light rounded p-2">
+          {% for k, v in details.items() %}
+          <div><strong>{{ k }}:</strong>
+            {% if v is mapping %}
+              <span class="text-muted">{{ v | tojson(indent=2) | truncate(200) }}</span>
+            {% elif v is iterable and v is not string %}
+              {{ v | join(', ') | truncate(200) }}
+            {% else %}
+              <code>{{ v }}</code>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+      {% endif %}
+
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security-Bericht — {{ target.domain }} — {{ scan.scanned_at.strftime('%d.%m.%Y') }}</title>
+  <style>
+    :root { --danger:#dc3545;--warning:#fd7e14;--info:#0dcaf0;--success:#198754;--secondary:#6c757d; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #fff; }
+    .page { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Cover */
+    .cover { border-bottom: 4px solid #0d6efd; padding-bottom: 24px; margin-bottom: 32px; }
+    .cover h1 { font-size: 22px; color: #0d6efd; margin-bottom: 6px; }
+    .cover .meta { color: #555; font-size: 12px; line-height: 1.8; }
+    .cover .badge-confidential {
+      display:inline-block; background:#dc3545; color:#fff;
+      padding: 3px 10px; border-radius:4px; font-size:11px; font-weight:700;
+      margin-top:10px; letter-spacing:.5px;
+    }
+
+    /* Score cards */
+    .score-grid { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+    .score-card {
+      flex: 1; min-width: 100px; border: 1px solid #e0e0e0; border-radius: 8px;
+      text-align: center; padding: 12px 8px;
+    }
+    .score-card .num { font-size: 28px; font-weight: 700; }
+    .score-card .lbl { font-size: 11px; color: #666; margin-top: 4px; }
+    .score-card.danger  { border-color: var(--danger);  }
+    .score-card.warning { border-color: var(--warning); }
+    .score-card.success { border-color: var(--success); }
+    .num.danger  { color: var(--danger);  }
+    .num.warning { color: var(--warning); }
+    .num.success { color: var(--success); }
+    .num.secondary { color: var(--secondary); }
+
+    /* Section heading */
+    h2 { font-size: 15px; color: #0d6efd; border-left: 4px solid #0d6efd;
+         padding-left: 10px; margin: 28px 0 14px; }
+    h3 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+
+    /* Diff box */
+    .diff-box { border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; margin-bottom: 24px; }
+    .diff-box h3 { color:#333; margin-bottom:10px; }
+    .diff-new  { color: var(--danger); }
+    .diff-fixed { color: var(--success); }
+    .diff-cols { display:flex; gap:16px; flex-wrap:wrap; }
+    .diff-col { flex:1; min-width:200px; }
+
+    /* Check card */
+    .check { border: 1px solid #e0e0e0; border-radius:8px; margin-bottom:16px; overflow:hidden; }
+    .check-header {
+      display:flex; justify-content:space-between; align-items:center;
+      background:#f8f9fa; padding: 8px 14px; font-weight:600; font-size:13px;
+    }
+    .check-body { padding: 10px 14px; }
+    .badge {
+      display:inline-block; padding: 3px 8px; border-radius:4px;
+      font-size:10px; font-weight:700; letter-spacing:.3px;
+    }
+    .badge-success  { background:#d1e7dd; color:#0a3622; }
+    .badge-danger   { background:#f8d7da; color:#58151c; }
+    .badge-warning  { background:#fff3cd; color:#664d03; }
+    .badge-secondary{ background:#e2e3e5; color:#383d41; }
+
+    /* Findings table */
+    table { width:100%; border-collapse:collapse; margin-top:8px; font-size:12px; }
+    th { background:#f0f4ff; color:#333; padding:6px 10px; text-align:left; font-weight:600; }
+    td { padding:6px 10px; border-bottom:1px solid #f0f0f0; vertical-align:top; }
+    tr:last-child td { border-bottom:none; }
+    code { font-size:11px; background:#f4f4f4; padding:2px 5px; border-radius:3px; word-break:break-all; }
+
+    /* Changes comparison */
+    .changes-table td:first-child { white-space: nowrap; width:140px; }
+
+    /* Technical details */
+    details { margin-top:8px; }
+    summary { cursor:pointer; color:#888; font-size:11px; }
+    .details-inner { background:#f8f8f8; border-radius:4px; padding:8px; margin-top:6px;
+                     font-size:11px; color:#555; word-break:break-all; }
+
+    /* Footer */
+    .footer { margin-top:40px; border-top:1px solid #e0e0e0; padding-top:14px;
+              font-size:11px; color:#888; display:flex; justify-content:space-between; }
+
+    /* Remediation section */
+    .remediation { background:#fffbe6; border:1px solid #ffe082; border-radius:8px;
+                   padding:14px; margin-bottom:24px; }
+    .remediation h3 { color:#7b5e00; margin-bottom:8px; }
+    .remediation li { margin-bottom:6px; }
+    .rem-priority { display:inline-block; width:70px; font-weight:700; }
+    .rem-p1 { color:var(--danger); }
+    .rem-p2 { color:var(--warning); }
+    .rem-p3 { color:var(--secondary); }
+
+    @media print {
+      body { font-size: 12px; }
+      .page { padding: 0; }
+      .check { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  {# ═══ COVER ═══ #}
+  <div class="cover">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h1>Security-Scan-Bericht</h1>
+        <div class="meta">
+          <strong>Zieldomain:</strong> {{ target.domain }}<br>
+          <strong>Scan-Datum:</strong> {{ scan.scanned_at.strftime('%d.%m.%Y %H:%M') }} UTC<br>
+          <strong>Ausgelöst von:</strong> {{ scan.triggered_by }}<br>
+          <strong>Erstellt von:</strong> VAT Verifizierung — NIS2 Compliance Monitor<br>
+          <strong>Nutzer:</strong> {{ user.email }}<br>
+          <strong>Rechtsgrundlage:</strong> §30 Nr. 5 BSIG (Schwachstellenmanagement)
+        </div>
+        <div class="badge-confidential">VERTRAULICH — NUR FUR INTERNEN GEBRAUCH</div>
+      </div>
+      <div style="text-align:right; color:#0d6efd; font-weight:700; font-size:32px;">
+        {{ scan.score|round|int }}<span style="font-size:16px;font-weight:400;">/100</span><br>
+        <span style="font-size:12px; color:#666; font-weight:400;">Sicherheitsscore</span>
+      </div>
+    </div>
+  </div>
+
+  {# ═══ SCORE CARDS ═══ #}
+  <div class="score-grid">
+    <div class="score-card {% if scan.critical_count > 0 %}danger{% endif %}">
+      <div class="num danger">{{ scan.critical_count }}</div>
+      <div class="lbl">Kritisch</div>
+    </div>
+    <div class="score-card {% if scan.high_count > 0 %}warning{% endif %}">
+      <div class="num warning">{{ scan.high_count }}</div>
+      <div class="lbl">Hoch</div>
+    </div>
+    <div class="score-card">
+      <div class="num secondary">{{ scan.medium_count }}</div>
+      <div class="lbl">Mittel</div>
+    </div>
+    <div class="score-card">
+      <div class="num secondary">{{ scan.low_count }}</div>
+      <div class="lbl">Niedrig</div>
+    </div>
+    <div class="score-card {% if scan.score >= 80 %}success{% elif scan.score >= 60 %}warning{% else %}danger{% endif %}">
+      <div class="num {% if scan.score >= 80 %}success{% elif scan.score >= 60 %}warning{% else %}danger{% endif %}">
+        {{ scan.score|round|int }}
+      </div>
+      <div class="lbl">Gesamt-Score</div>
+    </div>
+  </div>
+
+  {# ═══ ÄNDERUNGEN ═══ #}
+  {% if diff and not diff.get('new_scan') %}
+  <h2>Änderungen seit letztem Scan</h2>
+  <div class="diff-box">
+    <div style="margin-bottom:8px;color:#555;font-size:12px;">
+      Score-Änderung: <strong>{{ '%+.0f'|format(diff.get('score_delta', 0)) }} Punkte</strong>
+      (vorher {{ diff.get('prev_score', 0)|round|int }}, jetzt {{ diff.get('new_score', 0)|round|int }})
+    </div>
+    <div class="diff-cols">
+      {% if diff.get('new_issues') %}
+      <div class="diff-col">
+        <h3 class="diff-new">Neue Probleme ({{ diff.new_issues|length }})</h3>
+        <ul style="padding-left:18px;font-size:12px;">
+          {% for issue in diff.new_issues %}
+          <li><code>{{ issue.check }}</code>: {{ issue.prev }} &rarr; <strong>{{ issue.now }}</strong></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if diff.get('resolved_issues') %}
+      <div class="diff-col">
+        <h3 class="diff-fixed">Behobene Probleme ({{ diff.resolved_issues|length }})</h3>
+        <ul style="padding-left:18px;font-size:12px;">
+          {% for issue in diff.resolved_issues %}
+          <li><code>{{ issue.check }}</code>: {{ issue.prev }} &rarr; <strong class="diff-fixed">{{ issue.now }}</strong></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if not diff.get('new_issues') and not diff.get('resolved_issues') %}
+      <div class="diff-col" style="color:#888;">Keine Änderungen gegenüber dem vorherigen Scan.</div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ═══ PRIORISIERTER MASSNAHMENPLAN ═══ #}
+  {% set critical_issues = [] %}
+  {% set high_issues = [] %}
+  {% set medium_issues = [] %}
+  {% for check_key, check_data in results.get('checks', {}).items() %}
+    {% for issue in check_data.get('issues', []) %}
+      {% if issue is mapping %}
+        {% if issue.get('severity') in ('critical',) %}{% if critical_issues.append({'check': check_key, 'issue': issue}) %}{% endif %}{% endif %}
+        {% if issue.get('severity') in ('high',) %}{% if high_issues.append({'check': check_key, 'issue': issue}) %}{% endif %}{% endif %}
+        {% if issue.get('severity') in ('medium',) %}{% if medium_issues.append({'check': check_key, 'issue': issue}) %}{% endif %}{% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+
+  {% if critical_issues or high_issues or medium_issues %}
+  <h2>Priorisierter Massnahmenplan</h2>
+  <div class="remediation">
+    <h3>Empfohlene Massnahmen</h3>
+    <ol style="padding-left:20px;font-size:12px;">
+      {% for item in critical_issues %}
+      <li style="margin-bottom:8px;">
+        <span class="rem-priority rem-p1">[KRITISCH]</span>
+        <strong>{{ item.issue.get('title', item.check) }}</strong>
+        {% if item.issue.get('recommendation') or item.issue.get('fix') %}
+        — {{ item.issue.get('recommendation', item.issue.get('fix', '')) }}
+        {% endif %}
+      </li>
+      {% endfor %}
+      {% for item in high_issues %}
+      <li style="margin-bottom:8px;">
+        <span class="rem-priority rem-p2">[HOCH]</span>
+        <strong>{{ item.issue.get('title', item.check) }}</strong>
+        {% if item.issue.get('recommendation') or item.issue.get('fix') %}
+        — {{ item.issue.get('recommendation', item.issue.get('fix', '')) }}
+        {% endif %}
+      </li>
+      {% endfor %}
+      {% for item in medium_issues %}
+      <li style="margin-bottom:8px;">
+        <span class="rem-priority rem-p3">[MITTEL]</span>
+        <strong>{{ item.issue.get('title', item.check) }}</strong>
+        {% if item.issue.get('recommendation') or item.issue.get('fix') %}
+        — {{ item.issue.get('recommendation', item.issue.get('fix', '')) }}
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    <div style="margin-top:12px;font-size:11px;color:#888;border-top:1px solid #ffe082;padding-top:8px;">
+      Dieser Massnahmenplan kann dem IT-Sicherheitsverantwortlichen übergeben werden.
+      Nach Umsetzung erneut scannen, um Fortschritt zu dokumentieren (§30 Nr. 5 BSIG).
+    </div>
+  </div>
+  {% endif %}
+
+  {# ═══ DETAILLIERTE PRÜFUNGEN ═══ #}
+  <h2>Detaillierte Prüfungsergebnisse</h2>
+
+  {% set check_labels = {
+    'ssl_tls': 'SSL/TLS-Zertifikat',
+    'security_headers': 'HTTP-Security-Headers',
+    'sql_injection': 'SQL-Injection',
+    'xss': 'Cross-Site Scripting (XSS)',
+    'csrf': 'CSRF-Schutz',
+    'open_ports': 'Offene Ports',
+    'dnssec': 'DNSSEC',
+  } %}
+
+  {% for check_key, check_data in results.get('checks', {}).items() %}
+  {% set status = check_data.get('status', 'UNKNOWN') %}
+  {% set issues = check_data.get('issues', []) %}
+  {% set details = check_data.get('details', {}) %}
+
+  <div class="check">
+    <div class="check-header">
+      <span>{{ check_labels.get(check_key, check_key) }}</span>
+      {% if status == 'PASSED' %}<span class="badge badge-success">BESTANDEN</span>
+      {% elif status == 'WARNING' %}<span class="badge badge-warning">WARNUNG</span>
+      {% elif status == 'CRITICAL' %}<span class="badge badge-danger">KRITISCH</span>
+      {% elif status == 'FAILED' %}<span class="badge badge-danger">FEHLER</span>
+      {% else %}<span class="badge badge-secondary">{{ status }}</span>{% endif %}
+    </div>
+
+    {% if issues or details %}
+    <div class="check-body">
+      {% if issues %}
+      <table>
+        <thead>
+          <tr><th style="width:90px">Schwere</th><th>Beschreibung</th><th>Empfehlung</th></tr>
+        </thead>
+        <tbody>
+          {% for issue in issues %}
+          {% set sev = issue.get('severity', 'info') if issue is mapping else 'info' %}
+          <tr>
+            <td>
+              {% if sev in ('critical', 'high') %}<span class="badge badge-danger">{{ sev|title }}</span>
+              {% elif sev == 'medium' %}<span class="badge badge-warning">Mittel</span>
+              {% else %}<span class="badge badge-secondary">{{ sev|title }}</span>{% endif %}
+            </td>
+            <td>
+              {% if issue is mapping %}
+                <strong>{{ issue.get('title', issue.get('check', '')) }}</strong>
+                {% if issue.get('description') %}<br><span style="color:#555">{{ issue.description }}</span>{% endif %}
+                {% if issue.get('detail') %}<br><code>{{ issue.detail }}</code>{% endif %}
+                {% if issue.get('value') %}<br><code>{{ issue.value }}</code>{% endif %}
+              {% else %}{{ issue }}{% endif %}
+            </td>
+            <td style="color:#555">
+              {% if issue is mapping %}{{ issue.get('recommendation', issue.get('fix', '')) }}{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+      {% if details %}
+      <details>
+        <summary>Technische Details einblenden</summary>
+        <div class="details-inner">
+          {% for k, v in details.items() %}
+          <div><strong>{{ k }}:</strong>
+            {% if v is mapping %}{{ v | tojson | truncate(300) }}
+            {% elif v is iterable and v is not string %}{{ v | join(', ') | truncate(300) }}
+            {% else %}<code>{{ v }}</code>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  {# ═══ FOOTER ═══ #}
+  <div class="footer">
+    <div>
+      Erstellt: {{ scan.scanned_at.strftime('%d.%m.%Y %H:%M') }} UTC &nbsp;|&nbsp;
+      VAT Verifizierung &mdash; NIS2 Compliance Monitor &nbsp;|&nbsp;
+      vat-verifizierung.de
+    </div>
+    <div>
+      §30 Nr. 5 BSIG &nbsp;|&nbsp; Vertraulich
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

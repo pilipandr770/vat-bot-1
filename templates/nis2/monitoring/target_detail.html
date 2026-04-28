@@ -62,6 +62,7 @@
           <th>Mittel</th>
           <th>Ausgelöst von</th>
           <th>Änderungen</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -86,6 +87,18 @@
             {% if not diff.get('new_issues') and not diff.get('resolved_issues') %}
               <span class="text-muted small">Keine Änderungen</span>
             {% endif %}
+          </td>
+          <td class="text-end" style="white-space:nowrap;">
+            <a href="{{ url_for('nis2.monitoring_scan_detail', scan_id=scan.id) }}"
+               class="btn btn-sm btn-outline-primary me-1"
+               title="Bericht ansehen">
+              <i class="bi bi-eye"></i> Details
+            </a>
+            <a href="{{ url_for('nis2.monitoring_scan_report', scan_id=scan.id) }}"
+               class="btn btn-sm btn-outline-success"
+               title="HTML-Bericht herunterladen">
+              <i class="bi bi-download"></i>
+            </a>
           </td>
         </tr>
         {% endfor %}

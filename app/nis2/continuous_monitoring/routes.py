@@ -125,6 +125,50 @@ def register_monitoring_routes(bp):
         flash('Monitoring-Target gelöscht.', 'info')
         return redirect(url_for('nis2.monitoring_dashboard'))
 
+    @bp.route('/monitoring/scans/<int:scan_id>')
+    @login_required
+    @require_plan("professional")
+    def monitoring_scan_detail(scan_id):
+        scan = MonitoringScan.query.join(MonitoringTarget).filter(
+            MonitoringScan.id == scan_id,
+            MonitoringTarget.user_id == current_user.id,
+        ).first_or_404()
+        results = scan.get_results()
+        diff = scan.get_diff()
+        return render_template(
+            'nis2/monitoring/scan_detail.html',
+            scan=scan,
+            target=scan.target,
+            results=results,
+            diff=diff,
+        )
+
+    @bp.route('/monitoring/scans/<int:scan_id>/report.html')
+    @login_required
+    @require_plan("professional")
+    def monitoring_scan_report(scan_id):
+        """Download standalone HTML report for one scan."""
+        from flask import make_response
+        scan = MonitoringScan.query.join(MonitoringTarget).filter(
+            MonitoringScan.id == scan_id,
+            MonitoringTarget.user_id == current_user.id,
+        ).first_or_404()
+        results = scan.get_results()
+        diff = scan.get_diff()
+        html = render_template(
+            'nis2/monitoring/scan_report_download.html',
+            scan=scan,
+            target=scan.target,
+            results=results,
+            diff=diff,
+            user=current_user,
+        )
+        filename = f"security-report_{scan.target.domain}_{scan.scanned_at.strftime('%Y%m%d_%H%M')}.html"
+        response = make_response(html)
+        response.headers['Content-Type'] = 'text/html; charset=utf-8'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
     @bp.route('/monitoring/api/trend/<int:target_id>')
     @login_required
     @require_plan("professional")
