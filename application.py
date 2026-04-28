@@ -342,8 +342,8 @@ def create_app(config_name=None):
         init_nis2_monitoring_scheduler(app)
     except Exception as _nis2_exc:
         app.logger.warning('NIS2 blueprint not registered: %s', _nis2_exc)
-    # Init scheduler (only in production/when not in debug reload)
-    if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+    # Init scheduler (only in web process; Celery workers skip this)
+    if not os.environ.get('CELERY_WORKER') and (not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true'):
         try:
             init_scheduler(app=app)
         except Exception as _sched_exc:
