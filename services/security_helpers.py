@@ -1,8 +1,35 @@
-"""Security helpers for CSRF-exempt JSON endpoints."""
+"""Security helpers for CSRF-exempt JSON endpoints and plan gating."""
 from functools import wraps
 from urllib.parse import urlparse
 
-from flask import current_app, jsonify, request
+from flask import current_app, jsonify, redirect, url_for, flash, request
+from flask_login import current_user
+
+_PLAN_RANK = {'free': 0, 'basic': 1, 'professional': 2, 'enterprise': 3}
+
+
+def require_plan(minimum_plan: str):
+    """Decorator: restrict route to users on minimum_plan or higher."""
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return redirect(url_for('auth.login'))
+            if current_user.is_admin:
+                return f(*args, **kwargs)
+            user_plan = current_user.subscription_plan or 'free'
+            if _PLAN_RANK.get(user_plan, 0) < _PLAN_RANK.get(minimum_plan, 1):
+                wants_json = request.is_json or 'application/json' in request.headers.get('Accept', '')
+                if wants_json:
+                    return jsonify({
+                        'error': f'Plan „{minimum_plan}" oder höher erforderlich.',
+                        'upgrade_url': '/pricing'
+                    }), 403
+                flash(f'Diese Funktion erfordert den Plan „{minimum_plan.capitalize()}" oder höher.', 'warning')
+                return redirect(url_for('payments.pricing'))
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def require_same_origin(f):

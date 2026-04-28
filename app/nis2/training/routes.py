@@ -19,6 +19,7 @@ from email.mime.text import MIMEText
 
 from flask import (abort, current_app, flash, redirect, render_template,
                    request, url_for)
+from services.security_helpers import require_plan
 from flask_login import current_user, login_required
 
 from crm.models import db
@@ -120,6 +121,7 @@ def register_training_routes(bp):
     # ── List ──────────────────────────────────────────────────────
     @bp.route('/training/')
     @login_required
+    @require_plan("professional")
     def training_list():
         trainings = SecurityTraining.query.filter_by(user_id=current_user.id)\
             .order_by(SecurityTraining.created_at.desc()).all()
@@ -130,6 +132,7 @@ def register_training_routes(bp):
     # ── Create ────────────────────────────────────────────────────
     @bp.route('/training/create', methods=['GET', 'POST'])
     @login_required
+    @require_plan("professional")
     def training_create():
         if request.method == 'POST':
             topic = request.form.get('topic', 'general')
@@ -188,6 +191,7 @@ def register_training_routes(bp):
     # ── Detail / management view ──────────────────────────────────
     @bp.route('/training/<int:training_id>')
     @login_required
+    @require_plan("professional")
     def training_detail(training_id):
         training = SecurityTraining.query.filter_by(
             id=training_id, user_id=current_user.id
@@ -203,6 +207,7 @@ def register_training_routes(bp):
     # ── Send to audience ──────────────────────────────────────────
     @bp.route('/training/<int:training_id>/send', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def training_send(training_id):
         training = SecurityTraining.query.filter_by(
             id=training_id, user_id=current_user.id
@@ -259,6 +264,7 @@ def register_training_routes(bp):
     # ── Resend to single recipient ────────────────────────────────
     @bp.route('/training/<int:training_id>/resend/<int:ack_id>', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def training_resend(training_id, ack_id):
         training = SecurityTraining.query.filter_by(
             id=training_id, user_id=current_user.id
@@ -320,6 +326,7 @@ def register_training_routes(bp):
     # ── Compliance report (for auditor / BSI) ─────────────────────
     @bp.route('/training/<int:training_id>/report')
     @login_required
+    @require_plan("professional")
     def training_report(training_id):
         training = SecurityTraining.query.filter_by(
             id=training_id, user_id=current_user.id
@@ -337,6 +344,7 @@ def register_training_routes(bp):
     # ── Delete (draft only) ───────────────────────────────────────
     @bp.route('/training/<int:training_id>/delete', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def training_delete(training_id):
         training = SecurityTraining.query.filter_by(
             id=training_id, user_id=current_user.id

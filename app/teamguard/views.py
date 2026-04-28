@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from flask import (Blueprint, abort, current_app, flash, jsonify, redirect,
                    render_template, request, url_for)
 from flask_login import current_user, login_required
+from services.security_helpers import require_plan
 
 from crm.models import db
 
@@ -167,6 +168,7 @@ def _log_event(member_id, owner_user_id, event_type, description=None, performed
 
 @teamguard_bp.route('/')
 @login_required
+@require_plan("professional")
 def dashboard():
     from app.teamguard.models import (TeamMember, PasswordPolicy, SecurityEvent,
                                        PhishingTest, EVENT_TYPE_LABELS)
@@ -212,6 +214,7 @@ def dashboard():
 
 @teamguard_bp.route('/team')
 @login_required
+@require_plan("professional")
 def team_list():
     from app.teamguard.models import TeamMember, ACCESS_LEVEL_LABELS, PasswordPolicy
 
@@ -232,6 +235,7 @@ def team_list():
 
 @teamguard_bp.route('/team/add', methods=['GET', 'POST'])
 @login_required
+@require_plan("professional")
 def add_member():
     from app.teamguard.models import TeamMember, ACCESS_LEVELS, ACCESS_LEVEL_LABELS
 
@@ -284,6 +288,7 @@ def add_member():
 
 @teamguard_bp.route('/team/<int:member_id>/edit', methods=['GET', 'POST'])
 @login_required
+@require_plan("professional")
 def edit_member(member_id):
     from app.teamguard.models import TeamMember, ACCESS_LEVELS, ACCESS_LEVEL_LABELS
 
@@ -321,6 +326,7 @@ def edit_member(member_id):
 
 @teamguard_bp.route('/team/<int:member_id>/deactivate', methods=['POST'])
 @login_required
+@require_plan("professional")
 def deactivate_member(member_id):
     from app.teamguard.models import TeamMember
 
@@ -341,6 +347,7 @@ def deactivate_member(member_id):
 
 @teamguard_bp.route('/team/<int:member_id>/send-password', methods=['POST'])
 @login_required
+@require_plan("professional")
 def send_password(member_id):
     from app.teamguard.models import TeamMember, PasswordAssignment, PasswordPolicy
 
@@ -388,6 +395,7 @@ def send_password(member_id):
 
 @teamguard_bp.route('/team/send-password-bulk', methods=['POST'])
 @login_required
+@require_plan("professional")
 def send_password_bulk():
     """Send new passwords to all members with expired or missing passwords."""
     from app.teamguard.models import TeamMember, PasswordAssignment, PasswordPolicy
@@ -425,6 +433,7 @@ def send_password_bulk():
 
 @teamguard_bp.route('/policy', methods=['GET', 'POST'])
 @login_required
+@require_plan("professional")
 def password_policy():
     from app.teamguard.models import PasswordPolicy
 
@@ -460,6 +469,7 @@ def password_policy():
 
 @teamguard_bp.route('/message', methods=['GET', 'POST'])
 @login_required
+@require_plan("professional")
 def send_message():
     from app.teamguard.models import TeamMember
 
@@ -499,6 +509,7 @@ def send_message():
 
 @teamguard_bp.route('/phishing')
 @login_required
+@require_plan("professional")
 def phishing_list():
     from app.teamguard.models import PhishingTest
 
@@ -511,6 +522,7 @@ def phishing_list():
 
 @teamguard_bp.route('/phishing/create', methods=['GET', 'POST'])
 @login_required
+@require_plan("professional")
 def create_phishing_test():
     from app.teamguard.models import TeamMember, PhishingTest
 
@@ -549,6 +561,7 @@ def create_phishing_test():
 
 @teamguard_bp.route('/phishing/<int:test_id>')
 @login_required
+@require_plan("professional")
 def phishing_detail(test_id):
     from app.teamguard.models import PhishingTest, TeamMember, PhishingClick
 
@@ -579,6 +592,7 @@ def phishing_detail(test_id):
 
 @teamguard_bp.route('/phishing/<int:test_id>/send', methods=['POST'])
 @login_required
+@require_plan("professional")
 def send_phishing_test(test_id):
     from app.teamguard.models import PhishingTest, TeamMember
 
@@ -728,6 +742,7 @@ def phishing_track(token):
 
 @teamguard_bp.route('/events')
 @login_required
+@require_plan("professional")
 def event_log():
     from app.teamguard.models import SecurityEvent, TeamMember, EVENT_TYPE_LABELS
 
@@ -756,6 +771,7 @@ def event_log():
 
 @teamguard_bp.route('/smtp-test', methods=['POST'])
 @login_required
+@require_plan("professional")
 def smtp_test():
     """
     Send a test email to the currently logged-in user to verify SMTP config.

@@ -106,8 +106,8 @@ class User(UserMixin, db.Model):
             
         sub = self.active_subscription
         if not sub:
-            # Free plan - 1 verification per month
-            return self.get_monthly_verification_count() < 1
+            # Free plan - 5 verifications per month
+            return self.get_monthly_verification_count() < 5
         
         # Paid plan - check quota
         if sub.api_calls_limit == -1:  # Unlimited
@@ -211,17 +211,29 @@ class Subscription(db.Model):
                     'E-Mail Support'
                 ]
             },
-            'pro': {
-                'name': 'Professional',
-                'price': 49.99,
-                'api_calls': 200,
+            'basic': {
+                'name': 'Basic',
+                'price': 9.99,
+                'api_calls': 100,
                 'features': [
-                    '200 Prüfungen pro Monat',
-                    'Alle Validierungsdienste',
-                    'Handelsregister Prüfung',
-                    'Erweiterte Sanktionslisten',
-                    'API Zugang',
-                    'Verlauf & Berichte',
+                    '100 Prüfungen pro Monat',
+                    'VIES VAT-Validierung',
+                    'Sanktionslisten-Check',
+                    'OSINT Scanner',
+                    'CRM Basis',
+                    'E-Mail Support'
+                ]
+            },
+            'professional': {
+                'name': 'Professional',
+                'price': 49.90,
+                'api_calls': 500,
+                'features': [
+                    '500 Prüfungen pro Monat',
+                    'Alle Basic Features',
+                    'Handelsregister-Prüfung',
+                    'MailGuard AI',
+                    'API-Zugang',
                     'Prioritäts-Support'
                 ]
             },

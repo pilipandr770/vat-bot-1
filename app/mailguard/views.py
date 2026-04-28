@@ -8,6 +8,7 @@ from flask import (
     current_app,
 )
 from flask_login import login_required, current_user
+from services.security_helpers import require_plan
 from werkzeug.utils import secure_filename
 import json
 import os
@@ -32,6 +33,7 @@ import json
 
 @mailguard_bp.route('/')
 @login_required
+@require_plan("basic")
 def dashboard():
     """Главная страница MailGuard"""
     # Получаем подключенные аккаунты
@@ -108,6 +110,7 @@ def dashboard():
 
 @mailguard_bp.route('/messages')
 @login_required
+@require_plan("basic")
 def messages():
     """Просмотр входящих сообщений"""
     page = request.args.get('page', 1, type=int)
@@ -127,6 +130,7 @@ def messages():
 
 @mailguard_bp.route('/messages/<int:message_id>')
 @login_required
+@require_plan("basic")
 def message_detail(message_id):
     """Подробности сообщения"""
     message = MailMessage.query.join(MailAccount).filter(
@@ -154,6 +158,7 @@ def message_detail(message_id):
 
 @mailguard_bp.route('/accounts')
 @login_required
+@require_plan("basic")
 def accounts():
     """Управление почтовыми аккаунтами"""
     accounts = MailAccount.query.filter_by(user_id=current_user.id).all()
@@ -161,6 +166,7 @@ def accounts():
 
 @mailguard_bp.route('/rules', methods=['GET', 'POST'])
 @login_required
+@require_plan("basic")
 def rules():
     """Управление правилами"""
     accounts = MailAccount.query.filter_by(user_id=current_user.id).order_by(MailAccount.email).all()
@@ -229,6 +235,7 @@ def rules():
 
 @mailguard_bp.route('/counterparties')
 @login_required
+@require_plan("basic")
 def counterparties():
     """Управление известными контрагентами"""
     counterparties = KnownCounterparty.query.filter_by(is_active=True).all()
@@ -236,6 +243,7 @@ def counterparties():
 
 @mailguard_bp.route('/approve/<int:draft_id>', methods=['POST'])
 @login_required
+@require_plan("basic")
 def approve_and_send(draft_id):
     """Одобрить и отправить черновик"""
     draft = MailDraft.query.get_or_404(draft_id)
@@ -280,6 +288,7 @@ def approve_and_send(draft_id):
 
 @mailguard_bp.route('/reject/<int:draft_id>', methods=['POST'])
 @login_required
+@require_plan("basic")
 def reject_draft(draft_id):
     """Отклонить черновик"""
     draft = MailDraft.query.get_or_404(draft_id)
@@ -303,6 +312,7 @@ def reject_draft(draft_id):
 # API endpoints für AJAX
 @mailguard_bp.route('/api/accounts', methods=['GET'])
 @login_required
+@require_plan("basic")
 def api_accounts():
     """API: Получить аккаунты пользователя"""
     accounts = MailAccount.query.filter_by(user_id=current_user.id, is_active=True).all()
@@ -315,6 +325,7 @@ def api_accounts():
 
 @mailguard_bp.route('/api/drafts/pending', methods=['GET'])
 @login_required
+@require_plan("basic")
 def api_pending_drafts():
     """API: Получить ожидающие черновики"""
     drafts = MailDraft.query.join(MailMessage).join(MailAccount)\
@@ -353,6 +364,7 @@ def outlook_webhook():
 
 @mailguard_bp.route('/accounts/add-imap', methods=['GET', 'POST'])
 @login_required
+@require_plan("basic")
 def add_imap_account():
     """Добавить IMAP аккаунт вручную с поддержкой presets"""
     if request.method == 'GET':
@@ -440,6 +452,7 @@ def add_imap_account():
 
 @mailguard_bp.route('/accounts/<int:account_id>/sync', methods=['POST', 'GET'])
 @login_required
+@require_plan("basic")
 def sync_account(account_id):
     """Синхронизировать аккаунт вручную — запускает в фоновом потоке."""
     account = MailAccount.query.filter_by(id=account_id, user_id=current_user.id).first_or_404()
@@ -470,6 +483,7 @@ def sync_account(account_id):
 
 @mailguard_bp.route('/accounts/<int:account_id>/toggle', methods=['POST', 'GET'])
 @login_required
+@require_plan("basic")
 def toggle_account(account_id):
     """Включить/выключить аккаунт"""
     account = MailAccount.query.filter_by(id=account_id, user_id=current_user.id).first_or_404()
@@ -487,6 +501,7 @@ def toggle_account(account_id):
 
 @mailguard_bp.route('/accounts/<int:account_id>/delete', methods=['POST', 'GET'])
 @login_required
+@require_plan("basic")
 def delete_account(account_id):
     """Удалить аккаунт"""
     account = MailAccount.query.filter_by(id=account_id, user_id=current_user.id).first_or_404()
@@ -514,6 +529,7 @@ def delete_account(account_id):
 
 @mailguard_bp.route('/accounts/<int:account_id>/instructions', methods=['POST'])
 @login_required
+@require_plan("basic")
 def update_account_instructions(account_id):
     """Обновить инструкции для генерации ответов"""
     account = MailAccount.query.filter_by(id=account_id, user_id=current_user.id).first_or_404()
@@ -533,6 +549,7 @@ def update_account_instructions(account_id):
 
 @mailguard_bp.route('/drafts/<int:draft_id>/edit', methods=['GET', 'POST'])
 @login_required
+@require_plan("basic")
 def edit_draft(draft_id):
     """Редактировать черновик"""
     draft = MailDraft.query.get_or_404(draft_id)
@@ -562,6 +579,7 @@ def edit_draft(draft_id):
 
 @mailguard_bp.route('/drafts/<int:draft_id>/regenerate', methods=['POST'])
 @login_required
+@require_plan("basic")
 def regenerate_draft(draft_id):
     """Перегенерировать черновик с новыми параметрами"""
     draft = MailDraft.query.get_or_404(draft_id)
@@ -619,6 +637,7 @@ def regenerate_draft(draft_id):
 
 @mailguard_bp.route('/messages/<int:message_id>/label', methods=['POST'])
 @login_required
+@require_plan("basic")
 def label_message(message_id):
     """Добавить метку к сообщению"""
     message = MailMessage.query.join(MailAccount).filter(
@@ -648,6 +667,7 @@ def label_message(message_id):
 
 @mailguard_bp.route('/messages/<int:message_id>/unlabel', methods=['POST'])
 @login_required
+@require_plan("basic")
 def unlabel_message(message_id):
     """Удалить метку из сообщения"""
     message = MailMessage.query.join(MailAccount).filter(
@@ -677,6 +697,7 @@ def unlabel_message(message_id):
 
 @mailguard_bp.route('/messages/bulk-action', methods=['POST'])
 @login_required
+@require_plan("basic")
 def bulk_action():
     """Массовые операции с сообщениями"""
     try:

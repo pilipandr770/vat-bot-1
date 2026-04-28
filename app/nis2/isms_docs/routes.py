@@ -10,6 +10,7 @@ from datetime import datetime
 
 from flask import (abort, current_app, flash, jsonify, redirect,
                    render_template, request, send_file, url_for)
+from services.security_helpers import require_plan
 from flask_login import current_user, login_required
 
 from crm.models import db
@@ -25,6 +26,7 @@ def register_isms_routes(bp):
     # ── Overview ─────────────────────────────────────────────────
     @bp.route('/isms/')
     @login_required
+    @require_plan("professional")
     def isms_overview():
         interviews = ISMSInterview.query.filter_by(user_id=current_user.id)\
             .order_by(ISMSInterview.updated_at.desc()).all()
@@ -35,6 +37,7 @@ def register_isms_routes(bp):
     # ── Start new interview ───────────────────────────────────────
     @bp.route('/isms/interview/start', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def isms_start():
         interview = ISMSInterview(
             user_id=current_user.id,
@@ -49,6 +52,7 @@ def register_isms_routes(bp):
     @bp.route('/isms/interview/<int:interview_id>/phase/<int:phase>',
               methods=['GET', 'POST'])
     @login_required
+    @require_plan("professional")
     def isms_phase(interview_id: int, phase: int):
         interview = ISMSInterview.query.get_or_404(interview_id)
         if interview.user_id != current_user.id:
@@ -88,6 +92,7 @@ def register_isms_routes(bp):
     # ── Review & confirm ─────────────────────────────────────────
     @bp.route('/isms/interview/<int:interview_id>/review')
     @login_required
+    @require_plan("professional")
     def isms_review(interview_id: int):
         interview = ISMSInterview.query.get_or_404(interview_id)
         if interview.user_id != current_user.id:
@@ -108,6 +113,7 @@ def register_isms_routes(bp):
     # ── Generate documents (AJAX) ─────────────────────────────────
     @bp.route('/isms/interview/<int:interview_id>/generate', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def isms_generate(interview_id: int):
         """Legacy bulk-generate — kept for back-compat. Returns list of doc_types to generate."""
         interview = ISMSInterview.query.get_or_404(interview_id)
@@ -119,6 +125,7 @@ def register_isms_routes(bp):
 
     @bp.route('/isms/interview/<int:interview_id>/generate-one', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def isms_generate_one(interview_id: int):
         """Generate a single document. Called sequentially by JS to avoid worker timeout."""
         interview = ISMSInterview.query.get_or_404(interview_id)
@@ -170,6 +177,7 @@ def register_isms_routes(bp):
     # ── Document list ─────────────────────────────────────────────
     @bp.route('/isms/interview/<int:interview_id>/documents')
     @login_required
+    @require_plan("professional")
     def isms_documents(interview_id: int):
         interview = ISMSInterview.query.get_or_404(interview_id)
         if interview.user_id != current_user.id:
@@ -183,6 +191,7 @@ def register_isms_routes(bp):
     # ── Document detail / view ────────────────────────────────────
     @bp.route('/isms/documents/<int:doc_id>')
     @login_required
+    @require_plan("professional")
     def isms_document_view(doc_id: int):
         doc = ISMSDocument.query.get_or_404(doc_id)
         if doc.user_id != current_user.id:
@@ -192,6 +201,7 @@ def register_isms_routes(bp):
     # ── Document download (Markdown) ──────────────────────────────
     @bp.route('/isms/documents/<int:doc_id>/download')
     @login_required
+    @require_plan("professional")
     def isms_document_download(doc_id: int):
         doc = ISMSDocument.query.get_or_404(doc_id)
         if doc.user_id != current_user.id:
@@ -211,6 +221,7 @@ def register_isms_routes(bp):
     # ── Delete interview ──────────────────────────────────────────
     @bp.route('/isms/interview/<int:interview_id>/delete', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def isms_delete_interview(interview_id: int):
         interview = ISMSInterview.query.get_or_404(interview_id)
         if interview.user_id != current_user.id:

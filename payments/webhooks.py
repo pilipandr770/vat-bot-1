@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify, current_app
 import stripe
 from auth.models import db, User, Subscription, Payment
 from datetime import datetime, timedelta
+from notifications.alerts import send_email
 import hmac
 import hashlib
 
@@ -99,38 +100,57 @@ def handle_checkout_completed(session):
         current_app.logger.error(f"User {user_id} not found for checkout session")
         return
     
-    # Update or create subscription
+    stripe_subscription_id = session.get('subscription')
+    stripe_customer_id = session.get('customer')
+    api_limit = PLAN_LIMITS.get(plan_name, PLAN_LIMITS['free'])
+
     subscription = user.active_subscription
     if subscription:
-        subscription.stripe_subscription_id = session.get('subscription')
-        subscription.stripe_customer_id = session.get('customer')
+        subscription.stripe_subscription_id = stripe_subscription_id
+        subscription.stripe_customer_id = stripe_customer_id
         subscription.plan = plan_name
         subscription.status = 'active'
-        subscription.current_period_start = datetime.utcnow()
-        subscription.current_period_end = datetime.utcnow() + timedelta(days=30)
-        
-        # Update API limits based on plan
-        subscription.api_calls_limit = PLAN_LIMITS.get(plan_name, PLAN_LIMITS['free'])
+        subscription.start_date = datetime.utcnow()
+        subscription.end_date = datetime.utcnow() + timedelta(days=30)
+        subscription.api_calls_limit = api_limit
         subscription.api_calls_used = 0
     else:
-        api_limit = PLAN_LIMITS.get(plan_name, PLAN_LIMITS['free'])
+        subscription = Subscription(
+            user_id=user.id,
+            plan=plan_name,
+            status='active',
+            stripe_subscription_id=stripe_subscription_id,
+            stripe_customer_id=stripe_customer_id,
+            start_date=datetime.utcnow(),
+            end_date=datetime.utcnow() + timedelta(days=30),
+            api_calls_limit=api_limit,
+            api_calls_used=0,
+        )
+        db.session.add(subscription)
+
+    db.session.commit()
+    current_app.logger.info(f"Checkout completed for user {user_id}, plan: {plan_name}")
+
+
+def handle_subscription_created(subscription_data):
+    """
+    Handle customer.subscription.created event
+    Called when Stripe confirms subscription activation
+    """
+    stripe_subscription_id = subscription_data['id']
     subscription = Subscription.query.filter_by(
         stripe_subscription_id=stripe_subscription_id
     ).first()
-    
     if subscription:
         subscription.status = 'active'
-        subscription.current_period_start = datetime.fromtimestamp(
-            subscription_data['current_period_start']
-        )
-        subscription.current_period_end = datetime.fromtimestamp(
-            subscription_data['current_period_end']
-        )
+        if subscription_data.get('current_period_start'):
+            subscription.start_date = datetime.fromtimestamp(subscription_data['current_period_start'])
+        if subscription_data.get('current_period_end'):
+            subscription.end_date = datetime.fromtimestamp(subscription_data['current_period_end'])
         db.session.commit()
-        
-        current_app.logger.info(f"Subscription {stripe_subscription_id} activated")
+        current_app.logger.info(f"Subscription {stripe_subscription_id} confirmed via subscription.created")
     else:
-        current_app.logger.warning(f"Subscription {stripe_subscription_id} not found in database")
+        current_app.logger.warning(f"subscription.created: no local record for {stripe_subscription_id}")
 
 
 def handle_subscription_updated(subscription_data):
@@ -230,8 +250,14 @@ def handle_payment_succeeded(invoice):
         db.session.commit()
         
         current_app.logger.info(f"Payment succeeded for subscription {subscription_id}, amount: €{amount_paid/100}")
-        
-        # TODO: Send payment receipt email
+
+        user = User.query.get(subscription.user_id)
+        if user:
+            send_email(
+                subject='Zahlungsbestätigung – Ihr Abonnement',
+                recipient=user.email,
+                text_body=f'Vielen Dank! Zahlung von €{amount_paid/100:.2f} für Plan „{subscription.plan}" erfolgreich verarbeitet.'
+            )
     else:
         current_app.logger.warning(f"Subscription {subscription_id} not found for payment")
 
@@ -267,7 +293,13 @@ def handle_payment_failed(invoice):
         db.session.commit()
         
         current_app.logger.warning(f"Payment failed for subscription {subscription_id}, amount: €{amount_due/100}")
-        
-        # TODO: Send payment failed email to user
+
+        user = User.query.get(subscription.user_id)
+        if user:
+            send_email(
+                subject='Zahlungsproblem – Bitte aktualisieren Sie Ihre Zahlungsdaten',
+                recipient=user.email,
+                text_body=f'Die Zahlung von €{amount_due/100:.2f} für Ihr Abonnement ist fehlgeschlagen. Bitte aktualisieren Sie Ihre Zahlungsdaten unter /payments/billing.'
+            )
     else:
         current_app.logger.warning(f"Subscription {subscription_id} not found for failed payment")

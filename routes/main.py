@@ -144,7 +144,7 @@ def verify_counterparty():
         sub = current_user.active_subscription
         if not sub:
             current_usage = current_user.get_monthly_verification_count()
-            limit, plan_name = 50, 'Free'
+            limit, plan_name = 5, 'Free'
         else:
             current_usage = sub.api_calls_used
             limit = sub.api_calls_limit if sub.api_calls_limit != -1 else 'unlimited'

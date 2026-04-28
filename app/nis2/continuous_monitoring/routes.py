@@ -9,6 +9,7 @@ import json
 from datetime import datetime, timedelta
 
 from flask import render_template, request, jsonify, redirect, url_for, flash
+from services.security_helpers import require_plan
 from flask_login import login_required, current_user
 from crm.models import db
 
@@ -19,6 +20,7 @@ def register_monitoring_routes(bp):
 
     @bp.route('/monitoring/')
     @login_required
+    @require_plan("professional")
     def monitoring_dashboard():
         targets = MonitoringTarget.query.filter_by(
             user_id=current_user.id
@@ -32,6 +34,7 @@ def register_monitoring_routes(bp):
 
     @bp.route('/monitoring/targets/add', methods=['GET', 'POST'])
     @login_required
+    @require_plan("professional")
     def monitoring_add_target():
         if request.method == 'POST':
             domain = request.form.get('domain', '').strip().lower()
@@ -72,6 +75,7 @@ def register_monitoring_routes(bp):
 
     @bp.route('/monitoring/targets/<int:target_id>/scan-now', methods=['POST', 'GET'])
     @login_required
+    @require_plan("professional")
     def monitoring_scan_now(target_id):
         target = MonitoringTarget.query.filter_by(
             id=target_id, user_id=current_user.id
@@ -89,6 +93,7 @@ def register_monitoring_routes(bp):
 
     @bp.route('/monitoring/targets/<int:target_id>')
     @login_required
+    @require_plan("professional")
     def monitoring_target_detail(target_id):
         target = MonitoringTarget.query.filter_by(
             id=target_id, user_id=current_user.id
@@ -110,6 +115,7 @@ def register_monitoring_routes(bp):
 
     @bp.route('/monitoring/targets/<int:target_id>/delete', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def monitoring_delete_target(target_id):
         target = MonitoringTarget.query.filter_by(
             id=target_id, user_id=current_user.id
@@ -121,6 +127,7 @@ def register_monitoring_routes(bp):
 
     @bp.route('/monitoring/api/trend/<int:target_id>')
     @login_required
+    @require_plan("professional")
     def monitoring_trend_api(target_id):
         target = MonitoringTarget.query.filter_by(
             id=target_id, user_id=current_user.id

@@ -1,17 +1,20 @@
 from flask import Blueprint, request, jsonify, render_template, current_app
 from flask_login import login_required
+from services.security_helpers import require_plan
 
 phoneintel_bp = Blueprint('phoneintel', __name__)
 
 
 @phoneintel_bp.route('/')
 @login_required
+@require_plan('basic')
 def phoneintel_ui():
     return render_template('phoneintel/analyze.html')
 
 
 @phoneintel_bp.route('/api/analyze', methods=['POST'])
 @login_required
+@require_plan('basic')
 def analyze_api():
     from app.services.phoneintel import get_service  # Local import to avoid circular dependency
     

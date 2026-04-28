@@ -13,6 +13,7 @@ from datetime import datetime
 
 from flask import (abort, flash, jsonify, redirect, render_template,
                    request, url_for)
+from services.security_helpers import require_plan
 from flask_login import current_user, login_required
 
 from crm.models import db
@@ -26,6 +27,7 @@ def register_supply_chain_routes(bp):
     # ── Dashboard ─────────────────────────────────────────────────
     @bp.route('/supply-chain/')
     @login_required
+    @require_plan("professional")
     def supply_chain_dashboard():
         suppliers = Supplier.query.filter_by(user_id=current_user.id)\
             .order_by(Supplier.risk_score.desc()).all()
@@ -44,6 +46,7 @@ def register_supply_chain_routes(bp):
     # ── Add supplier ──────────────────────────────────────────────
     @bp.route('/supply-chain/add', methods=['GET', 'POST'])
     @login_required
+    @require_plan("professional")
     def supply_chain_add():
         if request.method == 'POST':
             supplier = Supplier(
@@ -72,6 +75,7 @@ def register_supply_chain_routes(bp):
     # ── Import via CSV ────────────────────────────────────────────
     @bp.route('/supply-chain/import', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def supply_chain_import():
         file = request.files.get('csv_file')
         if not file or not file.filename.endswith('.csv'):
@@ -111,6 +115,7 @@ def register_supply_chain_routes(bp):
     # ── Supplier detail ───────────────────────────────────────────
     @bp.route('/supply-chain/<int:supplier_id>')
     @login_required
+    @require_plan("professional")
     def supply_chain_detail(supplier_id: int):
         supplier = Supplier.query.get_or_404(supplier_id)
         if supplier.user_id != current_user.id:
@@ -125,6 +130,7 @@ def register_supply_chain_routes(bp):
     # ── Update supplier ───────────────────────────────────────────
     @bp.route('/supply-chain/<int:supplier_id>/update', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def supply_chain_update(supplier_id: int):
         supplier = Supplier.query.get_or_404(supplier_id)
         if supplier.user_id != current_user.id:
@@ -150,6 +156,7 @@ def register_supply_chain_routes(bp):
     # ── Quick verification via VIES + Sanctions ───────────────────
     @bp.route('/supply-chain/<int:supplier_id>/verify', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def supply_chain_verify(supplier_id: int):
         supplier = Supplier.query.get_or_404(supplier_id)
         if supplier.user_id != current_user.id:
@@ -192,6 +199,7 @@ def register_supply_chain_routes(bp):
     # ── Add assessment ────────────────────────────────────────────
     @bp.route('/supply-chain/<int:supplier_id>/assess', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def supply_chain_assess(supplier_id: int):
         supplier = Supplier.query.get_or_404(supplier_id)
         if supplier.user_id != current_user.id:
@@ -215,6 +223,7 @@ def register_supply_chain_routes(bp):
     # ── Delete supplier ───────────────────────────────────────────
     @bp.route('/supply-chain/<int:supplier_id>/delete', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def supply_chain_delete(supplier_id: int):
         supplier = Supplier.query.get_or_404(supplier_id)
         if supplier.user_id != current_user.id:
@@ -228,6 +237,7 @@ def register_supply_chain_routes(bp):
     # ── CSV template download ─────────────────────────────────────
     @bp.route('/supply-chain/csv-template')
     @login_required
+    @require_plan("professional")
     def supply_chain_csv_template():
         from flask import Response
         headers = [

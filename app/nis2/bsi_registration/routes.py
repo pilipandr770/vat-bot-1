@@ -12,6 +12,7 @@ import secrets
 from datetime import datetime
 
 from flask import render_template, request, jsonify, redirect, url_for, flash, send_file
+from services.security_helpers import require_plan
 from flask_login import login_required, current_user
 from crm.models import db
 
@@ -71,6 +72,7 @@ def register_bsi_routes(bp):
 
     @bp.route('/bsi-registration/wizard/start', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def bsi_wizard_start():
         """Create a new registration and redirect to step 1."""
         # Reuse existing incomplete registration or create new
@@ -88,6 +90,7 @@ def register_bsi_routes(bp):
     @bp.route('/bsi-registration/wizard/<int:reg_id>/step/<int:step>',
               methods=['GET', 'POST'])
     @login_required
+    @require_plan("professional")
     def bsi_wizard_step(reg_id, step):
         """Handle individual wizard steps 1–5."""
         reg = BSIRegistration.query.filter_by(
@@ -128,6 +131,7 @@ def register_bsi_routes(bp):
 
     @bp.route('/bsi-registration/<int:reg_id>/export')
     @login_required
+    @require_plan("professional")
     def bsi_export(reg_id):
         reg = BSIRegistration.query.filter_by(
             id=reg_id, user_id=current_user.id
@@ -141,6 +145,7 @@ def register_bsi_routes(bp):
 
     @bp.route('/bsi-registration/<int:reg_id>/export/json')
     @login_required
+    @require_plan("professional")
     def bsi_export_json(reg_id):
         reg = BSIRegistration.query.filter_by(
             id=reg_id, user_id=current_user.id
@@ -184,6 +189,7 @@ def register_bsi_routes(bp):
 
     @bp.route('/bsi-registration/<int:reg_id>/delete', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def bsi_delete(reg_id):
         reg = BSIRegistration.query.filter_by(
             id=reg_id, user_id=current_user.id

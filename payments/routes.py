@@ -202,9 +202,9 @@ def pricing():
             'display_name': 'Kostenlos',
             'price': 0.0,
             'period': 'dauerhaft',
-            'api_calls': 1,
+            'api_calls': 5,
             'features': [
-                '1 Prüfung pro Monat',
+                '5 Prüfungen pro Monat',
                 'VIES VAT-Validierung',
                 'Basis Sanktionsprüfung',
                 'KI-Assistent',

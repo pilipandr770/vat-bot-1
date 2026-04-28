@@ -11,6 +11,7 @@ from datetime import datetime
 
 from flask import (abort, current_app, flash, jsonify, redirect,
                    render_template, request, url_for)
+from services.security_helpers import require_plan
 from flask_login import current_user, login_required
 
 from crm.models import db
@@ -47,6 +48,7 @@ def register_incident_routes(bp):
     # ── Dashboard ─────────────────────────────────────────────────
     @bp.route('/incidents/')
     @login_required
+    @require_plan("professional")
     def incidents_list():
         incidents = Incident.query.filter_by(user_id=current_user.id)\
             .order_by(Incident.detected_at.desc()).all()
@@ -58,6 +60,7 @@ def register_incident_routes(bp):
     # ── Create incident ───────────────────────────────────────────
     @bp.route('/incidents/create', methods=['GET', 'POST'])
     @login_required
+    @require_plan("professional")
     def incident_create():
         if request.method == 'POST':
             detected_str = request.form.get('detected_at', '')
@@ -93,6 +96,7 @@ def register_incident_routes(bp):
     # ── Incident detail ───────────────────────────────────────────
     @bp.route('/incidents/<int:incident_id>')
     @login_required
+    @require_plan("professional")
     def incident_detail(incident_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
@@ -115,6 +119,7 @@ def register_incident_routes(bp):
     # ── Update incident ───────────────────────────────────────────
     @bp.route('/incidents/<int:incident_id>/update', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def incident_update(incident_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
@@ -139,6 +144,7 @@ def register_incident_routes(bp):
     # ── Generate BSI Meldung draft (AJAX) ─────────────────────────
     @bp.route('/incidents/<int:incident_id>/generate-draft', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def incident_generate_draft(incident_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
@@ -188,6 +194,7 @@ def register_incident_routes(bp):
     # ── View / edit draft ─────────────────────────────────────────
     @bp.route('/incidents/<int:incident_id>/draft/<int:draft_id>')
     @login_required
+    @require_plan("professional")
     def incident_draft_view(incident_id: int, draft_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
@@ -201,6 +208,7 @@ def register_incident_routes(bp):
     # ── Save edited draft ─────────────────────────────────────────
     @bp.route('/incidents/<int:incident_id>/draft/<int:draft_id>/save', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def incident_draft_save(incident_id: int, draft_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
@@ -216,6 +224,7 @@ def register_incident_routes(bp):
     # ── Mark draft as submitted ───────────────────────────────────
     @bp.route('/incidents/<int:incident_id>/draft/<int:draft_id>/submit', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def incident_draft_submit(incident_id: int, draft_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
@@ -280,6 +289,7 @@ def register_incident_routes(bp):
     # ── Add timeline entry ────────────────────────────────────────
     @bp.route('/incidents/<int:incident_id>/timeline/add', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def incident_timeline_add(incident_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
@@ -293,6 +303,7 @@ def register_incident_routes(bp):
     # ── Delete incident ───────────────────────────────────────────
     @bp.route('/incidents/<int:incident_id>/delete', methods=['POST'])
     @login_required
+    @require_plan("professional")
     def incident_delete(incident_id: int):
         incident = Incident.query.get_or_404(incident_id)
         if incident.user_id != current_user.id:
