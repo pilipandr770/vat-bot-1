@@ -77,7 +77,7 @@ class MSGraphAPI:
             received_str = msg_data.get('receivedDateTime', '')
             try:
                 received_at = datetime.fromisoformat(received_str.replace('Z', '+00:00'))
-            except:
+            except Exception:
                 received_at = datetime.utcnow()
 
             message = {

@@ -159,7 +159,7 @@ def scan_file():
                 # В крайнем случае попробуем удалить позже
                 try:
                     os.remove(temp_path)
-                except:
+                except Exception:
                     pass
 
     except Exception as e:
@@ -515,7 +515,7 @@ def get_virus_names(data):
         for engine, result in results.items():
             if result['category'] == 'malicious':
                 threats.append(f"{engine}: {result['result']}")
-    except:
+    except Exception:
         pass
     return threats[:10]  # Ограничиваем до 10 результатов
 

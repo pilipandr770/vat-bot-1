@@ -283,6 +283,24 @@ class Payment(db.Model):
         return f'<Payment {self.amount} {self.currency} - {self.status}>'
 
 
+class ProcessedStripeEvent(db.Model):
+    """Tracks processed Stripe webhook event IDs to ensure idempotency.
+
+    Stripe retries webhook delivery on failure, which can cause duplicate
+    processing. This table acts as a deduplication log.
+    """
+    __tablename__ = 'processed_stripe_events'
+    __table_args__ = {'schema': SCHEMA}
+
+    id = db.Column(db.Integer, primary_key=True)
+    stripe_event_id = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    event_type = db.Column(db.String(100), nullable=False)
+    processed_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    def __repr__(self):
+        return f'<ProcessedStripeEvent {self.stripe_event_id}>'
+
+
 # Update VerificationCheck model to link to users
 from crm.models import VerificationCheck
 

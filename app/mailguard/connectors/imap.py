@@ -79,7 +79,7 @@ def parse_email_message(email_message, message_id):
         # Парсим дату
         try:
             received_at = email.utils.parsedate_to_datetime(date_str)
-        except:
+        except Exception:
             received_at = datetime.utcnow()
 
         # Извлекаем содержимое
@@ -126,7 +126,7 @@ def decode_header(header_value):
             else:
                 decoded_string += str(part)
         return decoded_string
-    except:
+    except Exception:
         return str(header_value)
 
 def extract_email_address(header_value):
@@ -136,7 +136,7 @@ def extract_email_address(header_value):
         import re
         email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', header_value)
         return email_match.group(0) if email_match else header_value
-    except:
+    except Exception:
         return header_value
 
 def extract_email_content(email_message):

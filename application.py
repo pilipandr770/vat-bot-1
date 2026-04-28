@@ -382,6 +382,16 @@ def create_app(config_name=None):
     from routes.main import register_routes as _register_main_routes
     _register_main_routes(app)
 
+    @app.route('/healthz')
+    def healthz():
+        """Health check endpoint for Render/Heroku uptime monitoring."""
+        try:
+            db.session.execute(db.text('SELECT 1'))
+            return jsonify({'status': 'ok', 'db': 'ok'}), 200
+        except Exception as e:
+            app.logger.error(f"Health check DB error: {e}")
+            return jsonify({'status': 'error', 'db': 'unavailable'}), 503
+
     # Security headers middleware
     @app.after_request
     def add_security_headers(response):
@@ -438,7 +448,7 @@ def create_app(config_name=None):
             try:
                 db.session.rollback()
                 db.engine.dispose()
-            except:
+            except Exception:
                 pass
             
             # Return user-friendly error for JSON requests

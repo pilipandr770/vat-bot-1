@@ -18,11 +18,13 @@ from auth.forms import (LoginForm, RegistrationForm, PasswordResetRequestForm,
                          DeleteAccountForm)
 from auth.models import User, Subscription
 from crm.models import db
+from services.rate_limiter import auth_rate_limit
 
 auth_bp = Blueprint('auth', __name__)
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@auth_rate_limit(requests_per_minute=5, requests_per_hour=20)
 def register():
     """Registrierungsseite - User registration page."""
     if current_user.is_authenticated:
@@ -77,6 +79,7 @@ def register():
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@auth_rate_limit(requests_per_minute=5, requests_per_hour=30)
 def login():
     """Anmeldeseite - User login page."""
     if current_user.is_authenticated:
@@ -95,9 +98,11 @@ def login():
             flash('Ihr Konto wurde deaktiviert. Bitte kontaktieren Sie den Support.', 'error')
             return redirect(url_for('auth.login'))
         
-        # TEST MODE: Email confirmation check disabled
+        # KNOWN_ISSUE: Email confirmation intentionally disabled until MAIL_SERVER
+        # is configured in production. Re-enable by uncommenting the block below
+        # and ensuring send_confirmation_email() is imported and MAIL_* env vars are set.
         # if not user.is_email_confirmed:
-        #     flash('Bitte bestätigen Sie Ihre E-Mail-Adresse. Bestätigungs-E-Mail wurde erneut gesendet.', 'warning')
+        #     flash('Bitte bestätigen Sie Ihre E-Mail-Adresse.', 'warning')
         #     send_confirmation_email(user)
         #     return redirect(url_for('auth.login'))
         
@@ -161,6 +166,7 @@ def resend_confirmation():
 
 
 @auth_bp.route('/reset-password-request', methods=['GET', 'POST'])
+@auth_rate_limit(requests_per_minute=3, requests_per_hour=10)
 def reset_password_request():
     """Passwort zurücksetzen anfordern - Request password reset."""
     if current_user.is_authenticated:

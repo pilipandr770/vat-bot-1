@@ -53,13 +53,15 @@ def dashboard():
     
     # Subscription Statistics
     free_users = Subscription.query.filter_by(plan='free').count()
-    pro_users = Subscription.query.filter_by(plan='pro', status='active').count()
+    basic_users = Subscription.query.filter_by(plan='basic', status='active').count()
+    pro_users = Subscription.query.filter_by(plan='professional', status='active').count()
     enterprise_users = Subscription.query.filter_by(plan='enterprise', status='active').count()
-    
+
     # Revenue Statistics (Monthly Recurring Revenue)
-    pro_mrr = pro_users * 49
+    basic_mrr = basic_users * 9.99
+    pro_mrr = pro_users * 49.90
     enterprise_mrr = enterprise_users * 149
-    total_mrr = pro_mrr + enterprise_mrr
+    total_mrr = basic_mrr + pro_mrr + enterprise_mrr
     
     # Calculate total revenue (all-time)
     total_revenue = db.session.query(
@@ -126,9 +128,11 @@ def dashboard():
                          new_users_today=new_users_today,
                          new_users_this_month=new_users_this_month,
                          free_users=free_users,
+                         basic_users=basic_users,
                          pro_users=pro_users,
                          enterprise_users=enterprise_users,
                          total_mrr=total_mrr,
+                         basic_mrr=basic_mrr,
                          pro_mrr=pro_mrr,
                          enterprise_mrr=enterprise_mrr,
                          total_revenue=total_revenue,
@@ -363,19 +367,21 @@ def api_stats():
     JSON endpoint for dashboard statistics (for AJAX updates)
     """
     total_users = User.query.count()
-    pro_users = Subscription.query.filter_by(plan='pro', status='active').count()
+    basic_users = Subscription.query.filter_by(plan='basic', status='active').count()
+    pro_users = Subscription.query.filter_by(plan='professional', status='active').count()
     enterprise_users = Subscription.query.filter_by(plan='enterprise', status='active').count()
-    total_mrr = (pro_users * 49) + (enterprise_users * 149)
-    
+    total_mrr = (basic_users * 9.99) + (pro_users * 49.90) + (enterprise_users * 149)
+
     verifications_today = VerificationCheck.query.filter(
         func.date(VerificationCheck.check_date) == datetime.utcnow().date()
     ).count()
-    
+
     return jsonify({
         'total_users': total_users,
+        'basic_users': basic_users,
         'pro_users': pro_users,
         'enterprise_users': enterprise_users,
-        'total_mrr': total_mrr,
+        'total_mrr': round(total_mrr, 2),
         'verifications_today': verifications_today
     })
 

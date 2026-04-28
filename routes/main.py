@@ -118,8 +118,8 @@ def test_translations():
 def pentesting_scanner():
     """Website security scanner — PRO/ENTERPRISE or admin only."""
     sub = current_user.active_subscription
-    if not current_user.is_admin and (not sub or sub.plan not in ('pro', 'enterprise')):
-        flash('Website Security Scanner is only available for PRO and ENTERPRISE users', 'warning')
+    if not current_user.is_admin and (not sub or sub.plan not in ('professional', 'enterprise')):
+        flash('Der Website Security Scanner ist ab dem Professional-Plan verfügbar.', 'warning')
         return redirect(url_for('payments.pricing'))
     return render_template('pentesting/scanner.html')
 

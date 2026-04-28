@@ -167,6 +167,42 @@ def rate_limit(requests_per_minute: int = 60, requests_per_hour: int = 1000):
     return decorator
 
 
+def auth_rate_limit(requests_per_minute: int = 5, requests_per_hour: int = 20):
+    """
+    Decorator for HTML auth endpoints (login, register, password reset).
+    Redirects back with a flash message instead of returning JSON on limit exceeded.
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if request.method != 'POST':
+                return f(*args, **kwargs)
+
+            identifier = f"ip_{request.remote_addr}"
+
+            allowed_minute, info_minute = rate_limiter.is_allowed(identifier, requests_per_minute, 60)
+            if not allowed_minute:
+                logger.warning(f"Auth brute-force blocked for {identifier} on {request.path}")
+                from flask import flash, redirect
+                flash(
+                    f'Zu viele Versuche. Bitte warten Sie {info_minute["retry_after"]} Sekunden.',
+                    'error'
+                )
+                return redirect(request.url)
+
+            allowed_hour, info_hour = rate_limiter.is_allowed(identifier, requests_per_hour, 3600)
+            if not allowed_hour:
+                logger.warning(f"Auth hourly limit blocked for {identifier} on {request.path}")
+                from flask import flash, redirect
+                flash('Stundenlimit für Anmeldeversuche erreicht. Bitte versuchen Sie es später erneut.', 'error')
+                return redirect(request.url)
+
+            return f(*args, **kwargs)
+
+        return decorated_function
+    return decorator
+
+
 def get_rate_limit_headers(identifier: str, limit: int, window: int) -> Dict[str, str]:
     """Generate rate limit headers for response."""
     status = rate_limiter.get_status(identifier, limit, window)

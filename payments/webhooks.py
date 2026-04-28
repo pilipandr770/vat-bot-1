@@ -4,7 +4,7 @@ Processes Stripe webhook events for subscription lifecycle management
 """
 from flask import Blueprint, request, jsonify, current_app
 import stripe
-from auth.models import db, User, Subscription, Payment
+from auth.models import db, User, Subscription, Payment, ProcessedStripeEvent
 from datetime import datetime, timedelta
 from notifications.alerts import send_email
 import hmac
@@ -47,7 +47,7 @@ def stripe_webhook():
         # Invalid payload
         current_app.logger.error(f"Stripe webhook invalid payload: {str(e)}")
         return jsonify({'error': 'Invalid payload'}), 400
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.SignatureVerificationError as e:
         # Invalid signature
         current_app.logger.error(f"Stripe webhook invalid signature: {str(e)}")
         return jsonify({'error': 'Invalid signature'}), 400
@@ -55,9 +55,15 @@ def stripe_webhook():
     # Handle the event
     event_type = event['type']
     event_data = event['data']['object']
-    
-    current_app.logger.info(f"Received Stripe webhook: {event_type}")
-    
+    event_id = event['id']
+
+    current_app.logger.info(f"Received Stripe webhook: {event_type} ({event_id})")
+
+    # Idempotency check — skip already-processed events
+    if ProcessedStripeEvent.query.filter_by(stripe_event_id=event_id).first():
+        current_app.logger.info(f"Skipping duplicate Stripe event: {event_id}")
+        return jsonify({'status': 'already_processed'}), 200
+
     # Route to appropriate handler
     if event_type == 'checkout.session.completed':
         handle_checkout_completed(event_data)
@@ -79,7 +85,15 @@ def stripe_webhook():
     
     else:
         current_app.logger.info(f"Unhandled event type: {event_type}")
-    
+
+    # Mark event as processed
+    try:
+        processed = ProcessedStripeEvent(stripe_event_id=event_id, event_type=event_type)
+        db.session.add(processed)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
     return jsonify({'status': 'success'}), 200
 
 
