@@ -16,10 +16,16 @@
         {% endif %}
       </small>
     </div>
-    <a href="{{ url_for('nis2.isms_document_download', doc_id=doc.id) }}"
-       class="btn btn-outline-primary">
-      <i class="bi bi-download"></i> Markdown herunterladen
-    </a>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('nis2.isms_document_download', doc_id=doc.id) }}"
+         class="btn btn-outline-secondary">
+        <i class="bi bi-filetype-md"></i> Markdown
+      </a>
+      <a href="{{ url_for('nis2.isms_document_download_html', doc_id=doc.id) }}"
+         class="btn btn-outline-primary">
+        <i class="bi bi-filetype-html"></i> HTML herunterladen
+      </a>
+    </div>
   </div>
 
   <div class="card border-0 shadow-sm">

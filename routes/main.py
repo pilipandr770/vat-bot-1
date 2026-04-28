@@ -61,10 +61,11 @@ def landing():
 def dashboard():
     """Main verification interface for authenticated users."""
     subscription = current_user.active_subscription
-    total_checks = current_user.verifications.count()
+    total_checks = VerificationCheck.query.filter_by(user_id=current_user.id).count()
     monthly_checks = current_user.get_monthly_verification_count()
     recent_checks = (
-        current_user.verifications
+        VerificationCheck.query
+        .filter_by(user_id=current_user.id)
         .order_by(VerificationCheck.check_date.desc())
         .limit(5)
         .all()

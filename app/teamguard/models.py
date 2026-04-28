@@ -54,15 +54,15 @@ class TeamMember(db.Model):
 
     # Relationships
     password_assignments = db.relationship(
-        'PasswordAssignment', backref='member', lazy='dynamic',
+        'PasswordAssignment', backref='member', lazy='select',
         cascade='all, delete-orphan'
     )
     security_events = db.relationship(
-        'SecurityEvent', backref='member', lazy='dynamic',
+        'SecurityEvent', backref='member', lazy='select',
         cascade='all, delete-orphan'
     )
     phishing_clicks = db.relationship(
-        'PhishingClick', backref='member', lazy='dynamic',
+        'PhishingClick', backref='member', lazy='select',
         cascade='all, delete-orphan'
     )
 
@@ -221,7 +221,7 @@ class PhishingTest(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
 
     # Relationships
-    clicks = db.relationship('PhishingClick', backref='test', lazy='dynamic',
+    clicks = db.relationship('PhishingClick', backref='test', lazy='select',
                              cascade='all, delete-orphan')
 
     @property
@@ -243,7 +243,7 @@ class PhishingTest(db.Model):
 
     @property
     def total_clicks(self):
-        return self.clicks.count()
+        return PhishingClick.query.filter_by(test_id=self.id).count()
 
     @property
     def click_rate(self):

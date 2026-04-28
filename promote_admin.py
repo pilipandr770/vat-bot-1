@@ -63,7 +63,7 @@ def promote_user(email: str, password: str | None, confirm_email: bool) -> int:
             print("ℹ️  Keine Änderungen erforderlich.")
 
         # Ensure user has at least a free subscription for consistency
-        if not user.subscriptions.filter(Subscription.status == 'active').first():
+        if not Subscription.query.filter_by(user_id=user.id, status='active').first():
             free_subscription = Subscription(
                 user_id=user.id,
                 plan='free',

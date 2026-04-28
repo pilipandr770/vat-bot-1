@@ -28,7 +28,9 @@ def register_monitoring_routes(bp):
 
         # Attach last 2 scans per target for trend display
         for t in targets:
-            t.recent_scans = t.scans.limit(5).all()
+            t.recent_scans = MonitoringScan.query.filter_by(
+                target_id=t.id
+            ).order_by(MonitoringScan.scanned_at.desc()).limit(5).all()
 
         return render_template('nis2/monitoring/dashboard.html', targets=targets)
 
@@ -99,7 +101,9 @@ def register_monitoring_routes(bp):
             id=target_id, user_id=current_user.id
         ).first_or_404()
 
-        scans = target.scans.limit(20).all()
+        scans = MonitoringScan.query.filter_by(
+            target_id=target.id
+        ).order_by(MonitoringScan.scanned_at.desc()).limit(20).all()
         latest = scans[0] if scans else None
         previous = scans[1] if len(scans) > 1 else None
         diff = latest.get_diff() if latest else {}
@@ -177,7 +181,9 @@ def register_monitoring_routes(bp):
             id=target_id, user_id=current_user.id
         ).first_or_404()
 
-        scans = target.scans.order_by(MonitoringScan.scanned_at.asc()).limit(30).all()
+        scans = MonitoringScan.query.filter_by(
+            target_id=target.id
+        ).order_by(MonitoringScan.scanned_at.asc()).limit(30).all()
         data = {
             'labels': [s.scanned_at.strftime('%d.%m.%Y') for s in scans],
             'scores': [s.score for s in scans],

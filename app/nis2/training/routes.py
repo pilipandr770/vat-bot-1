@@ -196,9 +196,8 @@ def register_training_routes(bp):
         training = SecurityTraining.query.filter_by(
             id=training_id, user_id=current_user.id
         ).first_or_404()
-        acks = training.acknowledgments.order_by(
-            TrainingAcknowledgment.sent_at.asc()
-        ).all()
+        acks = TrainingAcknowledgment.query.filter_by(training_id=training.id)\
+            .order_by(TrainingAcknowledgment.sent_at.asc()).all()
         return render_template('nis2/training/detail.html',
                                training=training,
                                acks=acks,
@@ -323,6 +322,23 @@ def register_training_routes(bp):
         return render_template('nis2/training/ack.html',
                                ack=ack, training=training)
 
+    # ── Certificate download (public) ─────────────────────────────
+    @bp.route('/training/ack/<token>/certificate')
+    def training_certificate(token):
+        from flask import make_response
+        ack = TrainingAcknowledgment.query.filter_by(
+            token=token, acknowledged=True
+        ).first_or_404()
+        training = SecurityTraining.query.get_or_404(ack.training_id)
+        html = render_template('nis2/training/certificate.html',
+                               ack=ack, training=training)
+        safe_name = ack.confirmed_name.replace(' ', '_').replace('/', '_')
+        filename = f'zertifikat_{safe_name}_{training.id}.html'
+        response = make_response(html)
+        response.headers['Content-Type'] = 'text/html; charset=utf-8'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
     # ── Compliance report (for auditor / BSI) ─────────────────────
     @bp.route('/training/<int:training_id>/report')
     @login_required
@@ -331,10 +347,9 @@ def register_training_routes(bp):
         training = SecurityTraining.query.filter_by(
             id=training_id, user_id=current_user.id
         ).first_or_404()
-        acks = training.acknowledgments.order_by(
-            TrainingAcknowledgment.acknowledged.desc(),
-            TrainingAcknowledgment.acknowledged_at.asc(),
-        ).all()
+        acks = TrainingAcknowledgment.query.filter_by(training_id=training.id)\
+            .order_by(TrainingAcknowledgment.acknowledged.desc(),
+                      TrainingAcknowledgment.acknowledged_at.asc()).all()
         return render_template('nis2/training/report.html',
                                training=training,
                                acks=acks,

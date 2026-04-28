@@ -2,6 +2,8 @@ import imaplib
 import email
 import email.header
 import base64
+from email import encoders
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import current_app
@@ -208,12 +210,14 @@ def extract_email_attachments(email_message):
 def send_via_smtp(account, to_email, subject, text_content, html_content=None, attachments=None):
     """Отправить сообщение через SMTP"""
     try:
-        # Создаем сообщение
+        # Build message structure
         if html_content or attachments:
-            msg = MIMEMultipart('alternative')
+            msg = MIMEMultipart('mixed')
+            alt = MIMEMultipart('alternative')
+            alt.attach(MIMEText(text_content, 'plain', 'utf-8'))
             if html_content:
-                msg.attach(MIMEText(html_content, 'html', 'utf-8'))
-            msg.attach(MIMEText(text_content, 'plain', 'utf-8'))
+                alt.attach(MIMEText(html_content, 'html', 'utf-8'))
+            msg.attach(alt)
         else:
             msg = MIMEText(text_content, 'plain', 'utf-8')
 
@@ -221,7 +225,20 @@ def send_via_smtp(account, to_email, subject, text_content, html_content=None, a
         msg['From'] = account.email
         msg['To'] = to_email
 
-        # TODO: Добавить вложения если нужны
+        # Attach files
+        if attachments:
+            for att in attachments:
+                part = MIMEBase('application', 'octet-stream')
+                data = att.get('data', '')
+                if isinstance(data, str):
+                    data = base64.b64decode(data)
+                part.set_payload(data)
+                encoders.encode_base64(part)
+                part.add_header(
+                    'Content-Disposition', 'attachment',
+                    filename=att.get('filename', 'attachment')
+                )
+                msg.attach(part)
 
         # Подключаемся к SMTP
         smtp_host = account.host.replace('imap', 'smtp')  # Простая замена

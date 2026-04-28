@@ -219,7 +219,7 @@ class MonitoringTarget(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    scans = db.relationship('MonitoringScan', backref='target', lazy='dynamic',
+    scans = db.relationship('MonitoringScan', backref='target', lazy='select',
                             cascade='all, delete-orphan',
                             order_by='MonitoringScan.scanned_at.desc()')
 
@@ -354,7 +354,7 @@ class ISMSInterview(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    documents = db.relationship('ISMSDocument', backref='interview', lazy='dynamic',
+    documents = db.relationship('ISMSDocument', backref='interview', lazy='select',
                                 cascade='all, delete-orphan')
 
     def get_phase_data(self, phase: int):
@@ -522,10 +522,10 @@ class Incident(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    drafts = db.relationship('IncidentDraft', backref='incident', lazy='dynamic',
+    drafts = db.relationship('IncidentDraft', backref='incident', lazy='select',
                              cascade='all, delete-orphan',
                              order_by='IncidentDraft.created_at.desc()')
-    timeline = db.relationship('IncidentTimeline', backref='incident', lazy='dynamic',
+    timeline = db.relationship('IncidentTimeline', backref='incident', lazy='select',
                                cascade='all, delete-orphan',
                                order_by='IncidentTimeline.timestamp.asc()')
 
@@ -715,7 +715,7 @@ class Supplier(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    assessments = db.relationship('SupplierAssessment', backref='supplier', lazy='dynamic',
+    assessments = db.relationship('SupplierAssessment', backref='supplier', lazy='select',
                                   cascade='all, delete-orphan',
                                   order_by='SupplierAssessment.assessed_at.desc()')
 
@@ -846,7 +846,7 @@ class SecurityTraining(db.Model):
 
     acknowledgments = db.relationship(
         'TrainingAcknowledgment', backref='training',
-        lazy='dynamic', cascade='all, delete-orphan',
+        lazy='select', cascade='all, delete-orphan',
     )
 
     def get_audience(self):
@@ -940,17 +940,17 @@ class NIS2AuditJob(db.Model):
 
     # relationships
     findings = db.relationship(
-        'NIS2Finding', backref='job', lazy='dynamic',
+        'NIS2Finding', backref='job', lazy='select',
         cascade='all, delete-orphan',
         order_by='NIS2Finding.severity_rank',
     )
     logs = db.relationship(
-        'NIS2AuditLog', backref='job', lazy='dynamic',
+        'NIS2AuditLog', backref='job', lazy='select',
         cascade='all, delete-orphan',
         order_by='NIS2AuditLog.id',
     )
     tasks = db.relationship(
-        'NIS2AuditTask', backref='job', lazy='dynamic',
+        'NIS2AuditTask', backref='job', lazy='select',
         cascade='all, delete-orphan',
         order_by='NIS2AuditTask.id',
     )

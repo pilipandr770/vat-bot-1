@@ -53,11 +53,11 @@ class User(UserMixin, db.Model):
     last_login = db.Column(db.DateTime)
     
     # Relationships
-    subscriptions = db.relationship('Subscription', backref='user', lazy='dynamic', 
+    subscriptions = db.relationship('Subscription', backref='user', lazy='select',
                                     cascade='all, delete-orphan')
-    verifications = db.relationship('VerificationCheck', backref='user', lazy='dynamic',
+    verifications = db.relationship('VerificationCheck', backref='user', lazy='select',
                                     foreign_keys='VerificationCheck.user_id')
-    payments = db.relationship('Payment', backref='user', lazy='dynamic',
+    payments = db.relationship('Payment', backref='user', lazy='select',
                                cascade='all, delete-orphan')
     
     def __repr__(self):
@@ -87,7 +87,8 @@ class User(UserMixin, db.Model):
     @property
     def active_subscription(self):
         """Get current active subscription."""
-        return self.subscriptions.filter(
+        return Subscription.query.filter(
+            Subscription.user_id == self.id,
             Subscription.status == 'active',
             Subscription.end_date > datetime.utcnow()
         ).first()

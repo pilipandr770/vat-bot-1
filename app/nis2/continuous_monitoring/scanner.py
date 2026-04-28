@@ -109,7 +109,9 @@ def _compute_next_scan(target: MonitoringTarget) -> datetime:
 
 def _build_diff(target: MonitoringTarget, new_results: dict) -> dict:
     """Compare new scan results against previous scan to highlight changes."""
-    prev_scan = target.scans.first()      # first() = latest due to order_by desc
+    prev_scan = MonitoringScan.query.filter_by(target_id=target.id).order_by(
+        MonitoringScan.scanned_at.desc()
+    ).first()
     if not prev_scan:
         return {'new_scan': True}
 

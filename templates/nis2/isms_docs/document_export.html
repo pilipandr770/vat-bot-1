@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ doc.title }} — ISMS-Dokument</title>
+  <style>
+    :root { --blue:#0d6efd; --danger:#dc3545; --success:#198754; --muted:#6c757d; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',Arial,sans-serif; font-size:13px; color:#1a1a2e; background:#fff; }
+    .page { max-width:960px; margin:0 auto; padding:40px 32px; }
+
+    /* Cover */
+    .cover { border-bottom:4px solid var(--blue); padding-bottom:28px; margin-bottom:36px; }
+    .cover h1 { font-size:20px; color:var(--blue); margin-bottom:8px; }
+    .cover .meta { color:#555; font-size:12px; line-height:2; }
+    .cover .badge-conf {
+      display:inline-block; background:var(--danger); color:#fff;
+      padding:3px 10px; border-radius:4px; font-size:11px; font-weight:700;
+      margin-top:10px; letter-spacing:.5px;
+    }
+
+    /* Content area */
+    .content { line-height:1.7; }
+
+    /* Markdown-like heading styles */
+    .content h1, .content h2, .content h3 {
+      color:var(--blue); margin:24px 0 10px;
+      border-left:4px solid var(--blue); padding-left:10px;
+    }
+    .content h1 { font-size:17px; }
+    .content h2 { font-size:15px; }
+    .content h3 { font-size:13px; border-left-color:#aac4ff; color:#333; }
+
+    .content p { margin-bottom:10px; }
+    .content ul, .content ol { padding-left:22px; margin-bottom:10px; }
+    .content li { margin-bottom:4px; }
+    .content code {
+      font-size:11px; background:#f4f4f4; padding:2px 5px;
+      border-radius:3px; font-family:Consolas,monospace;
+    }
+    .content pre {
+      background:#f8f9fa; border:1px solid #e0e0e0; border-radius:6px;
+      padding:14px; font-size:11px; overflow-x:auto; margin-bottom:12px;
+      white-space:pre-wrap; word-break:break-word;
+    }
+    .content blockquote {
+      border-left:3px solid #aac4ff; margin:10px 0; padding:6px 12px;
+      color:#555; background:#f0f4ff; border-radius:0 4px 4px 0;
+    }
+    .content strong { font-weight:700; }
+    .content em { font-style:italic; }
+    .content hr { border:none; border-top:1px solid #e0e0e0; margin:20px 0; }
+    .content table {
+      width:100%; border-collapse:collapse; margin-bottom:14px; font-size:12px;
+    }
+    .content th {
+      background:#f0f4ff; color:#333; padding:6px 10px;
+      text-align:left; font-weight:600; border:1px solid #d0d8ff;
+    }
+    .content td { padding:6px 10px; border:1px solid #e8e8e8; vertical-align:top; }
+
+    /* Footer */
+    .footer {
+      margin-top:48px; border-top:1px solid #e0e0e0; padding-top:14px;
+      font-size:11px; color:#888; display:flex; justify-content:space-between;
+    }
+
+    @media print {
+      body { font-size:12px; }
+      .page { padding:0; }
+      .cover { page-break-after:avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  {# ══ COVER ══ #}
+  <div class="cover">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">
+          ISMS-Dokument · NIS2-Compliance
+        </div>
+        <h1>{{ doc.title }}</h1>
+        <div class="meta">
+          <strong>Dokumenttyp:</strong> {{ doc.doc_type }}<br>
+          <strong>Unternehmen:</strong> {{ doc.interview.company_name if doc.interview else '–' }}<br>
+          <strong>Erstellt am:</strong>
+          {% if doc.created_at %}{{ doc.created_at.strftime('%d.%m.%Y') }}{% else %}–{% endif %}<br>
+          <strong>Erstellt von:</strong> {{ user.email }}<br>
+          <strong>Rechtsgrundlage:</strong> §30 BSIG (NIS2-Umsetzungsgesetz)
+        </div>
+        <div class="badge-conf">VERTRAULICH — NUR FÜR INTERNEN GEBRAUCH</div>
+      </div>
+      <div style="text-align:right;color:var(--blue);font-size:11px;font-weight:600;max-width:160px;">
+        <div style="font-size:28px;font-weight:700;color:var(--blue);">NIS2</div>
+        <div style="color:var(--muted);">Compliance-Dokument</div>
+      </div>
+    </div>
+  </div>
+
+  {# ══ DOCUMENT CONTENT ══ #}
+  <div class="content" id="doc-content">
+    {# Render markdown content as styled HTML #}
+    {% set raw = doc.content_md or doc.content or '' %}
+    {% for line in raw.split('\n') %}
+      {% set stripped = line.strip() %}
+      {% if stripped.startswith('### ') %}
+        <h3>{{ stripped[4:] }}</h3>
+      {% elif stripped.startswith('## ') %}
+        <h2>{{ stripped[3:] }}</h2>
+      {% elif stripped.startswith('# ') %}
+        <h1>{{ stripped[2:] }}</h1>
+      {% elif stripped.startswith('---') %}
+        <hr>
+      {% elif stripped.startswith('- ') or stripped.startswith('* ') %}
+        <ul><li>{{ stripped[2:] | replace('**', '<strong>') | replace('**', '</strong>') }}</li></ul>
+      {% elif stripped and stripped[0].isdigit() and '. ' in stripped %}
+        {% set dot_pos = stripped.index('. ') %}
+        <ol start="{{ stripped[:dot_pos] }}"><li>{{ stripped[dot_pos+2:] }}</li></ol>
+      {% elif stripped.startswith('> ') %}
+        <blockquote>{{ stripped[2:] }}</blockquote>
+      {% elif stripped %}
+        <p>{{ stripped | replace('**', '<strong>') | replace('**', '</strong>') | replace('`', '<code>') | replace('`', '</code>') }}</p>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  {# ══ FOOTER ══ #}
+  <div class="footer">
+    <div>
+      Erstellt: {{ doc.created_at.strftime('%d.%m.%Y %H:%M') if doc.created_at else '–' }} UTC
+      &nbsp;|&nbsp; VAT Verifizierung — NIS2 Compliance Monitor &nbsp;|&nbsp; vat-verifizierung.de
+    </div>
+    <div>§30 BSIG &nbsp;|&nbsp; Vertraulich</div>
+  </div>
+
+</div>
+
+<script>
+  // Post-process: merge consecutive <ul>/<ol> tags
+  document.addEventListener('DOMContentLoaded', function() {
+    ['ul','ol'].forEach(function(tag) {
+      var lists = document.querySelectorAll('#doc-content ' + tag + ' + ' + tag);
+      lists.forEach(function(list) {
+        var prev = list.previousElementSibling;
+        while (list.firstChild) prev.appendChild(list.firstChild);
+        list.remove();
+      });
+    });
+  });
+</script>
+</body>
+</html>

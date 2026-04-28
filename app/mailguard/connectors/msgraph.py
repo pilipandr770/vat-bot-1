@@ -227,9 +227,3 @@ class MSGraphAPI:
         except Exception as e:
             current_app.logger.error(f"MS Graph setup webhook error: {e}")
             return None
-
-def process_ms_webhook(payload):
-    """Обработать webhook от Microsoft Graph"""
-    # TODO: Верификация подписи и обработка уведомлений
-    # Извлечь message IDs и запустить обработку
-    pass

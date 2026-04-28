@@ -8,7 +8,7 @@ import json
 import logging
 from datetime import datetime
 
-from flask import (abort, current_app, flash, jsonify, redirect,
+from flask import (abort, current_app, flash, jsonify, make_response, redirect,
                    render_template, request, send_file, url_for)
 from services.security_helpers import require_plan
 from flask_login import current_user, login_required
@@ -217,6 +217,22 @@ def register_isms_routes(bp):
             download_name=filename,
             mimetype='text/markdown; charset=utf-8',
         )
+
+    # ── Document download (HTML — print-friendly) ─────────────────
+    @bp.route('/isms/documents/<int:doc_id>/download.html')
+    @login_required
+    @require_plan("professional")
+    def isms_document_download_html(doc_id: int):
+        doc = ISMSDocument.query.get_or_404(doc_id)
+        if doc.user_id != current_user.id:
+            abort(403)
+        html = render_template('nis2/isms_docs/document_export.html',
+                               doc=doc, user=current_user)
+        filename = f'{doc.doc_type}_{datetime.utcnow().strftime("%Y%m%d")}.html'
+        response = make_response(html)
+        response.headers['Content-Type'] = 'text/html; charset=utf-8'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
 
     # ── Delete interview ──────────────────────────────────────────
     @bp.route('/isms/interview/<int:interview_id>/delete', methods=['POST'])
