@@ -5,7 +5,7 @@ from crm.models import db, Counterparty, VerificationCheck, CheckResult, Alert
 from services.vies import VIESService
 from services.handelsregister import HandelsregisterService
 from services.sanctions import SanctionsService
-# from services.insolvenz import InsolvenzService  # TODO: Create insolvency service
+from services.insolvenz import InsolvenzService
 from datetime import datetime, timedelta
 import json
 import logging
@@ -19,7 +19,7 @@ class MonitoringService:
         self.vies_service = VIESService()
         self.handelsregister_service = HandelsregisterService()
         self.sanctions_service = SanctionsService()
-        # self.insolvenz_service = InsolvenzService()  # TODO: Implement
+        self.insolvenz_service = InsolvenzService()
     
     def run_daily_checks(self):
         """
@@ -103,19 +103,20 @@ class MonitoringService:
             except Exception as e:
                 logger.error(f"Handelsregister check failed: {str(e)}")
         
-        # 4. Insolvency Check (Germany only) - TODO: Implement insolvency service
-        # if counterparty.country == 'DE' and counterparty.company_name:
-        #     try:
-        #         insolvenz_result = self.insolvenz_service.check_insolvency(counterparty.company_name)
-        #         new_results['insolvenz'] = insolvenz_result
-        #         
-        #         # Compare with previous
-        #         if 'insolvenz' in previous_results:
-        #             insolvenz_changes = self._detect_insolvency_changes(previous_results['insolvenz'], insolvenz_result)
-        #             if insolvenz_changes:
-        #                 changes_detected.extend(insolvenz_changes)
-        #     except Exception as e:
-        #         logger.error(f"Insolvency check failed: {str(e)}")
+        # 4. Insolvency Check (Germany only)
+        if counterparty.country == 'DE' and counterparty.company_name:
+            try:
+                insolvenz_result = self.insolvenz_service.check_insolvency(counterparty.company_name)
+                new_results['insolvenz'] = insolvenz_result
+
+                if 'insolvenz' in previous_results:
+                    insolvenz_changes = self._detect_insolvency_changes(
+                        previous_results['insolvenz'], insolvenz_result
+                    )
+                    if insolvenz_changes:
+                        changes_detected.extend(insolvenz_changes)
+            except Exception as e:
+                logger.error(f"Insolvency check failed: {str(e)}")
         
         # Save new check results
         for service_name, result in new_results.items():

@@ -1,9 +1,11 @@
 import requests
 from flask import current_app
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from ..oauth import decrypt_token
+from ..oauth import decrypt_token, encrypt_token, refresh_ms_token
+from ..models import db
+
 
 class MSGraphAPI:
     """Microsoft Graph API клиент"""
@@ -14,15 +16,39 @@ class MSGraphAPI:
         self.access_token = decrypt_token(account.access_token) if account.access_token else None
 
     def _get_headers(self):
+        self._refresh_token_if_needed()
         return {
             'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
 
     def _refresh_token_if_needed(self):
-        """Обновить токен если истёк"""
-        # TODO: Реализовать проверку и обновление токена
-        pass
+        """Refresh the access token if it has expired or is about to expire."""
+        account = self.account
+        if not account.refresh_token:
+            return
+        # Refresh 5 minutes before actual expiry
+        threshold = datetime.utcnow() + timedelta(minutes=5)
+        if account.expires_at and account.expires_at > threshold:
+            return
+
+        try:
+            refresh_token = decrypt_token(account.refresh_token)
+            new_tokens = refresh_ms_token(refresh_token)
+
+            account.access_token = encrypt_token(new_tokens['access_token'])
+            # MS may not return a new refresh_token — keep the old one
+            if new_tokens.get('refresh_token'):
+                account.refresh_token = encrypt_token(new_tokens['refresh_token'])
+            account.expires_at = datetime.utcnow() + timedelta(
+                seconds=new_tokens.get('expires_in', 3600)
+            )
+            db.session.commit()
+
+            self.access_token = new_tokens['access_token']
+            current_app.logger.info(f"Refreshed MS Graph token for {account.email}")
+        except Exception as e:
+            current_app.logger.error(f"MS Graph token refresh failed for {account.email}: {e}")
 
     def get_messages(self, folder='inbox', top=10):
         """Получить сообщения из папки"""

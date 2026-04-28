@@ -1,15 +1,80 @@
 """
 Rate limiting service for API and web endpoints.
 Prevents DDoS attacks and API abuse.
+
+Backend selection:
+  - If REDIS_URL is set in Flask config, uses Redis (consistent across workers).
+  - Otherwise falls back to in-process dict (safe for single-worker dev mode).
 """
 import time
 from datetime import datetime, timedelta
 from typing import Dict, Tuple, Optional
-from flask import request, session
+from flask import request, session, current_app
 from functools import wraps
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def _get_redis():
+    """Return a Redis client if configured, else None."""
+    try:
+        import redis
+        from flask import current_app
+        url = current_app.config.get('REDIS_URL') or current_app.config.get('CELERY_BROKER_URL')
+        if url:
+            return redis.from_url(url, socket_connect_timeout=1, socket_timeout=1)
+    except Exception:
+        pass
+    return None
+
+
+class RedisRateLimiter:
+    """Redis-backed rate limiter — consistent across multiple gunicorn workers."""
+
+    def _key(self, identifier: str, window: int) -> str:
+        slot = int(time.time()) // window
+        return f"ratelimit:{identifier}:{window}:{slot}"
+
+    def is_allowed(self, identifier: str, limit: int, window: int) -> Tuple[bool, Dict]:
+        try:
+            r = _get_redis()
+            if r is None:
+                raise RuntimeError("Redis not available")
+            key = self._key(identifier, window)
+            pipe = r.pipeline()
+            pipe.incr(key)
+            pipe.expire(key, window * 2)
+            current_count, _ = pipe.execute()
+            current_count = int(current_count)
+            allowed = current_count <= limit
+            retry_after = window - (int(time.time()) % window) if not allowed else 0
+            return allowed, {
+                'current_count': current_count,
+                'limit': limit,
+                'retry_after': retry_after,
+            }
+        except Exception as e:
+            logger.warning(f"RedisRateLimiter error, falling back: {e}")
+            return True, {'current_count': 0, 'limit': limit, 'retry_after': 0}
+
+    def get_status(self, identifier: str, limit: int, window: int) -> Dict:
+        try:
+            r = _get_redis()
+            if r is None:
+                raise RuntimeError
+            key = self._key(identifier, window)
+            current_count = int(r.get(key) or 0)
+            remaining = max(0, limit - current_count)
+            reset = (int(time.time()) // window + 1) * window
+            return {'limit': limit, 'remaining': remaining, 'reset': reset, 'retry_after': 0}
+        except Exception:
+            return {'limit': limit, 'remaining': limit, 'reset': int(time.time()) + window, 'retry_after': 0}
+
+    def _get_identifier(self, use_session=True) -> str:
+        if use_session and 'user_id' in session:
+            return f"user_{session['user_id']}"
+        return f"ip_{request.remote_addr}"
 
 
 class RateLimiter:
@@ -110,8 +175,33 @@ class RateLimiter:
         }
 
 
-# Global rate limiter instance
-rate_limiter = RateLimiter()
+class _SmartRateLimiter:
+    """Proxy that routes to Redis when available, in-memory otherwise."""
+
+    def __init__(self):
+        self._mem = RateLimiter()
+        self._redis = RedisRateLimiter()
+
+    def _backend(self):
+        try:
+            if _get_redis():
+                return self._redis
+        except Exception:
+            pass
+        return self._mem
+
+    def is_allowed(self, identifier, limit, window):
+        return self._backend().is_allowed(identifier, limit, window)
+
+    def get_status(self, identifier, limit, window):
+        return self._backend().get_status(identifier, limit, window)
+
+    def _get_identifier(self, use_session=True):
+        return self._mem._get_identifier(use_session)
+
+
+# Global rate limiter instance — Redis-backed when REDIS_URL is set, else in-memory
+rate_limiter = _SmartRateLimiter()
 
 
 def rate_limit(requests_per_minute: int = 60, requests_per_hour: int = 1000):

@@ -351,16 +351,128 @@ def api_pending_drafts():
 # Webhook endpoints для почтовых провайдеров
 @mailguard_bp.route('/webhook/gmail', methods=['POST'])
 def gmail_webhook():
-    """Webhook для Gmail push notifications"""
-    # TODO: Реализовать обработку Gmail webhook
-    # Верификация подписи, извлечение historyId, постановка в очередь
+    """
+    Gmail Pub/Sub push notification endpoint.
+
+    Google sends:  { "message": { "data": "<base64>", ... }, "subscription": "..." }
+    Decoded data:  { "emailAddress": "user@gmail.com", "historyId": "12345" }
+    """
+    import base64
+    payload = request.get_json(silent=True) or {}
+    message = payload.get('message', {})
+
+    raw_data = message.get('data', '')
+    if not raw_data:
+        return 'OK', 200
+
+    try:
+        decoded = base64.urlsafe_b64decode(raw_data + '==').decode('utf-8')
+        data = json.loads(decoded)
+    except Exception as e:
+        current_app.logger.warning(f"Gmail webhook decode error: {e}")
+        return 'OK', 200
+
+    email_address = data.get('emailAddress', '')
+    history_id = str(data.get('historyId', ''))
+
+    if not email_address:
+        return 'OK', 200
+
+    account = MailAccount.query.filter_by(email=email_address, provider='gmail', is_active=True).first()
+    if not account:
+        current_app.logger.info(f"Gmail webhook: no active account for {email_address}")
+        return 'OK', 200
+
+    # Update history_id so the next sync picks up from here
+    if history_id and history_id != account.last_history_id:
+        account.last_history_id = history_id
+        db.session.commit()
+
+    # Run sync in background thread to avoid blocking Google's push
+    app = current_app._get_current_object()
+    account_id = account.id
+
+    def _sync():
+        with app.app_context():
+            from .tasks import sync_gmail_account
+            acc = MailAccount.query.get(account_id)
+            if acc:
+                sync_gmail_account(acc)
+
+    threading.Thread(target=_sync, daemon=True).start()
+    current_app.logger.info(f"Gmail webhook triggered sync for {email_address} (historyId={history_id})")
     return 'OK', 200
 
-@mailguard_bp.route('/webhook/outlook', methods=['POST'])
+
+@mailguard_bp.route('/webhook/outlook', methods=['GET', 'POST'])
 def outlook_webhook():
-    """Webhook для Microsoft Graph"""
-    # TODO: Реализовать обработку Outlook webhook
-    return 'OK', 200
+    """
+    Microsoft Graph change notification endpoint.
+
+    GET  — validation handshake: return validationToken as plain text
+    POST — real notification: verify clientState, trigger sync
+    """
+    # Validation handshake (MS Graph sends this when the subscription is created)
+    validation_token = request.args.get('validationToken')
+    if validation_token:
+        return validation_token, 200, {'Content-Type': 'text/plain'}
+
+    payload = request.get_json(silent=True) or {}
+    notifications = payload.get('value', [])
+
+    expected_state = current_app.config.get('MS_WEBHOOK_SECRET', '')
+
+    for notification in notifications:
+        client_state = notification.get('clientState', '')
+        if expected_state and client_state != expected_state:
+            current_app.logger.warning(f"Outlook webhook: invalid clientState from {request.remote_addr}")
+            continue
+
+        # Extract affected resource (email address is in subscriptionId mapping)
+        resource = notification.get('resource', '')
+        # resource looks like: "Users/{user-id}/MailFolders('Inbox')/Messages"
+        # We use subscriptionId to look up the account (stored in account.settings_json)
+        subscription_id = notification.get('subscriptionId', '')
+
+        if not subscription_id:
+            continue
+
+        # Find account by subscription_id stored in settings
+        accounts = MailAccount.query.filter_by(provider='outlook', is_active=True).all()
+        target = next(
+            (a for a in accounts if a.get_settings().get('ms_subscription_id') == subscription_id),
+            None
+        )
+
+        if not target:
+            current_app.logger.info(f"Outlook webhook: no account for subscription {subscription_id}")
+            continue
+
+        app = current_app._get_current_object()
+        account_id = target.id
+
+        def _sync(aid=account_id):
+            with app.app_context():
+                from .tasks import sync_imap_account  # reuse connector logic
+                from .connectors.msgraph import MSGraphAPI
+                acc = MailAccount.query.get(aid)
+                if not acc:
+                    return
+                try:
+                    api = MSGraphAPI(acc)
+                    new_messages = api.get_messages(top=20)
+                    from .tasks import process_incoming_email
+                    for msg in new_messages:
+                        process_incoming_email(acc.id, msg)
+                    acc.last_sync_at = datetime.utcnow()
+                    db.session.commit()
+                except Exception as e:
+                    current_app.logger.error(f"Outlook webhook sync error: {e}")
+
+        threading.Thread(target=_sync, daemon=True).start()
+        current_app.logger.info(f"Outlook webhook triggered sync for subscription {subscription_id}")
+
+    return jsonify({'status': 'accepted'}), 202
 
 @mailguard_bp.route('/accounts/add-imap', methods=['GET', 'POST'])
 @login_required
