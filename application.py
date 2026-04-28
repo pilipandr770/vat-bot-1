@@ -518,11 +518,6 @@ def create_app(config_name=None):
         click.echo(click.style('Database initialized.', fg='green'))
 
     # ── Health check endpoints ─────────────────────────────────────────────
-    @app.route('/healthz')
-    def healthz():
-        """Liveness probe: application is running."""
-        return jsonify({'status': 'ok'}), 200
-
     @app.route('/readyz')
     def readyz():
         """Readiness probe: application can serve traffic (DB + Redis reachable)."""
