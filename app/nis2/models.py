@@ -860,11 +860,11 @@ class SecurityTraining(db.Model):
 
     @property
     def ack_count(self):
-        return self.acknowledgments.filter_by(acknowledged=True).count()
+        return sum(1 for a in self.acknowledgments if a.acknowledged)
 
     @property
     def sent_count(self):
-        return self.acknowledgments.count()
+        return len(self.acknowledgments)
 
     @property
     def topic_label(self):

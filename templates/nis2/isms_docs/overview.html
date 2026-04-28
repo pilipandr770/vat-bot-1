@@ -31,7 +31,7 @@
             </div>
           </div>
           <div class="d-flex gap-2">
-            {% set doc_count = interview.documents.count() %}
+            {% set doc_count = interview.documents|length %}
             {% if doc_count > 0 %}
               <a href="{{ url_for('nis2.isms_documents', interview_id=interview.id) }}" class="btn btn-sm btn-success">
                 <i class="bi bi-file-earmark"></i> {{ doc_count }} Dokument(e)
