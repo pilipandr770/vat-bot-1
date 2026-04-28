@@ -20,7 +20,6 @@ from flask import (
     flash,
     Response,
 )
-)
 from flask_login import current_user, login_required
 
 from crm.models import db, Company, Counterparty, VerificationCheck
