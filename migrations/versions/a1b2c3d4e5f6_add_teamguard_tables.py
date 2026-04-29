@@ -7,6 +7,7 @@ Create Date: 2026-04-01 12:00:00.000000
 """
 from alembic import op
 import sqlalchemy as sa
+import os
 
 # revision identifiers, used by Alembic.
 revision = 'a1b2c3d4e5f6'
@@ -14,7 +15,10 @@ down_revision = '6264f693f114'
 branch_labels = None
 depends_on = None
 
-SCHEMA = 'vat_verification'
+SCHEMA = os.environ.get('DB_SCHEMA') or None
+_fk_users = _fk_users if SCHEMA else 'users.id'
+_fk_members = _fk_members if SCHEMA else 'teamguard_members.id'
+_fk_tests = _fk_tests if SCHEMA else 'teamguard_phishing_tests.id'
 
 
 def upgrade():
@@ -33,7 +37,7 @@ def upgrade():
         sa.Column('notes', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['owner_user_id'], [f'{SCHEMA}.users.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['owner_user_id'], [_fk_users], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         schema=SCHEMA,
     )
@@ -52,7 +56,7 @@ def upgrade():
         sa.Column('require_special', sa.Boolean(), nullable=False, server_default='true'),
         sa.Column('reminder_days_before', sa.Integer(), nullable=False, server_default='7'),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['owner_user_id'], [f'{SCHEMA}.users.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['owner_user_id'], [_fk_users], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('owner_user_id'),
         schema=SCHEMA,
@@ -69,7 +73,7 @@ def upgrade():
         sa.Column('sent_by_user_id', sa.Integer(), nullable=True),
         sa.Column('acknowledged', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('acknowledged_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['member_id'], [f'{SCHEMA}.teamguard_members.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['member_id'], [_fk_members], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         schema=SCHEMA,
     )
@@ -86,7 +90,7 @@ def upgrade():
         sa.Column('description', sa.String(length=500), nullable=True),
         sa.Column('performed_by', sa.String(length=200), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
-        sa.ForeignKeyConstraint(['member_id'], [f'{SCHEMA}.teamguard_members.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['member_id'], [_fk_members], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         schema=SCHEMA,
     )
@@ -109,7 +113,7 @@ def upgrade():
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('sent_at', sa.DateTime(), nullable=True),
         sa.Column('completed_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['owner_user_id'], [f'{SCHEMA}.users.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['owner_user_id'], [_fk_users], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('tracking_token'),
         schema=SCHEMA,
@@ -127,8 +131,8 @@ def upgrade():
         sa.Column('clicked_at', sa.DateTime(), nullable=False),
         sa.Column('ip_hash', sa.String(length=64), nullable=True),
         sa.Column('user_agent_snippet', sa.String(length=200), nullable=True),
-        sa.ForeignKeyConstraint(['member_id'], [f'{SCHEMA}.teamguard_members.id'], ondelete='CASCADE'),
-        sa.ForeignKeyConstraint(['test_id'], [f'{SCHEMA}.teamguard_phishing_tests.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['member_id'], [_fk_members], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['test_id'], [_fk_tests], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         schema=SCHEMA,
     )
