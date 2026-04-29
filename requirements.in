@@ -9,8 +9,8 @@
 # -------------------------------------------------------
 
 # Web framework
-Flask>=3.0,<4.0
-Werkzeug>=3.0,<4.0
+Flask>=3.1,<4.0
+Werkzeug>=3.1,<4.0
 Flask-SQLAlchemy>=3.0,<4.0
 Flask-Migrate>=4.0,<5.0
 Flask-WTF>=1.2,<2.0
@@ -72,7 +72,7 @@ sentry-sdk[flask]>=1.45,<3.0
 python-json-logger>=2.0,<3.0
 
 # Production server
-gunicorn>=21.2,<24.0
+gunicorn>=22.0,<24.0
 
 # Config
 python-dotenv>=1.0,<2.0
