@@ -42,7 +42,7 @@ qrcode>=7.4.2
 stripe>=6.5,<9.0
 
 # AI / LLM
-anthropic>=0.50
+anthropic>=0.97.0
 
 # MailGuard — email connectors
 imapclient>=2.3,<3.0
