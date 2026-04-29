@@ -2,6 +2,8 @@
 Pytest configuration and shared fixtures for VAT Bot test suite.
 """
 import os
+import sys
+import types
 import pytest
 
 os.environ.setdefault('FLASK_ENV', 'testing')
@@ -9,6 +11,17 @@ os.environ.setdefault('SECRET_KEY', 'test-secret-key')
 os.environ.setdefault('MAILGUARD_ENCRYPTION_KEY', '')
 # Use no schema for SQLite — empty string resolves to None in auth/models.py
 os.environ['DB_SCHEMA'] = ''
+
+# Stub out psycopg2 if the binary extension isn't available in this Python env.
+# Tests use SQLite in-memory, so psycopg2 is never actually called.
+try:
+    import psycopg2  # noqa: F401
+except (ImportError, ModuleNotFoundError):
+    _stub = types.ModuleType('psycopg2')
+    _stub.__version__ = '2.9.9'
+    sys.modules.setdefault('psycopg2', _stub)
+    sys.modules.setdefault('psycopg2.extras', types.ModuleType('psycopg2.extras'))
+    sys.modules.setdefault('psycopg2.extensions', types.ModuleType('psycopg2.extensions'))
 
 
 @pytest.fixture(scope='session')
