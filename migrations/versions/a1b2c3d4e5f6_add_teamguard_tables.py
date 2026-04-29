@@ -16,9 +16,9 @@ branch_labels = None
 depends_on = None
 
 SCHEMA = os.environ.get('DB_SCHEMA') or None
-_fk_users = _fk_users if SCHEMA else 'users.id'
-_fk_members = _fk_members if SCHEMA else 'teamguard_members.id'
-_fk_tests = _fk_tests if SCHEMA else 'teamguard_phishing_tests.id'
+_fk_users = f'{SCHEMA}.users.id' if SCHEMA else 'users.id'
+_fk_members = f'{SCHEMA}.teamguard_members.id' if SCHEMA else 'teamguard_members.id'
+_fk_tests = f'{SCHEMA}.teamguard_phishing_tests.id' if SCHEMA else 'teamguard_phishing_tests.id'
 
 
 def upgrade():
