@@ -64,7 +64,7 @@ def training(db, app, pro_user):
             title='Phishing-Prävention',
             topic='phishing',
             content_md='## Phishing\n\nKeine Links klicken.',
-            audience_emails='employee@test.de',
+            audience_json='[{"name": "Employee", "email": "employee@test.de"}]',
         )
         db.session.add(t)
         db.session.commit()
@@ -82,6 +82,7 @@ def ack(db, app, training, pro_user):
         token = secrets.token_urlsafe(32)
         a = TrainingAcknowledgment(
             training_id=training.id,
+            recipient_name='Test Employee',
             recipient_email='employee@test.de',
             token=token,
             acknowledged=False,
@@ -103,6 +104,7 @@ def confirmed_ack(db, app, training, pro_user):
         token = secrets.token_urlsafe(32)
         a = TrainingAcknowledgment(
             training_id=training.id,
+            recipient_name='Max Mustermann',
             recipient_email='confirmed@test.de',
             token=token,
             acknowledged=True,
