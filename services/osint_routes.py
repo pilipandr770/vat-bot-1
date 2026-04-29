@@ -1,9 +1,10 @@
 # FILE: services/osint_routes.py
+import json
 import threading
 import uuid
 from datetime import datetime
 
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, current_app, jsonify, render_template, request
 from flask_login import login_required
 
 from .osint.scanner import OsintScanner
@@ -11,10 +12,30 @@ from crm.osint_models import db, OsintScan, OsintFinding
 
 osint_bp = Blueprint("osint", __name__, template_folder="../templates")
 
-# ── In-memory store for username scan tasks ───────────────────────────────────
-# { task_id: {"status": "pending"|"running"|"done"|"failed",
-#              "username": str, "results": list, "error": str, "started_at": dt} }
-_username_tasks: dict = {}
+_USERNAME_TASK_TTL = 3600  # 1 hour
+
+
+def _task_key(task_id: str) -> str:
+    return f"username_scan:{task_id}"
+
+
+def _save_task(task_id: str, data: dict) -> None:
+    try:
+        import redis as _redis
+        r = _redis.from_url(current_app.config.get('REDIS_URL', 'redis://localhost:6379/0'), decode_responses=True)
+        r.setex(_task_key(task_id), _USERNAME_TASK_TTL, json.dumps(data, default=str))
+    except Exception:
+        pass
+
+
+def _load_task(task_id: str) -> dict | None:
+    try:
+        import redis as _redis
+        r = _redis.from_url(current_app.config.get('REDIS_URL', 'redis://localhost:6379/0'), decode_responses=True)
+        raw = r.get(_task_key(task_id))
+        return json.loads(raw) if raw else None
+    except Exception:
+        return None
 
 
 # ── Domain / URL / Email OSINT ────────────────────────────────────────────────
@@ -67,41 +88,45 @@ def scan_view(scan_id: int):
 
 # ── Username OSINT ────────────────────────────────────────────────────────────
 
-def _run_username_scan(task_id: str, username: str) -> None:
-    """Background thread: check username progressively, writing each result as it arrives."""
+def _run_username_scan(task_id: str, username: str, app) -> None:
+    """Background thread: check username progressively, saving each result to Redis."""
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    from .osint.adapters.username_adapter import PLATFORMS, _check_one, _TIMEOUT
+    from .osint.adapters.username_adapter import PLATFORMS, _check_one
 
-    task = _username_tasks[task_id]
-    task["status"] = "running"
-    task["total"] = len(PLATFORMS)
+    with app.app_context():
+        task = _load_task(task_id) or {}
+        task["status"] = "running"
+        task["total"] = len(PLATFORMS)
+        _save_task(task_id, task)
 
-    try:
-        with ThreadPoolExecutor(max_workers=15) as pool:
-            futures = {pool.submit(_check_one, username, p): p for p in PLATFORMS}
-            for future in as_completed(futures):
-                try:
-                    result = future.result()
-                except Exception as exc:
-                    p = futures[future]
-                    result = {
-                        "platform": p["name"],
-                        "category": p["category"],
-                        "url": p["url"].format(username=username),
-                        "status": "unknown",
-                    }
-                task["results"].append(result)
-                task["checked"] = len(task["results"])
+        try:
+            with ThreadPoolExecutor(max_workers=15) as pool:
+                futures = {pool.submit(_check_one, username, p): p for p in PLATFORMS}
+                for future in as_completed(futures):
+                    try:
+                        result = future.result()
+                    except Exception:
+                        p = futures[future]
+                        result = {
+                            "platform": p["name"],
+                            "category": p["category"],
+                            "url": p["url"].format(username=username),
+                            "status": "unknown",
+                        }
+                    task["results"].append(result)
+                    task["checked"] = len(task["results"])
+                    _save_task(task_id, task)
 
-        # Sort final results: found first, then category, then name
-        order = {"found": 0, "not_found": 1, "unknown": 2}
-        task["results"].sort(
-            key=lambda r: (order.get(r["status"], 9), r["category"], r["platform"])
-        )
-        task["status"] = "done"
-    except Exception as exc:
-        task["status"] = "failed"
-        task["error"] = str(exc)
+            order = {"found": 0, "not_found": 1, "unknown": 2}
+            task["results"].sort(
+                key=lambda r: (order.get(r["status"], 9), r["category"], r["platform"])
+            )
+            task["status"] = "done"
+            _save_task(task_id, task)
+        except Exception as exc:
+            task["status"] = "failed"
+            task["error"] = str(exc)
+            _save_task(task_id, task)
 
 
 @osint_bp.route("/username-scan", methods=["POST"])
@@ -116,7 +141,7 @@ def username_scan_start():
         return jsonify({"error": "Username too long"}), 400
 
     task_id = str(uuid.uuid4())
-    _username_tasks[task_id] = {
+    task_data = {
         "status": "pending",
         "username": username,
         "results": [],
@@ -125,10 +150,12 @@ def username_scan_start():
         "error": None,
         "started_at": datetime.utcnow().isoformat(),
     }
+    _save_task(task_id, task_data)
 
+    app = current_app._get_current_object()
     t = threading.Thread(
         target=_run_username_scan,
-        args=(task_id, username),
+        args=(task_id, username, app),
         daemon=True,
     )
     t.start()
@@ -140,7 +167,7 @@ def username_scan_start():
 @login_required
 def username_scan_result(task_id: str):
     """Poll for username scan result."""
-    task = _username_tasks.get(task_id)
+    task = _load_task(task_id)
     if not task:
         return jsonify({"error": "Task not found"}), 404
 
