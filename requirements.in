@@ -65,7 +65,7 @@ python-whois>=0.9
 dnspython>=2.7
 tldextract>=5.3
 beautifulsoup4>=4.12
-lxml>=5.3
+lxml>=6.1.0
 
 # Observability
 sentry-sdk[flask]>=1.45,<3.0
