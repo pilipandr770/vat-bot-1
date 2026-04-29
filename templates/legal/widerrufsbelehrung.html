@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Widerrufsbelehrung - VAT Verification System{% endblock %}
+
+{% block content %}
+<div class="container py-5 legal-page">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="mb-4">Widerrufsbelehrung</h1>
+
+            <p class="lead">Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen.</p>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">Widerrufsfrist</h2>
+                    <p>Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses bzw. bei Dienstleistungen ab dem Tag des Vertragsabschlusses.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">Ausschluss oder vorzeitiges Erlöschen des Widerrufsrechts</h2>
+                    <p>Das Widerrufsrecht besteht nicht bei Verträgen zur Erbringung von Dienstleistungen, wenn der Anbieter die Dienstleistung vollständig erbracht hat und mit der Ausführung der Dienstleistung erst begonnen hat, nachdem der Verbraucher hierzu seine ausdrückliche Zustimmung gegeben und gleichzeitig seine Kenntnis davon bestätigt hat, dass er sein Widerrufsrecht bei vollständiger Vertragserfüllung durch den Unternehmer verliert.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">Folgen des Widerrufs</h2>
+                    <p>Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass Sie eine andere Art der Lieferung als die von uns angebotene, günstigste Standardlieferung gewählt haben), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist.</p>
+                    <p>Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser Rückzahlung Entgelte berechnet.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">Rücksendungen</h2>
+                    <p>Sie haben die Waren unverzüglich und in jedem Fall spätestens binnen vierzehn Tagen ab dem Tag, an dem Sie uns über den Widerruf dieses Vertrags unterrichten, an die im Impressum genannte Adresse zurückzusenden oder zu übergeben. Die Kosten der Rücksendung trägt der Verbraucher, sofern nicht anders vereinbart.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">Muster-Widerrufsformular</h2>
+                    <p>Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück.</p>
+                    <pre class="small">An: AndriiIT
+Bergmannweg 16
+65934 Frankfurt am Main
+Deutschland
+E-Mail: andrii.it.info@gmail.com
+
+Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über die Erbringung der folgenden Dienstleistung:
+
+Bestellt am / erhalten am:
+
+Name des/der Verbraucher(s):
+
+Anschrift des/der Verbraucher(s):
+
+Unterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier):
+
+Datum:
+
+(*) Unzutreffendes streichen
+                    </pre>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted"><small>Stand: {{ current_date }}</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

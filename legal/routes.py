@@ -32,6 +32,12 @@ def agb():
     return render_template('legal/agb.html')
 
 
+@legal_bp.route('/widerrufsbelehrung')
+def widerruf():
+    """Widerrufsbelehrung / Verbraucher-Widerrufsrecht (14 Tage)."""
+    return render_template('legal/widerrufsbelehrung.html')
+
+
 @legal_bp.route('/delete-account', methods=['GET', 'POST'])
 @login_required
 def delete_account():
