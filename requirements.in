@@ -55,7 +55,7 @@ google-auth-httplib2>=0.1
 google-api-python-client>=2.108
 
 # Microsoft OAuth
-msal>=1.25
+msal>=1.36,<2.0
 
 # Phone intelligence
 phonenumbers>=8.13
