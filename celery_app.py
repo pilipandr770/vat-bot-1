@@ -44,4 +44,7 @@ def make_celery(app) -> Celery:
 celery = make_celery(flask_app)
 
 # Auto-discover tasks from registered packages
-celery.autodiscover_tasks(['app.pentesting', 'app.mailguard'])
+# app.pentesting uses celery_tasks.py (not tasks.py), so import explicitly
+celery.autodiscover_tasks(['app.mailguard'])
+with flask_app.app_context():
+    import app.pentesting.celery_tasks  # noqa: F401
