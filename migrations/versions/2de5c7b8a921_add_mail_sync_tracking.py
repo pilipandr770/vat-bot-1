@@ -7,6 +7,7 @@ Create Date: 2025-11-07 15:30:00.000000
 """
 from alembic import op
 import sqlalchemy as sa
+import os
 
 
 # revision identifiers, used by Alembic.
@@ -15,7 +16,7 @@ down_revision = 'f9b5e3a7c2d4'
 branch_labels = None
 depends_on = None
 
-SCHEMA = 'vat_verification_claude'
+SCHEMA = os.environ.get('DB_SCHEMA') or None
 
 
 def upgrade():

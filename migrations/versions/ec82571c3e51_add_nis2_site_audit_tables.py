@@ -8,12 +8,16 @@ Create Date: 2026-04-19 21:15:32.493498
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+import os
 
 # revision identifiers, used by Alembic.
 revision = 'ec82571c3e51'
 down_revision = 'f17652b371c2'
 branch_labels = None
 depends_on = None
+
+SCHEMA = os.environ.get('DB_SCHEMA') or None
+_s = f'{SCHEMA}.' if SCHEMA else ''
 
 
 def upgrade():
@@ -26,9 +30,9 @@ def upgrade():
     sa.Column('report_html', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('completed_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['vat_verification.users.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], [f'{_s}users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    schema='vat_verification'
+    schema=SCHEMA
     )
     with op.batch_alter_table('nis2_audit_jobs', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_vat_verification_nis2_audit_jobs_created_at'), ['created_at'], unique=False)
@@ -47,9 +51,9 @@ def upgrade():
     sa.Column('target_url', sa.String(length=500), nullable=True),
     sa.Column('tool', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['job_id'], ['vat_verification.nis2_audit_jobs.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['job_id'], [f'{_s}nis2_audit_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    schema='vat_verification'
+    schema=SCHEMA
     )
     with op.batch_alter_table('nis2_audit_findings', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_vat_verification_nis2_audit_findings_job_id'), ['job_id'], unique=False)
@@ -60,9 +64,9 @@ def upgrade():
     sa.Column('level', sa.String(length=20), nullable=True),
     sa.Column('message', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['job_id'], ['vat_verification.nis2_audit_jobs.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['job_id'], [f'{_s}nis2_audit_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    schema='vat_verification'
+    schema=SCHEMA
     )
     with op.batch_alter_table('nis2_audit_logs', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_vat_verification_nis2_audit_logs_job_id'), ['job_id'], unique=False)
@@ -79,9 +83,9 @@ def upgrade():
     sa.Column('done', sa.Boolean(), nullable=True),
     sa.Column('done_at', sa.DateTime(), nullable=True),
     sa.Column('notes', sa.String(length=500), nullable=True),
-    sa.ForeignKeyConstraint(['job_id'], ['vat_verification.nis2_audit_jobs.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['job_id'], [f'{_s}nis2_audit_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    schema='vat_verification'
+    schema=SCHEMA
     )
     with op.batch_alter_table('nis2_audit_tasks', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_vat_verification_nis2_audit_tasks_job_id'), ['job_id'], unique=False)
@@ -114,147 +118,147 @@ def upgrade():
     op.drop_table('teamguard_members')
     with op.batch_alter_table('alerts', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('alerts_check_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'verification_checks', ['check_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'verification_checks', ['check_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('check_results', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('check_results_check_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'verification_checks', ['check_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'verification_checks', ['check_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('companies', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('companies_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('counterparties', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('counterparties_user_id_fkey1'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('known_counterparty', schema=None) as batch_op:
         batch_op.alter_column('trust_level',
                existing_type=postgresql.ENUM('low', 'medium', 'high', 'vip', name='trust_levels'),
-               type_=sa.Enum('low', 'medium', 'high', 'vip', name='trust_levels', schema='vat_verification'),
+               type_=sa.Enum('low', 'medium', 'high', 'vip', name='trust_levels', schema=SCHEMA),
                existing_nullable=True)
 
     with op.batch_alter_table('mail_account', schema=None) as batch_op:
         batch_op.alter_column('provider',
                existing_type=postgresql.ENUM('gmail', 'outlook', 'imap', name='provider_types'),
-               type_=sa.Enum('gmail', 'outlook', 'imap', name='provider_types', schema='vat_verification'),
+               type_=sa.Enum('gmail', 'outlook', 'imap', name='provider_types', schema=SCHEMA),
                existing_nullable=False)
         batch_op.drop_constraint(batch_op.f('mail_account_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('mail_draft', schema=None) as batch_op:
         batch_op.alter_column('suggested_by',
                existing_type=postgresql.ENUM('assistant', 'rule', 'manual', name='suggested_by_types'),
-               type_=sa.Enum('assistant', 'rule', 'manual', name='suggested_by_types', schema='vat_verification'),
+               type_=sa.Enum('assistant', 'rule', 'manual', name='suggested_by_types', schema=SCHEMA),
                existing_nullable=True)
         batch_op.drop_constraint(batch_op.f('mail_draft_message_id_fkey'), type_='foreignkey')
         batch_op.drop_constraint(batch_op.f('mail_draft_account_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'mail_account', ['account_id'], ['id'], referent_schema='vat_verification')
-        batch_op.create_foreign_key(None, 'mail_message', ['message_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'mail_account', ['account_id'], ['id'], referent_schema=SCHEMA)
+        batch_op.create_foreign_key(None, 'mail_message', ['message_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('mail_message', schema=None) as batch_op:
         batch_op.alter_column('status',
                existing_type=postgresql.ENUM('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types'),
-               type_=sa.Enum('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types', schema='vat_verification'),
+               type_=sa.Enum('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types', schema=SCHEMA),
                existing_nullable=True)
         batch_op.drop_constraint(batch_op.f('mail_message_counterparty_id_fkey'), type_='foreignkey')
         batch_op.drop_constraint(batch_op.f('mail_message_account_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'mail_account', ['account_id'], ['id'], referent_schema='vat_verification')
-        batch_op.create_foreign_key(None, 'known_counterparty', ['counterparty_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'mail_account', ['account_id'], ['id'], referent_schema=SCHEMA)
+        batch_op.create_foreign_key(None, 'known_counterparty', ['counterparty_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('mail_rule', schema=None) as batch_op:
         batch_op.alter_column('action',
                existing_type=postgresql.ENUM('auto_reply', 'draft', 'quarantine', 'ignore', name='action_types'),
-               type_=sa.Enum('auto_reply', 'draft', 'quarantine', 'ignore', name='action_types', schema='vat_verification'),
+               type_=sa.Enum('auto_reply', 'draft', 'quarantine', 'ignore', name='action_types', schema=SCHEMA),
                existing_nullable=True)
 
     with op.batch_alter_table('nis2_bsi_registrations', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_bsi_registrations_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_incident_drafts', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_incident_drafts_incident_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'nis2_incidents', ['incident_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'nis2_incidents', ['incident_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_incident_timeline', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_incident_timeline_incident_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'nis2_incidents', ['incident_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'nis2_incidents', ['incident_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_incidents', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_incidents_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_isms_documents', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_isms_documents_user_id_fkey'), type_='foreignkey')
         batch_op.drop_constraint(batch_op.f('nis2_isms_documents_interview_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'nis2_isms_interviews', ['interview_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'nis2_isms_interviews', ['interview_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_isms_interviews', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_isms_interviews_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_monitoring_scans', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_monitoring_scans_target_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'nis2_monitoring_targets', ['target_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'nis2_monitoring_targets', ['target_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_monitoring_targets', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_monitoring_targets_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_supplier_assessments', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_supplier_assessments_supplier_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'nis2_suppliers', ['supplier_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'nis2_suppliers', ['supplier_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_suppliers', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_suppliers_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_training_acks', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_training_acks_training_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'nis2_trainings', ['training_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'nis2_trainings', ['training_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('nis2_trainings', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('nis2_trainings_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification', ondelete='CASCADE')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA, ondelete='CASCADE')
 
     with op.batch_alter_table('osint_findings', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('osint_findings_scan_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'osint_scans', ['scan_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'osint_scans', ['scan_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('payments', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('payments_subscription_id_fkey'), type_='foreignkey')
         batch_op.drop_constraint(batch_op.f('payments_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification')
-        batch_op.create_foreign_key(None, 'subscriptions', ['subscription_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA)
+        batch_op.create_foreign_key(None, 'subscriptions', ['subscription_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('pentesting_logs', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('pentesting_logs_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('pentesting_quotas', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('pentesting_quotas_subscription_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'subscriptions', ['subscription_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'subscriptions', ['subscription_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('scan_report', schema=None) as batch_op:
         batch_op.alter_column('verdict',
                existing_type=postgresql.ENUM('safe', 'suspicious', 'malicious', name='verdict_types'),
-               type_=sa.Enum('safe', 'suspicious', 'malicious', name='verdict_types', schema='vat_verification'),
+               type_=sa.Enum('safe', 'suspicious', 'malicious', name='verdict_types', schema=SCHEMA),
                existing_nullable=False)
         batch_op.drop_constraint(batch_op.f('scan_report_message_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'mail_message', ['message_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'mail_message', ['message_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('subscriptions', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('subscriptions_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA)
 
     with op.batch_alter_table('verification_checks', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('verification_checks_company_id_fkey'), type_='foreignkey')
         batch_op.drop_constraint(batch_op.f('verification_checks_counterparty_id_fkey'), type_='foreignkey')
         batch_op.drop_constraint(batch_op.f('verification_checks_user_id_fkey'), type_='foreignkey')
-        batch_op.create_foreign_key(None, 'counterparties', ['counterparty_id'], ['id'], referent_schema='vat_verification')
-        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='vat_verification')
-        batch_op.create_foreign_key(None, 'companies', ['company_id'], ['id'], referent_schema='vat_verification')
+        batch_op.create_foreign_key(None, 'counterparties', ['counterparty_id'], ['id'], referent_schema=SCHEMA)
+        batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema=SCHEMA)
+        batch_op.create_foreign_key(None, 'companies', ['company_id'], ['id'], referent_schema=SCHEMA)
 
     # ### end Alembic commands ###
 
@@ -277,7 +281,7 @@ def downgrade():
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.create_foreign_key(batch_op.f('scan_report_message_id_fkey'), 'mail_message', ['message_id'], ['id'])
         batch_op.alter_column('verdict',
-               existing_type=sa.Enum('safe', 'suspicious', 'malicious', name='verdict_types', schema='vat_verification'),
+               existing_type=sa.Enum('safe', 'suspicious', 'malicious', name='verdict_types', schema=SCHEMA),
                type_=postgresql.ENUM('safe', 'suspicious', 'malicious', name='verdict_types'),
                existing_nullable=False)
 
@@ -351,7 +355,7 @@ def downgrade():
 
     with op.batch_alter_table('mail_rule', schema=None) as batch_op:
         batch_op.alter_column('action',
-               existing_type=sa.Enum('auto_reply', 'draft', 'quarantine', 'ignore', name='action_types', schema='vat_verification'),
+               existing_type=sa.Enum('auto_reply', 'draft', 'quarantine', 'ignore', name='action_types', schema=SCHEMA),
                type_=postgresql.ENUM('auto_reply', 'draft', 'quarantine', 'ignore', name='action_types'),
                existing_nullable=True)
 
@@ -361,7 +365,7 @@ def downgrade():
         batch_op.create_foreign_key(batch_op.f('mail_message_account_id_fkey'), 'mail_account', ['account_id'], ['id'])
         batch_op.create_foreign_key(batch_op.f('mail_message_counterparty_id_fkey'), 'known_counterparty', ['counterparty_id'], ['id'])
         batch_op.alter_column('status',
-               existing_type=sa.Enum('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types', schema='vat_verification'),
+               existing_type=sa.Enum('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types', schema=SCHEMA),
                type_=postgresql.ENUM('new', 'scanned', 'drafted', 'sent', 'quarantined', 'skipped', name='status_types'),
                existing_nullable=True)
 
@@ -371,7 +375,7 @@ def downgrade():
         batch_op.create_foreign_key(batch_op.f('mail_draft_account_id_fkey'), 'mail_account', ['account_id'], ['id'])
         batch_op.create_foreign_key(batch_op.f('mail_draft_message_id_fkey'), 'mail_message', ['message_id'], ['id'])
         batch_op.alter_column('suggested_by',
-               existing_type=sa.Enum('assistant', 'rule', 'manual', name='suggested_by_types', schema='vat_verification'),
+               existing_type=sa.Enum('assistant', 'rule', 'manual', name='suggested_by_types', schema=SCHEMA),
                type_=postgresql.ENUM('assistant', 'rule', 'manual', name='suggested_by_types'),
                existing_nullable=True)
 
@@ -379,13 +383,13 @@ def downgrade():
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.create_foreign_key(batch_op.f('mail_account_user_id_fkey'), 'users', ['user_id'], ['id'])
         batch_op.alter_column('provider',
-               existing_type=sa.Enum('gmail', 'outlook', 'imap', name='provider_types', schema='vat_verification'),
+               existing_type=sa.Enum('gmail', 'outlook', 'imap', name='provider_types', schema=SCHEMA),
                type_=postgresql.ENUM('gmail', 'outlook', 'imap', name='provider_types'),
                existing_nullable=False)
 
     with op.batch_alter_table('known_counterparty', schema=None) as batch_op:
         batch_op.alter_column('trust_level',
-               existing_type=sa.Enum('low', 'medium', 'high', 'vip', name='trust_levels', schema='vat_verification'),
+               existing_type=sa.Enum('low', 'medium', 'high', 'vip', name='trust_levels', schema=SCHEMA),
                type_=postgresql.ENUM('low', 'medium', 'high', 'vip', name='trust_levels'),
                existing_nullable=True)
 
@@ -508,18 +512,18 @@ def downgrade():
     with op.batch_alter_table('nis2_audit_tasks', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_vat_verification_nis2_audit_tasks_job_id'))
 
-    op.drop_table('nis2_audit_tasks', schema='vat_verification')
+    op.drop_table('nis2_audit_tasks', schema=SCHEMA)
     with op.batch_alter_table('nis2_audit_logs', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_vat_verification_nis2_audit_logs_job_id'))
 
-    op.drop_table('nis2_audit_logs', schema='vat_verification')
+    op.drop_table('nis2_audit_logs', schema=SCHEMA)
     with op.batch_alter_table('nis2_audit_findings', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_vat_verification_nis2_audit_findings_job_id'))
 
-    op.drop_table('nis2_audit_findings', schema='vat_verification')
+    op.drop_table('nis2_audit_findings', schema=SCHEMA)
     with op.batch_alter_table('nis2_audit_jobs', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_vat_verification_nis2_audit_jobs_user_id'))
         batch_op.drop_index(batch_op.f('ix_vat_verification_nis2_audit_jobs_created_at'))
 
-    op.drop_table('nis2_audit_jobs', schema='vat_verification')
+    op.drop_table('nis2_audit_jobs', schema=SCHEMA)
     # ### end Alembic commands ###
