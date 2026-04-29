@@ -51,8 +51,8 @@ const translations = {
             overall_result: 'Загальний результат:',
             trust_level: 'Рівень довіри',
             check_id: 'ID перевірки',
-            status: 'Статус:',
-            confidence: 'Довіра:',
+            status: 'Status:',
+            confidence: 'Vertrauen:',
             result: 'Результат:',
             response_time: 'Час відповіді:',
             error: 'Помилка:'

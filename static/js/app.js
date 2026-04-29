@@ -343,10 +343,10 @@ class CounterpartyVerification {
         html += `
             <div class="row mb-2">
                 <div class="col-6">
-                    <strong>Статус:</strong> ${this.getStatusText(result.status)}
+                    <strong>Status:</strong> ${this.getStatusText(result.status)}
                 </div>
                 <div class="col-6">
-                    <strong>Довіра:</strong> ${confidencePercent}%
+                    <strong>Vertrauen:</strong> ${confidencePercent}%
                 </div>
             </div>
         `;
@@ -525,7 +525,7 @@ class CounterpartyVerification {
     }
 
     formatHandelsregisterData(data) {
-        let html = '<strong>Handelsregister (Німеччина):</strong>';
+        let html = '<strong>Handelsregister (Deutschland):</strong>';
         html += '<div class="mt-2">';
 
         if (data.message) {
@@ -533,25 +533,25 @@ class CounterpartyVerification {
         }
 
         if (data.total_matches !== undefined) {
-            html += `<div class="mb-2"><strong>Знайдено записів:</strong> ${data.total_matches}</div>`;
+            html += `<div class="mb-2"><strong>Gefundene Einträge:</strong> ${data.total_matches}</div>`;
         }
 
         if (data.best_match) {
             const match = data.best_match;
-            html += '<div class="mb-3"><strong>Найкраще співпадіння:</strong></div>';
+            html += '<div class="mb-3"><strong>Beste Übereinstimmung:</strong></div>';
             html += '<div class="ms-3">';
 
-            if (match.name) html += `<div><strong>Назва:</strong> ${match.name}</div>`;
-            if (match.registration_number) html += `<div><strong>Реєстраційний номер:</strong> ${match.registration_number}</div>`;
-            if (match.legal_form) html += `<div><strong>Правова форма:</strong> ${match.legal_form}</div>`;
-            if (match.address) html += `<div><strong>Адреса:</strong> ${match.address}</div>`;
+            if (match.name) html += `<div><strong>Name:</strong> ${match.name}</div>`;
+            if (match.registration_number) html += `<div><strong>Registernummer:</strong> ${match.registration_number}</div>`;
+            if (match.legal_form) html += `<div><strong>Rechtsform:</strong> ${match.legal_form}</div>`;
+            if (match.address) html += `<div><strong>Adresse:</strong> ${match.address}</div>`;
             if (match.active !== undefined) {
                 const activeIcon = match.active ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
-                html += `<div><strong>Активна:</strong> ${activeIcon} ${match.active ? 'Так' : 'Ні'}</div>`;
+                html += `<div><strong>Aktiv:</strong> ${activeIcon} ${match.active ? 'Ja' : 'Nein'}</div>`;
             }
             if (match.match_confidence) {
                 const confidence = Math.round(match.match_confidence * 100);
-                html += `<div><strong>Точність співпадіння:</strong> ${confidence}%</div>`;
+                html += `<div><strong>Übereinstimmungsgenauigkeit:</strong> ${confidence}%</div>`;
             }
 
             html += '</div>';
@@ -663,8 +663,8 @@ class CounterpartyVerification {
 
         else if (service === 'email_basic' && data.valid !== undefined) {
             const validIcon = data.valid ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
-            const validText = data.valid ? 'Дійсний' : 'Недійсний';
-            html += `<div><strong>Статус email:</strong> ${validIcon} ${validText}</div>`;
+            const validText = data.valid ? 'Gültig' : 'Ungültig';
+            html += `<div><strong>E-Mail-Status:</strong> ${validIcon} ${validText}</div>`;
 
             if (data.mx_records) {
                 html += `<div><strong>MX сервери:</strong> ${data.mx_records.join(', ')}</div>`;

@@ -343,8 +343,8 @@
                             {% if oc and (oc.get('dissolution_date') or (oc.get('status') or '')|lower in ('dissolved', 'struck off', 'liquidation', 'inactive')) %}
                             <div class="alert alert-danger mb-3">
                                 <i class="bi bi-exclamation-octagon-fill"></i>
-                                <strong>Компанія ліквідована або не активна!</strong>
-                                {% if oc.get('dissolution_date') %} Дата ліквідації: {{ oc.get('dissolution_date') }}{% endif %}
+                            <strong>Unternehmen aufgelöst oder inaktiv!</strong>
+                                {% if oc.get('dissolution_date') %} Auflösungsdatum: {{ oc.get('dissolution_date') }}{% endif %}
                             </div>
                             {% endif %}
                             {% if oc %}
@@ -352,19 +352,19 @@
                                 <div class="col-md-6">
                                     <dl class="row small mb-0">
                                         {% if oc.get('company_number') %}
-                                        <dt class="col-sm-5">Реєстр. №:</dt>
+        <dt class="col-sm-5">Reg.-Nr.:</dt>
                                         <dd class="col-sm-7"><code>{{ oc.get('company_number') }}</code></dd>
                                         {% endif %}
                                         {% if oc.get('jurisdiction') %}
-                                        <dt class="col-sm-5">Юрисдикція:</dt>
+                                        <dt class="col-sm-5">Jurisdiktion:</dt>
                                         <dd class="col-sm-7"><span class="badge bg-secondary">{{ oc.get('jurisdiction') }}</span></dd>
                                         {% endif %}
                                         {% if oc.get('company_type') %}
-                                        <dt class="col-sm-5">Тип:</dt>
+                                        <dt class="col-sm-5">Rechtsform:</dt>
                                         <dd class="col-sm-7">{{ oc.get('company_type') }}</dd>
                                         {% endif %}
                                         {% if oc.get('status') %}
-                                        <dt class="col-sm-5">Статус:</dt>
+                                        <dt class="col-sm-5">Status:</dt>
                                         <dd class="col-sm-7">
                                             <span class="badge {% if (oc.get('status') or '')|lower == 'active' %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ oc.get('status') }}</span>
                                         </dd>
@@ -374,11 +374,11 @@
                                 <div class="col-md-6">
                                     <dl class="row small mb-0">
                                         {% if oc.get('incorporation_date') %}
-                                        <dt class="col-sm-5">Засновано:</dt>
+                                        <dt class="col-sm-5">Gegründet:</dt>
                                         <dd class="col-sm-7">{{ oc.get('incorporation_date') }}</dd>
                                         {% endif %}
                                         {% if oc.get('dissolution_date') %}
-                                        <dt class="col-sm-5">Ліквідовано:</dt>
+                                        <dt class="col-sm-5">Aufgelöst:</dt>
                                         <dd class="col-sm-7 text-danger">{{ oc.get('dissolution_date') }}</dd>
                                         {% endif %}
                                         {% if oc.get('registered_address') %}
@@ -390,7 +390,7 @@
                             </div>
                             {% if oc.get('directors') %}
                             <div class="mb-3">
-                                <h6 class="mb-2">Директори / Kerівники:</h6>
+                                <h6 class="mb-2">Direktoren / Geschäftsführer:</h6>
                                 {% for d in oc.get('directors', []) %}
                                 <span class="badge bg-light text-dark border me-1 mb-1"><i class="bi bi-person"></i> {{ d }}</span>
                                 {% endfor %}
@@ -398,7 +398,7 @@
                             {% endif %}
                             {% if oc.get('opencorporates_url') %}
                             <a href="{{ oc.get('opencorporates_url') }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-box-arrow-up-right"></i> Відкрити на OpenCorporates →
+                                <i class="bi bi-box-arrow-up-right"></i> Auf OpenCorporates öffnen →
                             </a>
                             {% endif %}
                             {% endif %}
@@ -421,13 +421,13 @@
                                 <div class="col-md-4">
                                     <h6>Метадані:</h6>
                                     <dl class="small">
-                                        <dt>Довіра:</dt>
+                                        <dt>Vertrauen:</dt>
                                         <dd>{{ (result.confidence_score * 100)|round|int }}%</dd>
                                         {% if result.response_time_ms %}
-                                        <dt>Час відповіді:</dt>
-                                        <dd>{{ result.response_time_ms }} мс</dd>
+                                        <dt>Antwortzeit:</dt>
+                                        <dd>{{ result.response_time_ms }} ms</dd>
                                         {% endif %}
-                                        <dt>Перевірено:</dt>
+                                        <dt>Geprüft am:</dt>
                                         <dd>{{ result.created_at.strftime('%d.%m.%Y %H:%M') }}</dd>
                                     </dl>
                                 </div>
@@ -436,8 +436,8 @@
 
                             {# Metadata footer (all services) #}
                             <div class="border-top mt-3 pt-2 d-flex gap-3 small text-muted">
-                                <span><i class="bi bi-patch-check"></i> Довіра: <strong>{{ (result.confidence_score * 100)|round|int }}%</strong></span>
-                                {% if result.response_time_ms %}<span><i class="bi bi-stopwatch"></i> {{ result.response_time_ms }} мс</span>{% endif %}
+                                <span><i class="bi bi-patch-check"></i> Vertrauen: <strong>{{ (result.confidence_score * 100)|round|int }}%</strong></span>
+                                {% if result.response_time_ms %}<span><i class="bi bi-stopwatch"></i> {{ result.response_time_ms }} ms</span>{% endif %}
                                 <span><i class="bi bi-calendar2-check"></i> {{ result.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
                                 {% if result.error_message %}<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> {{ result.error_message }}</span>{% endif %}
                             </div>
