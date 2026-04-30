@@ -295,7 +295,7 @@
                                             <div class="col-md-6 mb-3">
                                                 <div class="card h-100">
                                                     <div class="card-header d-flex justify-content-between">
-                                                        <strong>{{ result.check_type.replace('_', ' ').title() }}</strong>
+                                                        <strong>{{ result.service_name.replace('_', ' ').title() }}</strong>
                                                         {% if result.status == 'valid' %}
                                                             <span class="badge bg-success">✓</span>
                                                         {% elif result.status == 'warning' %}
@@ -306,7 +306,7 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <small class="d-block mb-2 text-muted">
-                                                            {{ result.checked_at.strftime('%d.%m.%Y %H:%M:%S') }}
+                                                            {{ result.created_at.strftime('%d.%m.%Y %H:%M:%S') }}
                                                         </small>
                                                         {% if result.data %}
                                                             <pre style="font-size: 0.85em; max-height: 200px; overflow-y: auto;">{{ result.data|tojson(indent=2) }}</pre>
