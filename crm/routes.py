@@ -260,30 +260,31 @@ def api_delete_counterparty(counterparty_id):
     # Count related records before deletion
     checks_count = VerificationCheck.query.filter_by(counterparty_id=counterparty_id).count()
     
+    logger = logging.getLogger(__name__)
     try:
-        # Delete related verification checks (cascade will handle check_results and alerts)
-        VerificationCheck.query.filter_by(counterparty_id=counterparty_id).delete()
-        
+        # Delete check_results first (FK → verification_checks), then checks, then alerts
+        check_ids = [c.id for c in VerificationCheck.query.filter_by(
+            counterparty_id=counterparty_id).with_entities(VerificationCheck.id).all()]
+        if check_ids:
+            CheckResult.query.filter(CheckResult.check_id.in_(check_ids)).delete(synchronize_session=False)
+            Alert.query.filter(Alert.check_id.in_(check_ids)).delete(synchronize_session=False)
+        VerificationCheck.query.filter_by(counterparty_id=counterparty_id).delete(synchronize_session=False)
+
         # Delete counterparty
         db.session.delete(counterparty)
         db.session.commit()
-        
-        # Log the deletion
-        from datetime import datetime
-        import logging
-        logger = logging.getLogger(__name__)
+
         logger.info(f"Counterparty deleted: {company_name} (VAT: {vat_number}) by user {current_user.email}. "
-                   f"Deleted {checks_count} verification checks and related data.")
-        
+                    f"Deleted {checks_count} verification checks and related data.")
+
         return jsonify({
             'success': True,
             'message': f'Counterparty "{company_name}" deleted successfully',
             'deleted_checks': checks_count
         })
-    
+
     except Exception as e:
         db.session.rollback()
-        logger = logging.getLogger(__name__)
         logger.error(f"Error deleting counterparty {counterparty_id}: {str(e)}")
         return jsonify({
             'success': False,
