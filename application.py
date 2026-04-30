@@ -368,10 +368,15 @@ def create_app(config_name=None):
     # Mailguard models use the same db instance
     
     # Add Jinja2 filter for JSON formatting
-    import json
+    import json, re as _re
     @app.template_filter('tojsonpretty')
     def to_json_pretty(value):
         return json.dumps(value, indent=2, ensure_ascii=False)
+
+    @app.template_filter('regex_search')
+    def regex_search_filter(value, pattern):
+        """Return truthy match object or None – usable in Jinja2 conditionals."""
+        return _re.search(pattern, str(value))
     
     # Add context processor for current date
     @app.context_processor

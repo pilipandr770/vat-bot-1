@@ -576,7 +576,7 @@ def phishing_detail(test_id):
         ).all()
     } if member_ids else {}
 
-    clicked_ids = {c.member_id for c in test.clicks.all()}
+    clicked_ids = {c.member_id for c in test.clicks}
 
     tracking_url = url_for('teamguard.phishing_track',
                            token=test.tracking_token, _external=True)
